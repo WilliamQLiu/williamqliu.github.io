@@ -10,6 +10,19 @@
    <!-- Homepage CSS -->
    <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
 
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
 </head>
 
 <body>
@@ -19,9 +32,16 @@
     </div>
 
     <div id="post">
-<p>First Post</p>
+<p><strong>First Post</strong></p>
 
-<p>This is contents of a first post</p>
+<p>This is contents of a first post.</p>
+
+<p>Testing out inline Math Equations $a^2 + b^2 = c^2$ and \( sin(x^2) \)</p>
+
+<p>Testing out separate line Math Equations:</p>
+
+<script type="math/tex; mode=display">a^2 + b^2 = c^2</script>
+
 
 </div>
 
