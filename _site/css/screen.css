@@ -7,7 +7,7 @@
 /* Global Reset */
 
 * {
-  margin: 0;
+  margin: 1;
   padding: 0;
 }
 
@@ -22,17 +22,20 @@ body {
   text-align: center;
 }
 
+/*
 h1, h2, h3, h4, h5, h6 {
   font-size: 100%;
 }
-
 h1 {
   margin-bottom: 1em;
 }
 
+
 p {
   margin: 1em 0;
 }
+*/
+
 
 a {
   color: #00a;
@@ -79,10 +82,10 @@ ul.posts {
 /*****************************************************************************/
 
 .site {
-  font-size: 110%;
+  font-size: 100%;
   text-align: justify;
   width: 42em;
-  margin: 3em auto 2em auto;
+  margin: 1em auto 2em auto;
   line-height: 1.5em;
 }
 

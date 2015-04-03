@@ -7,12 +7,12 @@ title: William Liu
 <html>
     <div id="home"
     <body>
-        <h1>About</h1>
+        <h3>About</h3>
         <p>Hi, I'm Will.</p>
 
         <br>
 
-        <h1>Blog Posts</h1>
+        <h3>Blog Posts</h3>
         <ul class="posts">
         {% for post in site.posts %}
             <li><span>{{ post.date | date_to_string }}</span> &nbsp &nbsp <a href="{{ post.url }}">{{ post.title }}</a></li>
