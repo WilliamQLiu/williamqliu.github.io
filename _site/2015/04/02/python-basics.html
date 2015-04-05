@@ -34,6 +34,10 @@
     <div id="post">
 <h2 id="python-basics">Python Basics</h2>
 
+<hr />
+
+<p><strong>About Python</strong></p>
+
 <p>Python is a general purpose programming language that focuses on code readability.  This is a quick summary of what you will need to know about Python data types and control flow.</p>
 
 <ul>
@@ -57,6 +61,15 @@
       <li>for statement</li>
       <li>range()</li>
       <li>lambda expression</li>
+    </ul>
+  </li>
+  <li>Debugging Functions
+    <ul>
+      <li>help()</li>
+      <li>dir()</li>
+      <li>globals()</li>
+      <li>type()</li>
+      <li>id()</li>
     </ul>
   </li>
 </ul>
@@ -150,7 +163,7 @@ print word[2:4]  # Slice characters
 
 <h3 id="lists">Lists</h3>
 
-<p>Lists are a way to hold items in order.  The items can be different data types or the same type.  Lists can also be sliced and concatenated (i.e. sequence type).  Lists are also <strong>mutable</strong> (i.e. there are methods to modify the object)</p>
+<p>Lists are a way to hold items in order.  The items can be different data types or the same type (if it’s the same type and you need speed, look up arrays, in particular numpy arrays).  Lists can also be sliced and concatenated (i.e. sequence type).  Lists are also <strong>mutable</strong> (i.e. there are methods to modify the object)</p>
 
 <pre><code>squares = [1, 4, 9, 16, 25]  # make a list of numbers
 print squares
@@ -196,7 +209,7 @@ print type(queue)  # &lt;type 'collections.deque'&gt;
 
 <h4 id="list-comprehensions">List comprehensions</h4>
 
-<p>List comprehensions are a concise way of making lists based on an operation or if the item satisifes a certain condition.  Here are different ways of doing a regular loop:</p>
+<p>List comprehensions are a concise way of making lists based on an operation or if the item satisifes a certain condition.  This is a compact for-loop that builds lists.  Here are different ways of doing a regular loop along with the list comprehension equivalent:</p>
 
 <pre><code>sqaures = []
 for x in range(10):  # range(10) loops from 0 - 9
@@ -210,25 +223,33 @@ squares = [x**2 for x in range(10)]  # same, using list comprehension
 
 <h4 id="so-what-makes-up-a-list-comprehension">So what makes up a list comprehension?</h4>
 
-<ol>
-  <li>Consists of brackets containing an expression</li>
-  <li>Expressioned followed by a <code>for</code> statement</li>
-  <li>Followed by zero or more <code>for</code> or <code>if</code> statements</li>
-  <li>Result is a new list from evaluating the <code>for</code> and <code>if</code> clauses</li>
-</ol>
+<p>The basic structure is:</p>
+
+<pre><code>[&lt;output value&gt; for &lt;element&gt; in &lt;list&gt; &lt;optional criteria&gt;]
+</code></pre>
+
+<ul>
+  <li>We have the list comprehension enclosed with brackets <code>[]</code> because we return a list</li>
+  <li>In the middle section, we have <code>for &lt;element&gt; in &lt;list&gt;</code> and it looks like a regular <code>for-loop</code>.  This tells us we are iterating over the list going through each element in the sequence.</li>
+  <li>The <code>&lt;output value&gt;</code> is what we append to the list we are building.  We can say this is the element itself, the element squared, the absolute value of the element, etc.</li>
+  <li>The <code>&lt;optional criteria&gt;</code> can be a way to filter out items if they do not meet a condition.  </li>
+</ul>
 
 <p>Examples:</p>
 
 <pre><code>vec = [-4, -2, 0, 2, 4]
 
-[x*2 for x in vec]  # create a new list with the values doubled
-#[-8, -4, 0, 4, 8]
+[x for x in vec]  # print out the list as is
+#[-4, -2, 0, 2, 4]
 
-[x for x in vec if x &gt;= 0]  # filter the list to exclude negative numbers
-#[0, 2, 4]
+[x*2 for x in vec]  # create a new list with the output values doubled
+#[-8, -4, 0, 4, 8]
 
 [abs(x) for x in vec]  # apply a function to all the elements
 #[8, 4, 0, 4, 8]
+
+[x for x in vec if x &gt;= 0]  # filter the list to exclude negative numbers
+#[0, 2, 4]
 </code></pre>
 
 <hr />
@@ -309,13 +330,16 @@ s1.symmetric_difference(s2)  # set(['Epsilon', 'Delta', 'Omega', 'Gamma'])
 
 <h2 id="control-flow">CONTROL FLOW</h2>
 
-<p>Python has the usual control flow statements.  These include:
-*  <code>if</code> statement
-*  <code>for</code> statement
-*  <code>range()</code> function iterates over a sequence of numbers
-*  <code>xrange()</code> function is like <code>range()</code>, but doesn’t store in memory
-*  <code>lambda</code> expression is a small anonymous function, which means lambda: a if some_condition() else b
-*  <code>map()</code> function applys a function to every item of iterable and returns a list</p>
+<p>Python has the usual control flow statements.  These include:</p>
+
+<ul>
+  <li><code>if</code> statement</li>
+  <li><code>for</code> statement</li>
+  <li><code>range()</code> function iterates over a sequence of numbers</li>
+  <li><code>xrange()</code> function is like <code>range()</code>, but doesn’t store in memory</li>
+  <li><code>lambda</code> expression is a small anonymous function, which means lambda: a if some_condition() else b</li>
+  <li><code>map()</code> function applys a function to every item of iterable and returns a list</li>
+</ul>
 
 <h3 id="if-elif-else-statement">if, elif, else statement</h3>
 
@@ -342,7 +366,8 @@ for w in words:
 for i in range(5):
     print i,  # 0 1 2 3 4
 
-temp = list(range(3, 6))  # normal call with separate arguments
+# normal call with separate arguments
+temp = list(range(3, 6))
 print temp  # [3, 4, 5]
 
 $ xrange() function
@@ -352,10 +377,96 @@ for i in xrange(2, 10):
 
 <h3 id="lambda-expression">lambda expression</h3>
 
-<pre><code># lambda expression
+<p>Lambda is a way to create small anonymous functions (i.e. a function without a name).  These are often used in combination with <code>filter()</code>, <code>map()</code>, and <code>reduce()</code></p>
+
+<pre><code># a general lambda expression
 lambda x: 'big' if x &gt; 100 else 'small'
 lambda x: x**2
 </code></pre>
+
+<h4 id="filter">filter()</h4>
+
+<p><code>filter(function, sequence)</code> is a function that filters out all the elements of a sequence where the function returns <code>True</code>.  The first argument is the function that returns a Boolean and this is applied to every element of the list.  A sequence is returned where the values are only where the function returns <code>True</code>.</p>
+
+<pre><code># filter() with number
+def lessThanFive(element):
+    return element &lt; 5  # True if less than 5, otherwise False
+fib = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
+result = filter(lessThanFive, fib)
+print result # [0, 1, 1, 2, 3]
+
+# filter() with strings
+names = ['Jack', 'Jill', 'Steve', '']
+filter(None, names)  # empty strings, 0's and None's are False
+
+# filter() with lambda
+result = filter(lambda x: x %2, fib)  # odd only
+print result # [1, 1, 3, 5, 13, 21, 55]
+
+# filter's equivalent in list comprehension
+# [item for item in iterable if function(item)]  # if function not None
+# [item for item in iterable if item]  # if function is None
+</code></pre>
+
+<h4 id="map">map()</h4>
+
+<p><code>map(function, sequence)</code> is a function with two arguments.  The first argument is the name of a function and the second is a <em>sequence data type</em> (e.g. a list).  Map applies the function to all the elements of the sequence and returns this as a new list.</p>
+
+<pre><code># map()
+def fahrenheit(T):
+    return ((float(9)/5)*T + 32)
+temp = (36.5, 37, 37.5, 39)  # temp (C)
+F = map(fahrenheit, temp)
+
+# map() with lambda
+Celsius = [36.5, 37, 37.5, 39]
+Fahrenheit = map(lambda x: (float(9)/5)*x + 32, Celsius)
+print Fahrenehit  # [97.7, 98.60000000000001, 99.5, 102.2]
+</code></pre>
+
+<h4 id="reduce">reduce()</h4>
+
+<p><code>reduce(function, sequence)</code> applies a function to a sequence and returns a single value (instead of a list like the above).  The idea is that the first two items are reduced to a single value, then that single value and the third value is reduced into a new single value.  This repeats until no more items are in the list.</p>
+
+<pre><code># reduce()
+result = reduce(lambda x,y: x+y, [47, 11, 42, 13])
+print result  # 113
+</code></pre>
+
+<h4 id="zip">zip()</h4>
+
+<p><code>zip(sequence1, sequence2)</code> returns a list of tuples, where each tuple contains the ith element from each of the sequences.  The returned list is truncated to the length of the shortest argument sequence.</p>
+
+<pre><code># zip()
+temp = zip(range(5), range(1, 20, 2))
+print zip  # [(0, 1), (1, 3), (2, 5), (3, 7), (4, 9)]
+</code></pre>
+
+<hr />
+
+<h2 id="debugging-functions">DEBUGGING FUNCTIONS</h2>
+
+<p>These functions are nice for debugging your code.</p>
+
+<h4 id="helpobject">help(object)</h4>
+
+<p><code>help()</code> uses the built-in help system to tell you more about the function, class, method, keyword, etc.  Exit help with <code>:q</code>.</p>
+
+<h4 id="dir">dir()</h4>
+
+<p><code>dir()</code> gives you the list of names in the current local scope.  If you input an object as an argument, it tells you its attributes.</p>
+
+<h4 id="globals">globals()</h4>
+
+<p><code>globals()</code> returns a dictionary of the current objects.</p>
+
+<h4 id="typeobject">type(object)</h4>
+
+<p><code>type()</code> returns the type of an object (e.g. str, list)</p>
+
+<h4 id="idobject">id(object)</h4>
+
+<p><code>id()</code> returns the identity of the object as an integer or long integer; this represents the address of the object in memory.  This is useful to see if copies are being referenced or if the same object is.</p>
 
 <hr />
 
@@ -365,7 +476,11 @@ lambda x: x**2
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>02 Apr 2015</span> <a href="/2015/04/02/hello-world.html">First Post</a></li>
+      <li><span>05 Apr 2015</span> <a href="/2015/04/05/pandas.html">Pandas</a></li>
+    
+      <li><span>04 Apr 2015</span> <a href="/2015/04/04/numpy.html">NumPy</a></li>
+    
+      <li><span>03 Apr 2015</span> <a href="/2015/04/03/statistical-analysis.html">Statistical Analysis</a></li>
     
   </ul>
 </div>
