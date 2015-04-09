@@ -47,12 +47,14 @@
       <li>Strings (str) and Unicode (unicode)</li>
       <li>Lists (list, list comprehension)</li>
       <li>Tuples</li>
+      <li>Sequence Methods</li>
+      <li>Sorting Sequences</li>
     </ul>
   </li>
   <li>Hash Table Types (i.e. key-value pair)
     <ul>
-      <li>Dicts</li>
-      <li>Sets</li>
+      <li>Dict</li>
+      <li>Set</li>
     </ul>
   </li>
   <li>Control Flow
@@ -249,14 +251,14 @@ squares = [x**2 for x in range(10)]  # same, using list comprehension
 #[8, 4, 0, 4, 8]
 
 [x for x in vec if x &gt;= 0]  # filter the list to exclude negative numbers
-#[0, 2, 4]
+#[0, 2, 4]    
 </code></pre>
 
 <hr />
 
 <h3 id="tuples">Tuples</h3>
 
-<p><strong>Tuples</strong> are like read-only lists because they are immutable (instead of mutable) and are enclosed with parentheses (instead of brackets).</p>
+<p><strong>Tuples</strong> are like read-only lists because they are immutable (instead of mutable) and are enclosed with parentheses (instead of brackets).  Tuples do care about order.</p>
 
 <pre><code>temp = ('abcd', 786, 2.23, 'john', 70.2 )
 print temp  # ('abcd', 785, 2.23, 'john', 70.2)
@@ -287,22 +289,130 @@ print temp[1:3]  # prints elements after 1st to 3rd
   <li><code>s.count(x)</code>  # total number of occurences of x in s</li>
 </ul>
 
+<h4 id="sorting-sequences">Sorting Sequences</h4>
+
+<p>Python has a <code>sort</code> method that modifies a list in-place and a <code>sorted</code> method that builds a new sorted list from an iterable.  NumPy also has a <code>sort</code> method, but it does not modify the list in-place.</p>
+
+<pre><code>my_list = ['hello', 'world', 'will', 'was', 'here']
+
+#NumPy's sort; not inplace
+np.sort(my_list)
+#array(['hello', 'here', 'was', 'will', 'world'],
+#  dtype='|S5')
+my_list
+#['hello', 'world', 'will', 'was', 'here']
+
+#Python's sort; inplace, only works for lists
+my_list.sort()
+#['hello', 'here', 'was', 'will', 'world']
+
+#Python's sorted
+sorted([5, 2, 3, 1, 4], reverse=False)
+[1, 2, 3, 4, 5]
+</code></pre>
+
+<h4 id="keys">keys</h4>
+
+<p>There is a <code>key</code> parameter in Python's <code>sort</code> and <code>sorted</code> methods that allows you to specify a function to be called on each list element prior to making comparisons.  Note this is not available in the Numpy version of <code>sort</code>.</p>
+
+<pre><code>sorted("This is a test string from Will".split(), key=str.lower)
+#['a', 'from', 'is', 'string', 'test', 'This', 'Will']
+</code></pre>
+
+<p>A common pattern is to sort objects using the object indices as a key.  For example, we are interested in the sorting by the age in this tuple.</p>
+
+<pre><code>student_tuple = [
+    ('john', 'A', 15),
+    ('jane', 'B', 12),
+    ('dave', 'B', 10)]
+#[('john', 'A', 15), ('jane', 'B', 12), ('dave', 'B', 10)]
+sorted(student_tuple, key=lambda student: student[2])  # sort by age
+#[('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]
+</code></pre>
+
+<h4 id="operator-itemgetter-attrgetter-methodcaller">operator (itemgetter, attrgetter, methodcaller)</h4>
+
+<p>Python has a few built in functions to help you get get items with <code>itemgetter</code> and <code>attrgetter</code> to get attributes</p>
+
+<pre><code>from operator import itemgetter, attrgetter
+</code></pre>
+
+<h4 id="itemgetter">itemgetter</h4>
+
+<p>Get an item from an object using <strong>itemgetter</strong>.  This basically looks up an index on a sequence, then returns that value.</p>
+
+<pre><code>#String
+itemgetter(1)('ABCDEFG')  #'B'
+
+#List
+itemgetter(2)(['Hello', 'World', 'Will'])  #'World'
+
+#Dict
+itemgetter('Age')(phonebook1)
+
+#Tuple
+itemgetter(2)(student_tuple)  # ('dave', 'B', 10)
+</code></pre>
+
+<h4 id="attrgetter">attrgetter</h4>
+
+<p>Get attributes from an object using <strong>attrgetter</strong>.  This basically looks up an attribute on an object.</p>
+
+<pre><code>import operator
+class Student(object):
+    def __init__(self, id, name, grades):
+        self.id = id
+        self.name = name
+        self.grades = grades
+    
+    def __str__(self):
+        return '%s has grade %s' %(self.name, self.grades)
+
+students = [Student(0, 'Will', 70), Student(1, 'Laura', 90), Student(2, 'Wayne', 87)]
+best_student = max(students, key=operator.attrgetter('grades'))
+print best_student
+#Laura has grade 90
+</code></pre>
+
 <hr />
 
 <h2 id="hash-table-types">HASH TABLE TYPES</h2>
 <p>A hash table (aka hash map) is a way to map keys to values (i.e. a key-value pair).  A hash function computes an index into an array of buckets or slots, from which the correct value can be found.</p>
 
 <h3 id="dictionary-dict">Dictionary (dict)</h3>
-<p>A <strong>dictionary</strong> is a key-value pair.  The key can be almost any type, but usually are numbers or strings.  Value can be any Python object.  Dictionaries are enclosed with <code>{}</code> and accessed with brackets <code>[]</code></p>
+<p>A <strong>dictionary</strong> is a key-value pair.  The key can be almost any type, but usually are numbers or strings.  Value can be any Python object.  Dictionaries are enclosed with <code>{}</code> and accessed with brackets <code>[]</code>.  The idea is also called <strong>associative arrays</strong>, <strong>map</strong>, <strong>symbol table</strong>.  The ideas behind operations are:</p>
+
+<ul>
+  <li>create a dictionary</li>
+  <li>add (aka insert) a key-value pair</li>
+  <li>reassign a value</li>
+  <li>remove (aka delete) a key/value pair</li>
+  <li>clear to remove all elements</li>
+  <li>give key, get value</li>
+  <li>iterate through the dictionary</li>
+</ul>
+
+<p>Example:</p>
 
 <pre><code>phonebook = {}  # Create dict with {}
-phonebook["John"] = 938477566  # Get value with []
-phonebook["Jack"] = 938377264
-print phonebook  # {'John': 938477566, 'Jack': 938377264}
-for name, number in phonebook.iteritems():
-    print "Phone number of %s is %d" % (name, number)
-#Phone number of John is 938477566
-#Phone number of Jack is 938377264
+phonebook = {'Name': 'Will', 'Age': 30, 'Number': 1234567890}
+phonebook['Notes'] = 'Do not give cookies'  # Add key-value pair
+phonebook['Number'] = 938477566  # Update value with key
+del phonebook['Notes']  # Delete key-value pair
+phonebook.keys()  #get keys  #['Age', 'Name', 'Number']
+phonebook.values()  # get values  # [30, 'Will', 123456789]
+phonebook.clear()  # clears all values, keeps keys
+
+#Iterate through key, values    
+for my_key, my_value in phonebook.iteritems():
+    print "Key is: ", my_key
+    print "Value is: ", my_value
+#Key is:  Age
+#Value is:  30
+#Key is:  Name
+#Value is:  Will
+#Key is:  Number
+#Value is:  938477566
 </code></pre>
 
 <hr />
