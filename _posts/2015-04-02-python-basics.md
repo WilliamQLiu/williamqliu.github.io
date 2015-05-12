@@ -11,31 +11,31 @@ title: Python Basics
 
 Python is a general purpose programming language that focuses on code readability.  This is a quick summary of what you will need to know about Python data types and control flow.
 
-*  Numbers (int, float)
-*  Sequence Types (i.e. can slice)
-    -  Strings (str) and Unicode (unicode)
-    -  Lists (list, list comprehension)
-    -  Tuples
-    -  Sequence Methods
-    -  Sorting Sequences
-*  Hash Table Types (i.e. key-value pair)
-    -  Dict
-    -  Set
-*  Control Flow
-    -  if statement
-    -  for statement
-    -  range()
-    -  lambda expression
-*  Debugging Functions
-    -  help()
-    -  dir()
-    -  globals()
-    -  type()
-    -  id()
+*  [Numbers (int, float)](#numbers)
+*  [Sequence Types (i.e. can slice)](#sequencetypes)
+    -  [Strings (str) and Unicode (unicode)](#strings)
+    -  [Lists (list, stacks, queues, list comprehension)](#lists)
+    -  [Tuples](#tuples)
+    -  [Sequence Methods](#sequencemethods)
+    -  [Sorting Sequences](#sequencesort)
+*  [Hash Table (i.e. key-value pair)](#hashtables)
+    -  [Dict](#dict)
+    -  [Set](#set)
+*  [Control Flow](#controlflow)
+    -  [if else statement](#ifelse)
+    -  [for statement](#for)
+    -  [range(), xrange()](#range)
+    -  [lambda expression](#lambda)
+*  [Debugging Functions](#debug)
+    -  [help()](#help)
+    -  [dir()](#dir)
+    -  [globals()](#globals)
+    -  [type()](#type)
+    -  [id()](#id)
 
 - - - -
 
-## NUMBERS
+## <a id="numbers">NUMBERS</a>
 
 Python can do simple calculations like addition, subtraction, division, multiplcation, and calculate powers.  
 
@@ -57,9 +57,9 @@ Integers (e.g. `2`, `4`, `20`) have type **int** and the fractional parts (e.g. 
 
 - - - -
 
-## SEQUENCE TYPES
+##<a id="sequencetypes">SEQUENCE TYPES</a>
 
-###Strings
+###<a id="strings">Strings</a>
 
 Python can also manipulate strings using single quotes (`'...'`) and double quotes (`"..."`) with `\` as an escape character.  Strings are **immutable** (i.e. object can't be altered, a new object has to be created if a different value has to be stored)
 
@@ -113,7 +113,7 @@ If you want to join strings together use `+`.  If you want to slice strings, use
 
 - - - -
 
-###Lists
+###<a id="lists">Lists</a>
 
 Lists are a way to hold items in order.  The items can be different data types or the same type (if it's the same type and you need speed, look up arrays, in particular numpy arrays).  Lists can also be sliced and concatenated (i.e. sequence type).  Lists are also **mutable** (i.e. there are methods to modify the object)
 
@@ -197,7 +197,7 @@ Examples:
 
 - - - -
 
-###Tuples
+###<a id="tuples">Tuples</a>
 
 **Tuples** are like read-only lists because they are immutable (instead of mutable) and are enclosed with parentheses (instead of brackets).  Tuples do care about order.
 
@@ -211,7 +211,7 @@ Examples:
     print temp[1:3]  # prints elements after 1st to 3rd
     # (785, 2.23)
 
-#### Sequence Functions
+####<a id="sequencemethods">Sequence Methods</a>
 Assuming `s` and `t` are sequences and `n`, `i`, `j` are integers.
 
 *  `x in s`  # True if an item of s is equal to x, else False
@@ -227,7 +227,7 @@ Assuming `s` and `t` are sequences and `n`, `i`, `j` are integers.
 *  `s.index(x)`  # index of the first occurence of x in s
 *  `s.count(x)`  # total number of occurences of x in s
 
-####Sorting Sequences
+####<a id="sequencesort">Sorting Sequences</a>
 
 Python has a `sort` method that modifies a list in-place and a `sorted` method that builds a new sorted list from an iterable.  NumPy also has a `sort` method, but it does not modify the list in-place.
 
@@ -308,10 +308,10 @@ Get attributes from an object using **attrgetter**.  This basically looks up an 
 
 - - - -
 
-## HASH TABLE TYPES
+##<a id="hashtables">HASH TABLES</a>
 A hash table (aka hash map) is a way to map keys to values (i.e. a key-value pair).  A hash function computes an index into an array of buckets or slots, from which the correct value can be found.
 
-###Dictionary (dict)
+###<a id="dict">Dictionary (dict)</a>
 A **dictionary** is a key-value pair.  The key can be almost any type, but usually are numbers or strings.  Value can be any Python object.  Dictionaries are enclosed with `{}` and accessed with brackets `[]`.  The idea is also called **associative arrays**, **map**, **symbol table**.  The ideas behind operations are:
 
 *  create a dictionary
@@ -347,7 +347,7 @@ Example:
 
 - - - -
 
-###Set
+###<a id="set">Set</a>
 
 A **set** is an unordered collection of distinct hashable elements.  Note that items have to be hashable and can't hold duplicates.  Sets have all these restrictions, but are really fast.  They're also good for set methods.
 
@@ -367,7 +367,7 @@ A **set** is an unordered collection of distinct hashable elements.  Note that i
 
 - - - -
 
-## CONTROL FLOW
+##<a id="controlflow">Control Flow</a>
 
 Python has the usual control flow statements.  These include:
 
@@ -378,7 +378,7 @@ Python has the usual control flow statements.  These include:
 *  `lambda` expression is a small anonymous function, which means lambda: a if some_condition() else b
 *  `map()` function applys a function to every item of iterable and returns a list
 
-###if, elif, else statement
+###<a id="ifelse">if, elif, else statement</a>
 
     # if statement
     if x < 0:
@@ -388,14 +388,14 @@ Python has the usual control flow statements.  These include:
     else:
         print "x is positive"
 
-###for statement
+###<a id="for">for statement</a>
 
     # for statement
     words = ['cat', 'window', 'defense']
     for w in words:
        print w,  # cat window defense
 
-###range(), xrange()
+###<a id="range">range(), xrange()</a>
 
     # range() function
     for i in range(5):
@@ -409,7 +409,7 @@ Python has the usual control flow statements.  These include:
     for i in xrange(2, 10):
         print i,  # 2 3 4 5 6 7 8 9
 
-###lambda expression
+###<a id="lambda">lambda expression</a>
 
 Lambda is a way to create small anonymous functions (i.e. a function without a name).  These are often used in combination with `filter()`, `map()`, and `reduce()`
 
@@ -417,7 +417,7 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
     lambda x: 'big' if x > 100 else 'small'
     lambda x: x**2
 
-####filter()
+####<a id="filter">filter()</a>
 
 `filter(function, sequence)` is a function that filters out all the elements of a sequence where the function returns `True`.  The first argument is the function that returns a Boolean and this is applied to every element of the list.  A sequence is returned where the values are only where the function returns `True`.
 
@@ -440,7 +440,7 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
     # [item for item in iterable if function(item)]  # if function not None
     # [item for item in iterable if item]  # if function is None
 
-####map()
+####<a id="map">map</a>
 
 `map(function, sequence)` is a function with two arguments.  The first argument is the name of a function and the second is a _sequence data type_ (e.g. a list).  Map applies the function to all the elements of the sequence and returns this as a new list.
 
@@ -455,7 +455,7 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
     Fahrenheit = map(lambda x: (float(9)/5)*x + 32, Celsius)
     print Fahrenehit  # [97.7, 98.60000000000001, 99.5, 102.2]
 
-####reduce()
+####<a id="reduce">reduce</a>
 
 `reduce(function, sequence)` applies a function to a sequence and returns a single value (instead of a list like the above).  The idea is that the first two items are reduced to a single value, then that single value and the third value is reduced into a new single value.  This repeats until no more items are in the list.
 
@@ -463,7 +463,7 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
     result = reduce(lambda x,y: x+y, [47, 11, 42, 13])
     print result  # 113
 
-####zip()
+####<a id="zip">zip</a>
 
 `zip(sequence1, sequence2)` returns a list of tuples, where each tuple contains the ith element from each of the sequences.  The returned list is truncated to the length of the shortest argument sequence.
 
@@ -473,27 +473,27 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
 
 - - - -
 
-## DEBUGGING FUNCTIONS
+##<a id="debug">DEBUGGING FUNCTIONS</a>
 
 These functions are nice for debugging your code.
 
-####help(object)
+####<a id="help">help(object)</a>
 
 `help()` uses the built-in help system to tell you more about the function, class, method, keyword, etc.  Exit help with `:q`.
 
-####dir()
+####<a id="dir">dir()</a>
 
 `dir()` gives you the list of names in the current local scope.  If you input an object as an argument, it tells you its attributes.
 
-####globals()
+####<a id="globals">globals()</a>
 
 `globals()` returns a dictionary of the current objects.
 
-####type(object)
+####<a id="type">type(object)</a>
 
 `type()` returns the type of an object (e.g. str, list)
 
-####id(object)
+####<a id="id">id(object)</a>
 
 `id()` returns the identity of the object as an integer or long integer; this represents the address of the object in memory.  This is useful to see if copies are being referenced or if the same object is.
 
