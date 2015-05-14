@@ -52,7 +52,7 @@ An algorithm is correct if _every_ input instance halts with the correct output.
 
 ####<a id="algorithmefficient">Is the algorithm efficient?</a>
 
-There are different algorithms to solve the same problem and they are often drastically different in efficiency.  We normally measure efficiency by looking at two things:
+There are different algorithms to solve the same problem and they are often drastically different in efficiency.  We normally measure efficiency by looking at _running time_, which is mainly affected by the _size of input_.
 
 1. the _size of input_ (i.e. normally we look at the _number of items in the input_; for other problems like multiplying integers, we look at the _total number of bits_ used)
 2. the _running time_ (i.e. the number of 'steps'; the number of times something is executed).  We normally focus on the _worst-case running time_ (aka __Omega__), but sometimes we look at the _average-case running time_ (__Theta__) when doing _probabilistic analysis_.  We rarely care about _best-case running time_ (aka __O__).
@@ -63,7 +63,7 @@ Other considerations in real life (that we won't consider for now) are things li
 
 There are a variety of design approaches to algorithms.  Let's start with __incremental__ and __divide and conquer__, which are opposites of each other.
 
-*  __incremental approach__ (aka __iteration__) is used in algorithms like _insertion sort_
+*  __incremental approach__ (aka __iteration__) is used in algorithms like _insertion sort_.  This means working with _iterables_, objects that can be used in `for` or `while` loops.
 *  __divide and conquer approach__ breaks the problem into several subproblems that are similar to the original problem, but smaller in size.  This is used in algorithms like _merge sort_.
 
 ####<a id="incremental">Approach: Incremental</a>
@@ -118,9 +118,12 @@ __Insertion sort__ is based on the incremental approach and is efficient at sort
 
 ####<a id="quicksort">Divide and Conquer: merge sort</a>
 
-__Merge sort__ is based on the divide-and-conquer approach until the sorted sequence has a length of 1, then merges all the sorted sequences together.  This approach has a faster _worst-case running time_ than insertion sort.  For example, if we want to sort a hand of playing cards:
+__Merge sort__ uses the divide-and-conquer approach until the sorted sequence has a length of 1, then merges all the sorted sequences together.  Depending on the length of items, this approach usually has a faster _worst-case running time_ than insertion sort.  For example, if we want to sort a hand of playing cards:
 
 1. __divide__ means splitting the n-element sequence into two subsequences of n/2 elements each
 2. __conquer__ by sorting the two subsequences recursively using merge sort
 3. __combine__ by merging the two sorted subsequences to produce the sorted answer
 
+####<a id="bubblesort">bubble sort</a>
+
+__Bubble sort__  (aka __sinking sort__, __ripple sort__) is a simple but inefficient sorting algorithm that repeatedly goes through the list to be sorted, compares each pair of adjacent items, and swaps them if they are in the wrong order.
