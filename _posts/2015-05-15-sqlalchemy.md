@@ -34,7 +34,16 @@ title: SQLAlchemy
         + [Separate](#ormseparate)
         + [SQLAlchemy ORM Pattern](#ormsqlalchemypattern)
     - [SQLAlchemy ORM Usage](#ormsqlalchemyuse)
-        + [](#)
+        + [Step 1 - delcarative_base()](#ormdeclarativebase)
+        + [Step 2 - create schema](#ormschema)
+        + [Step 3 - create instance of the class](#orminstanceclass)
+        + [Step 4 - create session](#ormsession)
+        + [Step 5 - create session data](#ormsessiondata)
+    - [SQLAlchemy ORM Object Manipulation](#ormobjectmanipulation)
+        + [Object Querying with query()](#ormquerying)
+        + [Object Filtering with filter() and filter_by()](#ormfiltering)
+        + [Object Iteration](#ormobjectiterating)
+        + [Object Naming with alised() and label()](#ormnaming)
 
 ##<a id="summary">Summary</a>
 
@@ -112,7 +121,6 @@ An example setup:
     
     metadata.create_all(engine)  # Check presence of each table before creating
     
-
 
 ####<a id="sqlalchemyexpinsert">insert()</a>
 
@@ -459,16 +467,17 @@ SQLAlchemy ORM is essentially a __data mapper__ style ORM that has a __declarati
 *  __Identity Map__ - objects are tracked by their primary key within the unit of work.  These are _unique_ on that primary key identity.
 *  __Lazy Loading__ - some attributes of an object may emit additional SQL queries when they are accessed.  You do not access this additional information unless you explicitly say to load it.  This means if you access a user table, it will not load other table data.  This is more efficient if you have all the data you want.
 *  __Eager Loading__ - multiple tables are queried at once in order to load related objects and collections.  E.g. give me this user table, but also give me the related objects and collections.  This saves a trip to the database, but grabs a lot more data.
+*  __Method Chaining__ - each method returns the object back and you can chain multiple methods
 
-####<a id="ormsqlalchemyuse">SQLAlchemy Use</a>
+###<a id="ormsqlalchemyuse">SQLAlchemy ORM Use</a>
 
-Basic Example
+Here we have a basic example of using the __Declarative system__.  This is the recommended method, although you can use the __Classical Mappings__ instead if you want to map a `Table` to a Python class using the `mapper()` function directly.
 
     from sqlalchemy import create_engine, Column, Integer, String
     from sqlalchemy.ext.declarative import declarative_base
     
     engine = create_engine('sqlite:///:memory:', echo=True)
-    base = declarative_base()
+    Base = declarative_base()  # Capitalize first letter since its a class
     
     class User(Base):
         __tablename__ = 'users'
@@ -480,4 +489,224 @@ Basic Example
         
         def __repr__(self):
             return "<User(name='%s', fullname='%s', password='%s')>" % \
-            (self.name, self.fullname, self.password)
+                    (self.name, self.fullname, self.password)
+    
+     Base.metadata.create_all(engine)  # Create Tables (User)
+
+The basic idea behind the Declarative system are these steps:
+
+1. We start by making a __declarative_base()__ class; this is a reference to determine how other classes map together (e.g. how User class relates to our Base class)
+2. We create a schema of the table in the database; this maps the Database Table with the Python object.  If this Table does not exist in the Database yet, we can use the __MetaData__ object to help issue special commands like CREATE TABLE
+3. Now that mapping between Python objects and Database Tables are complete, we create instances of the Python object (e.g. for `User` object, we can now create a `User` of Will)
+4. We create a `Session`, which basically handles how to talk to the database
+5. We manipulate our data, whether we do things like query, filter, join, rename objects.  Once this is done, we `commit()` changes back to the database.
+
+####<a id="ormdeclarativebase">Step 1 - setup a declarative_base()</a>
+
+We start with a __declarative_base__ class, which is a class that maintains a catalog of classes and tables relative to that base class.  We normally only have one instance of this base class in an application.  We then map classes in terms of this base class (e.g. we create a User Table using this new Base class).
+
+The purpose of the declarative base class is __instrumentation__, which means we augment the functionality of a regular class with additional database-enabled descriptors that represent database columns and relationships.  Since we defining the database table, we are required to have at least one column (which is part of the Primary Key) and a `__tablename__` attribute.
+
+    from sqlalchemy.ext.declarative import declarative_base
+    
+    Base = declarative_base()  # using Declarative system
+    
+    class User(Base):
+        __tablename__ = 'users'  # required table name
+        id = Column(Integer, primary_key=True)  # required at least one Col
+
+####<a id="ormschema">Step 2 - create a schema</a>
+
+We have to specify the schema of the Table (e.g. what are the Column names, their types, table name).  This should appear in the class `.__table__` attribute.  If the Table does not exist in the database, we can use the `MetaData` object to help with commands like a CREATE TABLE statement.
+
+####Table
+
+When we declared our class using the Declarative system, this automatically created a `Table` object.  We can look at the `__table__` attribute of our new class.
+
+    >>> User.__table__
+    Table('users', MetaData(bind=None),
+            Column('id', Integer(), table=<users>, primary_key=True, nullable=False),
+            Column('name', String(), table=<users>),
+            Column('fullname', String(), table=<users>),
+            Column('password', String(), table=<users>), schema=None)
+
+####Mapper
+
+You can see how the Database Table and the Python object are mapped together by looking at the `.__mapper__` attribute.
+
+    >>> User.__mapper__
+    >>> <Mapper at 0x327e240; User>
+
+####MetaData
+
+The Table is part of a larger collection known as the `MetaData`.  This MetaData has the ability to create schema commands to the database.  For example, we can use the MetaData to do a CREATE TABLE statement using the `MetaData.create_all()` method.  In general, we can see the Base class `.metadata` attribute.  Note: Even though this looks like magic, remember that we still need to import your model (like we did with the User class).
+
+    >>> Base.metadata.create_all(engine)
+    PRAGMA table_info("users")
+    ()
+    CREATE TABLE users (
+        id INTEGER NOT NULL,
+        name VARCHAR,
+        fullname VARCHAR,
+        password VARCHAR,
+        PRIMARY KEY (id)
+        )
+    ()
+    COMMIT
+
+####<a id="orminstanceclass">Step 3 - create an instance of the class</a>
+
+Now that we have mappings completed between the Python object (`class User(Base)`) and the Database Table (`CREATE TABLE users...`), we can now create specific instances of the `User` object.
+
+    >>> will_user = User(name='will', fullname='Will Liu', password='stuff')
+    >>> will_user.name
+    'will'
+    >>> will_user.password
+    'stuff'
+    >>> str(will_user.id)
+    'None'
+
+Note that in our instance (will_user) when we do not specify a field (e.g. the id), we get a return value of `None` instead of a regular behavior like `AttributeError` for an undefined attribute. 
+
+If we want to customize this, we can explicitly override the `__init__()` method created by the Declarative system for our `User` class.
+
+####<a id="ormsession">Step 4 - create a session</a>
+
+In order to talk to the database, we need to create a __Session__ class using the `sqlalchemy.orm.session.Session`.  There are additional helper functions like __sessionmaker__ to generates a new __Session__ with customized parameters and __scoped_session__ creates a thread local proxy/manager of Session instances (i.e. which thread is asking for what session; good for multithreaded applications).
+
+####sessionmaker
+
+A __sessionmaker__ class is normally used to create a top level `Session` configuration.  This is only created one time in your application and is a factory for creating `Session` objects.
+
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    
+    # create an Engine, the Session uses this to get DB table info
+    some_engine = create_engine('postgresql://will:pwd@localhost/')
+    
+    # create a configured 'Session' class; sessionmaker is a factory
+    Session = sessionmaker(bind=engine)
+    
+    # create a Session object used whenver you want to talk to the DB table
+    session = Session()
+    
+    # Do some work with the Python object
+    item1 = session.query(Item).get(1)
+    item2 = session.query(Item).get(2)
+    session.commit()
+
+####scoped_session
+
+A __scoped_session__ creates a thread local proxy/manager of `Session` instances.  If you are doing multithreaded applications, you can normally just do this.  Otherwise, just ignore.
+
+    DBSession = scoped_session(sessionmaker(engine))
+    companies = DBSession.query(Company).all()
+
+####<a id="ormsessiondata">Step 5 - manipulate data in a session</a>
+
+For each `Session` object, we can do a variety of things like `add()`, `add_all()`, `delete()`, `rollback()`, `query()`.  The objects are in a __pending__ state until we issue the SQL to persist using a process known as __flush__ (which commits the current transaction to the Database using `commit()`).
+
+    >>> will_user = User(name='will', fullname='Will Liu', password='stuff')
+    >>> session.add(will_user)
+    >>> our_user = session.query(User).filter_by(name='will').first()
+    >>> our_user
+    <User(name='will', fullname='Will Liu', password='stuff')>
+    # SQL View
+    # INSERT INTO users (name, fullname, password) VALUES (?, ?, ?)
+    # ('will', 'Will Liu', 'stuff')
+    # SELECT users.id AS users_id,
+    #        users.name AS users_name,
+    #        users.fullname AS users_fullname,
+    #        users.password AS users_password
+    # FROM users
+    # WHERE users.name = ?
+    #  LIMIT ? OFFSET ?
+    # ('will', 1, 0)
+    
+    >>> session.add_all([
+        User(name='wendy', fullname='Wendy Williams', password='test'),
+        User(name='mary', fullname='Mary Contrary', password='test1'),
+        User(name='fred', fullname='Fred Flinstone', password='test2')])
+    >>> session.delete(will_user)
+    >>> session.commit()
+
+###<a id="ormobjectmanipulation">ORM Object Manipulation</a>
+
+You can get into some pretty advanced querying, filtering, iterating, and renaming of objects.
+
+####<a id="ormquerying">Querying</a>
+
+To get data from the Database Table, we can use the `query()` method to return a `Query` object.  We can do this a few different ways including:
+
+    # query from a class
+    session.query(User).filter_by(name='ed').all()
+    
+    # query with multiple classes, returns tuples
+    session.query(User, Address).join('addresses').filter_by(name='ed').all()
+    
+    # query using ORM-enabled descriptors
+    session.query(User.name, User.fullname).all()
+    
+    # query from a mapper
+    user_mapper = class_mapper(User)
+    session.query(user_mapper)
+
+####<a id="ormfiltering">Filtering with filter() and filter_by()</a>
+
+We can chain methods by using `filter()` to get the objects we want and `filter_by()` for specific column names (i.e. keyword arguments), though you can use `filter()` to get the same results.  Note that the reason we can use `==` is because behind the hood the equality operator is overloaded.
+
+    session.query(User).filter_by(name='will')
+    session.query(User.name=='will')
+    session.query(User.filter(or_(User.name=='will', User.password='test1')))
+
+Basically `filter()` is for `column==expression` and `filter_by()` is for `keyword=expression`.
+
+####<a id="ormobjectiterating">Iterating through Query object</a>
+
+We can iterate through a `Query` object using a variety of ways.  
+
+    # We can return a list of `User` objects.
+    for instance in session.query(User).order_by(User.id):
+        print instance.name, instance.fullname
+    #will Will Liu
+    #wendy Wendy Williams
+    #mary Mary Contrary
+    #fred Fred Flinstone
+    
+    # We can return tuples using ORM-instrumented descriptors as arguments
+    for name, fullname in session.query(User.name, User.fullname):
+        print name, fullname
+    #will Will Liu
+    #wendy Wendy Williams
+    #mary Mary Contrary
+    #fred Fred Flinstone
+    
+    # We can return `KeyedTuple` class and are like a regular Python object
+    for row in session.query(User, User.name).all():
+        print row.User, row.name
+    #<User(name='will', fullname='Will Liu', password='stuff')> will
+    #<User(name='wendy', fullname='Will Liu', password='test1')> wendy
+    #<User(name='mary', fullname='Mary Contrary', password='test2')> mary
+    #<User(name='fred', fullname='Fred Flinstone', password='test3')> fred
+
+####<a id="ormnaming">Control Names with aliased() and label()</a>
+
+You can change the object name returned from the `query()` using `aliased()`.  You can change the individual column names using `label()`
+
+    from sqlalchemy.orm import aliased
+    user_alias = aliased(User, name='user_alias')
+    
+    for row in session.query(user_alias, user_alias.name).all():
+        print row.user_alias
+    #<User(name='will', fullname='Will Liu', password='stuff')>
+    #<User(name='wendy', fullname='Will Liu', password='test1')>
+    #<User(name='mary', fullname='Mary Contrary', password='test2')>
+    #<User(name='fred', fullname='Fred Flinstone', password='test3')>
+    
+    for row in session.query(User.name.label('name_label')).all():
+        print (row.name_label)
+    #will
+    #wendy
+    #mary
+    #fred
+
