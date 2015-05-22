@@ -17,7 +17,7 @@ title: SQLAlchemy
         + [insert()](#sqlalchemyexpinsert)
         + [select()](#sqlalchemyexpselect)
         + [operators: where(), like()](#sqlalchemyexpoperators)
-        + [conjunctions: and_, or_, not_](#sqlalchemyexpconjunctions)
+        + [conjunctions: `and_`, `or_`, `not_`](#sqlalchemyexpconjunctions)
         + [execute()](#sqlalchemyexpexecute)
         + [result object](#resultobject)
     -  [SQLAlchemy Schema](#sqlalchemyschema)
@@ -39,22 +39,25 @@ title: SQLAlchemy
         + [Step 3 - create instance of the class](#orminstanceclass)
         + [Step 4 - create session](#ormsession)
         + [Step 5 - create session data](#ormsessiondata)
+        + [Step 6 - commit session data](#ormcommitsession)
     - [SQLAlchemy ORM Object Manipulation](#ormobjectmanipulation)
         + [Object Querying with query()](#ormquerying)
         + [Object Filtering with filter() and filter_by()](#ormfiltering)
         + [Object Iteration](#ormobjectiterating)
         + [Object Naming with alised() and label()](#ormnaming)
+*   [SQLAlchemy with Pandas](#sqlalchemypandas)
+    -   
 
 ##<a id="summary">Summary</a>
 
-__SQLAlchemy__ is a set of tools for working with databases using Python.  There are many layers to this system and you can pick which one(s) you want to use.  As for the layers, going from lowest to highest level, we have:
+__SQLAlchemy__ is a set of tools for working with databases using Python.  There are many layers to this system and you can pick which one(s) you want to use.  As for the layers, going from lowest (closest to the database) to highest level (very abstracted, closest to Python), we have:
 
-*  Python DBAPI; lowest level of using Python to interact with the database
-*  SQLAlchemy Core
+*  Python DBAPI; lowest level of using Python to interact with the database.  Most of this is straight up SQL statements and little Python.
+*  SQLAlchemy Core; good mix of SQL and Python.
     - SQLAlchemy Engine; this gives SQLAlchemy and the DBAPI the ability to interact
     - SQLAlchemy Schema; this lets you see the database metadata
     - SQL Expression Language - slight abstraction by converting SQL statements to Python objects and vice versa.  This approach is more like the literal schema and SQL expressions.
-*  SQLAlchemy Object Relational Mapper (ORM) - database is fully abstracted, we work with Python classes instead of SQL for everything including mapping tables and relationships.
+*  SQLAlchemy Object Relational Mapper (ORM) - database is fully abstracted, we work mainly with Python classes instead of SQL for everything including mapping tables and relationships.
 
 ##<a id="dbapi">Python DBAPI</a>
 
@@ -84,7 +87,7 @@ A __bound parameter__ is where you can bind a Python variable (e.g. `5`, `emp_na
 
 By default, the DBAPI does not autocommit.  That means you have to explicitly say to commit.
 
-##<a id-"sqlalchemycore">SQLAlchemy Core</a>
+##<a id="sqlalchemycore">SQLAlchemy Core</a>
 
 One layer above the Python DBAPI is the SQLAlchemy Core.  The Core is made up of the Engine (used for connecting to Python DBAPI), the SQL Expression Language (for running queries), and the Schema (for inspecting the database or the SQLAlchemy objects).
 
@@ -202,7 +205,7 @@ We can add a WHERE clause to a statement by appending it to our method.  For exa
     
     s = select(addresses).where(addresses.c.email_address.like('%@gmail.com'))
 
-####<a id="sqlalchemyexpconjunctions">Conjunctions: and_, or_, not_</a>
+####<a id="sqlalchemyexpconjunctions">Conjunctions: `and_`, `or_`, `not_`</a>
 
 We can add AND, OR, NOT similar to a SQL statement.
 
@@ -710,3 +713,88 @@ You can change the object name returned from the `query()` using `aliased()`.  Y
     #mary
     #fred
 
+####<a id="ormsessioncommit">Step 6 - commit a session</a>
+
+Finally you want to commit your session data.  This might look like:
+
+    import urllib
+    import pyodbc
+    from sqlalchemy import create_engine, Column, Integer, String
+    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy.orm import sessionmaker
+    import pandas as pd
+    
+    # SQLAlchemy SETUP
+    params = urllib.quote_plus('DRIVER={SQL Server};SERVER=<mysqlserver>;DATABASE=<mydb>;UID=<myusername>;PWD=<mypassword>')
+    engine = create_engine("mssql+pyodbc:///?odbc_connect=%s" % params)
+    Base = declarative_base()
+    Session = sessionmaker(bind=engine)
+    
+    class LookupTable(Base):
+        """
+            LookupTable is the Python object that represents the Lookup Table used in the database.
+        """
+        __tablename__ = 'myTableName'
+        myid = Column(String(50), primary_key=True)
+        value = Column(String(512))
+    
+    if __name__ == '__main__':
+        # Setup
+        Base.metadata.create_all(engine)
+        session = Session()
+    
+        # Peak at the dataset
+        current_table = session.query(myTableName).all()
+        for row in current_table:
+           print row.myid, row.value
+        
+        # Add some data
+        test_kvpair = LookupTable(myid='Foo', value='Bar')
+        session.add(test_kvpair)
+        
+        try:
+            session.commit()
+            print "Session Committed"
+        except:
+            print "Error with committing session"
+            raise
+
+##<a id="sqlalchemypandas">SQLAlchemy with Pandas</a>
+
+So SQLAlchemy is great with connecting and writing to databases, but I use Pandas DataFrames for doing statistical analysis and general data cleaning.  Can we use these two together?  Yes!  Here is an example of connecting to a MS SQL Server, reading a query into a DataFrame, doing some stuff (e.g. here is an arbitrary JOIN), then write this new DataFrame back to the Database Table.  You can skip using sessions and do read and writes immediately with `read_sql()` and `to_sql()`.
+
+    import urllib
+    import pyodbc
+    from sqlalchemy import create_engine, Column, Integer, String
+    from sqlalchemy.ext.declarative import declarative_base
+    import pandas as pd
+    
+    params = urllib.quote_plus('DRIVER={SQL Server};SERVER=<nameofserver>;DATABASE=<nameofdb>;UID=<userid>;PWD=<pwd>')
+    engine = create_engine("mssql+pyodbc:///?odbc_connect=%s" % params)
+    Base = declarative_base()
+    
+    class LookupTable(Base):
+        """
+            LookupTable is the Python object that represents the Lookup Table used in the database.
+        """
+        __tablename__ = 'myTableName'
+    
+        myid = Column(String(50), primary_key=True)
+        value = Column(String(512))
+    
+    if __name__ == '__main__':
+        
+        # Setup
+        Base.metadata.create_all(engine)
+        pdsql = pd.io.sql.SQLDatabase(engine)
+        
+        # Query Database Table and return a DataFrame
+        df_a = pd.read_sql("SELECT * FROM myTableName", con=engine)
+        
+        # Do DataFrame Stuff; here its just a simple join
+        df_b = pd.DataFrame({'myid': [1, 2, 3, 4],
+                             'value': ['Hello', 'World', 'Liu', 'Summers']})
+        df_c = pd.merge(df_a, df_b, on='myid', how='inner')
+    
+        # Write new DataFrame back to Database Table
+        df_c.to_sql(name='myTableName', if_exists='append',con=engine)
