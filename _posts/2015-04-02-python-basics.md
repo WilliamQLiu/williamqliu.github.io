@@ -32,6 +32,8 @@ Python is a general purpose programming language that focuses on code readabilit
     -  [globals()](#globals)
     -  [type()](#type)
     -  [id()](#id)
+*  [Classes](#classes)
+    -  []
 
 - - - -
 
@@ -498,3 +500,158 @@ These functions are nice for debugging your code.
 `id()` returns the identity of the object as an integer or long integer; this represents the address of the object in memory.  This is useful to see if copies are being referenced or if the same object is.
 
 - - - -
+
+## <a id="functionsmethods">Functions, Classes, and Methods</a>
+
+A __function__ is a block of reusable code that is used to perform specific actions.  Some familiar built-in functions are things like `print`.  You can do a variety of things including pass in arguments, set default values, set keyword arguments, and make certain fields required.  Functions are defined using the `def` keyword.
+
+    def happy_birthday(name, age_yesterday=10):
+        """ Print happy birthday to a person and tell them their age"""
+        age = age_yesterday + 1
+        message = "Happy Birthday " + person + "! Congrats turning " + str(age)
+        return message
+    
+    happy_birthday(Will, 29)  # Happy Birthday Will! Congrats turning 30!
+    happy_birthday('Laura', 26)  # Happy Birthday Laura! Congrats turning 27!
+    happy_birthday(name='Billy')  # Happy Birthday Billy! Congrats turning 11!
+
+A __class__ is like a blueprint or instruction manual for creating objects.  You define a class using the `class` keyword and normally name it starting with a capital letter (e.g. Person, Car).  Even though we define how to create an object, we do not actually create an instance of one until we call the Class (e.g. Will is an instance of a Person, a Tesla is an instance of a Car).
+
+    class Customer(object):
+        """ A customer of a bank with a checking account """
+        def __init__(self, name, balance=0.0):
+            """ Return a Customer object with name and balance """
+            self.name = name
+            self.balance = balance
+        
+        def withdraw(self, amount):
+            """ Return the balance remaining after withdrawing an amount """
+            if amount > self.balance:
+                raise RuntimeError("Amount greater than available balance")
+            self.balance -= amount
+            return self.balance
+        
+        def deposit(self, amount):
+            """ Return balance remaining after depositing an amount """
+            self.balance += amount
+            return self.balance
+    
+    will = Customer()  # Create an instance of the Class
+
+
+A __method__ is a function that is stored as a class attribute.  Here we declare a method called `get_size` and bind it to an instance of our object Pizza.
+
+    class Pizza(object):
+        def __init__(self, size):
+            self.size = size
+        def get_size(self):
+            return self.size
+    
+    my_pizza = Pizza(size=5)
+    my_pizza.get_size()  # 5
+
+## <a id="variablescope">Local vs Global variables</a>
+
+Variables defined inside a function have a __local scope__, which means that they can only be accessed inside the function they are declared.
+
+    def calculate(arg1, arg2):
+        """ Add both the parameters and return the total """
+        total = arg1 + arg2
+        print "Inside the local function, total is:", total
+        return total
+    calculate(5, 7)
+    #Inside the local function, total is: 12
+
+Variables defined outside a function have a __global scope__, which means that they can be accessed outside the function.
+
+    a = 10
+    def my_func():
+        a = 5
+        return a
+    print a  # 10
+    print my_func()  #5
+
+- - - -
+
+## <a id="classes">CLASS OBJECTS</a>
+
+Classes in Python create objects, which provides all the standard features of Object Oriented Programming.  You can have class inheritance from base class(es); this means you can derive a new class with all the variables and methods of the base class(es) and override any variables and/or methods.  We can access Class objects through __attribute reference__ or __instantiation__.
+
+#### <a id="classattributes">Attribute Reference</a>
+
+When you create a Class, all variables are in the __local scope__ (i.e. referenced only inside the Class).  You can reference class objects with the pattern `Obj.name`; this can reference variables or methods.  For example:
+
+    class MyClass:
+        """ A simple example class """
+        i = 12345
+        def f(self):
+            return 'hello world'
+    
+    MyClass.i  # access an object integer
+    # 12345
+    
+    MyClass.f  # access an object method
+    # <unbound method MyClass.f>
+    
+    MyClass.__doc__  # access an object docstring
+    # 'A simple example class'
+    
+    MyClass.__dict__  # access an object dict
+    # {'i': 12345, '__module__': '__main__', '__doc__': ' A simple class ', 'f': <function f at 0x0000000002BCA128>}
+
+##### <a id="boundunbound">Bound vs Unbound methods</a>
+
+In Python we have __unbound__ and __bound__ methods.
+
+
+#### <a id="init">Instantiation using `__init__(self)`</a>
+
+Class __instantiation__ uses function notation; just pretend a class object is a parameterless function that returns a new instance of the class.
+
+    x = MyClass()  # creates a new instance of the class and assigns it to a variable x
+
+The instantiation operation ('calling' a class object) creates an empty object.  If you want to create an initial state, you use `__init__(self)`.
+
+    class Complex:
+        def __init__(self, realpart, imagpart):
+            self.r = realpart
+            self.i = imagpart
+    
+    x = Complex(3.0, -4.5)
+    x.r, x.i  #(3.0, -4.5)
+
+#### <a id="self">self</a>
+
+As part of the __instantiation__ of the `__init__` method, we create `self`; self tells us we are looking at the instance of the class.  The name is by convention and does not actually have to be self (i.e. can be any word).  What it comes down to is when you call a method of an instance (e.g. call getName method from the instance of polly the Pet), Python automatically figures out that self should be the instance (e.g. polly) and passes it to the function (e.g. getName).
+
+    class Pet(object):
+        def __init__(self, name, species):
+            self.name = name
+            self.species = species
+        def getName(self):
+            return self.name
+        def getSpecies(self):
+            return self.species
+        def __str__(self):
+            return "%s is a %s" % (self.name, self.species)
+    
+    polly = Pet("Polly", "Parrot")
+    
+    print "Polly is a %s" % polly.getSpecies()
+    # Polly is a Parrot
+    
+    print "Polly is a %s" % Pet.getSpecies(polly)
+    # Polly is a Parrot
+
+#### <a id="underscores">Use of underscores `_` and `__`</a>
+
+With classes, you may have noticed that some variables and functions have `_` and `__` listed in front (e.g. `__init__`, `__del__`).  Here are what these mean:
+
+*  `_singleleadingunderscore` - a single leading underscore usually means an 'internal use' indicator (i.e. this field is used only in this context, you should not access it).  This is more than just convention; when a class is imported, the objects that start with an `_` are not imported.
+*  `singletrailingunderscore_` - a single trailing underscore means avoiding a conflict with a Python keyword (e.g. class is now class_)
+*  `__doubleleadingunderscore` - double leading underscores is known as __name mangling__ and mean a class attribute in the pattern `_classname__spam`.  This is considered a 'private' class
+*  `__doubleleadingandtrailunderscore__` - double leading and trailing underscores is reserved for Python's magic/builtin methods or variables.  Do not create these, just use as documented (e.g. `__init__`, `__doc__`)
+
+#### <a id="inheritance">Class Inheritance (aka Derived Class, Subclass)</a>
+
+Classes can support __inheritance including__ including __single inheritance__ and __multiple inheritance__.
