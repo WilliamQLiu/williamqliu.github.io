@@ -11,6 +11,8 @@ title: Python Basics
 
 Python is a general purpose programming language that focuses on code readability.  This is a quick summary of what you will need to know about Python data types and control flow.
 
+__BEGINNER__
+
 *  [Numbers (int, float)](#numbers)
 *  [Sequence Types (i.e. can slice)](#sequencetypes)
     -  [Strings (str) and Unicode (unicode)](#strings)
@@ -26,14 +28,32 @@ Python is a general purpose programming language that focuses on code readabilit
     -  [for statement](#for)
     -  [range(), xrange()](#range)
     -  [lambda expression](#lambda)
+
+__ADVANCED__
+
 *  [Debugging Functions](#debug)
     -  [help()](#help)
     -  [dir()](#dir)
     -  [globals()](#globals)
     -  [type()](#type)
     -  [id()](#id)
-*  [Classes](#classes)
-    -  []
+*  [Functions, Classes, Methods](#functionmethodclass)
+    -  [variable scope](#variablescope)
+    -  [bound and unbound methods](#boundunbound)
+    -  [class and static methods](#classstaticmethods)
+    -  [descriptors](#descriptors)
+*  [Class Objects](#classes)
+    -  [Attribute Reference](#classattributes)
+    -  [Instantiation with `__init__()`](#init)
+    -  [self()](#self)
+    -  [underscores](#underscores)
+    -  [inheritance](#inheritance)
+*  [Class Magic Methods](#magicmethods)
+    -  [Construction and Initialization](#magicmethodsconstruction)
+    -  [Representation of Classes](#magicmethodsrepresentation)
+    -  [Attribute Access](#magicmethodsattributeaccess)
+    -  [Container Objects](#magicmethodscontainerobjects)
+    -  [Callable Objects](#magicmethodscallable)
 
 - - - -
 
@@ -501,7 +521,7 @@ These functions are nice for debugging your code.
 
 - - - -
 
-## <a id="functionsmethods">Functions, Classes, and Methods</a>
+## <a id="functionmethodclass">Functions, Classes, and Methods</a>
 
 A __function__ is a block of reusable code that is used to perform specific actions.  Some familiar built-in functions are things like `print`.  You can do a variety of things including pass in arguments, set default values, set keyword arguments, and make certain fields required.  Functions are defined using the `def` keyword.
 
@@ -538,7 +558,6 @@ A __class__ is like a blueprint or instruction manual for creating objects.  You
     
     will = Customer()  # Create an instance of the Class
 
-
 A __method__ is a function that is stored as a class attribute.  Here we declare a method called `get_size` and bind it to an instance of our object Pizza.
 
     class Pizza(object):
@@ -550,7 +569,7 @@ A __method__ is a function that is stored as a class attribute.  Here we declare
     my_pizza = Pizza(size=5)
     my_pizza.get_size()  # 5
 
-## <a id="variablescope">Local vs Global variables</a>
+#### <a id="variablescope">Local vs Global variables</a>
 
 Variables defined inside a function have a __local scope__, which means that they can only be accessed inside the function they are declared.
 
@@ -571,13 +590,60 @@ Variables defined outside a function have a __global scope__, which means that t
     print a  # 10
     print my_func()  #5
 
+#### <a id="boundunbound">Bound vs Unbound methods</a>
+
+In Python classes we have __unbound__ and __bound__ methods.  When you access the method directly through the class (e.g. `Customer.withdraw()`), it is __unbound__.  When you access the method through an instance of the class (e.g. `Will.withdraw()`, it is __bound__ to that instance of the class (in our example, the Customer `Will`).  This means that when you call a bound instance, its simply saying `Will` is passed as the first argument.
+
+     class Customer(object):
+        def withdraw():
+            return "Withdrawing money!"
+    
+    # Example of unbound method
+    Customer.withdraw
+    # <unbound method Customer.withdraw>
+    
+    # Example of bound method
+    Will = Customer()
+    Will.withdraw
+    # <bound method Customer.withdraw of <__main__.Customer object at 0x00000000>>
+
+#### <a id="classstaticmethods">Class and Static Methods</a>
+
+Besides bound and unbound methods, we have __static methods__ and __class methods__.
+
+    class Customer(object):
+        @staticmethod
+        def withdraw():
+            return "Withdrawing money!"
+        @classmethod
+        def deposit(cls):
+            return "Depositing money!"
+    
+        
+    
+    Will = Customer()
+    Will.withdraw  # <function withdraw at 0x00000000>
+    Will.withdraw()  # Normally this would be a bound method, but staticmethod prevents it
+    # 'Withdrawing money!'
+    
+    Will.deposit  # <bound method type.deposit of <class '__main__.Customer'>>
+    Will.deposit()  # 'Depositing money!'
+
+__Static methods__ tells the method not to bind to an instance.  For the example, the method would normally be a bound method, but the `@staticmethod` makes this into a regular function.
+
+__Class methods__ tells the method not to bind to an instance, but the `@classmethod` binds the method to a class.  A class method is used to share among all the instances.
+
+#### <a id="descriptors">Descriptors</a>
+
+__Descriptors__ are classes which, when accessed through either get, set, or delete, can also alter other objects.  Descriptors are not meant to be used alone and instead are used when building object-oriented databases or classes that have attributes whose values are dependent on each other.
+
 - - - -
 
 ## <a id="classes">CLASS OBJECTS</a>
 
 Classes in Python create objects, which provides all the standard features of Object Oriented Programming.  You can have class inheritance from base class(es); this means you can derive a new class with all the variables and methods of the base class(es) and override any variables and/or methods.  We can access Class objects through __attribute reference__ or __instantiation__.
 
-#### <a id="classattributes">Attribute Reference</a>
+#### <a id="classattributes">Class Attribute Reference</a>
 
 When you create a Class, all variables are in the __local scope__ (i.e. referenced only inside the Class).  You can reference class objects with the pattern `Obj.name`; this can reference variables or methods.  For example:
 
@@ -598,10 +664,6 @@ When you create a Class, all variables are in the __local scope__ (i.e. referenc
     
     MyClass.__dict__  # access an object dict
     # {'i': 12345, '__module__': '__main__', '__doc__': ' A simple class ', 'f': <function f at 0x0000000002BCA128>}
-
-##### <a id="boundunbound">Bound vs Unbound methods</a>
-
-In Python we have __unbound__ and __bound__ methods.
 
 
 #### <a id="init">Instantiation using `__init__(self)`</a>
@@ -649,9 +711,99 @@ With classes, you may have noticed that some variables and functions have `_` an
 
 *  `_singleleadingunderscore` - a single leading underscore usually means an 'internal use' indicator (i.e. this field is used only in this context, you should not access it).  This is more than just convention; when a class is imported, the objects that start with an `_` are not imported.
 *  `singletrailingunderscore_` - a single trailing underscore means avoiding a conflict with a Python keyword (e.g. class is now class_)
-*  `__doubleleadingunderscore` - double leading underscores is known as __name mangling__ and mean a class attribute in the pattern `_classname__spam`.  This is considered a 'private' class
-*  `__doubleleadingandtrailunderscore__` - double leading and trailing underscores is reserved for Python's magic/builtin methods or variables.  Do not create these, just use as documented (e.g. `__init__`, `__doc__`)
+*  `__doubleleadingunderscore` - double leading underscores mean that the variables should be private and you should not access them (but really you still can since this is Python).  The idea is that subclasses should not accidentally override the private methods and attributes of their superclasses so Python does __name mangling__, which creates a class attribute in the pattern `_classname__spam`.
+*  `__doubleleadingandtrailunderscore__` - double leading and trailing underscores is reserved for Python's magic/builtin methods or variables.  Do not create these, just use them as documented (e.g. `__init__`, `__doc__`).  See the magic methods section for more on this.
 
 #### <a id="inheritance">Class Inheritance (aka Derived Class, Subclass)</a>
 
-Classes can support __inheritance including__ including __single inheritance__ and __multiple inheritance__.
+Classes can support __inheritance__, which can include __single inheritance__ and __multiple inheritance__ (Note: avoid multiple inheritance, this gets too complicated).  The idea is that for the code `class Dog(Pet)`, a class named `Dog` inherits the features from the parent class `Pet`.
+
+Classes can be derived from other classes and these can take many forms.  A __derived class__ (aka __subclass)__ is a class that is derived from another class.  As soon as we create a class, we are actually already subclassing from an object (e.g. `class Human(object):`).
+
+We can use `isinstance()` and `issubclass()` functions to check if these are an instance or a subclass of a class.  These functions check the attributes: `class.__instancecheck__(self, instance)` and `class.__subclasscheck__(self, subclass)`.
+
+## <a id="magicmethods">Class Magic Methods</a>
+
+Python has a few 'magic' methods that add 'magic' to your classes.  These methods range from helping with initialization, showing how classes are represented, and what attributes are accessed.  This is a more in-depth and advanced look into how classes work in Python.
+
+#### <a id="magicmethodsconstruction">Construction and Initialization</a>
+
+`__new__(cls, ...)` - this is the first method called when a object is instantiated.  It takes the class and any arguments and passes this to `__init__`.  This is not used too often except for sublassing an immutable type (like a tuple or string).
+
+`__init__(self, ...)` - this is the initializer for a class; it gets passed when a new instance is created.  For example, `will = Person('William', 30)` would pass in the values `William` and `30` as arguments.
+
+`__del__(self)` - this is destructor; this defines behavior for when an object is garbaged collected (e.g. close a database connection, close a file object).  There is no guarantee that this will be executed on exit so be careful.
+
+    from os.path import join
+    
+    class FileObject:
+        """ Wrapper for file objects """
+        def __init__(self, filepath='~', filename='sample.txt'):
+            # open a file filename in filepath in read and write mode
+            self.file = open(join(filepath, filename), 'r+')
+        def __del__(self):
+            self.file.close()
+            del self.file
+
+#### <a id="magicmethodsrepresentation">Representation of Class</a>
+
+You can represent your class usually as a custom string.
+
+`__str__(self)` - this represents what happens when `str()` is called on the instance of your class.  Usually this returns a useful human readable name.
+
+`__dir__(self)` - this represents what happens when `dir()` is called on the instance of your class.  Usually you do not modify this, it just returns a list of attributes of your class.
+
+#### <a id="magicmethodsattributeaccess">Attribute Access</a>
+
+Some say that Python does not have true encapsulation for classes (e.g. no way to define private attributes and then have a public getter and setters).  Python actually does have a lot of encapsulation through these 'magic' methods.
+
+`__getattr__(self, name)` - this represents what happens when a user attempts to access an attribute that does not exist.  This is commonly used in catching and redirecting common misspellings, giving warnings about deprecated attributes or methods.
+
+`__setattr__(self, name, value)` - this assigns a value to an attribute regardless of whether or not that attribute exists.
+
+`__delattr__(self, name)` - this attempts to delete an attribute regardless of whether or not that attribute exists.
+
+`__getattribute__(self, name)` - try to avoid this and use `__getattr__` instead since this has a higher chance of implementing infinite recursion.
+
+#### <a id="magicmethodscontainerobjects">Container Objects</a>
+
+We can implement __container objects__, these can be __sequences__ (like lists, tuples) or __mappings__ (like dictionaries) or any other container type.  Container objects can be:
+
+*  An __immutable container__ requires:
+    -  `__len__`
+    -  `__getitem__`
+*  A __mutable container__ requires:
+    -  `__len__`
+    -  `__getitem__`
+    -  `__setitem__`
+    -  `__delitem__`
+*  An __iterable__ requires:
+    -  `__iter__`
+    -  `__next__`
+
+As for the actual protocols, here is a short (and not complete) list:
+
+`__len__(self)` - returns the length of the container; used on both immutable and mutable containers.
+
+`__getitem__(self, key)` - defines behavior for when an item is accessed.  The notation is: `self[key]`.  This raises `TypeError` if the type of the key is wrong and `KeyError` if there is no corresponding value for the key.
+
+`__setitem__(self, key, value)` - defines behavior for when an item is assigned.  The notation is `self[nkey] = value`.  This raises `TypeError` if the type of the key is wrong and `KeyError` if there is no corresponding value for the key.
+
+`__delitem__(self, key)` - defines behavior for when an item is deleted.  The notation is `del self[key]`.  The notation is `self[nkey] = value`.  This raises `TypeError` if the type of the key is wrong and `KeyError` if there is no corresponding value for the key.
+
+`__iter__(self)` - is an iterator for the container.  For example `for x in container:`.  Iterators are their own objects and they also must define an `__iter__` method that returns `self`.
+
+#### <a id="magicmethodscallable">Callable Objects</a>
+
+Python functions are first-classed objects; this means they can be passed to functions and methods as if they were objects of any other kind.  A special magic method `__call__(self, ...)` allows an instance of the class to behave as if they were functions.  This means `x()` is the same as `x.__call__`.  This is useful in classes whose instances need to change an object's state.
+
+    class Entity:
+        """ Class to represent an entity.  Callable to update the entity's position"""
+    
+        def __init__(self, size, x, y):
+            self.x, self.y = x, y
+            self.size = size
+    
+        def __call__(self, x, y):
+            """ Change the position of the entity """
+            self.x, self.y = x, y
