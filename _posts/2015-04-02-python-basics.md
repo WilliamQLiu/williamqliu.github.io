@@ -41,7 +41,6 @@ __ADVANCED__
     -  [variable scope](#variablescope)
     -  [bound and unbound methods](#boundunbound)
     -  [class and static methods](#classstaticmethods)
-    -  [descriptors](#descriptors)
 *  [Class Objects](#classes)
     -  [Attribute Reference](#classattributes)
     -  [Instantiation with `__init__()`](#init)
@@ -52,6 +51,7 @@ __ADVANCED__
     -  [Construction and Initialization](#magicmethodsconstruction)
     -  [Representation of Classes](#magicmethodsrepresentation)
     -  [Attribute Access](#magicmethodsattributeaccess)
+    -  [descriptors](#descriptors)
     -  [Container Objects](#magicmethodscontainerobjects)
     -  [Callable Objects](#magicmethodscallable)
 
@@ -619,8 +619,6 @@ Besides bound and unbound methods, we have __static methods__ and __class method
         def deposit(cls):
             return "Depositing money!"
     
-        
-    
     Will = Customer()
     Will.withdraw  # <function withdraw at 0x00000000>
     Will.withdraw()  # Normally this would be a bound method, but staticmethod prevents it
@@ -632,10 +630,6 @@ Besides bound and unbound methods, we have __static methods__ and __class method
 __Static methods__ tells the method not to bind to an instance.  For the example, the method would normally be a bound method, but the `@staticmethod` makes this into a regular function.
 
 __Class methods__ tells the method not to bind to an instance, but the `@classmethod` binds the method to a class.  A class method is used to share among all the instances.
-
-#### <a id="descriptors">Descriptors</a>
-
-__Descriptors__ are classes which, when accessed through either get, set, or delete, can also alter other objects.  Descriptors are not meant to be used alone and instead are used when building object-oriented databases or classes that have attributes whose values are dependent on each other.
 
 - - - -
 
@@ -664,7 +658,6 @@ When you create a Class, all variables are in the __local scope__ (i.e. referenc
     
     MyClass.__dict__  # access an object dict
     # {'i': 12345, '__module__': '__main__', '__doc__': ' A simple class ', 'f': <function f at 0x0000000002BCA128>}
-
 
 #### <a id="init">Instantiation using `__init__(self)`</a>
 
@@ -720,7 +713,16 @@ Classes can support __inheritance__, which can include __single inheritance__ an
 
 Classes can be derived from other classes and these can take many forms.  A __derived class__ (aka __subclass)__ is a class that is derived from another class.  As soon as we create a class, we are actually already subclassing from an object (e.g. `class Human(object):`).
 
-We can use `isinstance()` and `issubclass()` functions to check if these are an instance or a subclass of a class.  These functions check the attributes: `class.__instancecheck__(self, instance)` and `class.__subclasscheck__(self, subclass)`.
+#### <a id="reflection">Reflection (aka Introspection)</a>
+
+__Reflection__ (aka __introspection__) means finding out about the type, class, attributes and methods of an object.  Some reflection-enabling functions include:
+
+*  `type()`
+*  `isinstance()` - check if this is an instance of a class; checks attribute `class.__instancecheck__(self, instance)`.  E.g. `isinstance(instance, class)`
+*  `issubclass()` - check if this is a subclass of a class; checks attribute `class.__subclasscheck__(self, subclass)`.  E.g. `issubclass(subclass, class)`
+*  `callable()` - check if this instance of your class can be called as if it were a function.
+*  `dir()`
+*  `getattr()`
 
 ## <a id="magicmethods">Class Magic Methods</a>
 
@@ -765,6 +767,43 @@ Some say that Python does not have true encapsulation for classes (e.g. no way t
 
 `__getattribute__(self, name)` - try to avoid this and use `__getattr__` instead since this has a higher chance of implementing infinite recursion.
 
+## <a id="descriptors">Descriptors</a>
+
+__Descriptors__ are classes that have any of the methods `__get__()`, `__set__()`, and/or `__delete__()` defined.  The default behavior for these attribute access is to get, set, or delete the attribute from an object's dictionary.  When you define your own method, you override the default behavior.  So why would you want to do that?  Descriptors are what's used in defining properties, (bound and unbound) methods, static methods, class methods, and `super()`.
+
+__Descriptor Protocol__
+
+*  `descr.__get__(self, obj, type=None)` --> value
+*  `descr.__set__(self, obj, value)` --> None
+*  `descr.__delete__(self, obj)` --> None
+
+Depending on what methods you define/override, this results in different types of descriptors (and this type determines how overrides are calculated).
+
+*  If you only define `__get__()`, this is a __non-data descriptor__.  This is typically used for methods
+*  If you define both `__get__()` and `__set__()`, this is a __data descriptor__.
+
+__Invoking Descriptors__
+
+Descriptors are not meant to be used alone and instead are used when building object-oriented databases or classes that have attributes whose values are dependent on each other.
+
+    class Meter(object):
+        ''' Descriptor for a meter '''
+    
+        def __init__(self, value=0.0):
+            self.value = float(value)
+        def __get__(self, instance, owner):
+            return self.value
+        def __set__(self, instance, value):
+            self.value = float(value)
+    
+    class Distance(object):
+        ''' Class to represent distance using descriptor for meters '''
+        meter = Meter()
+
+__property()__
+
+Calling __property()__ is a quick (and recommended) way to access or set an attribute.  When you want read-only properties, then use the `@property` decorator.
+
 #### <a id="magicmethodscontainerobjects">Container Objects</a>
 
 We can implement __container objects__, these can be __sequences__ (like lists, tuples) or __mappings__ (like dictionaries) or any other container type.  Container objects can be:
@@ -797,8 +836,8 @@ As for the actual protocols, here is a short (and not complete) list:
 
 Python functions are first-classed objects; this means they can be passed to functions and methods as if they were objects of any other kind.  A special magic method `__call__(self, ...)` allows an instance of the class to behave as if they were functions.  This means `x()` is the same as `x.__call__`.  This is useful in classes whose instances need to change an object's state.
 
-    class Entity:
-        """ Class to represent an entity.  Callable to update the entity's position"""
+    class Entity(object):
+        """ Class to represent an entity.  Callable to update the entity's position.  If no class inheritance, it is good practice to explicitly inherit from type 'object' """
     
         def __init__(self, size, x, y):
             self.x, self.y = x, y
@@ -807,3 +846,8 @@ Python functions are first-classed objects; this means they can be passed to fun
         def __call__(self, x, y):
             """ Change the position of the entity """
             self.x, self.y = x, y
+
+#### <a id="newstyleoldstyle">New Style Classes and Old Style Classes</a>
+
+Don't worry about this if you're using a current version of Python (e.g. 2.7 or 3+).  You're using a new style object or class (Note: a class is new style if it inherits from `object` or `type`).
+
