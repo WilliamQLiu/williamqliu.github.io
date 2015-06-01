@@ -43,10 +43,11 @@ __ADVANCED__
     -  [class and static methods](#classstaticmethods)
 *  [Class Objects](#classes)
     -  [Attribute Reference](#classattributes)
-    -  [Instantiation with `__init__()`](#init)
-    -  [self()](#self)
+    -  [Instantiation and `__init__()`](#init)
+    -  [`self` and `cls`](#selfandcls)
     -  [underscores](#underscores)
     -  [inheritance](#inheritance)
+    -  [`super()`](#super)
 *  [Class Magic Methods](#magicmethods)
     -  [Construction and Initialization](#magicmethodsconstruction)
     -  [Representation of Classes](#magicmethodsrepresentation)
@@ -635,7 +636,7 @@ __Class methods__ tells the method not to bind to an instance, but the `@classme
 
 ## <a id="classes">CLASS OBJECTS</a>
 
-Classes in Python create objects, which provides all the standard features of Object Oriented Programming.  You can have class inheritance from base class(es); this means you can derive a new class with all the variables and methods of the base class(es) and override any variables and/or methods.  We can access Class objects through __attribute reference__ or __instantiation__.
+Classes in Python create objects, which provides all the standard features of Object Oriented Programming.  You can have class inheritance from base class(es); this means you can derive a new class with all the variables and methods of the base class(es) and override any variables and/or methods.  We can access Class objects through __attribute reference__ or __instantiation__.  By convention, we upper case our class names (e.g. Pet).
 
 #### <a id="classattributes">Class Attribute Reference</a>
 
@@ -659,6 +660,7 @@ When you create a Class, all variables are in the __local scope__ (i.e. referenc
     MyClass.__dict__  # access an object dict
     # {'i': 12345, '__module__': '__main__', '__doc__': ' A simple class ', 'f': <function f at 0x0000000002BCA128>}
 
+
 #### <a id="init">Instantiation using `__init__(self)`</a>
 
 Class __instantiation__ uses function notation; just pretend a class object is a parameterless function that returns a new instance of the class.
@@ -675,9 +677,9 @@ The instantiation operation ('calling' a class object) creates an empty object. 
     x = Complex(3.0, -4.5)
     x.r, x.i  #(3.0, -4.5)
 
-#### <a id="self">self</a>
+#### <a id="selfandcls">`self` and `cls`</a>
 
-As part of the __instantiation__ of the `__init__` method, we create `self`; self tells us we are looking at the instance of the class.  The name is by convention and does not actually have to be self (i.e. can be any word).  What it comes down to is when you call a method of an instance (e.g. call getName method from the instance of polly the Pet), Python automatically figures out that self should be the instance (e.g. polly) and passes it to the function (e.g. getName).
+`self` tells us we are looking at the instance of the class.  The name is by convention and does not actually have to be self (i.e. can be any word).  What it comes down to is when you call a method of an instance (e.g. call getName method from the instance of polly from the class Pet), Python automatically figures out that self should be the instance (e.g. polly) and passes it to the function (e.g. getName).  Always use `self` for the first argument to instance methods.
 
     class Pet(object):
         def __init__(self, name, species):
@@ -697,6 +699,8 @@ As part of the __instantiation__ of the `__init__` method, we create `self`; sel
     
     print "Polly is a %s" % Pet.getSpecies(polly)
     # Polly is a Parrot
+
+`cls` tells us we are looking at a class method.  This is similar to self, which is used in instance methods.  Again, the naming is just convention and can be called whatever you want.  cls is usually used in the `__new__` protocol for `staticmethod` and `classmethod` (i.e. methods that only need access to the class, but not to things specific to each instance of the class).  Always use cls for the first argument to class methods.  
 
 #### <a id="underscores">Use of underscores `_` and `__`</a>
 
@@ -723,6 +727,16 @@ __Reflection__ (aka __introspection__) means finding out about the type, class, 
 *  `callable()` - check if this instance of your class can be called as if it were a function.
 *  `dir()`
 *  `getattr()`
+
+#### <a id="super">Superclass and `super()`</a>
+
+With class inheritance, you can have many hierarchies.  For example, if C is a subclass of C1 and C1 is a subclass of C2, we have the linear hierarchy of [C, C1, C2].  With multiple inheritance this can get pretty crazy with no linearization (so try to avoid using multiple inheritance).  The set of rules that construct this linearization of C is called the __Method Resolution Order (MRO)__ (aka __C3 superclass linerization__) and can be found under the __mro__ attribute.
+
+We can use `super()` to get the class hierarchy when there is single inheritance without having to name the parent classes explicitly.
+
+    class C(B):
+        def method(self, arg):
+            super().method(arg)  # same as super(C, self).method(arg)
 
 ## <a id="magicmethods">Class Magic Methods</a>
 
