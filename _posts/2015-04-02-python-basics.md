@@ -660,14 +660,13 @@ When you create a Class, all variables are in the __local scope__ (i.e. referenc
     MyClass.__dict__  # access an object dict
     # {'i': 12345, '__module__': '__main__', '__doc__': ' A simple class ', 'f': <function f at 0x0000000002BCA128>}
 
-
 #### <a id="init">Instantiation using `__init__(self)`</a>
 
 Class __instantiation__ uses function notation; just pretend a class object is a parameterless function that returns a new instance of the class.
 
     x = MyClass()  # creates a new instance of the class and assigns it to a variable x
 
-The instantiation operation ('calling' a class object) creates an empty object.  If you want to create an initial state, you use `__init__(self)`.
+The instantiation operation ('calling' a class object) creates an empty object.  If you want to create an initial state, you define `__init__(self)`.
 
     class Complex:
         def __init__(self, realpart, imagpart):
@@ -700,7 +699,7 @@ The instantiation operation ('calling' a class object) creates an empty object. 
     print "Polly is a %s" % Pet.getSpecies(polly)
     # Polly is a Parrot
 
-`cls` tells us we are looking at a class method.  This is similar to self, which is used in instance methods.  Again, the naming is just convention and can be called whatever you want.  cls is usually used in the `__new__` protocol for `staticmethod` and `classmethod` (i.e. methods that only need access to the class, but not to things specific to each instance of the class).  Always use cls for the first argument to class methods.  
+`cls` tells us we are looking at a class method.  This is similar to how self is used in instance methods.  Always use cls for the first argument to class methods.  Again, this naming is just convention and in theory you can call this whatever you want (but don't make a new name, this will just cause confusion).  cls is usually used in the `__new__` protocol for `staticmethod` and `classmethod` (i.e. methods that only need access to the class, but not to things specific to each instance of the class).  
 
 #### <a id="underscores">Use of underscores `_` and `__`</a>
 
@@ -737,6 +736,15 @@ We can use `super()` to get the class hierarchy when there is single inheritance
     class C(B):
         def method(self, arg):
             super().method(arg)  # same as super(C, self).method(arg)
+
+#### <a id="metaclasses">Metaclasses and `type`</a>
+
+So we know that classes are templates to create objects.  We can also have templates to build classes; these are called __metaclasses__.  So basically, classes are instances of something called metaclasses (the idea is kind of like how we have instances of classes).  The base metaclass is an instance of `type` (which is a kind of object).  To create this, you can do:
+
+     class mymeta(type):
+         pass
+
+We don't really need to use metaclasses or type.
 
 ## <a id="magicmethods">Class Magic Methods</a>
 
