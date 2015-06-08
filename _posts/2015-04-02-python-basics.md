@@ -41,6 +41,7 @@ __ADVANCED__
     -  [variable scope](#variablescope)
     -  [bound and unbound methods](#boundunbound)
     -  [class and static methods](#classstaticmethods)
+    -  [decorators](#decorators)
 *  [Class Objects](#classes)
     -  [Attribute Reference](#classattributes)
     -  [Instantiation and `__init__()`](#init)
@@ -631,6 +632,32 @@ Besides bound and unbound methods, we have __static methods__ and __class method
 __Static methods__ tells the method not to bind to an instance.  For the example, the method would normally be a bound method, but the `@staticmethod` makes this into a regular function.
 
 __Class methods__ tells the method not to bind to an instance, but the `@classmethod` binds the method to a class.  A class method is used to share among all the instances.
+
+#### <a id="decorators">Decorators</a>
+
+Decorators are functions that are applied right before your function or method call.  This is usually seen in something like a login function where say you can only run this specific function if you are logged in.  The decorator is a clean way to show this so you do not have to declare the login function inside your function. 
+
+    def p_decorate(func):
+        """ Wraps string around with <p> tags """
+        def func_wrapper(name):
+            return "<p>{0}</p>".format(func(name))
+        return func_wrapper
+    
+    # Example of decorating a function
+    @p_decorate
+    def get_text_clean(name):
+        return "lorem ipsum, {0} dolor sit amet".format(name)
+    
+    # Example of decorating a method
+    class Person(object):
+        def __init__(self):
+            self.name = "Willy"
+            self.family = "Liu"
+    
+        @p_decorate
+        def get_fullname(self):
+            return self.name + " " + self.family
+
 
 - - - -
 
