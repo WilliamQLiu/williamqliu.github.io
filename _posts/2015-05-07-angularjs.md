@@ -15,7 +15,7 @@ Angularjs follows the Model-View-Controller Pattern to structure a website; this
 *  The __View__ is the projection of the model through the HTML template (e.g. app/index.html).  When the model is updated, the View is updated.
   *  __Directives__ create standalone UI components.  There are many different directives including 'ng-repeat', 'ng-controller', 'ng-bind', 'ng-app', 'ng-change', 'ng-model', 'ng-submit', 'ng-click'.  You see these in the html, like: `<html ng-app>`, which represents an Angular directive named 'ng-app'.
   *  __Expressions__ are the data bindings.  E.g. `{{ phone.name }}`
-*  The __Controller__ is just a constructor function that takes in a `$` parameter, mainly the '$scope' parameter.  The Controller's job is to establish the data binding between the Model and the View.  The Controller uses the 'ng-controller' directive.  There are additional parameters including $https, $locationUrl, etc.
+*  The __Controller__ is just a constructor function that takes in a `$` parameter, mainly the `$scope` parameter.  The Controller's job is to establish the data binding between the Model and the View.  The Controller uses the `ng-controller` directive.  There are additional parameters including $https, $locationUrl, etc.
 
 - - - -
 
