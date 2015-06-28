@@ -18,7 +18,7 @@ __BEGINNER__
     -  [Strings (str) and Unicode (unicode)](#strings)
     -  [Lists (list, stacks, queues, list comprehension)](#lists)
     -  [Tuples](#tuples)
-    -  [Sequence Methods](#sequencemethods)
+    -  [Sequence Methods (e.g. enumerate)](#sequencemethods)
     -  [Sorting Sequences](#sequencesort)
 *  [Hash Table (i.e. key-value pair)](#hashtables)
     -  [Dict](#dict)
@@ -275,6 +275,25 @@ Assuming `s` and `t` are sequences and `n`, `i`, `j` are integers.
 *  `max(s)`  # largest item of s
 *  `s.index(x)`  # index of the first occurence of x in s
 *  `s.count(x)`  # total number of occurences of x in s
+
+####Enumerate
+
+A useful built-in function for sequences is Enumerate.  Enumerate means you return a tuple containing a count and the value from iterating over the sequence.  By default this starts counting from start 0, unless you specify the `start=` parameter.
+
+    seasons = ['Spring', 'Summer', 'Fall', 'Winter']
+    
+    list(enumerate(seasons))
+    # [(0, 'Spring'), (1, 'Summer'), (2, 'Fall'), (3, 'Winter')]
+    
+    list(enumerate(seasons, start=1))
+    # [(1, 'Spring'), (2, 'Summer'), (3, 'Fall'), (4, 'Winter')]
+    
+    for i, value in enumerate(seasons):
+        print "Position ", i, " has value ", value
+    #Position  0  has value  Spring
+    #Position  1  has value  Summer
+    #Position  2  has value  Fall
+    #Position  3  has value  Winter
 
 ####<a id="sequencesort">Sorting Sequences</a>
 
