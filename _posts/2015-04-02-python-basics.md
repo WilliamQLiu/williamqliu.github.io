@@ -152,6 +152,31 @@ Lists are a way to hold items in order.  The items can be different data types o
     #[9, 16]
     print type(squares)  # <type 'list'>
 
+####List Slicing
+
+Just like you can index and slice strings, you can do the same for Python's lists.
+
+    squares = [1, 4, 9, 16, 25]
+    print squares # [1, 4, 9, 16, 25]
+    squares[0]  # 1
+    squares[-1]  # 25
+    squares[:]  # [1, 4, 9, 16, 25]
+    squares[2:4]  # [9, 16]  # only get index 2 and 3 (excludes 4)
+    squares[::2] # [1, 9, 25]  # skip every other
+    squares[::-1]  # [25, 16, 9, 4, 1] reverse order
+
+####Nesting Lists
+
+You can nest lists (create lists that contain other lists).
+
+    a = ['a', 'b', 'c', 'd']
+    n = [1, 2, 3, 4]
+    x = [a, n]
+    print x  # [['a', 'b', 'c', 'd'], [1, 2, 3, 4]]
+    print x[0]  # ['a', 'b', 'c', 'd']
+    print x[0][1]  # b
+
+
 ####List Methods
 
 *  `list.append(x)` adds an item `x` to the end of the list
