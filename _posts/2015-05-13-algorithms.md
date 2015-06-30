@@ -10,6 +10,7 @@ title: Algorithms
 ##Table of Contents
 
 *  [Summary](#summary)
+    - [Structure of Data](#datastructure)
     - [What is an Algorithm](#whatisalgorithm)
     - [Is the algorithm correct?](#algorithmcorrect)
     - [Is the algorithm efficient?](#algorithmefficient)
@@ -19,16 +20,22 @@ title: Algorithms
         + [loop invariant](#loopinvariant)
     - [Divide and Conquer](#divideandconquer)
         + [recursion](#recursion)
-*  [Sorting Problem](#problemsorting)
+*  [Sorting Algorithms using Comparison Sort](#comparisonsortalgorithms)
     - [Incremental: insertion sort](#insertionsort)
     - [Incremental: bubble sort](#bubblesort)
     - [Divide and Conquer: merge sort](#mergesort)
     - [Divide and Conquer: quick sort](#quicksort)
+*  [Sorting Algorithms using Decision-Tree Models](#decisiontreemodels)
+    - [Counting Sort]
+    - [Radix Sort]
+    - [Bucket Sort]
 *  [Growth of Functions](#growthfunctions)
     - [Big O Notation](#bigonotation)
 *  [Probabilistic Analysis](#probabilisticanalysis)
     - [The Hiring Problem](#hiringproblem)
-    - [The Birthday Paradox](#birthdayparadox) 
+    - [The Birthday Paradox](#birthdayparadox)
+    - [Balls and Bins](#ballsbins)
+    - [Streaks (coin flips)](#streaks)
 
 TODO:
 
@@ -43,9 +50,17 @@ TODO:
 
 ##<a id="summary">Summary</a>
 
+####<a id="datastructure">Structure of Data</a>
+
+An individual data piece (i.e. a __record__) is usually part of a bigger collection of data.  Each record has a __key__ (the value to be sorted) and the rest of the record has __satellite data__ (data carried around with the key).
+
+So what goes on behind the scenes?  When we move data around, we apply a sorting algorithm; usually there's a large amount of satellite data that makes it slow to physically move (e.g. erase from hard drive, write to another place in hard drive) so instead we normally just move our pointer to the records.
+
+A __sorting algorithm__ is the method that we determine the sorted order (regardless of individual fields or large satellite data).
+
 ####<a id="whatisalgorithm">What is an Algorithm?</a>
 
-An __algorithm__ is a sequence of steps that takes an __input__ (i.e. some value(s)) and produces an __output__ (some value(s)).  For example, we might encounter a _sorting problem_ where we want to sort a sequence of numbers into nondecreasing order.
+So let's take a step back.  An __algorithm__ is a sequence of steps that takes an __input__ (i.e. some value(s)) and produces an __output__ (some value(s)).  For example, we might encounter a _sorting problem_ where we want to sort a sequence of numbers into nondecreasing order.  Most of these notes below are taken from reading the book 'Introduction to Algorithms' by Thome H. Cormen.
 
 ####<a id="algorithmcorrect">Is the algorithm correct?</a>
 
@@ -66,7 +81,7 @@ Other considerations in real life (that we won't consider for now) are things li
 
 ##<a id="algorithmdesign">Designing Algorithms</a>
 
-There are a variety of design approaches to algorithms.  Let's start with __incremental__ and __divide and conquer__, which are opposites of each other.
+We briefly cover the structure of data, then go into a couple of design approaches with __incremental__ and __divide and conquer__, which are opposites of each other.
 
 *  __incremental approach__ (aka __iteration__) is used in algorithms like _insertion sort_.  This means working with _iterables_, objects that can be used in `for` or `while` loops.
 *  __divide and conquer approach__ breaks the problem into several subproblems that are similar to the original problem, but smaller in size.  This is used in algorithms like _merge sort_.
@@ -109,9 +124,9 @@ __Recursion__ is a method where the solution to a problem depends on solutions t
         else:
             return fib(n-1) + fib(n-2)
 
-##<a id="problemsorting">Sorting Problems</a>
+##<a id="comparisonsortalgorithms">Sorting Algorithms with Comparison Sorts</a>
 
-A basic computational problem is sorting a sequence of _n_ numbers (aka __keys__).  We apply the above approaches (insertion, divide and conquer) to different algorithms.
+A basic computational problem is the __sorting problem__, where you sort a sequence of _n_ numbers (aka __keys__).  We apply the above general approaches (_insertion_, _divide and conquer_) using different types of algorithms.  The following algorithms (_insertion sort_, _bubble sort_, _merge sort_, _heapsort_, and _quicksort_) are all __comparison sorts__ (i.e. they determine the order of an input array by comparing elements).
 
 ####<a id="insertionsort">Incremental: insertion sort</a>
 
@@ -151,6 +166,41 @@ __Quick sort__ is an efficient algorithm that does a sort 'in place' by splittin
 2. We now do a __partition__ operation; this means we reorder the array so that all elements with values less than the pivot are on one side while all elements with values greater than the pivot are on the other side (equal values can go either way).  After this paritioning, the pivot element is in its final position.
 3. Recursively apply the above steps to the sub-array of elements with smaller values and separately to the sub-array of elements with greater values.
 
+####<a id="heapsort">Divide and Conquer: heap sort</a>
+
+__Heap sort__ takes the best properties of merge sort (the run time) and the efficency of insertion sort's ability to sort in place (i.e. only a constant number of elements are stored outside the input array at any time).  What makes heapsort unique is that it uses a data structure called a __heap__ to help manage information (instead of a __linear-time search__); heapsort divides its input into a sorted and an unsorted region and it iteratively shrinks the unsorted region by extracting the largest element and moving that to the sorted region.  This heapsort is really efficient at managing __priority queues__.
+
+Note: In programming languages like Java or Lisp, heap refers to 'garbage-collected storage'; this is not what we're talking about here.
+
+Given an array _A_ that represents a heap, we can look at the two attributes (_length_, _heap-size_) and determine what part is valid (i.e. this is the correctly sorted region) and what is still the heap (i.e. unsorted):
+
+*  `A.length` gives us the number of elements in the array
+*  `A.heap-size` gives us how many elements in the heap are stored within array _A_.
+*  The heap would then be calculated as `A[1 ... A.heap-size]` where `0 <= A.heap-size <= A.length`
+
+<a id="binaryheap">__(Binary) Heap__</a>
+
+A __(binary) heap__ data structure is an array object that we can view as a nearly complete binary tree.  Think of it as two parts:
+
+1. We have some data (e.g. a list of `[6, 5, 3, 1, 8, 7, 2, 4]`) that we use to create the _heap_, a data structure that looks like a binary tree.  As we're building this binary tree, the heap swaps elements depending on the type (e.g. min or max) of the binary heap (e.g. sorting smallest to largest, larger nodes don't stay below smaller node parents and end up swapping; `8` can't be below `5` on the heap).  Once the binary tree is built, we have a tree where each array index represents a node and also has the index of the node's parent, left child branch, or right child branch.
+2. We then create a _sorted array_ by repeatedly removing the largest element from the root of the heap and inserting it into the array.  The heap is updated after each removal to maintain the heap.  Once all objects have been removed from the heap, the result is a sorted array.
+
+##<a id="decisiontree">Sorting Algorithms using Decision Tree Models</a>
+
+Placeholder for smart stuff.
+
+####<a id="countingsort">Counting Sort</a>
+
+Placeholder for smart stuff.
+
+####<a id="radixsort">Radix Sort</a>
+
+Placeholder for smart stuff.
+
+####<a id="bucketsort">Bucket Sort</a>
+
+Placeholder for smart stuff.
+
 ##<a id="growthfunctions">Growth of Functions</a>
 
 We are interested in the __asymptotic__ efficiency of algorithms, which means we are estimating for very large inputs.  Usually an asymptotically efficient algorithm will be the best choice for everything but the smallest input cases.
@@ -160,7 +210,11 @@ We use __Big O notation__ to give an estimated running time based on the input s
 
 ##<a id="probabilisticanalysis">Probabilistic Analysis</a>
 
-__Probabilistic analysis__ is the use of probability in the analysis of problems.  We can use this in analyzing the running time of an algorithm or we can use it to analyze other quantities, such as who to hire.
+__Probabilistic analysis__ is the use of probability in the analysis of problems.  We can use this in analyzing the running time of an algorithm or we can use it to analyze other quantities, such as who to hire.  We have some examples:
+
+*  Determine the probability that in a room of k people, two of them share the same birthday.
+*  What happens when we randomly toss balls into bins
+*  Where 'streaks' of consecutive heads come from when we flip coins
 
 ####<a id="hiringproblem">The Hiring Problem</a>
 
@@ -176,3 +230,17 @@ How many people must there be in a room before there is a 50% chance that two of
 
 *  `k = number of people in the room`; we index the people in the room with integers (e.g. 1, 2, 3, ... k)
 *  `n = 365 days`; we ignore leap years
+*  Assume that birthdays are uniformly distributed across n days and are independent.
+
+####<a id="ballsbins">Balls and Bins</a>
+
+If we randomly toss identical balls into _b_ bins (1 through _b_) and assuming the tosses are independent with an equal chance of ending up in any bin, we have the probability that a tossed ball lands in any given bin as `1/b` of success (where success is falling into the given bin).  The ball tossing can be seen as a sequence of __Bernoulli trials__ (i.e. a binomial trial, a random experiment where there are exactly two possible outcomes; success and failure).  This answers questions like:
+
+*  How many balls fall in a given bin?
+*  How many balls must we toss, on average, until a given bin contains a ball?
+*  How many balls must we toss until every bin contains at least one ball?  (aka the __coupon collector's problem__, which says that a person trying to collect each of _b_ different coupons expects to acquire aprpoximately _b_ ln _b_ randomly obtained coupons in order to succeed).
+
+####<a id="streaks">Streaks</a>
+
+If you flip a fair coin _n_ times, what is the longest streak of consecutive heads that you expect to see?
+
