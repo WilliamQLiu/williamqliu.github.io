@@ -180,14 +180,18 @@ Given an array _A_ that represents a heap, we can look at the two attributes (_l
 
 <a id="binaryheap">__(Binary) Heap__</a>
 
-A __(binary) heap__ data structure is an array object that we can view as a nearly complete binary tree.  Think of it as two parts:
+A __(binary) heap__ data structure is an array object that we can view as a binary tree.  Think of this algorithm as two parts:
 
 1. We have some data (e.g. a list of `[6, 5, 3, 1, 8, 7, 2, 4]`) that we use to create the _heap_, a data structure that looks like a binary tree.  As we're building this binary tree, the heap swaps elements depending on the type (e.g. min or max) of the binary heap (e.g. sorting smallest to largest, larger nodes don't stay below smaller node parents and end up swapping; `8` can't be below `5` on the heap).  Once the binary tree is built, we have a tree where each array index represents a node and also has the index of the node's parent, left child branch, or right child branch.
-2. We then create a _sorted array_ by repeatedly removing the largest element from the root of the heap and inserting it into the array.  The heap is updated after each removal to maintain the heap.  Once all objects have been removed from the heap, the result is a sorted array.
+2. We then create a _sorted array_ by repeatedly removing the largest element from the root of the heap and inserting it into the array.  The heap is updated after each removal to maintain the heap.  The heap incrementally gets smaller until all objects have been removed from the heap, resulting in only a sorted array left.
 
-##<a id="decisiontree">Sorting Algorithms using Decision Tree Models</a>
+<a id="priorityqueue">__Priority Queue__</a>
 
-Placeholder for smart stuff.
+As mentioned earlier, __heap sort__ is great for creating __priority queues__, which is a data structure for maintaining a set _S_ of elements, each with an associated value called a __key__.  There's __max-priority queue__ (e.g. used to schedule jobs on a server and set their relative priorities) and a __min-priority queue__ (e.g. used for _discrete event-driven simulation_ models like determining how many patients can be served from changing 8 hours to 9 hours of operation when avg surguery takes say 4 hours).
+
+##<a id="decisiontree">Sorting Algorithms with Linear Time (Decision Tree Models)</a>
+
+Previously mentioned algorithms are __comparison sorts__, which determines the sort order based only on comparisons between the input elements.  If we make the assumption that all the input elements are distinct, we can sort by __linear time__.  This means we can do comparison sorts in terms of __decision trees__, which is a full binary tree that represents the comparisons between elements in a sorting algorithm (say elements `i` : `j`).  
 
 ####<a id="countingsort">Counting Sort</a>
 
