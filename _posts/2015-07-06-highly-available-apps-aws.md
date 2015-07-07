@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Architecting Highly Available Applications on AWS
+title: Architecting Highly Available Apps on AWS
 ---
 
 ## {{ page.title }}
@@ -75,6 +75,7 @@ __Highly Available__ means removing single points of failure (because "Everythin
 ####<a id="numbernines">Number of Nines in Levels of Availability</a>
 
 __Number of Nines__ in Levels of Availability
+
 *  1 Nine = 90% uptime, downtime per year = 36.5 days
 *  2 Nines = 99%, downtime per year = 3.65 days
 *  3 Nines = 99.9%, downtime per year = 8.76 hrs (probably the standard, we have two load balancers, two web servers, two application servers, two databases, etc.)
@@ -84,13 +85,15 @@ __Number of Nines__ in Levels of Availability
 ####<a id="faulttolerance">Fault Tolerance</a>
 
 __Fault Tolerance__ means built-in redundancy so apps can continue functioning when components fail
-*  Ability of a application to accommodate growth without changing design
+
+*  Ability of an application to accommodate growth without changing design
 *  Be able to recover from failure
 
 ##<a id="awsarchitecture">AWS Architecture</a>
 
 AWS encourages everything in the cloud as 'off-site' and 'multi-site'.
-*  Lots of great diagrams showing big picture of architecture here: http://aws.amazon.com/architecture/
+
+*  Lots of great diagrams showing big picture of architecture [here](http://aws.amazon.com/architecture/  "Diagrams of AWS Architecture")
 *  Single or Multi-Regions?  Depends on how much money you have/want to spend and what your app does without say a key component like a database.  Recommend to a single default region + multiple Availability Zones
 *  AWS is literally a programmable data center, automation is one of its key uses.  Everything is API driven.  Automate and test your highly available implementation.
 
@@ -111,6 +114,7 @@ __CloudFront__ is a world-wide __content distribution network__ (CDN).  This dis
 Without CloudFront, your content is being loaded from EC2 webservers directly.  With no CDN, the response time is longer and server load is higher.
 
 You can use CloudFront for even Dynamic Resources (not just static).  This is perfect for intelligently pushing back small packets of data back to the origin server as long as it does NOT require a real time response (e.g. a voting application).  You can:
+
 *  TCP/IP optimizations for the network path
 *  Keep-Alive Connections to reduce RTT
 *  Collapsed forwarding
@@ -123,12 +127,14 @@ AWS __Route 53__ is a highly available and scalable DNS (Fun note: 53 is the com
 
 __DNS Failover__ means that if you have a DNS pointing to a primary server and the health check fails, you can automatically reroute to a different server (even if its just a static site that says there are issues).  For example, that setup would look like this:
 
-Record Sets
+__Record Sets__
+
 *  CNAME www is pointing to the elastic_load_balancer
 *  Routing Policy = Failover
 *  Record Type = Primary
 
-Amazon S3 website
+__Amazon S3 website__
+
 *  Routing Policy = Failover
 *  Record Type = Secondary
 
@@ -148,7 +154,7 @@ We will simulate a faulty instance by deleting the web server under instances.  
 
 AWS lets you failover to a backup website if your primary website is unavailable.  We will do this by configuring a simple backup website on Amazon S3 and use Amazon Route 53 DNS Failover to automatically route traffic when the primary site is unavailable.
 
-_Setup Hosted Zone, Health Check, and set Failover Routing Policy_
+__Setup Hosted Zone, Health Check, and set Failover Routing Policy__
 
 In our __Route 53__, we will look at __Hosted Zones__, which is a hosted zone for your domain name (usually modifying these settings takes hours to take into effect).  Under 'Hosted Zones' > 'Go to Record Sets'.  You will see 3 records with these types:
 
@@ -193,6 +199,7 @@ Cloudwatch allows you to monitor AWS cloud resources.  Alarms can be setup.  You
 Elastic Load Balancer (ELB) is a load balancer that is highly available and helps with auto-scaling, does health checks, etc.  ELB spans across multiple AZs.  ELB scales smoothly based on traffic.  Scaling can take from 1-7 minutes based on traffic profile.
 
 IP Address will change over time (so don't use IP Address).
+
 *  Use 'CNAME' records in DNS
 *  DNS TTL of 60 seconds
 
@@ -209,6 +216,7 @@ For example, scale up by 10% if CPU utilization is greater than 60% for 5 minute
 ####<a id="autoscalecomponents">Auto Scaling Components</a>
 
 We have the following components:
+
 *  Launch Configuration - describes what auto scaling will create when adding instances
 *  Auto-Scaling Group - auto scaling managed grouping of EC2 instances
 *  Auto-Scaling Policy - parameters for performing an auto scaling action
@@ -272,6 +280,7 @@ A volume is replicated, but only within a __single Availability Zone__.  Snapsho
 __EBS Performance__
 
 There are two types of EBS, Magnetic and SSD.  Recommend not using Magnetic.
+
 *  3 IOPS/GB sustained/baseline
     -  100GB = 300 IOPS, 1000GB = 3000 IOPS sustained
 *  Each volume gets an IO credit of 5.4 million IOPS
@@ -281,6 +290,7 @@ There are two types of EBS, Magnetic and SSD.  Recommend not using Magnetic.
 *  Sustained performance until IOPS are depleted
 
 Use PIOPS for consistent IO performance
+
 *  Up to 4000 16KB IOPS/volume
 *  Stripe multiple volumes for >4000 IOPS
 *  Use with EBS Optimized Instances (be aware of max IOPS and bandwidth based on your EC2 instance size, e.g. c1.xlarge = 1,000 dedicated EBS throughput)
@@ -288,6 +298,7 @@ Use PIOPS for consistent IO performance
 ####<a id="instancestorage">AWS EC2 Instance Storage</a>
 
 'Instance Storage' is a storage local to your AWS EC2 instance.  These are basically hard drives that you can't take with you (i.e. you lose this when your server shuts down) with the following properties:
+
 *  Temporary, volatile block storage
 *  Not all instances have instance storage (e.g. T2)
 *  Must be configured at launch of instance, cannot be reconfigured later
@@ -335,6 +346,7 @@ Very very high durability of objects.  Unlimited storage of objects of any type.
 ##<a id="dbarchitecture">Database Options</a>
 
 AWS supports a variety of database deployment options.  
+
 *  AWS can support traditional database high availability options by mirroring and replication.
 *  AWS also offers managed databases with high availability support using __Amazon RDS Multi-AZ__ and __Amazon DynamoDB__.
 
@@ -343,17 +355,20 @@ AWS supports a variety of database deployment options.
 Each option solves different DB problems so choose based on experience, features, and cost.
 
 Self managed on EC2
+
 *  Oracle, SQL Server, DB2
 *  MySQL, PostgreSQL
 *  Basically any type of database
 
 AWS Managed (RDS)
+
 *  RDS MySQL
 *  RDS Oracle
 *  RDS SQL Server
 *  RDS PostgreSQL
 
 ####<a id="dbstorageconsiderations">Database Storage Considerations</a>
+
 *  Use EBS GP2 volumes for low/medium workloads
 *  EBS PIOPS provides up to 4000 IOPS/volume for high performance workloads
 *  Instance storage for temporary data
@@ -422,6 +437,7 @@ In summary, it is easy to create high availability of databases if you use AWS R
 ##<a id="hadesignpatterns">High Availability Design Patterns</a>
 
 When it comes to High Availability, we have the following patterns:
+
 *  Basic patterns
 *  Advanced patterns
 *  Amazon Virtual Private Cloud (VPC) patterns
@@ -429,22 +445,27 @@ When it comes to High Availability, we have the following patterns:
 ####<a id="commondesignpatterns">Common Design Patterns</a>
 
 __Multi-Server Pattern__
+
 *  Problem: Need to increase availability at the instance layer such that if an instance dies there is a resilient solution.
 *  Solution: Distribute load between instances using Elastic Load Balancing
 
 __Multi-Datacenter Pattern__
+
 *  Problem:  Increase availability of my application if there is a power outage or a natural disaster in the area causing a data center outage
 *  Solution: Distribute load between instances using an Elastic Load Balancing across multiple AZs.
 
 __High Availability Database Pattern__
+
 *  Problem:  Need to have high availability solution that will withstand an outage of the DB master and can sustain high volume of reads
 *  Solution:  Deploy RDS with a master and slave configuration.  In addition, deploy a read replica in each availability zone for my reads.
 
 __Floating IP Pattern__
+
 *  Problem:  If my instance fails or I need to upgrade it, I need to push traffic to another instance with the same public IP Address.
 *  Solution:  Use an IP address which allows portability of a given IP Address between EC2 instances without updating DNS
 
 __Floating Interface Pattern__
+
 *  Problem:  If my instance fails or I need to upgrade it, I need to push traffic to another instance with the same public and private IP addresses and same network interface
 *  Solution:  Deploy your application in VPC and use an elastic network interface (ENI) on eth1 that can be moved between instances and retain same MAC, public, and private IP addresses.
 
@@ -499,5 +520,3 @@ __AWS Direct Connect__ establishes a private network connection between your net
 In previous labs we created redundant services across availability zones (AZs) within a region and distributing inbound traffic across those services at various application tiers (web, database).  Now we want to look at how to make outbound traffic highly originating from application tiers in VPC highly available, using NAT instances that span multiple AZs.
 
 This looks tough, time to call an Amazon representative if you run into this issue.
-
-
