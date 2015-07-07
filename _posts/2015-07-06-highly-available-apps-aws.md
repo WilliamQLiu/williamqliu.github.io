@@ -11,9 +11,9 @@ title: Architecting Highly Available Applications on AWS
 
 *  [Summary](#summary)
 *  [Highly Available vs Fault Tolerant](#haft)
-    -  [Highly Available]
-    -  [Number of Nines]
-    -  [Fault Tolerance]
+    -  [Highly Available](#highlyavailable)
+    -  [Number of Nines](#numberofnines)
+    -  [Fault Tolerance](#faulttolerance)
 *  [AWS Architecture](#awsarchitecture)
     -  [Chaos Monkey](#chaosmonkey)
     -  [AWS S3](#s3)
@@ -60,6 +60,8 @@ These are notes from attending the NYC AWS Training and Certification for Highly
 
 ##<a id="haft">Highly Available vs Fault Tolerant</a>
 
+####<a id="highlyavailable">Highly Available</a>
+
 __Highly Available__ means removing single points of failure (because "Everything fails all the time")
 
 *  Assume everything fails and work backwards
@@ -70,12 +72,16 @@ __Highly Available__ means removing single points of failure (because "Everythin
 *  _Availability_ defined as percentage of time an application operates during its work cycle
 *  Loss of availability is known as an outage or downtime (e.g. app is offline, app is slow, either planned or unplanned)
 
+####<a id="numbernines">Number of Nines in Levels of Availability</a>
+
 __Number of Nines__ in Levels of Availability
 *  1 Nine = 90% uptime, downtime per year = 36.5 days
 *  2 Nines = 99%, downtime per year = 3.65 days
 *  3 Nines = 99.9%, downtime per year = 8.76 hrs (probably the standard, we have two load balancers, two web servers, two application servers, two databases, etc.)
 *  4 Nines = 99.99%, downtime per year = 52.6 min (at this point, to go from 3 Nines to 4 Nines, you need to put servers in another building / some distance, but this adds in some latency issues)
 *  5 Nines, etc... (things like S3 has 9 Nines)
+
+####<a id="faulttolerance">Fault Tolerance</a>
 
 __Fault Tolerance__ means built-in redundancy so apps can continue functioning when components fail
 *  Ability of a application to accommodate growth without changing design
@@ -488,7 +494,7 @@ __VPN Connectivity__ allows connecting dual redundant tunnels between your on-pr
 
 __AWS Direct Connect__ establishes a private network connection between your network and one of the AWS Regions.  AWS Direct Connect is an alternative to using the Internet to access AWS cloud services.  This reduces bandwith costs, creates consistent network performance, is a private connection to your Amazon VPC.
 
-##<a id="lab4">Making outbound traffic highly available using NAT instances</a>
+####<a id="lab4">Lab 4 Exercise - Making outbound traffic highly available using NAT instances</a>
 
 In previous labs we created redundant services across availability zones (AZs) within a region and distributing inbound traffic across those services at various application tiers (web, database).  Now we want to look at how to make outbound traffic highly originating from application tiers in VPC highly available, using NAT instances that span multiple AZs.
 

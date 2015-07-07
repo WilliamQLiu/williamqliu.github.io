@@ -36,6 +36,9 @@ title: Algorithms
     - [The Birthday Paradox](#birthdayparadox)
     - [Balls and Bins](#ballsbins)
     - [Streaks (coin flips)](#streaks)
+*  [Graph Theory](#graphtheory)
+    - [Graphs](#graphs)
+    - [Trees](#trees)
 
 TODO:
 
@@ -248,3 +251,65 @@ If we randomly toss identical balls into _b_ bins (1 through _b_) and assuming t
 
 If you flip a fair coin _n_ times, what is the longest streak of consecutive heads that you expect to see?
 
+##<a id="graphtheory">Graph Theory</a>
+
+__Graph theory__ is the study of graphs, which are mathematical structures used to model pairwise relations between objects.  A __graph__ is made up of __vertices__ (aka __nodes__; note that a node is called a __leaf__ if it has no children) and lines that connect them are called __edges__.
+
+####<a id="trees">Trees</a>
+
+__Trees__ are a type of graph and they're described as:
+*  Each tree has a root node
+*  The root node has zero or more child nodes
+*  Each child node has zero or more child nodes, and so on.
+
+The tree cannot contain cycles.  The nodes may or may not be in a particular order, they could have any data type as values, and they may or may not have links back to their parent nodes.
+
+__Types of Trees__
+There are different types of trees that can take on different properties:
+*  We can describe a tree as a __binary tree__ (a node has up to 2 children), __ternary tree__ (a node has up to 3 children) and so forth.
+*  A __binary tree__ means each node has up to 2 children vs a __binary search tree__, which has the _additional_ requirement that `all left descendants <= n < all right descendents` for every node.  Note that some definitions of a binary search tree cannot have duplicates, others the duplicate values will be on the right or can be on either side.  All are valid definitions.
+*  __balanced__ vs __unbalanced__ does not mean that the left aznd right subtrees are exactly the same size (like a _perfect binary tree_).  It simply means that they're balanced enough to ensure `O(log n)` run times for `insert` and `find` operations.
+*  A __complete binary tree__ is a binary tree where every level of the tree is fully filled, except for possibly the last level (filled left to right).  Examples of these include __min binary heaps__ and __max binary heaps__.
+*  A __full binary tree__ is a binary tree in which every node has either zero or two children (no nodes have only one child)
+*  A __perfect binary tree__ is a tree that is both full and complete.  All leaf nodes will be at the same level and this level has the maximum number of nodes.
+
+__Traversing Trees__
+You can traverse binary trees using a variety of methods (the most common being 'in-order' traversal):
+*  __in-order traversal__ means to 'visit' the left branch, then the current node, and finally the right branch.  When performed on a binary search tree, it visits the nodes in ascending order (thus the name, in-order)
+*  __pre-order traversal__ means to 'visit' the current node before its child nodes (thus the name, pre-order).  The root is always the first node visited.
+*  __post-order traversal__ means to 'visit' the current node after its child nodes (thus the name, post-order).  The root is always the last node visited.
+
+__Tries (prefix trees)__
+
+A __trie__ (aka __prefix tree__) is a special kind of tree; a trie is like an n-ry tree in which characters are stored at each node and each path down the tree may represent a word.  
+
+There are `*` nodes (aka __null nodes__) that are used to indicate complete words (e.g. `Many*` means many is a complete word or `Ma*` means there are lots of words that start with `Ma`).
+
+A trie is commonly used to store the entire English language for quick prefix lookups.  A hash table can quickly look up whether a string is a valid word, but it cannot tell us if a string is a prefix of any valid words.
+
+####<a id="trees">Graphs</a>
+
+A tree is a type of __graph__, but not all graphs are trees.  A tree is a connected graph without cycles.  A graph is a collection of nodes with edges between (some of) them.  Graphs are used to model pairwise relations between objects. 
+*  graphs can be either __directed__ (where edges are like a one way street) or __undirected__ (where edges are like a two way street).
+*  graphs might consist of multiple isolated subgraphs.
+*  if there is a path between every pair of vertices, it is a __connected graph__
+*  graphs can (or not) have cycles.  an __acyclic graph__ is a graph without cycles
+
+__Ways to store graphs__
+
+You can store graphs as an __adjacency list__ (most common way) or as an __adjacency matrices__.
+*  an __adjacency list__ is where every vertex (or node) stores a list of adjacent vertices in an undirected graph; an edge like (a, b) would be stored twice: once in a's adjacent vertices and once in b's adjacent vertices.  You can also store an adjacency list as an array (or a hash table) of lists like:
+    -  0: 1
+    -  1: 2
+    -  2: 0, 3
+    -  3: 2
+    -  4: 6
+    -  5: 4
+    -  6: 5
+*  an __adjacency matrix__ is an N*N boolean matrix (where N is the number of nodes), where a true value at `matrix[i][j]` indicates an edge from node i to node j (or you can use an integer matrix with 0's and 1's).  Usually searches on adjacency matrix are less efficient than an adjacency list since you have to search through all the nodes to identify a node's neighbors.
+
+__Ways to search a Graph__
+
+The two most common ways to search a graph are __depth-first search__ and __breadth-first search__.
+*  In __depth-first search (DFS)__, we start at the root (or an arbitrarily selected node) and explore each branch completely before moving on to the next branch (thus the name depth-first) before we go wide.  This is usually a simpler approach.
+*  In __breadth-first search (BFS)__, we start at the root (or an arbitrarily selected node) and explore each neighbor before going on to any of their children (thus the name breadth-first) before we go deep.
