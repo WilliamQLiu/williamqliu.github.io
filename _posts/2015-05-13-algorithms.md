@@ -213,6 +213,7 @@ Placeholder for smart stuff.
 We are interested in the __asymptotic__ efficiency of algorithms, which means we are estimating for very large inputs.  Usually an asymptotically efficient algorithm will be the best choice for everything but the smallest input cases.
 
 ####<a id="bigo">Big O Notation</a>
+
 We use __Big O notation__ to give an estimated running time based on the input size (as it tends toward infinity)
 
 ##<a id="probabilisticanalysis">Probabilistic Analysis</a>
@@ -266,6 +267,7 @@ The tree cannot contain cycles.  The nodes may or may not be in a particular ord
 
 __Types of Trees__
 There are different types of trees that can take on different properties:
+
 *  We can describe a tree as a __binary tree__ (a node has up to 2 children), __ternary tree__ (a node has up to 3 children) and so forth.
 *  A __binary tree__ means each node has up to 2 children vs a __binary search tree__, which has the _additional_ requirement that `all left descendants <= n < all right descendents` for every node.  Note that some definitions of a binary search tree cannot have duplicates, others the duplicate values will be on the right or can be on either side.  All are valid definitions.
 *  __balanced__ vs __unbalanced__ does not mean that the left aznd right subtrees are exactly the same size (like a _perfect binary tree_).  It simply means that they're balanced enough to ensure `O(log n)` run times for `insert` and `find` operations.
@@ -275,6 +277,7 @@ There are different types of trees that can take on different properties:
 
 __Traversing Trees__
 You can traverse binary trees using a variety of methods (the most common being 'in-order' traversal):
+
 *  __in-order traversal__ means to 'visit' the left branch, then the current node, and finally the right branch.  When performed on a binary search tree, it visits the nodes in ascending order (thus the name, in-order)
 *  __pre-order traversal__ means to 'visit' the current node before its child nodes (thus the name, pre-order).  The root is always the first node visited.
 *  __post-order traversal__ means to 'visit' the current node after its child nodes (thus the name, post-order).  The root is always the last node visited.
@@ -290,6 +293,7 @@ A trie is commonly used to store the entire English language for quick prefix lo
 ####<a id="trees">Graphs</a>
 
 A tree is a type of __graph__, but not all graphs are trees.  A tree is a connected graph without cycles.  A graph is a collection of nodes with edges between (some of) them.  Graphs are used to model pairwise relations between objects. 
+
 *  graphs can be either __directed__ (where edges are like a one way street) or __undirected__ (where edges are like a two way street).
 *  graphs might consist of multiple isolated subgraphs.
 *  if there is a path between every pair of vertices, it is a __connected graph__
@@ -298,6 +302,7 @@ A tree is a type of __graph__, but not all graphs are trees.  A tree is a connec
 __Ways to store graphs__
 
 You can store graphs as an __adjacency list__ (most common way) or as an __adjacency matrices__.
+
 *  an __adjacency list__ is where every vertex (or node) stores a list of adjacent vertices in an undirected graph; an edge like (a, b) would be stored twice: once in a's adjacent vertices and once in b's adjacent vertices.  You can also store an adjacency list as an array (or a hash table) of lists like:
     -  0: 1
     -  1: 2
@@ -311,5 +316,6 @@ You can store graphs as an __adjacency list__ (most common way) or as an __adjac
 __Ways to search a Graph__
 
 The two most common ways to search a graph are __depth-first search__ and __breadth-first search__.
+
 *  In __depth-first search (DFS)__, we start at the root (or an arbitrarily selected node) and explore each branch completely before moving on to the next branch (thus the name depth-first) before we go wide.  This is usually a simpler approach.
 *  In __breadth-first search (BFS)__, we start at the root (or an arbitrarily selected node) and explore each neighbor before going on to any of their children (thus the name breadth-first) before we go deep.
