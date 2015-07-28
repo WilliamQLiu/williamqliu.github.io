@@ -5,13 +5,24 @@ title: Statistical Analysis
 
 ## {{ page.title }}
 
-**Summary**
+- - - -
+
+##Table of Contents
+
+*  [Summary](#summary)
+*  [Statistics High Level Overview](#statsoverview)
+    -  [Descriptive Statistics](#descriptive)
+    -  [Inferential Statistics](#inferential)
+*  [Model Cheatsheet](#modelcs)
+*  [One Sample T-Test](#onesamplettest)
+
+##<a id="summary">Summary</a>
 
 When I was younger, I wish someone told me to learn calculus if I wanted to be a rocket scientist, otherwise go learn statistics.  Even with that advice, I found it difficult to learn statistics because there seems to be a lot of different naming conventions.  Here is my take on the first principles of statistics where we try to break down statistical analysis into its smallest pieces; the idea is that we want to find useful patterns for learning statistics.  Statistics is simply `outcome = model + error`
 
-**Factors**
+##<a id="statsoverview">Statistics High Level Overview</a>
 
-I think the main factors in determining an analysis are:
+I think the main pieces in determining how we approach data analysis are the following:
 
 *  Number of __independent variables__ and __dependent variables__
 *  Data type(s) of __independent variables__ and __dependent variables__
@@ -21,19 +32,19 @@ I think the main factors in determining an analysis are:
 *  What is the Sample Size and what should we consider statistically significant (p-value)?
 *  Are we reliably checking what we actually want to measure __reliability__ and __validity__?
 
-**Descriptive Statistics**
+####<a id="descriptivestatistics">Descriptive Statistics</a>
 
 This describes the dataset and is pretty straightforward.  For example, what is the mode, median, mean?  For more details, look up the Stats Primer post.
 
-**Inferential Statistics**
+####<a id="inferentialstatistics">Inferential Statistics</a>
 
 We predict values of an outcome variable based on some kind of model.  This usually means we are looking to see if the independent variable(s) cause some kind of change in the dependent variable(s).  All inferential statistics can be described with:
 
     outcome = model + error
 
-**Model CheatSheet**
+##<a id="modelcs">Model Cheat Sheet</a>
 
-We simply switch out the model, which is made up of __variables__ and __parameters__.
+We simply switch out the model, which is made up of __variables__ and __parameters__.  Like all cheat sheets, this is a large oversimplification of statistics, but could be useful as a high level starting point.
 
 | __test_name_aka__ | __about_model_description__ | __example_use_of_the_model__ |dist|__#dep__|type_dep|__#ind__|type_ind|pop| __the_really_long_notes_section__ |
 |:--------:|:-------------------|:----------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
@@ -62,3 +73,25 @@ We simply switch out the model, which is made up of __variables__ and __paramete
 |__Multiple Linear Regression__|Looks at the linear relationship between two or more independent continuous variables and its effect on a continuous dependent variable using __independent measures__.|How much does advertising cost (first independent continuous variable) and airtime on radio (second independent continuous variable) affect album sales (continuous dependent variable)?|P|1|continuous|2+|continuous|2+ ind|We calculate __Pearson's correlation__ and __coefficient of correlation (r^2)__.  This is similar to a Simple Linear Regression, except in a Multiple Linear Regression we have more than one independent variable.  The mathmatical concept is still the same, we use model sum of squares where we try to fit a line that minimizes error.  Here the line is more complex than a straight line.|
 |__Analysis of Covariance__|Looks at the linear relationship between independent variables (where there's both continuous and categorical) and a dependent continuous variable by comparing several __means__.|We have viagra doses (placebo, low, high dose as categoricals) and we measure a participant's libido (continuous dependent variable) with the partner's libido (independent continuous variable as the __covariate__)|P|1|continuous|2+|at least 1 continuous and/or at least 1 categorical|2+ ind|__Partial eta squared__ (aka __partial n^2__) is an effect size measure for ANCOVA; this is like __eta squared__ (n^2) in ANOVA or r^2.  ANCOVA is like ANOVA except you include __covariates__, which are one or more continuous variables that are not part of the main experimental manipulation, but have an influence on the dependent variable.  You add these to 1.) __reduce within-group error variance__ and 2.) __elimination of confounds__ (those variables other than the experimental manipulation that affect the dependent variable)|
 |__Multiple Logistic Regression__|Test that assumes one categorical (nominal) dependent variable and two or more continuous independent variables using __independent measures__.|High school graduates make career choices (nothing, work, college as the dependent variable) and we model this off of their social economic status (low, middle, high income as their first independent variable) and their SAT scores (as their second independent variable).|NP|1|continuous|2+|at least 1 continuous and/or at least 1 categorical|2+ ind|We're interested in the effect that the independent variables have on the probability of obtaining a particular value of the dependent variable|
+
+##<a id="scipystats">SciPy Stats</a>
+
+In Python, there's an open-source library called SciPy that handles a lot of standard mathematics, science, and engineering calculations.  There's many subpackages, including linear algebra (`scipy.linalg`), spatial data structures and algorithms to compute triangulations and Voronoi diagrams (`scipy.spatial`), but for this article we want to look at the statistics side (`scipy.stats`).
+
+   
+##<a id="onesamplettest">One Sample T-Test</a>
+
+We want to compare a sample mean to a population mean of the average American height (177cm).  Does this data represent the population mean?
+
+    from scipy import stats
+    
+    data = [177.3, 177, 178.1, 198, 156, 173]
+    result = stats.ttest_1samp(data, 177)
+    print "t-statistic is {} and p-value is {}".format(result[0], result[1]) # t-statistic and p-value
+
+
+
+
+
+
+
