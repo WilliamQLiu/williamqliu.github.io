@@ -48,6 +48,7 @@ __ADVANCED__
     -  [`self` and `cls`](#selfandcls)
     -  [underscores](#underscores)
     -  [inheritance](#inheritance)
+    -  [abstract class](#abstractbaseclass)
     -  [`super()`](#super)
 *  [Class Magic Methods](#magicmethods)
     -  [Construction and Initialization](#magicmethodsconstruction)
@@ -260,6 +261,11 @@ Examples:
     print temp[1:3]  # prints elements after 1st to 3rd
     # (785, 2.23)
 
+So why use a tuple over a list?
+
+*  Certain tuples (if they contain values like strings, numbers, other tuples) can be used as dictionary _keys_.  Lists cannot be used as dictionary keys (because lists are not immutable).  Dictionary _keys_ require an immutable data type, although the _value_ can be mutable or immutable).
+*  Tuples are faster than lists.
+
 ####<a id="sequencemethods">Sequence Methods</a>
 Assuming `s` and `t` are sequences and `n`, `i`, `j` are integers.
 
@@ -377,9 +383,11 @@ Get attributes from an object using **attrgetter**.  This basically looks up an 
 - - - -
 
 ##<a id="hashtables">HASH TABLES</a>
+
 A hash table (aka hash map) is a way to map keys to values (i.e. a key-value pair).  A hash function computes an index into an array of buckets or slots, from which the correct value can be found.
 
 ###<a id="dict">Dictionary (dict)</a>
+
 A **dictionary** is a key-value pair.  The key can be almost any type, but usually are numbers or strings.  Value can be any Python object.  Dictionaries are enclosed with `{}` and accessed with brackets `[]`.  The idea is also called **associative arrays**, **map**, **symbol table**.  The ideas behind operations are:
 
 *  create a dictionary
@@ -417,7 +425,7 @@ Example:
 
 ###<a id="set">Set</a>
 
-A **set** is an unordered collection of distinct hashable elements.  Note that items have to be hashable and can't hold duplicates.  Sets have all these restrictions, but are really fast.  They're also good for set methods.
+A **set** is an unordered collection of distinct hashable elements.  Note that items have to be hashable and can't hold duplicates. Sets do not have indexing, ordering, or slicing. Sets have all these restrictions, but are really fast. They're also good for set methods.
 
     from sets import Set
     engineers = Set(['John', 'Jane', 'Jack'])
@@ -427,6 +435,9 @@ A **set** is an unordered collection of distinct hashable elements.  Note that i
     # Set operations
     s1 = set(['Beta', 'Gamma', 'Alpha', 'Delta', 'Gamma', 'Beta'])
     s2 = set(['Beta', 'Alpha', 'Epsilon', 'Omega'])
+    len(s1)  # get length of s1, # 4
+    'Gamma' in s1  # True  # test value if it exists in s1
+    'Beta' not in s1  # False  # test value if it does not exist in s1
     s1.union(s2)  # set(['Epsilon', 'Beta', 'Delta', 'Alpha', 'Omega', 'Gamma'])
     s1 | s2  # set(['Epsilon', 'Beta', 'Delta', 'Alpha', 'Omega', 'Gamma'])
     s1.intersection(s2)  # set(['Alpha', 'Beta'])
@@ -673,7 +684,7 @@ Besides bound and unbound methods, we have __static methods__ and __class method
     Will.deposit  # <bound method type.deposit of <class '__main__.Customer'>>
     Will.deposit()  # 'Depositing money!'
 
-__Static methods__ tells the method not to bind to an instance.  For the example, the method would normally be a bound method, but the `@staticmethod` makes this into a regular function.
+__Static methods__ tells the method not to bind to an instance.  For the example, the method would normally be a bound method, but the `@staticmethod` makes this into a regular function.  When you see `@staticmethod`, it tells us that the method does not depend on the state of the object itself.
 
 __Class methods__ tells the method not to bind to an instance, but the `@classmethod` binds the method to a class.  A class method is used to share among all the instances.
 
@@ -711,11 +722,31 @@ Classes in Python create objects, which provides all the standard features of Ob
 
 #### <a id="classattributes">Class Attribute Reference</a>
 
-When you create a Class, all variables are in the __local scope__ (i.e. referenced only inside the Class).  You can reference class objects with the pattern `Obj.name`; this can reference variables or methods.  For example:
+When you create a Class, all variables are in the __local scope__ (i.e. referenced only inside the Class).  You can reference class objects with the pattern `Obj.name`; this can reference variables or methods.  
+
+Example 1
+
+    class Car(object):
+        """ This is the docstring of a class """
+    
+        wheels = 4
+        def __init__(self, make, model):
+            self.make = make
+            self.model = model
+    
+        def make_sound(self):
+            print "Vroooom!"
+    
+    mustang = Car('Ford', 'Mustang')
+    print mustang.wheels  # 4
+    print Car.wheels  # 4
+
+Example 2
 
     class MyClass:
         """ A simple example class """
-        i = 12345
+        i = 12345  # a class attribute set at the class level
+    
         def f(self):
             return 'hello world'
     
@@ -737,7 +768,7 @@ Class __instantiation__ uses function notation; just pretend a class object is a
 
     x = MyClass()  # creates a new instance of the class and assigns it to a variable x
 
-The instantiation operation ('calling' a class object) creates an empty object.  If you want to create an initial state, you define `__init__(self)`.
+The instantiation operation ('calling' a class object) creates an empty object.  If you want to create an initial state, you define `__init__(self)`.  A good rule of thumb is to never introduce a normal variable outside of `__init__`.
 
     class Complex:
         def __init__(self, realpart, imagpart):
@@ -749,7 +780,7 @@ The instantiation operation ('calling' a class object) creates an empty object. 
 
 #### <a id="selfandcls">`self` and `cls`</a>
 
-`self` tells us we are looking at the instance of the class.  The name is by convention and does not actually have to be self (i.e. can be any word).  What it comes down to is when you call a method of an instance (e.g. call getName method from the instance of polly from the class Pet), Python automatically figures out that self should be the instance (e.g. polly) and passes it to the function (e.g. getName).  Always use `self` for the first argument to instance methods.
+`self` tells us we are looking at an _instance method_.  The name is by convention and does not actually have to be self (i.e. can be any word).  What it comes down to is when you call a method of an instance (e.g. call getName method from the instance of polly from the class Pet), Python automatically figures out that self should be the instance (e.g. polly) and passes it to the function (e.g. getName).  Always use `self` for the first argument to instance methods.
 
     class Pet(object):
         def __init__(self, name, species):
@@ -770,7 +801,7 @@ The instantiation operation ('calling' a class object) creates an empty object. 
     print "Polly is a %s" % Pet.getSpecies(polly)
     # Polly is a Parrot
 
-`cls` tells us we are looking at a class method.  This is similar to how self is used in instance methods.  Always use cls for the first argument to class methods.  Again, this naming is just convention and in theory you can call this whatever you want (but don't make a new name, this will just cause confusion).  cls is usually used in the `__new__` protocol for `staticmethod` and `classmethod` (i.e. methods that only need access to the class, but not to things specific to each instance of the class).  
+`cls` tells us we are looking at a _class method_.  This is similar to how self is used in instance methods.  Always use cls for the first argument to class methods.  Again, this naming is just convention and in theory you can call this whatever you want (but don't make a new name, this will just cause confusion).  The reason you use cls is if you wanted attributes that all instances of the class can share.  cls is usually used in the `__new__` protocol for `staticmethod` and `classmethod` (i.e. methods that only need access to the class, but not to things specific to each instance of the class).
 
 #### <a id="underscores">Use of underscores `_` and `__`</a>
 
@@ -785,7 +816,113 @@ With classes, you may have noticed that some variables and functions have `_` an
 
 Classes can support __inheritance__, which can include __single inheritance__ and __multiple inheritance__ (Note: avoid multiple inheritance, this gets too complicated).  The idea is that for the code `class Dog(Pet)`, a class named `Dog` inherits the features from the parent class `Pet`.
 
-Classes can be derived from other classes and these can take many forms.  A __derived class__ (aka __subclass)__ is a class that is derived from another class.  As soon as we create a class, we are actually already subclassing from an object (e.g. `class Human(object):`).
+Classes can be derived from other classes and these can take many forms.  A __derived class__ (aka __subclass)__ is a class that is derived from another class.  As soon as we create a class, we are actually already subclassing from an object (e.g. `class Human(object):`).  A more obvious example of inheritance would be a class _Car_ and class _Truck_ inheriting from class _Vehicle_, (`class Car(Vehicle)`, `class Truck(Vehicle)`).  For example:
+
+    class Vehicle(object):
+        """ A vehicle for sale """
+    
+        base_sale_price = 0
+    
+        def __init__(self, wheels, miles, make, model, year, sold_on):
+            """ Return a new Vehicle object """
+            self.wheels = wheels
+            self.miles = miles
+            self.make = make
+            self.model = model
+            self.year = year
+            self.sold_on = sold_on
+    
+        def sale_price(self):
+            """ Return the sale price for this vehicle """
+            if self.sold_on is not None:
+                return 0.0  # Already sold
+            return 5000.0 * self.wheels
+    
+        def purchase_price(self):
+            """ Return the price we would pay to purchase the vehicle """
+            if self.sold_on is None:
+                return 0.0  # Not yet sold
+            return self.base_sale_price - (.10 * self.miles)
+    
+    class Car(Vehicle):
+        def __init__(self, wheels, miles, make, model, year, sold_on):
+            """ Return a new Car object """
+            self.wheels = wheels
+            self.miles = miles
+            self.make = make
+            self.model = model
+            ...
+    
+    class Truck(Vehicle):
+        def __init__(self, wheels, miles, make, model, year, sold_on):
+            """ Return a new Car object """
+            self.wheels = wheels
+            self.miles = miles
+            self.make = make
+            self.model = model
+            ...
+
+#### <a id="abstractbaseclass">Abstract Base Class</a>
+
+In the above, we have a few issues in that there is still some repetition of fields and now we have a _Vehicle_ object when it is really a concept (and not a real thing).  We can abstract these methods with `from abc import ABCMeta, abstractmethod`.  For example:
+
+    from abc import ABCMeta, abstractmethod
+    
+    class Vehicle(object):
+        """ Vehicle for Sale """
+    
+        __metaclass__ = ABCMeta
+        
+        base_sale_price = 0
+        wheels = 0
+    
+        def __init__(self, miles, make, model, year, sold_on):
+            self.miles = miles
+            self.make = make
+            self.model = model
+            self.year = year
+            self.sold_on = sold_on
+    
+        def sale_price(self):
+            """Return sale price"""
+            if self.sold_on is not None:
+                return 0.0  # Already sold
+            return 5000.0 * self.wheels
+        
+        def purchase_price(self):
+            """ Return price we pay to purchase the vehicle """
+            if self.sold_on is None:
+                return 0.0  # Not yet sold
+            return self.base_sale_price - (.10 * self.miles)
+    
+        @abstractmethod
+        def vehicle_type(self):
+            """ Return a string representing the type of vehicle this is """
+            pass
+    
+    class Car(Vehicle):
+        """ A Car """
+    
+        base_sale_price = 8000
+        wheels = 4
+    
+        def vehicle_type(self):
+            """ Return a string representing the type of vehicle this is """
+            return 'car'
+    
+    class Motorcycle(Vehicle):
+        """ A Motorcycle """
+    
+        base_sale_price = 4000
+        wheels = 2
+    
+        def vehicle_type(self):
+            """ Return a string representing the type of vehicle this is """
+            return 'motorcycle'
+
+__Abstract Base Class__ creates a class that you can only inherit from.  By putting `__metaclass__ = ABC`, we created an ABC.
+
+__abstractmethod__ requires that the class has a `__metaclass__ = ABCMeta`. 
 
 #### <a id="reflection">Reflection (aka Introspection)</a>
 
