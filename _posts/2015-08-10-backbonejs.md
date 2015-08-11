@@ -12,11 +12,18 @@ title: Backbone.js
 *  [Summary](#summary)
 *  [Dependencies](#dependencies)
 *  [API Integration](#apiintegration)
-*  [Models]
-*  [Collections]
-*  [Views]
-*  [Routing with URLs]
-*  [Events]
+*  [Models](#models)
+*  [Collections](#collections)
+*  [Views](#views)
+*  [Routing with URLs](#route)
+*  [Events](#events)
+*  [Non JS Template](#nonjstemplate)
+*  [Hello World Example](#hwexample)
+  -  [1. Create View with initialize](#hwview)
+  -  [2. Bind DOM events to View methods](#hwevent)
+  -  [3. Models and Collections](#hwmodelcollection)
+  -  [4. Delegate Model to View](#hwmodelview)
+  -  [5. Create Model Actions](#hwmodelaction)
 
 ##<a id="summary">Summary</a>
 
@@ -57,8 +64,9 @@ The non-js part of our template.
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
       <script src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
       <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.1/backbone-min.js"></script>
-    
-      <script src="...number.js..." type="text/javascript"></script>
+      <script>
+        <!-- Put Backbone.js stuff here or link to src-->
+      </script>
     </body>
     </html>
 
@@ -66,7 +74,9 @@ The non-js part of our template.
 
 The View is the user interface and tells us how data is displayed.  Backbone views are generally based on View Templates.  While rendering the UI, Views also listen to the events from the DOM.
 
-####Declaration and Instantiation of a minimalist View with `initialize` and `render`
+##<a id="hwexample">Hello World Example</a>
+
+####<a id="hwview">Declaration and Instantiation of a minimalist View with `initialize` and `render`</a>
 
 Upon instantiation, we automatically call `initialize()`.  This handles all bindings except for UI events like clicks.  We then `render()` the view, in this case inside an existing element.
 
@@ -88,7 +98,7 @@ Upon instantiation, we automatically call `initialize()`.  This handles all bind
       var listView = new ListView();  // instantiate main app view
     })(jQuery);
 
-####Binding of DOM events to View methods with `events`
+####<a id="hwevent">Binding of DOM events to View methods with `events`</a>
 
 Views act like Controllers in a MVC and are used to bind DOM events to View methods.  Under 'events', you can see that we have a 'click' that triggers the custom 'addItem' function.
 
@@ -125,7 +135,7 @@ Views act like Controllers in a MVC and are used to bind DOM events to View meth
 
 A Model is a JavaScript object (i.e. key-value pairs) with some helper functions to handle things like event triggering, persistence.  A Collection is a group of Models.
 
-####How to use a Collection of Models to store data and tie changes to a View
+####<a id="hwmodelcollection">How to use a Collection of Models to store data and tie changes to a View</a>
 
     (function($){  // creates a self-executing wrapper
     
@@ -186,7 +196,7 @@ A Model is a JavaScript object (i.e. key-value pairs) with some helper functions
       var listView = new ListView();  // instantiate main app view
     })(jQuery);
 
-####Delegate rendering of a Model to a dedicated View
+####<a id="hwmodelview">Delegate rendering of a Model to a dedicated View</a>
 
     (function($){  // creates a self-executing wrapper
     
@@ -261,7 +271,7 @@ A Model is a JavaScript object (i.e. key-value pairs) with some helper functions
       var listView = new ListView();  // instantiate main app view
     })(jQuery);
 
-####Create Model actions
+####<a id="hwmodelaction">Create Model actions</a>
 
 We use `Backbone.sync` to override persistence storage (so we can do `Model.destroy()`).  In our `ItemView` we now have two clickable events for each `Item` (swap and delete).  
 
