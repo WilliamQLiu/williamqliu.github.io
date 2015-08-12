@@ -11,25 +11,35 @@ title: Backbone.js
 
 *  [Summary](#summary)
 *  [Dependencies](#dependencies)
-*  [API Integration](#apiintegration)
 *  [Models](#models)
+  -  [Validating Models](#modelsvalidate)
+  -  [Model id, cid, idAttribute](#modelsid)
 *  [Collections](#collections)
+  -  [Collections (get, set)](#collectionsgetset)
+  -  [Collections (multiple Models)](#collectionsmultiple)
+  -  [Collections Underscore functions](#collectionsunderscore)
+*  [Events Mixin](#events)
 *  [Views](#views)
-*  [Routing with URLs](#route)
-*  [Events](#events)
+  -  [el](#viewsel)
+  -  [initialize](#viewsinitialize)
+  -  [render](#viewsrender)
+  -  [events](#viewsevents)
+  -  [template](#viewstemplate)
+*  [Routing with URLs](#routers)
 *  [Non JS Template](#nonjstemplate)
 *  [Hello World Example](#hwexample)
-  -  [1. Create View with initialize](#hwview)
-  -  [2. Bind DOM events to View methods](#hwevent)
-  -  [3. Models and Collections](#hwmodelcollection)
-  -  [4. Delegate Model to View](#hwmodelview)
-  -  [5. Create Model Actions](#hwmodelaction)
+   [1. Create View with initialize](#hwview)
+   [2. Bind DOM events to View methods](#hwevent)
+   [3. Models and Collections](#hwmodelcollection)
+   [4. Delegate Model to View](#hwmodelview)
+   [5. Create Model Actions](#hwmodelaction)
+*  [API Integration](#apiintegration)
 
 ##<a id="summary">Summary</a>
 
-Backbone.js is a JavaScript MV* for front-end web development.  It's basically a huge step up from pulling and pushing data (e.g. pull with AJAX GET, push with WebSockets using a persistent connection between client and server) to manipulate data (where you previously would have to write the glue code that looks at the DOM, finds an element with a specific id, and update the HTML manually).  Backbone is pre-configured to sync with a RESTful API and is great for building single page applications (don't have to wait for entire page to reload for everytime we change the underlying data).
+__Backbone.js__ is a JavaScript MV* for front-end web development.  It's basically a huge step up from pulling and pushing data (e.g. pull with AJAX GET, push with WebSockets using a persistent connection between client and server) to manipulate data (where you previously would have to write the glue code that looks at the DOM, finds an element with a specific id, and update the HTML manually).  Backbone is pre-configured to sync with a RESTful API and is great for building single page applications (don't have to wait for entire page to reload for every time we change the underlying data).
 
-Note: For server stuff, Django is mainly a synchronous framework (a request goes in, server computes stuff, then a response goes out).  If you need a persistent connection, change your back-end server to something like Tornado or Twisted (which complicates projects because of connections breaking).
+Note: For back-end/server stuff, Django is mainly a synchronous framework (a request goes in, we wait while the server computes stuff, then a response goes out).  If you need a persistent connection, change your back-end server to something like Tornado or Twisted (which complicates projects because of connections breaking).
 
 The idea behind Backbone is that you represent your data with __Models__, which can be created, validated, destroyed, and saved to the server.  When a UI action causes an attribute to change, the model triggers a 'change' event.  The change event notifies the __Views__ that display the model's state and are able to respond accordingly by re-rendering themselves with the new information.
 
@@ -46,9 +56,174 @@ Backbone is a minimal way of separating business logic from user interface:
 
 Backbone has a fixed dependency on __Underscore.js__ to help with filtering and sorting data.  Backbone uses __jQuery__ for manipulating the Document Object Model (DOM).
 
-##<a id="apiintegration">API Integration</a>
+##<a id="models">Models</a>
 
-Backbone is pre-configured to sync with a RESTful API.
+Models contain interactive data and logic such as getters, setters, data initialization, and data validation.  Properties are dynamic (can be created on the spot) and don't have a specific type associated with it.
+
+    var app = {};  // Create namespace for our app
+    
+    app.Todo = Backbone.Model.extend({
+      defaults: {
+          title: '',
+          completed: false
+      }
+    });
+
+To test Models in Chrome, you can go to the Console and do:
+
+1. `var todo = new app.Todo({title: 'Learn Backbone.js', completed: false});`
+2. `todo.get('title');` returns `"Learn Backbone.js"`
+3. `todo.set('created_at', Date());` create a new object
+4. `todo.get('created_at')` returns 'Tue Aug 11 2015'
+
+####<a id="modelsvalidate">Models (validate)</a>
+
+Backbone has model validation using `model.validate()`, which checks the attribute values before setting them.  By default, this occurs during a `save()` method or when `set()` is called if `{validate: true}` is passed as an argument.
+
+    var Person = new Backbone.Model({name: 'Will'});
+    
+    // Validate the model name
+    Person.validate = function(attrs) {
+      if (!attrs.name) {
+        return 'I need a name';
+      }
+    };
+    
+    // Change the name
+    Person.set({name: 'Laura'});
+    console.log(Person.get('name'));  // 'Laura'
+    
+    // Remove the name attribute, force validation
+    Person.unset('name', {validate: true});  // false
+
+####<a id="modelsid">Models (id, cid, idAttribute)</a>
+
+When you exchange data between the client and the server, you need a way to uniquely identify models.  In Backbone, we have the `id`, `cid`, and `idAttribute` properties.
+
+-  Each model has an `id`, a unique identifier that is either an integer or a string (e.g. a UUID).
+-  Each model also has a client id `cid`, which is automatically generated by Backbone when the model is created.
+-  You can use either the `id` or the `cid` to retrieve a model from a collection.  The difference is that the `cid` is generated by Backbone, which is helpful when you don't have a true id yet (e.g. if your model hasn't been saved to the server or you aren't saving it to a database).
+-  The `idAttribute` is the id from the server (i.e. the `id` in your database).  This is like a mapper.  By default, it assumes `id`.
+
+##<a id="collections">Collections</a>
+
+Collections are ordered sets of models.  You can get and set models in the collection, listen for events when any element in the collection changes, and fetch data from the server and save the model's data to the database.  Collections require a reference, usually a __url__ parameter where the model's resource is located on the server (e.g. on an API).  If you want to work with local files, you can use the backbone.localStorage-min.js file.
+
+    app.TodoList = Backbone.Collection.extend({
+      model: app.Todo,
+      localStorage: new Store("backbone-todo")
+    });
+    app.todoList = new app.TodoList();  // instance of the Collection
+
+To test Collections in Chrome, you can go to the Console and do:
+
+1. `var todoList = new app.TodoList()`
+2. `todoList.create({title: 'Learn Backbone\s Collection'});`
+3. `var lmodel = new app.Todo({title: 'Learn Models', completed: true});`
+4. `todoList.add(lmodel);`
+5. `todoList.pluck('title');`  // ["Learn Backbone's Collection", "Learn Models"]
+6. `todoList.pluck('completed');`  // [false, true]
+7. `JSON.stringify(todoList);`  // "[{"title":"Learn Backbone's Collection", "completed":false"}..., {"title":"Learn Models"...}]"
+
+####<a id="collectionsgetset">Collections (get, set)</a>
+
+By default, the Models stored inside Collections are enumerated (i.e. ordered) by their `id` property.  To get a specific model, you can use `collection.get(id)`, which will check the array for the existence of the model with the right `id`.  You can also try to reference a model with the `cid` or `idAttribute`.  This also applies to `collection.set(id)`
+
+####<a id="collectionsmultiple">Collections (multiple Models)</a>
+
+You can do the standard `collection.get()`, `collection.set()`, `collection.reset()` to affect the entire Collection instead of just a Model at a time.
+
+####<a id="collectionsunderscore">Collections Underscore functions (forEach, sortBy(), map(), chain())</a>s
+
+Since Backbone has a hard dependency on Underscore, you can use Underscore's utility functions directly on collections.  These include:
+
+-  `forEach`: iterate over collections
+-  `sortBy()`: sort a collection on a specific attribute
+-  `map()`: iterate through a collection, map each value
+-  `min()/max()`: retrieve an item with min or max value of an attribute
+-  `filter()`: filter a collection (e.g. contains these ids)
+-  `indexOf()`: return index of a particular item within a collection
+-  `any()`: confirm if any of the values in a collection pass an iterator truth test
+-  `size`: return size of a collection
+-  `isEmpty()`: determines if a collection is empty
+-  `keys()/values()`: gets a list of attribute names/keys and values
+
+You can also use Underscore's `chain()` method to chain multiple methods (e.g. if you want to filter by age and map what is returned to another list)
+
+##<a id="events">Events (a mixin)</a>
+
+Events is a mixin you can use to listen for well... events.  Events have a few methods we're interested in like `on`, `off`, and `trigger` (similar to jQuery).  `on` has the format `object.on(event, callback, [context])`, which means to bind an object to an event and a callback.  When that event is triggered, it executes the callback.  E.g. `todoList.on('add', this.addAll, this);` would mean everytime a new item is 'add'ed to the Backbone.Collection, the event 'add' is triggered.  You can add events to Collections, Views, etc.
+
+Events follow the publisher/subscriber behavior where publishers (aka senders/messages) do not sent messages directly to specific subscribers (aka receivers) and instead are sent to a message-oriented middleware system.  More specifically, events follow the __observer pattern__ where an object (the subject) has a list of dependents called observers that are notified automatically of any state changes (usually by calling one of their methods).
+
+Events have the following format `{"<EVENT_TYPE> <ELEMENT_ID>": "<CALLBACK_FUNCTION>"}`.  For example: `events: {'keypress #new-todo': 'createTodoOnEnter'}`.  The jQuery equivalent would be `$('#new-todo').keypress(createTodoOnEnter);`.
+
+Events can also have a simpler format: `object.on({click: action})`.  E.g.
+
+    var Todo = Backbone.Model.extend({
+      defaults: {
+        title: '',
+        completed: false
+      }
+    });
+    
+    var myTodo = new Todo();
+    myTodo.set({title: 'Buy some cookies', completed:true});
+    
+    myTodo.on({
+      'change:title': titleChanged,
+      'change:completed': stateChanged
+    });
+    
+    function titleChanged(){
+      console.log('Title changed!');
+    }
+    
+    function stateChanged(){
+      console.log('State changed!');
+    }
+    
+    myTodo.set({title: 'Get the groceries!'});  // Title changed!
+
+Some more examples:
+
+-  `object.on("change: something", function(stuff){ console.log("Stuff"); });`
+
+##<a id="views">Views (Overview)</a>
+
+Views are the user interface and tells us how data is displayed.  Backbone views are generally based on View Templates.  While rendering the UI, Views also listen to the events from the DOM.  Views have four basic properties (with an optional fifth 'template'):
+
+1. `el`
+2. `initialize`
+3. `render`
+4. `events`
+5. `template`
+
+####<a id="viewsel">Views (el)</a>
+
+The el property stands for element and is the reference to the DOM.  Every view has an element associated with it where the view will inject content in.
+  - `this.el` is created from the view's `el`, `tagName`, `className`, `id`, or `attributes` properties.  If none of these are specified, then it is an empty `div`.
+  - `view.$el` is the cached jQuery object of the view's element (`view.el`)
+
+####<a id="viewsinitialize">Views (initialize)</a>
+
+`initialize` - the first function called when a view is instantiated.  You can pass parameters that will be attached to a model, collection or `view.el`
+
+####<a id="viewsrender">Views (render)</a>
+
+`render` - this function injects the markup into the elements.  This is not required; some views can call other view's render function.
+
+####<a id="viewsevents">Views (events mixin)</a>
+
+See Events.
+
+####<a id="viewstemplate">Views (template)</a>
+
+`template` - _.js templates have the following format `_.template(templateString, [data], [settings])` where `templateString` you can use the placeholders `<%= %>` (allows for HTML escape) and `<%- %>` (does not allow for HTML escape) to dynamically insert data.  Also there is `<% %>` to run any javascript code.  
+
+##<a id="routers">Routers</a>
+
+Routes reference a certain 'state' of the web application in the URL.  Routes are hash maps that match URL patterns to functions.  You can use parameter parts such as `todos/:id` or splats `file/*path` to match all the parameters from the splat on (make sure to make splat parameters last since they're greedy).
 
 ##<a id="nonjstemplate">Non-Javascript part of Template</a>
 
@@ -69,10 +244,6 @@ The non-js part of our template.
       </script>
     </body>
     </html>
-
-##<a id="views">Views</a>
-
-The View is the user interface and tells us how data is displayed.  Backbone views are generally based on View Templates.  While rendering the UI, Views also listen to the events from the DOM.
 
 ##<a id="hwexample">Hello World Example</a>
 
@@ -378,4 +549,29 @@ We use `Backbone.sync` to override persistence storage (so we can do `Model.dest
       
       var listView = new ListView();  // instantiate main app view
     })(jQuery);
+
+##<a id="apiintegration">API Integration</a>
+
+Backbone is pre-configured to sync with a RESTful API.  For example, create a 'Collection' with the 'url' of your resource endpoint.
+
+    var Books = Backbone.Collection.extend({
+      url: '/books'
+    });
+
+####<a id="apimappings">API Mappings</a>
+
+Here's how the __Collection__ and __Model__ components map to __REST__ resources.
+
+    GET  /books/  ... collection.fetch();
+    POST /books/  ... collection.create();
+    GET  /books/1 ... model.fetch();
+    PUT  /books/1 ... model.save();
+    DEL  /books/1 ... model.destroy();
+
+####<a id="apijson">API JSON data</a>
+
+When fetching raw JSON data from an API, __Collection__ populates itself with data as an __array__ while __Model__ populates itself with data as an __object__.
+
+    [{"id": 1}, {"id":2}]     ... a Collection with a couple of items
+    {"id": 1, "name": "Will"} ... a Model with a couple of attributes
 
