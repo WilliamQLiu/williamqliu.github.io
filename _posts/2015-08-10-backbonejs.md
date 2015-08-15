@@ -12,28 +12,40 @@ title: Backbone.js
 *  [Summary](#summary)
 *  [Dependencies](#dependencies)
 *  [Models](#models)
-  -  [Validating Models](#modelsvalidate)
-  -  [Model id, cid, idAttribute](#modelsid)
+    - [Validating Models](#modelsvalidate)
+    - [Model id, cid, idAttribute](#modelsid)
 *  [Collections](#collections)
-  -  [Collections (get, set)](#collectionsgetset)
-  -  [Collections (multiple Models)](#collectionsmultiple)
-  -  [Collections Underscore functions](#collectionsunderscore)
+    - [Collections (get, set)](#collectionsgetset)
+    - [Collections (multiple Models)](#collectionsmultiple)
+    - [Collections Underscore functions](#collectionsunderscore)
 *  [Events Mixin](#events)
+    - [Publish and Subscribe Pattern](#eventspushsub)
+    - [Events Format](#eventsformat)
+    - [`on` and `trigger`](#eventsontrigger)
+    - [`off`](#eventsoff)
+    - [](#)
 *  [Views](#views)
-  -  [el](#viewsel)
-  -  [initialize](#viewsinitialize)
-  -  [render](#viewsrender)
-  -  [events](#viewsevents)
-  -  [template](#viewstemplate)
-*  [Routing with URLs](#routers)
+    - [el](#viewsel)
+    - [initialize](#viewsinitialize)
+    - [render](#viewsrender)
+    - [events](#viewsevents)
+    - [template](#viewstemplate)
+*  [Routes](#routes)
+    - [History](#history)
 *  [Non JS Template](#nonjstemplate)
 *  [Hello World Example](#hwexample)
-   [1. Create View with initialize](#hwview)
-   [2. Bind DOM events to View methods](#hwevent)
-   [3. Models and Collections](#hwmodelcollection)
-   [4. Delegate Model to View](#hwmodelview)
-   [5. Create Model Actions](#hwmodelaction)
+    - [1. Create View with initialize](#hwview)
+    - [2. Bind DOM events to View methods](#hwevent)
+    - [3. Models and Collections](#hwmodelcollection)
+    - [4. Delegate Model to View](#hwmodelview)
+    - [5. Create Model Actions](#hwmodelaction)
 *  [API Integration](#apiintegration)
+    - [API Mappings](#apimappings)
+    - [API JSON](#apijson)
+    - [API fetch()](#apifetch)
+    - [API save()](#apisave)
+    - [API destroy()](#apidestroy)
+    - [API options](#apioptions)
 
 ##<a id="summary">Summary</a>
 
@@ -150,13 +162,22 @@ Since Backbone has a hard dependency on Underscore, you can use Underscore's uti
 
 You can also use Underscore's `chain()` method to chain multiple methods (e.g. if you want to filter by age and map what is returned to another list)
 
-##<a id="events">Events (a mixin)</a>
+##<a id="events">Events (an object mixin)</a>
 
-Events is a mixin you can use to listen for well... events.  Events have a few methods we're interested in like `on`, `off`, and `trigger` (similar to jQuery).  `on` has the format `object.on(event, callback, [context])`, which means to bind an object to an event and a callback.  When that event is triggered, it executes the callback.  E.g. `todoList.on('add', this.addAll, this);` would mean everytime a new item is 'add'ed to the Backbone.Collection, the event 'add' is triggered.  You can add events to Collections, Views, etc.
+Events is an object mixin (like a class mixin) that you can use to listen for well... events across the other Backbone objects like Model, Collection, Router, History, and View.  So how does `Backbone.Events` give any object the ability to bind and trigger custom events?
+
+1. What normally happens is you have a function that calls another function by name.  The programmer controls the events; the first function runs then the second function.
+2. However, Events works by replacing the first function with an event handler (i.e. a specific function that looks for a specific event to occur) that when triggered, runs the second function.
+
+Events have a few methods we're interested in like `on`, `off`, and `trigger` (similar to jQuery).  `on` has the format `object.on(event, callback, [context])`, which means to bind an object to an event and a callback.  When that event is triggered, it executes the callback.  E.g. `todoList.on('add', this.addAll, this);` would mean everytime a new item is 'add'ed to the Backbone.Collection, the event 'add' is triggered.  You can add events to Collections, Views, etc.
+
+####<a id="eventspushsub">Events (Publish/Subscribe Pattern)</a>
 
 Events follow the publisher/subscriber behavior where publishers (aka senders/messages) do not sent messages directly to specific subscribers (aka receivers) and instead are sent to a message-oriented middleware system.  More specifically, events follow the __observer pattern__ where an object (the subject) has a list of dependents called observers that are notified automatically of any state changes (usually by calling one of their methods).
 
-Events have the following format `{"<EVENT_TYPE> <ELEMENT_ID>": "<CALLBACK_FUNCTION>"}`.  For example: `events: {'keypress #new-todo': 'createTodoOnEnter'}`.  The jQuery equivalent would be `$('#new-todo').keypress(createTodoOnEnter);`.
+####<a id="eventsformat">Events (Format)</a>
+
+Events have the following format: `{"<EVENT_TYPE> <ELEMENT_ID>": "<CALLBACK_FUNCTION>"}`.  E.g. `events: {'keypress #new-todo': 'createTodoOnEnter'}`.  The jQuery equivalent would be `$('#new-todo').keypress(createTodoOnEnter);`.
 
 Events can also have a simpler format: `object.on({click: action})`.  E.g.
 
@@ -187,7 +208,100 @@ Events can also have a simpler format: `object.on({click: action})`.  E.g.
 
 Some more examples:
 
--  `object.on("change: something", function(stuff){ console.log("Stuff"); });`
+    object.on("change: something", function(stuff){ 
+      console.log("Stuff");
+    });`
+
+####<a id="eventsontrigger">Events as a Mixin using `on` and `trigger`</a>
+
+    var ourObject = {};
+    
+    // Mixin
+    _.extend(ourObject, Backbone.Events);
+    
+    // Add a custom event
+    ourObject.on('dance', function(msg){
+      console.log('We triggered ' + msg);
+    });
+    
+    // Trigger the custom event
+    ourObject.trigger('dance', 'ourevent');
+
+The `on` is similar to the __subscribe__ and `trigger` is similar to __publish__ in a Publish/Subscribe pattern.  `on` binds a callback function to an object 'dance'.  The callback is invoked whenever the event is triggered.  If you do a lot of events, consider namespacing the events.  If there is no listener for a trigger (e.g. `object.trigger("jump", "jump.  Yeah!"`, then nothing happens.
+
+    var ourObject = {};
+    
+    // Mixin
+    _.extend(ourObject, Backbone.Events);
+    
+    function dancing(msg) {
+      console.log("We started " + msg);
+    }
+    
+    // Add namespaced custom events
+    ourObject.on("dance:tap", dancing);
+    ourObject.on("dance:break", dancing);
+    
+    // Trigger the custom events individually
+    ourObject.trigger("dance:tap", "tap dancing. Yeahhh!");
+    ourObject.trigger("dance:break", "break dancing.  Woottt!");
+
+Instead of a single event, we can also trigger multiple events / pass multiple arguments to the callback function.
+
+    // Trigger multiple events
+    ourObject.trigger("dance:tap dance:break", " dancing!");
+
+####<a id="eventsall">Events as a Mixin using `all`</a>
+
+The event `all` creates notifications for every event that occurs on the object.
+
+    var ourObject = {};
+    
+    // Mixin
+    _.extend(ourObject, Backbone.Events);
+    
+    function dancing(msg){
+      console.log("We started " + msg);
+    }
+    
+    ourObject.on("all", function(eventName){
+      console.log("The name of the event passed was " + eventName);
+    });
+    
+    // Each event will be caught with a catch 'all' event listener
+    ourObject.trigger("dance:tap", "tap dancing.  Yeahhh!");
+    ourObject.trigger("dance:break", "break dancing.  Woottt!");
+
+####<a id="eventsoff">Events as a Mixin using `off`</a>
+
+`off` removes callback functions that were previously bound to an object.  In a Publish/Subscribe pattern, `off` is similar to __unsubscribe__.  We can remove specific callbacks to an event or we can remove all callbacks for the event.
+
+    // Removes a single event bound to the object
+    ourObject.off("dance:tap");
+
+Every `on` should have an `off` or else we'll have memory leaks.  You should use `on`/`off` on views and their corresponding models at the same time, otherwise if you remove a view that you registered to be notified about events on a model, but don't remove the model or call `off` to remove the view's event handler, the view's callback function can't be collected by JavaScript's garbage collector.
+
+####<a id="eventsoff">Events using `listenTo()` and `stopListening()`</a>
+
+We can either have every `on` called on an object to also have an `off` called, or we can use `listenTo()`, which allows Views to bind to Model notifications and unbind from all of them with just one call `stopListening()`.  The default `View.remove()` makes a call to `stopListening()` to ensure that any listeners bound are unbound before the view is destroyed.
+
+    var view = new Backbone.View();
+    var b = _.extend({}, Backbone.Events);
+    
+    view.listenTo(b, 'all', function(){
+      console.log(true);
+    });
+    b.trigger('anything');  // logs: true
+    
+    view.listenTo(b, 'all', function(){
+      console.log(false);
+    });
+    view.remove();  // 'stopListening()' implicitly called by 'remove()'
+    b.trigger('anything');  // does not log anything since trigger has been removed
+
+####<a id="eventsviews">Events binding to Views</a>
+
+Events bind to views a little differently; see the Views - Events section.
 
 ##<a id="views">Views (Overview)</a>
 
@@ -215,15 +329,102 @@ The el property stands for element and is the reference to the DOM.  Every view 
 
 ####<a id="viewsevents">Views (events mixin)</a>
 
-See Events.
+Events bind to Views a little different; in Views there's two types of events you can listen for and depending on the type, `this` points to different things.  The two types of events you can listen for are:
+
+1. DOM events
+2. Events triggered using the Event API
+
+__Dom events__ can be bound using the View's `events` property or using `jQuery.on()`.
+
+*  If the event is bound using the `events` property, then `this` refers to the View object
+*  If the event is bound using jQuery, then `this` is set to the handling DOM element by jQuery.
+
+All Dom event callbacks are passed as an `event` object by jQuery.
+
+__Event API__ events can be bound using `on()` on the observed object with a context parameter passed as the third parameter or with `listenTo()`.
+
+*  If the event is bound using `on()` on the object, then a context parameter is passed as the third argument.
+*  If the event is bound using `listenTo()` then within the callback `this` refers to the listener.  The arguments passed to Event API callbacks depends on the type of event (see Catalog of Events in the Backbonejs documentation).
+
+For example:
+
+    <div id="todo">
+      <input type='checkbox'/>
+    </div>
+    
+    var View = Backbone.View.extend({
+      el: '#todo',
+    
+      // bind to DOM event using the `events` property
+      events: {
+        'click [type="checkbox"]': 'clicked',
+      },
+      initialize: function() {
+        // bind to DOM event using jQuery
+        this.$el.click(this.jqueryClicked);
+        
+        // bind to an Event API
+        this.on('apiEvent', this.callback);        
+      },
+      
+      // 'this' is view
+      clicked: function(event) {
+        console.log("events handled for " + this.el.outerHTML);
+        this.trigger('apiEvent', event.type);
+      },
+      
+      // 'this' is handling a DOM element
+      jQueryClicked: function(event) {
+        console.log("jQuery handler for " + this.outerHTML);
+      },
+      
+      callback: function(eventType) {
+        console.log("event type was " + eventType);
+      }
+    });
+    var view = new View();
+
 
 ####<a id="viewstemplate">Views (template)</a>
 
 `template` - _.js templates have the following format `_.template(templateString, [data], [settings])` where `templateString` you can use the placeholders `<%= %>` (allows for HTML escape) and `<%- %>` (does not allow for HTML escape) to dynamically insert data.  Also there is `<% %>` to run any javascript code.  
 
-##<a id="routers">Routers</a>
+##<a id="routes">Routes</a>
 
-Routes reference a certain 'state' of the web application in the URL.  Routes are hash maps that match URL patterns to functions.  You can use parameter parts such as `todos/:id` or splats `file/*path` to match all the parameters from the splat on (make sure to make splat parameters last since they're greedy).
+Routes reference a certain 'state' of the web application in the URL.  Routes are hash maps that match URL patterns to functions.  You can use parameter parts such as `todo/:id` or splats `file/*path` to match all the parameters from the splat on (make sure to make splat parameters last since they're greedy).
+
+    // Example Route:  http://example.com/$search/hotels/page1
+    
+    var TodoRouter = Backbone.Router.extend({
+      // define the route and funtion maps for this router
+      routes: {
+        "about" : "showAbout",  // E.g. http://example.com/#about
+        "todo/:id" : "getTodo",  // Using a ':param' variable; E.g. http://example.com/#todo/5
+        "todos/*documentPath" : "downloadDocument", // Using a '*splat'; E.g. http://example.com/#todos/Meeting_schedule.doc
+        "*other" : "defaultRoute",
+      },
+      
+      showAbout: function(){
+    
+      },
+    
+      getTodo: function(id){
+        console.log("You reached todo item " + id);
+      },
+    
+      downloadDocument: function(id, path){
+      },
+    
+      defaultRoute: function(other){
+        console.log("Invalid, you attempted to reach:" + other);
+      }
+    });
+
+####<a id="history">History</a>
+
+Backbone.history handles `hashchange` events in our application; this automatically handles routes that have been defined and trigger callbacks when they've been accessed.  Place this right after your Routes initialization.
+
+    Backbone.history.start();
 
 ##<a id="nonjstemplate">Non-Javascript part of Template</a>
 
@@ -552,13 +753,13 @@ We use `Backbone.sync` to override persistence storage (so we can do `Model.dest
 
 ##<a id="apiintegration">API Integration</a>
 
-Backbone is pre-configured to sync with a RESTful API.  For example, create a 'Collection' with the 'url' of your resource endpoint.
+One of Backbone's biggest advantages is that it is pre-configured to sync with a RESTful API.  The API talks through a __Collection__ by specifying the __url__ of your resource endpoint and calling `fetch()` to get your data.  Once you get your data, you can do GET, POST, DEL, etc.
 
     var Books = Backbone.Collection.extend({
       url: '/books'
     });
 
-####<a id="apimappings">API Mappings</a>
+####<a id="apimappings">API (Mappings)</a>
 
 Here's how the __Collection__ and __Model__ components map to __REST__ resources.
 
@@ -568,10 +769,99 @@ Here's how the __Collection__ and __Model__ components map to __REST__ resources
     PUT  /books/1 ... model.save();
     DEL  /books/1 ... model.destroy();
 
-####<a id="apijson">API JSON data</a>
+####<a id="apijson">API (JSON data)</a>
 
 When fetching raw JSON data from an API, __Collection__ populates itself with data as an __array__ while __Model__ populates itself with data as an __object__.
 
     [{"id": 1}, {"id":2}]     ... a Collection with a couple of items
     {"id": 1, "name": "Will"} ... a Model with a couple of attributes
+
+####<a id="apifetch">API - `Collections.fetch()`</a>
+
+`Collections.fetch()` is used to fetch an entire collection of models from a server as a JSON array by sending a HTTP GET request to the URL specified by the collection's __url__ property.
+
+    // Create Model
+    var Todo = Backbone.Model.extend({
+      defaults: {
+        title: '',
+        completed: false
+      }
+    });
+    
+    // Create Collection
+    var TodosCollection = Backbone.Collection.extend({
+      model: Todo,
+      url: '/todos'  // specify 'url' for the HTTP request
+    });
+    
+    var todos = new TodosCollection();  // instantiate
+    todos.fetch();  // sends HTTP GET to '/todos'
+
+####<a id="apisave">API - `save()` and `Collections.create()`</a>
+
+With `fetch()` we were able to get an entire collection of models, but we cannot save models individually (instead of as a group).  When we save a model, we call on the model's `save()` method, which checks if the model is a new instance:
+
+1. If the model is a new instance that was created in the browser (i.e. does not have an id), then an HTTP POST is sent to the collection's URL.
+2. If the model is not a new instance (i.e. has an id already), we construct a URL by appending the model's id to the collections URL and sends and a HTTP POST is sent to the server.
+
+Note: If we want to save time, we can use `Collection.create()` to create a new model, add it to the collection, and send it to the server in a single method call.
+
+    // Create Model
+      var Todo = Backbone.Model.extend({
+        defaults: {
+          title: '',
+          completed: false
+        }
+      });
+      
+    // Create Collection
+    var TodosCollection = Backbone.Collection.extend({
+      model: Todo,
+      url: '/todos'  // specify 'url' for the HTTP request
+    });
+    
+    var todos = new TodosCollection();  // instantiate
+    todos.fetch();  // sends HTTP GET to '/todos'
+    
+    var todo2 = todos.get(2);
+    todo2.set('title', 'go fishing');
+    todo2.set('completed': true);
+    todo2.save();  // sends HTTP PUT to '/todos/2'
+
+Note: When a model is `saved()`, the `validate()` method will automatically be called and will trigger an `invalid` event if the model validation fails.
+
+####<a id="apidestroy">API - `destroy()` and `Collections.remove()`</a>
+
+A model can be deleted from the collection and server by calling `destroy()`.  `destroy()` sends an HTTP DELETE to the collection's URL.  If you want to only remove a model from a collection (and not delete it on the server), you can use `Collection.remove()`.
+
+    // Create Model
+      var Todo = Backbone.Model.extend({
+        defaults: {
+          title: '',
+          completed: false
+        }
+      });
+      
+    // Create Collection
+    var TodosCollection = Backbone.Collection.extend({
+      model: Todo,
+      url: '/todos'  // specify 'url' for the HTTP request
+    });
+    
+    var todos = new TodosCollection();  // instantiate
+    todos.fetch();  // sends HTTP GET to '/todos'
+    
+    var todo2 = todos.get(2);
+    todo2.destroy();  // sends HTTP DELETE to '/todos/2' and removes from collection
+
+####<a id="apioptions">API options</a>
+
+Each RESTful API method accepts a variety of options, including success and error callbacks.  See the Backbone.js documentation for full descriptions of supported options.
+
+    // Save partial information using HTTP PATCH by using API options
+    model.clear().set({id: 1, a: 1, b: 2, c: 3, d: 4});
+    model.save();
+    model.save({b: 2, d:4}, {patch: true});
+    console.loge(this.syncArgs.method);  // 'patch'
+
 
