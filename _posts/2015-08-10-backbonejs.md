@@ -806,7 +806,7 @@ You can also use Underscore's `chain()` method to chain multiple methods (e.g. i
 
 ##<a id="routes">Routes</a>
 
-Routes reference a certain 'state' of the web application in the URL.  Routes are hash maps that match URL patterns to functions.  You can use parameter parts such as `todo/:id` or splats `file/*path` to match all the parameters from the splat on (make sure to make splat parameters last since they're greedy).
+Routes reference a certain 'state' of the web application in the URL.  Routes are hash maps that match URL patterns to functions.  You can use parameter parts such as `todo/:id` or splats `file/*path` to match all the parameters from the splat on (make sure to make splat parameters last since they're greedy).  Remember that this navigates to a `#` location (e.g. a route to "about" leads to a url of "#about"). 
 
     // Example Route:  http://example.com/$search/hotels/page1
     
@@ -1320,5 +1320,12 @@ Each RESTful API method accepts a variety of options, including success and erro
     model.save();
     model.save({b: 2, d:4}, {patch: true});
     console.log(this.syncArgs.method);  // 'patch'
+
+####<a id="apiprimer">API Primer</a>
+
+From the creator of Backbone.js, this is the best resource on how to really work with Models and Collections.
+
+https://github.com/jashkenas/backbone/wiki/Backbone,-The-Primer
+
 
 
