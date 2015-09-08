@@ -22,9 +22,17 @@ title: Git Commands
     -  [Branches](#branches)
     -  [Merging](#merging)
     -  [Stash](#stash)
+*  [Undo with Reset, Checkout, Revert](#undo)
 *  [Cleanup](#cleanup)
     -  [Remove Large Files](#removelarge)
     -  [Remove passwords, secret info](#removesecrets)
+*  [Undo with Reset, Checkout, and Revert](#undo)
+    -  [Undo Scope](#undoscope)
+    -  [Undo Commands](#undocommands)
+    -  [Undo Parameters](#undoparameters)
+*  [Pull Request](#pull)
+*  [Rebase](#rebase)
+*  [GitFlow](#gitflow)
    
 ##<a id="summary">Summary</a>
 
@@ -116,9 +124,63 @@ You can clone an existing repository from another server (like GitHub) using the
     git stash  # hide your current changes on branch
     git stash pop  # get your hidden changes on branch
 
+##<a id="undo">Undo with Reset, Checkout, and Revert</a>
+
+To undo changes to your repository, you first need to think about the scope of what you want to change and then what command to use.
+
+####<a id="undoscope">Undo Scope</a>
+
+In a Git repository, we have the following components.
+
+  * the working directory
+  * the staged snapshot
+  * the commit history
+
+####<a id="undocommands">Undo Commands</a>
+
+With these git commands, you can pass in the above component (e.g. the working directory) as a parameter (e.g. `--soft`, `--mixed`, `--hard`) and that determines the scope of the undo.
+
+  * `git reset` - moves the tip of a branch to a different commit; this is used to remove commits from the current branch (e.g. go back two commits would be `git checkout hotfix` and then `git reset HEAD~2`).  We end up throwing away these last two commits.
+  * `git checkout` - moves `HEAD` to a different branch and updates the working directory to match.  If there are any differences, you have to commit or stash any changes in the working directory first.
+  * `git revert` - undoes a commit by creating a new commit.  This is safe since it does not re-write a commit history.
+
+####<a id="undoparamters">Undo Parameters</a>
+
+Again when you do an undo, you can pass in an optional parameter with your command to specify the scope of the change.  To be safe, only use `HEAD` as the parameter.
+
+For example, with a `git reset`, we have:
+
+  *  `--soft` means we reset only the commit history (code in the working directory and staged snapshot is untouched)
+  *  `--mixed` means we reset the staged snapshot and the commit history (code in the working directory is untouched)
+  *  `--hard` means we reset everything
+
+`git revert` is the only one that does not have a file-level counterpart.
+
 ##<a id="cleanup">Cleanup</a>
 
 BFG Repo-Cleaner is a tool to remove large (e.g. blobs bigger than 1M) or bad data (e.g. passwords, credentials, private data) and this is faster and easier to use than the `git-filter-branch` command.
+
+##<a id="pull">Pull Request</a>
+
+Once you start working with other people, you may want to make suggestions to their code or they might have suggestions for your code.  This is called a pull request and involves these steps:
+
+1. Fork a repository (the one that you want to make a pull request/repo where you want to have the code changed).  Click on the fork button on the GitHub repo page.
+2. Clone the repo to your local machine.  Click the clone in desktop button beside the repo name.
+3. Make the local changes/commits to the files (trying to touch as few files as possible)
+4. Sync the changes
+5. Go to your github forked repository and click 'Compare, review, create a pull request' (a green icon button that has no text).
+6. A new page opens that shows the changes, then click the pull request link and it will send the request to the original owner of the repo.
+
+##<a id="rebase">Rebase</a>
+
+__Rebasing__ (`git rebase`) is an alternative to __merging__ (`git merge`), but does this in a destructive manner (opposed to merging's non-destructive operation).
+
+What this means is that if you work on a feature branch, __merge__ ties together the histories of both branches.  The advantage is that this is __non-destructive__, but the issue is that we can have a polluted feature branch history if there were a lot of commits in the master branch (which makes it hard for other developers to understand the history of the project).  If this happens, look into `git log` options.
+
+With __rebase__, you can rebase the feature branch to begin on the tip of the master branch.  This basically moves the entire feature branch to begin at the end of the master branch.  The issue with rebase is that you __re-write__ the project history by creating brand new commits for each commit in the original branch.  You get a cleaner project history (linear project history), but this is dangerous.  If you have to, consider doing an __interactive rebasing__ to alter commits as they are moved to the new branch so you can get complete control over the branch's commit history.  Helpful commands are `pick` and `fixup`.  Do NOT use rebase on a public branch (i.e. if someone else might be looking at the branch).
+
+    git checkout feature
+    git rebase -i master
 
 ####<a id="removesecrets">Remove passwords and secret information</a>
 
@@ -131,3 +193,14 @@ BFG Repo-Cleaner is a tool to remove large (e.g. blobs bigger than 1M) or bad da
 
 Funny story: When I first ran this, I accidentally put the passwords.txt file in Git.  I had to rerun BFG to remove the passwords file.  Oops.
 
+##<a id="featurebranch">Feature Branch Workflow</a>
+
+The __Feature Branch Workflow__ is a git workflow where all feature development takes place in a dedicated branch instead of the __master__ branch.  This means that the master branch will only contain valid code and that work on a particular feature does not disturb the main code.
+
+##<a id="gitflow">GitFlow Workflow</a>
+
+GitFlow is a specific type of workflow for larger projects and is built off of the __Feature Branch Workflow__.  The branch structure is slightly more complicated by having more specific roles to different branches and adding in tags around a project release.
+
+  * Historical Branches - instead of a single master branch, there is now __master__ and __develop__
+  * Feature Branches - each feature resides in its own branch.  Feature branches branch from __develop__ instead of master.
+  * Once develop has enough features for a release, you fork a release branch off of develop.  No new features are added and only bug fixes, document generation are added.  Once this is ready to ship, the release gets merged into __master__ and tagged with a version number.  Once merged back to master, we merge back into develop.
