@@ -11,8 +11,9 @@ title: Statistical Analysis
 
 *  [Summary](#summary)
 *  [Statistics High Level Overview](#statsoverview)
-    -  [Descriptive Statistics](#descriptive)
-    -  [Inferential Statistics](#inferential)
+    -  [How are we using the data?  Descirbe or Infer](#describeinfer)
+    -  [What are the data types?  Categorical or Continuous](#categoricalcontinuous)
+    -  [Number of Independent and Dependent Variables](#numbervariables)
 *  [Model Cheatsheet](#modelcs)
 *  [One Sample T-Test](#onesamplettest)
 
@@ -22,25 +23,44 @@ When I was younger, I wish someone told me to learn calculus if I wanted to be a
 
 ##<a id="statsoverview">Statistics High Level Overview</a>
 
-I think the main pieces in determining how we approach data analysis are the following:
+I think data analysis can be broken down into three key parts.  This is a very high level overview so it is probably oversimplifying a lot of complex topics, but should give you a sense of what data is.
 
-*  Number of __independent variables__ and __dependent variables__
-*  Data type(s) of __independent variables__ and __dependent variables__
-    -  E.g. Are the variables categorical (dichotomous, nominal, ordinal) or continuous?  If the variables are continuous, we can use __parametric__ tests and if the variables are categorical, we use __non-parametric__ tests that make less assumptions
-*  What are we interested in checking, __correlation__ or __causality__ (cause and effect)?  Correlation does not directly infer whereas Causality says a variable effects another.
-*  How are we measuring?  Are we looking at __independent measures__ (a single point in time snapshot) or __repeated measures__ (measure variables at different points in time)
-*  What is the Sample Size and what should we consider statistically significant (p-value)?
-*  Are we reliably checking what we actually want to measure __reliability__ and __validity__?
+1.  How are we using the data?  Do we want to __describe__ or make __inferences__ about the dataset?
+    -  If we want to just __describe__ the dataset, we look at things like the mean, median, etc.  We want to be careful to make sure that our measurements are good in the sense that they are __reliable__ and __valid__, etc.
+    -  If we want to make some type of __inference__, we have additional criteria to consider and can look at it a few different ways.
+        -  What are we interested in checking, __correlation__ or __causality__ (cause and effect)?  Correlation does not directly infer whereas Causality says a variable effects another.
+        -  How are we measuring?  Are we looking at __independent measures__ (aka __cross-sectional study__, a single point in time snapshot) or __repeated measures__ (aka __longitudinal study__, measure variables at different points in time).
+        -  There's additional considerations like if we have an adequate __sample size__, what should we consider __statistically significant (p-value)__, __one-tailed__ or __two-tailed__ test, etc.
+2.  What are the data types?  Are the variables __categorical__ (dichotomous, nominal, ordinal) or __continuous__?
+    -  If the variables are continuous, we can use __parametric__ tests (that assume a normal distribution) and if the variables are categorical, we use __non-parametric__ tests, which make less assumptions
+3.  Number of __independent variables__ and __dependent variables__
+      - The number of variables affect the test we can use.  I made a quick guide below with some examples.
 
-####<a id="descriptivestatistics">Descriptive Statistics</a>
+####<a id="describeinfer">How are we using the data?</a>
 
-This describes the dataset and is pretty straightforward.  For example, what is the mode, median, mean?  For more details, look up the Stats Primer post.
+__Descriptive Statistics__ describes the dataset and is pretty straightforward.  For example, what is the mode, median, mean?  For more details, look up the Stats Primer post.
 
-####<a id="inferentialstatistics">Inferential Statistics</a>
-
-We predict values of an outcome variable based on some kind of model.  This usually means we are looking to see if the independent variable(s) cause some kind of change in the dependent variable(s).  All inferential statistics can be described with:
+__Inferential Statistics__ predicts values of an outcome variable based on some kind of model.  This usually means we are looking to see if the independent variable(s) cause some kind of change in the dependent variable(s) or if there is a strong relationship between a set of variables.  All inferential statistics can be described with:
 
     outcome = model + error
+
+Personal Note: A lot of data analyst jobs out there are just making graphs of descriptive statistics.  It's a great intro to data and is useful, but being able to make inferences from the dataset is a natural (and more difficult) next step.
+
+####<a id="categoricalcontinuous">What are the data types?</a>
+
+Data can be broken down into different __levels of measurement__ that help determine what statistical tests we can do.  Ideally we want more specific (continuous) instead of braoder (categorical-binary).  Here they are from weakest to strongest in terms of statistical power (so you can find the right effect).
+
+*  __Categorical__ (aka Qualitative)
+    -  __Binary__ (aka Dichotomous) has only two distinct possibilities (e.g. either alive or dead, pregnant or not)
+    -  __Nominal__ has two or more possibilities (e.g. human, cat, dog)
+    -  __Ordinal__ has two or more possibilities and there is a logical order (e.g. first, second, third place in a race); you know which is larger and smaller, but not by how much
+*  __Continuous__ (aka Quantitative)
+    -  __Numerical__ data that are numbers (e.g. 1,000 cookies)
+
+
+####<a id="numbervariables">Number of Independent and Dependent Variables</a>
+
+See chart below on what statistical test to use based on the number (and type) of variables we have.
 
 ##<a id="modelcs">Model Cheat Sheet</a>
 
@@ -76,8 +96,7 @@ We simply switch out the model, which is made up of __variables__ and __paramete
 
 ##<a id="scipystats">SciPy Stats</a>
 
-In Python, there's an open-source library called SciPy that handles a lot of standard mathematics, science, and engineering calculations.  There's many subpackages, including linear algebra (`scipy.linalg`), spatial data structures and algorithms to compute triangulations and Voronoi diagrams (`scipy.spatial`), but for this article we want to look at the statistics side (`scipy.stats`).
-
+In Python, there's an open-source library called SciPy that handles a lot of standard mathematics, science, and engineering calculations.  There's many subpackages, including linear algebra (`scipy.linalg`), spatial data structures and algorithms to compute triangulations and Voronoi diagrams (`scipy.spatial`), but for this article we want to look at the statistics side (`scipy.stats`).  FYI there are other libraries like `statsmodel` that do this and more.
    
 ##<a id="onesamplettest">One Sample T-Test</a>
 
