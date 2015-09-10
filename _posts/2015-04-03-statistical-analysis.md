@@ -15,7 +15,8 @@ title: Statistical Analysis
     -  [What are the data types?  Categorical or Continuous](#categoricalcontinuous)
     -  [Number of Independent and Dependent Variables](#numbervariables)
 *  [Model Cheatsheet](#modelcs)
-*  [One Sample T-Test](#onesamplettest)
+*  [SciPy Stats](#scipystats)
+    -  [One Sample T-Test](#onesamplettest)
 
 ##<a id="summary">Summary</a>
 
@@ -98,19 +99,41 @@ We simply switch out the model, which is made up of __variables__ and __paramete
 
 In Python, there's an open-source library called SciPy that handles a lot of standard mathematics, science, and engineering calculations.  There's many subpackages, including linear algebra (`scipy.linalg`), spatial data structures and algorithms to compute triangulations and Voronoi diagrams (`scipy.spatial`), but for this article we want to look at the statistics side (`scipy.stats`).  FYI there are other libraries like `statsmodel` that do this and more.
    
-##<a id="onesamplettest">One Sample T-Test</a>
+####<a id="onesamplettest">One Sample T-Test</a>
 
-We want to compare a sample mean to a population mean of the average American height (177cm).  Does this data represent the population mean?
+__Problem__
+
+We want to compare a sample mean to a known population mean of the average American height (177cm).  Does this data represent the population mean?
+
+__Code__
 
     from scipy import stats
     
-    data = [177.3, 177, 178.1, 198, 156, 173]
-    result = stats.ttest_1samp(data, 177)
+    data_pass = [177.3, 177, 178.1, 179, 172, 173]  # avg height: 176.06
+    data_fail = [180, 198, 200, 178, 199]  # avg height: 191
+    
+    result = stats.ttest_1samp(data_pass, 177)  # avg height: 191
     print "t-statistic is {} and p-value is {}".format(result[0], result[1]) # t-statistic and p-value
+    # t-statistic is -0.797659292772 and p-value is 0.461253479692
+    
+    result = stats.ttest_1samp(data_fail, 177)
+    print "t-statistic is {} and p-value is {}".format(result[0], result[1]) # t-statistic and p-value
+    # t-statistic is 2.84590469864 and p-value is 0.0465883605229
 
 
+__Explaination of Results__
 
+We did a __t-test__ for the mean of ONE group of scores.  We created two examples, one dataset that passes and the other that fails.  As a quick overview:
 
+*  __Null hypothesis__ is just a way of saying there is no relationship among these variables.  We either accept or reject the null hypothesis.  If we accept the null hypothesis, this means there is no relationship between variables.  If we reject the null hypothesis, this means there is a relationship.
+*  The __t-statistic__ used in this __t-test__ assesses whether the size of the difference is significant.  The greater this value, the greater the evidence against the null hypothesis.
+*  The __p-value__ can be seen as the probability of obtaining the observed sample results when the null hypothesis is true.  When _p-value_ is small (usually below .05) then the null hypothesis must be rejected (i.e. there is a relationship between the variables, the null hypothesis is wrong).  
 
+__Example 1 - Similar Data__
 
+In `data_pass` we had an average height of `176.06`.  This is near the mean of 177 that we passed in.  We get a _t-statistic_ that is `-0.798` and a _two tailed p-value_ of `.461`.  Notice how the _t-statistic_ is small (not much difference) and how large the _p-value_ is (pretty sure there is a relationship).
+
+__Example 2 - Different Data__
+
+In `data_fail` we had an average height of `191`.  This is not near the mean of 177 that we passed in.  We get a _t-statistic_ that is `2.846` and a _two tailed p-value_ of `.046`.  Notice how there is a much larger _t-statistic_ (a bit of a difference in numbers) and how small the _p-value_ is (i.e. we're confident this isn't happening by chance).
 
