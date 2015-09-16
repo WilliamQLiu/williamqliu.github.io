@@ -22,17 +22,18 @@ title: Git Commands
     -  [Branches](#branches)
     -  [Merging](#merging)
     -  [Stash](#stash)
-*  [Undo with Reset, Checkout, Revert](#undo)
-*  [Cleanup](#cleanup)
-    -  [Remove Large Files](#removelarge)
-    -  [Remove passwords, secret info](#removesecrets)
 *  [Undo with Reset, Checkout, and Revert](#undo)
     -  [Undo Scope](#undoscope)
     -  [Undo Commands](#undocommands)
     -  [Undo Parameters](#undoparameters)
+*  [Cleanup with BFG](#cleanup)
+    -  [Remove passwords, secret info](#removesecrets)
+    -  [Remove file](#removefile)
 *  [Pull Request](#pull)
 *  [Rebase](#rebase)
-*  [GitFlow](#gitflow)
+*  [Different Workflows](#diffworkflows)
+    -   [Feature Branch](#featurebranch)
+    -   [GitFlow](#gitflow)
    
 ##<a id="summary">Summary</a>
 
@@ -156,9 +157,27 @@ For example, with a `git reset`, we have:
 
 `git revert` is the only one that does not have a file-level counterpart.
 
-##<a id="cleanup">Cleanup</a>
+##<a id="cleanup">Cleanup with BFG</a>
 
 BFG Repo-Cleaner is a tool to remove large (e.g. blobs bigger than 1M) or bad data (e.g. passwords, credentials, private data) and this is faster and easier to use than the `git-filter-branch` command.
+
+####<a id="removesecrets">Remove passwords and secret information</a>
+
+1. Clone your repo using the `--mirror` flag: e.g. `git clone --mirror https://github.com/WilliamQLiu/reponame.git`
+2. Download `BFG Repo-Cleaner` [here](https://rtyley.github.io/bfg-repo-cleaner/ "BFG Repo-Cleaner").  You will get a file that looks like this `bfg-1.12.3.jar`.  If you are on a mac, just setup with homebrew using `brew install bfg` and then you can use the `bfg` command.
+3. Create a `passwords.txt` file and add in all the data you want to remove (e.g. mypassword, 'mypassword')
+4. Run the command `java -jar bfg-1.12.3.jar --replace-text passwords.txt`
+5. Then run `git reflog expire --expire=now --all && git gc --prune=now --aggressive`
+6. Finally, `git push`
+
+Funny story: When I first ran this, I accidentally put the passwords.txt file in Git.  I had to rerun BFG to remove the passwords file.  Oops.
+
+####<a id="removefile">Remove a file</a>
+
+1. Go to your repository
+2. Delete your file, commit and save to repo (make sure to list what files were deleted)
+3. Then use BFG to erase your history of that file: `bfg --delete-files myfile.txt` (files from earlier step)
+4. `git reflog expire --expire=now --all && git gc --prune=now --aggressive` when you're complete with all the files from Option 3
 
 ##<a id="pull">Pull Request</a>
 
@@ -182,22 +201,15 @@ With __rebase__, you can rebase the feature branch to begin on the tip of the ma
     git checkout feature
     git rebase -i master
 
-####<a id="removesecrets">Remove passwords and secret information</a>
+##<a id="diffworkflows">Different Workflows</a>
 
-1. Clone your repo using the `--mirror` flag: e.g. `git clone --mirror https://github.com/WilliamQLiu/reponame.git`
-2. Download `BFG Repo-Cleaner` [here](https://rtyley.github.io/bfg-repo-cleaner/ "BFG Repo-Cleaner").  You will get a file that looks like this `bfg-1.12.3.jar`
-3. Create a `passwords.txt` file and add in all the data you want to remove (e.g. mypassword, 'mypassword')
-4. Run the command `java -jar bfg-1.12.3.jar --replace-text passwords.txt`
-5. Then run `git reflog expire --expire=now --all && git gc --prune=now --aggressive`
-6. Finally, `git push`
+Besides using git as just a simple save in time on one branch workflow, we can have other options depending on project and team size.
 
-Funny story: When I first ran this, I accidentally put the passwords.txt file in Git.  I had to rerun BFG to remove the passwords file.  Oops.
-
-##<a id="featurebranch">Feature Branch Workflow</a>
+####<a id="featurebranch">Feature Branch Workflow</a>
 
 The __Feature Branch Workflow__ is a git workflow where all feature development takes place in a dedicated branch instead of the __master__ branch.  This means that the master branch will only contain valid code and that work on a particular feature does not disturb the main code.
 
-##<a id="gitflow">GitFlow Workflow</a>
+####<a id="gitflow">GitFlow Workflow</a>
 
 GitFlow is a specific type of workflow for larger projects and is built off of the __Feature Branch Workflow__.  The branch structure is slightly more complicated by having more specific roles to different branches and adding in tags around a project release.
 

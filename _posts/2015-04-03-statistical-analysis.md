@@ -16,7 +16,7 @@ title: Statistical Analysis
     -  [Number of Independent and Dependent Variables](#numbervariables)
 *  [Model Cheatsheet](#modelcs)
 *  [SciPy Stats](#scipystats)
-    -  [One Sample T-Test](#onesamplettest)
+    -  [Example: One Sample T-Test](#onesamplettest)
 
 ##<a id="summary">Summary</a>
 
@@ -99,7 +99,7 @@ We simply switch out the model, which is made up of __variables__ and __paramete
 
 In Python, there's an open-source library called SciPy that handles a lot of standard mathematics, science, and engineering calculations.  There's many subpackages, including linear algebra (`scipy.linalg`), spatial data structures and algorithms to compute triangulations and Voronoi diagrams (`scipy.spatial`), but for this article we want to look at the statistics side (`scipy.stats`).  FYI there are other libraries like `statsmodel` that do this and more.
    
-####<a id="onesamplettest">One Sample T-Test</a>
+####<a id="onesamplettest">Example: One Sample T-Test</a>
 
 __Problem__
 
@@ -107,33 +107,67 @@ We want to compare a sample mean to a known population mean of the average Ameri
 
 __Code__
 
+        """
+      Definitons:
+        Assume statistical significance level (alpha) = .05
+        Assume Two tailed
+        Degrees of Freedom (dof) = For a simple t-test: number of samples - 1
+    
+      Example:
+        If we look up degrees of freedom, say for 29 samples, assume a statistical
+        significance .05, two-tailed test, we look up a 'critical value' table
+        and get a critical value of 2.045; this means if we get a t-statistic of
+        less than -2.045 or greater than 2.045, we reject the null hypothesis
+    """
+    
     from scipy import stats
+    import numpy as np
     
-    data_pass = [177.3, 177, 178.1, 179, 172, 173]  # avg height: 176.06
-    data_fail = [180, 198, 200, 178, 199]  # avg height: 191
+    data_a = [177, 177, 178, 179, 172, 173, 178, 177, 174, 175, 178, 179,
+                 178, 179, 178, 177, 173, 177, 175]
+    data_b = [180, 198, 200, 178, 199, 210, 270, 210, 430, 240, 260,
+                 180, 190, 188, 300, 210]
     
-    result = stats.ttest_1samp(data_pass, 177)  # avg height: 191
-    print "t-statistic is {} and p-value is {}".format(result[0], result[1]) # t-statistic and p-value
-    # t-statistic is -0.797659292772 and p-value is 0.461253479692
+    print "Running Data A; we accept the null hypothesis" \
+          "(i.e. no relationship/difference between measured groups)"
+    print "Data A has a mean of:", np.mean(data_a)  # avg height: 176.526
+    dof = len(data_a)-1  # for a t-test, degrees of freedom = number samples-1
+    print "Data A has a length of:", len(data_a), " and " \
+        " degrees of freedom:", len(data_a)-1
+    result = stats.ttest_1samp(data_a, 177)
+    print "t-statistic is {} and p-value is {}".format(result[0], result[1])
+    # t-statistic is -0.940589569294 and p-value is 0.359367763116
+    critical_value = stats.t.isf(0.05/2, dof)  # critical value for two sided test
+    print "critical value is:", critical_value  # 2.100
     
-    result = stats.ttest_1samp(data_fail, 177)
-    print "t-statistic is {} and p-value is {}".format(result[0], result[1]) # t-statistic and p-value
-    # t-statistic is 2.84590469864 and p-value is 0.0465883605229
+    print "\nRunning Data B; we reject the null hypothesis" \
+          "(i.e. there is a relationship/difference between measured groups)"
+    print "Data B has a mean of:", np.mean(data_b)  # avg height: 227.687
+    dof = len(data_b)-1  # for a t-test, degrees of freedom = number samples-1
+    print "Data B has a length of:", len(data_b), " and " \
+        " degrees of freedom:", len(data_b)-1
+    result = stats.ttest_1samp(data_b, 177)
+    print "t-statistic is {} and p-value is {}".format(result[0], result[1])
+    # t-statistic is 3.13929630004 and p-value is 0.00675255864071
+    critical_value = 2.13  # 2.13, found through critical value chart
+    critical_value = stats.t.isf(0.05/2, dof)  # critical value for two sided test
+    print "critical value is:", critical_value  # 2.131
 
 
 __Explaination of Results__
 
-We did a __t-test__ for the mean of ONE group of scores.  We created two examples, one dataset that passes and the other that fails.  As a quick overview:
+We did a __t-test__ for the mean of ONE group of scores.  We created two examples, one dataset that accepts the null hypothesis and the other that rejects the null hypothesis.  As a quick overview:
 
-*  __Null hypothesis__ is just a way of saying there is no relationship among these variables.  We either accept or reject the null hypothesis.  If we accept the null hypothesis, this means there is no relationship between variables.  If we reject the null hypothesis, this means there is a relationship.
+*  __Null hypothesis__ is just a way of saying there is no relationship/difference among these variables.  We either accept or reject the null hypothesis.  If we accept the null hypothesis, this means there is no relationship/difference between variables.  If we reject the null hypothesis, this means there is a relationship/difference between the groups.
+*  The __statistical signifiance level__ (aka __alpha__) is a number we pick at the beginning of our experiment (usually `.05` or `.01`) and use this as a threshold to determine if we accept or reject the null hypothesis.
+*  The __p-value__ can be seen as the probability of obtaining the observed sample results.  If the _p-value_ is equal or smaller than the _statistical signifiance level_, then the _null hypothesis_ must be rejected.  However, this does not automatically mean that the alternative hypothesis is true.
 *  The __t-statistic__ used in this __t-test__ assesses whether the size of the difference is significant.  The greater this value, the greater the evidence against the null hypothesis.
-*  The __p-value__ can be seen as the probability of obtaining the observed sample results when the null hypothesis is true.  When _p-value_ is small (usually below .05) then the null hypothesis must be rejected (i.e. there is a relationship between the variables, the null hypothesis is wrong).  
+*  The __critical value__ is what we use to compare to the t-statistic to see if we reject the null hypothesis or not.
 
 __Example 1 - Similar Data__
 
-In `data_pass` we had an average height of `176.06`.  This is near the mean of 177 that we passed in.  We get a _t-statistic_ that is `-0.798` and a _two tailed p-value_ of `.461`.  Notice how the _t-statistic_ is small (not much difference) and how large the _p-value_ is (pretty sure there is a relationship).
+In `data_a` we had an average height of `176.526`.  Just by eyeballing, our `data_a` is near the mean of 177 that we passed in.  For a t-test, we calculate the _degrees of freedom_ as the number of samples-1, which comes out to be `19-1=18`.  We get a _t-statistic_ that is `-0.940` and a _two tailed p-value_ of `0.359`.  We calculate the _critical value_ to be `2.100`.  We compare the _t-statistic_ with the _critical value_ and find that the _t-statistic_ value (`-0.940`) is within the _critical value_ ranges (of `-2.1` to `2.1`) so we have to accept the null hypothesis (i.e. there is no relationship/difference between these two sets of numbers).  With a _p-value_ of `.0359`, this is another indicator that we must reject the null hypothesis since it is greater than our signifiance level of `.05`.
 
 __Example 2 - Different Data__
 
-In `data_fail` we had an average height of `191`.  This is not near the mean of 177 that we passed in.  We get a _t-statistic_ that is `2.846` and a _two tailed p-value_ of `.046`.  Notice how there is a much larger _t-statistic_ (a bit of a difference in numbers) and how small the _p-value_ is (i.e. we're confident this isn't happening by chance).
-
+In `data_b` we had an average height of `227.687`.  Just by eyeballing, our `data_b` is not near the mean of 177 that we passed in.  For a t-test, we calculate the _degrees of freedom_ as the number of samples-1, which comes out to be `16-1=15`.  We get a _t-statistic_ that is `3.139` and a _two tailed p-value_ of `0.006`.  We calculate the _critical value_ to be `2.131`.  We compare the _t-statistic_ with the _critical value_ and find that the _t-statistic_ value (`3.139`) is within the _critical value_ ranges (of `-2.131` to `2.131`) so we reject the null hypothesis (i.e. there is a relationship/difference between these two sets of numbers).  With a _p-value_ of `.006`, this is another indicator that we can accept this alternative hypothesis since it is less than our signifiance level of `.05`.
