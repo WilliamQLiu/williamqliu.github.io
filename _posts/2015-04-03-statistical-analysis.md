@@ -17,6 +17,10 @@ title: Statistical Analysis
 *  [Model Cheatsheet](#modelcs)
 *  [SciPy Stats](#scipystats)
     -  [Example: One Sample T-Test](#onesamplettest)
+    -  [Example: Fisher's Exact Test](#fishersexact)
+*  [Statistician Tools](#tools)
+    -  [Example: Simulation with Coin Tosses](#simulation)
+    -  [TODO Example: Shuffling with Two Groups](#shuffling)
 
 ##<a id="summary">Summary</a>
 
@@ -69,10 +73,10 @@ We simply switch out the model, which is made up of __variables__ and __paramete
 
 | __test_name_aka__ | __about_model_description__ | __example_use_of_the_model__ |dist|__#dep__|type_dep|__#ind__|type_ind|pop| __the_really_long_notes_section__ |
 |:--------:|:-------------------|:----------------------|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|__one sample t-test__ and __one sample z-test__|compare one group to a 'known truth' looking at their __means__; <30 sample is t-test, >30 sample is z-test| Does the average NY student spend more time studying than the national average of 2hrs/day |P|1|continuous|0|N/A|1 ind|Calculations based on Central Limit Theorem|
-|__one sample sign__ (aka one sample median) and __one sample Wilcoxon__|compare one group to a 'known truth' looking at their __medians__; use one sample sign for unknown or asymmetric distribution, use one sample Wilcoxon for symmetric distribution|We want to know the median time it takes for a new user to add a friend to their buddy list.  We want to know if the median time for a newly developed drug to relieve pain is 12 minutes.|NP|1|categorical (ordinal) or continuous|0|N/A|1 ind|
-|__one sample test of proportions__ (__binomial sign test__ and __Chi-square goodness-of-fit__)|compare one group to a 'known truth' looking at their __proportions__;use binomial sign test if categories are dichotomous, use Chi-square for more than 2 categories|A company prints out baseball cards claiming 30% are rookies, 60% are veterans, 10% all-stars.  We gather a random sample and use Chi-square goodness of fit to see if our sample distribution is statistically greater than what the company claimed|NP|1|categorical|0|N/A|1 ind|Population should be at least 10 times as large as the samples; this method is good for really large samples, but not suited for small samples (go get more samples if necessary)|
-|__unpaired t-test__ (aka two independent samples t-test) and __unpaired z-test__ (aka two independent samples z-test)|Compare two continuous variables by looking at their __means__ using unpaired t-test (n<30 or unknown standard deviation) and unpaired z-test (n>30)|We want to know if two categorical groups (say women and men) have different average heights|P|1|continuous|1|categorical (only dichotomous)|2 ind|Do not do multiple t-tests because of __familywise__ (aka experimentwise error rate)|
+|__one sample t-test__ and __one sample z-test__|Compare one group to a 'known truth' looking at their __means__; <30 sample is t-test, >30 sample is z-test| Does the average NY student spend more time studying than the national average of 2hrs/day |P|1|continuous|0|N/A|1 ind|Calculations based on Central Limit Theorem|
+|__one sample sign__ (aka one sample median) and __one sample Wilcoxon__|Compare one group to a 'known truth' looking at their __medians__; use one sample sign for unknown or asymmetric distribution, use one sample Wilcoxon for symmetric distribution|We want to know the median time it takes for a new user to add a friend to their buddy list.  We want to know if the median time for a newly developed drug to relieve pain is 12 minutes.|NP|1|categorical (ordinal) or continuous|0|N/A|1 ind|
+|__one sample test of proportions__ (__binomial sign test__ and __Chi-square goodness-of-fit__)|Compare one group to a 'known truth' looking at their __proportions__;use binomial sign test if categories are dichotomous, use Chi-square for more than 2 categories|A company prints out baseball cards claiming 30% are rookies, 60% are veterans, 10% all-stars.  We gather a random sample and use Chi-square goodness of fit to see if our sample distribution is statistically greater than what the company claimed|NP|1|categorical|0|N/A|1 ind|Population should be at least 10 times as large as the samples; this method is good for really large samples, but not suited for small samples (go get more samples if necessary)|
+|__unpaired t-test__ (aka __two independent samples t-test__, __Student's t-test__, __Welch's t-test__) and __unpaired z-test__ (aka two independent samples z-test)|Compare two continuous variables by looking at their __means__ using unpaired t-test (n<30 or unknown standard deviation) and unpaired z-test (n>30).  Student's t-test for equal variances, Welch's t-test for unequal variances|We want to know if two categorical groups (say women and men) have different average heights|P|1|continuous|1|categorical (only dichotomous)|2 ind|Do not do multiple t-tests because of __familywise__ (aka experimentwise error rate)|
 |__Wilcoxon Rank-Sum__ (aka Wilcoxon-Mann-Whitney, Mann-Whitney, Wilcoxon two sample)|Compares two categoricals (looking at their medians) using the __independent measures__ design.  Note: For repeated-measures design, use Wilcoxon signed rank test.|We want to know the differences in depression levels between two groups of people (one takes alcohol, other ecstasy).  We want to decide at a .05 significance level if the gas mileage data of manual and automatic cars have identical distributions.|NP|1|categorical (ordinal) or continuous|1|categorical (only dichotomous)|2 ind||
 |__Chi square test of homogeneity__ (aka Chi-square test) and __Fisher's exact test__|Compare two categoricals (looking at their __proportions__).  Create crosstab and if each cell has a minimum frequency of 5 use Chi-square test of homogeneity.  If a cell does not have the minimum frequency of 5, use Fisher's exact test.|We want to know if there is a relationship between a person's gender (Male, Female) and the type of school (Public, Private).  Is there any statistically significant relationship between school attended and gender?|NP|1|categorical|1|categorical (only dichotomous)|2 ind||
 |__One-way Independent ANOVA__ (Analysis of Variance)|Compares several groups (three or more) by looking at their __means__ using __independent measures__.  ANOVA is an __omnibus test__, meaning it tests for an overall effect between all groups.  Check __homogeneity of variance__ (i.e. variances of groups should be equal) with __Levene's test__.|We want to see if costumes of flying superheroes (Superman, Spiderman) injure themselves (scale 0 to 100) more than non-flying superheroes (Hulk, Ninja Turtles).  Does the mean score differ significantly among the levels of each group/superhero?|P|1|continuous|1|categorical|3+ ind|Test statistic is the __F-ratio__ (aka F-statistic, F-test) and tells us if the means of the 3+ groups are different (as a whole).  Do __planned contrasts__ or __post-hoc comparisons__ to determine which specific group is different|
@@ -107,7 +111,7 @@ We want to compare a sample mean to a known population mean of the average Ameri
 
 __Code__
 
-        """
+    """
       Definitons:
         Assume statistical significance level (alpha) = .05
         Assume Two tailed
@@ -170,3 +174,115 @@ In `data_a` we had an average height of `176.526`.  Just by eyeballing, our `dat
 __Example 2 - Different Data__
 
 In `data_b` we had an average height of `227.687`.  Just by eyeballing, our `data_b` is not near the mean of 177 that we passed in.  For a t-test, we calculate the _degrees of freedom_ as the number of samples-1, which comes out to be `16-1=15`.  We get a _t-statistic_ that is `3.139` and a _two tailed p-value_ of `0.006`.  We calculate the _critical value_ to be `2.131`.  We compare the _t-statistic_ with the _critical value_ and find that the _t-statistic_ value (`3.139`) is within the _critical value_ ranges (of `-2.131` to `2.131`) so we reject the null hypothesis (not necessarily have to accept the alternative hypothesis).  With a _p-value_ of `.006`, we can then accept the alternative hypothesis since it is less than our signifiance level of `.05` (i.e. there is a relationship/difference between these two sets of numbers).
+
+####<a id="fishersexact">Example: Fisher's Exact Test</a>
+
+__Code__
+
+    import pandas as pd
+    import scipy.stats as stats
+    
+    
+    if __name__ == '__main__':
+    
+        raw_data = {'gender': ['Male', 'Female', 'Male', 'Male', 'Female', 'Male',
+                               'Female', 'Male', 'Male', 'Female', 'Female',
+                               'Female', 'Female', 'Female', 'Male', 'Female',
+                               'Male', 'Female', 'Male', 'Male', 'Female',
+                               'Female', 'Female', 'Male', 'Male'],
+                    'diet': ['Yes', 'No', 'No', 'Yes', 'No', 'Yes', 'Yes', 'No',
+                             'Yes', 'No', 'No', 'Yes', 'Yes', 'No', 'No', 'Yes',
+                             'No', 'Yes', 'Yes', 'No', 'Yes', 'Yes', 'Yes',
+                             'No', 'No']}
+        df = pd.DataFrame(raw_data, columns=['gender', 'diet'])
+        print df
+        #     gender diet
+        # 0     Male  Yes
+        # 1   Female   No
+        # 2     Male   No
+        # 3     Male  Yes
+        # 4   Female   No
+        # 5     Male  Yes
+        # 6   Female  Yes
+        # 7     Male   No
+        # 8     Male  Yes
+        # 9   Female   No
+        # 10  Female   No
+        # 11  Female  Yes
+        # 12  Female  Yes
+        # 13  Female   No
+        # 14    Male   No
+        # 15  Female  Yes
+        # 16    Male   No
+        # 17  Female  Yes
+        # 18    Male  Yes
+        # 19    Male   No
+        # 20  Female  Yes
+        # 21  Female  Yes
+        # 22  Female  Yes
+        # 23    Male   No
+        # 24    Male   No
+        
+        # See crosstab of counts
+        a = df['gender']
+        b = df['diet']
+        
+        ct = pd.crosstab(index=a, columns=b)
+        ct = ct[['Yes', 'No']]  # Reorder columns
+        print ct
+        # diet    Yes  No
+        # gender
+        # Female    8   5
+        # Male      5   7
+        
+        row_1 = list(ct.ix['Female'])
+        row_2 = list(ct.ix['Male'])
+        
+        fvalue, pvalue = stats.fisher_exact([row_1, row_2])
+        print "fvalue is {f}, pvalue is {p}".format(f=fvalue, p=pvalue)
+        # fvalue is 2.24, pvalue is 0.433752668115
+
+
+##<a id="statisticiantools">Statistician's Tools</a>
+
+With a computer, we can do a lot of computations that can help verify our math (or save us from doing a lot of math).  We can:
+
+*  Simulate Results
+*  Shuffle Data
+*  Bootstrap Data
+*  Cross Validate Models
+
+####<a id="simulation">Simulation with Coin Tosses</a>
+
+Say you toss a coin 30 times and see 22 heads.  Is it a fair coin?  Using a __probabilistic model__ (i.e. we know it will be 50/50 chance for heads or tails), we can __simulate__ the results.
+
+__Code__
+
+    """
+        From: Statistics for Hackers by Jake VanderPlas
+    
+        Instead of calculating the probability behind a sampling distribution,
+        we simply simulate the sampling distribution of say a coin flipping
+        using a for-loop.  We count the number of occurrences something happens
+        and can check the probability that it occurs.
+    
+        Sample Problem: You toss a coin 30 times and you see 22 heads.  Is the
+        coin fair?  Assuming that the coin is not fair, we test the Null Hypothesis
+        We reject the fair coin hypothesis at p < 0.05
+    """
+    
+    
+    import numpy
+    
+    
+    if __name__ == '__main__':
+        numpy.random.seed(1)
+        M = 0
+        for i in xrange(10000):  # do 10,000 trials
+            trials = numpy.random.randint(2, size=30)  # each trial, flip 30 times
+            if (trials.sum() >= 22):
+                M += 1
+        p = M/10000.0
+    
+        print 'Probability is: {0:.5f}'.format(p)  #p=0.00830, reject fair coin hypothesis
+
