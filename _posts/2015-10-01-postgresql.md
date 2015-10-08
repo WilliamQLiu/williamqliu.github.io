@@ -11,12 +11,40 @@ title: PostgreSQL
 
 *  [Summary](#summary)
 *  [Basic Commands](#basiccommands)
+    -  [Login](#login)
+    -  [List Databases](#listdb)
+    -  [Create Database](#createdb)
+    -  [Access Database](#accessdb)
+    -  [List Databases (inside psql)](#listdbinside)
+    -  [See Roles)](#seeroles)
+    -  [Change Database Password](#changepw)
+    -  [View Current Connection Info](#conninfo)
+    -  [View Database Tables](#dt)
+    -  [View Tables, Views, and Sequences](#viewall)
+    -  [Queries](#queries)
+    -  [Exit](#exit)
+    -  [SQL Help](#sqlhelp)
+    -  [PSQL Help](#psqlhelp)
+
 
 ##<a id="summary">Summary</a>
 
 __PostgreSQL__ is an open source relational database.  
 
 ##<a id="basiccommands">Basic Commands</a>
+
+####<a id="login">Login</a>
+
+In the command line, just enter `psql` to see your options
+
+    $psql --help
+
+####<a id="listdb">List Databases</a>
+
+In the command line, to see what databases are available for access, do:
+
+    $psql --list
+
 
 ####<a id="createdb">Create Database</a>
 
@@ -30,13 +58,13 @@ Connect to a database (e.g. db is named mydb)
 
     psql mydb [optional user name]
 
-####<a id="listdb">Lists all Databases</a>
+####<a id="listdbinside">Lists all Databases</a>
 
-Lists all databases
+Now that you're in psql, you can also list all databases
 
      \list
 
-####<a id="printroles">Print Roles</a>
+####<a id="seeroles">See Roles</a>
 
 Prints out a list of roles and attributes (e.g. name, superuser, member of)
 
