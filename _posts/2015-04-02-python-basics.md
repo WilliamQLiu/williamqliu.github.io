@@ -57,6 +57,11 @@ __ADVANCED__
     -  [descriptors](#descriptors)
     -  [Container Objects](#magicmethodscontainerobjects)
     -  [Callable Objects](#magicmethodscallable)
+*  [Context Managers](contextmanagers)
+    -  [__enter__() and __exit__()](#enterexit)
+    -  
+
+
 
 - - - -
 
@@ -1080,4 +1085,18 @@ Python functions are first-classed objects; this means they can be passed to fun
 #### <a id="newstyleoldstyle">New Style Classes and Old Style Classes</a>
 
 Don't worry about this if you're using a current version of Python (e.g. 2.7 or 3+).  You're using a new style object or class (Note: a class is new style if it inherits from `object` or `type`).
+
+## <a id="contextmanagers">Context Managers</a>
+
+PEP 343 introduces a new __with__ statement to Python so we don't have to be as reliant on __try/finally__ statements. we have context managers that provide __enter__() and __exit__() methods that are invoked on entry to and exit from the body of the __with__ statement.  For example, the below statement is roughly translated to:
+
+    with VAR = EXPR:
+        BLOCK
+    
+    VAR = EXPR
+    VAR.__enter__()
+    try:
+        BLOCK
+    finally:
+        VAR.__exit__()
 
