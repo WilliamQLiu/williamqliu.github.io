@@ -59,7 +59,6 @@ __ADVANCED__
     -  [Callable Objects](#magicmethodscallable)
 *  [Context Managers](contextmanagers)
     -  [__enter__() and __exit__()](#enterexit)
-    -  
 
 
 
