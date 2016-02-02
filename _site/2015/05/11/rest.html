@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Representational State Transfer (REST)</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="representational-state-transfer-rest">Representational State Transfer (REST)</h2>
+
+<hr />
+
+<h2 id="summary">Summary</h2>
+
+<p><em>Representational State Transfer (REST)</em> is a software architecture style that relies on a stateless, client-server, cacheable communications protocol.  The idea is that client-server is separated for portability of code and ability to scale web services.  REST basically exposes application data through an API and with a web framework like django, it’s easy to use django-rest-framework to implement a RESTful API.</p>
+
+<h2 id="http-messages">HTTP Messages</h2>
+
+<p>HTTP messages are made up of a <strong>header</strong> and optionally a <strong>body</strong>.  Messages can be either a:</p>
+
+<ol>
+  <li><strong>request</strong> that sends from client to server</li>
+  <li><strong>response</strong> that sends from server to client</li>
+</ol>
+
+<p>HTTP messages are made up of a <strong>header</strong> and <strong>body</strong>.</p>
+
+<h4 id="http-message-header">HTTP Message Header</h4>
+
+<p>HTTP Header contains metadata and can only contain plain text formatted in a specific manner.  These include:</p>
+
+<ul>
+  <li>general-header</li>
+  <li>request-header</li>
+  <li>response-header</li>
+</ul>
+
+<h4 id="http-message-body-optional">HTTP Message Body (optional)</h4>
+
+<p>HTTP body can contain any data in any format.  You can send plain text, HTML, XML, etc.  By requesting different metadata or URLs, you can choose between different representations for the same resource (e.g. send webpage to browsers, JSON to applications).</p>
+
+<h4 id="http-response">HTTP Response</h4>
+
+<p>HTTP Response should specify the content type of the body using the <code>Content-Type</code> field.  For example: <code>Content/Type: application/json</code>.</p>
+
+<h2 id="commands">Commands</h2>
+
+<p>REST systems communicate over Hypertext Transfer Protocol (https) and uses the following commands to retrieve and send data.</p>
+
+<ul>
+  <li><strong>GET</strong>
+    <ul>
+      <li>Read an existing resource.  This is like <code>SELECT</code> in SQL.  This is a ‘SAFE’ method (along with HEAD, OPTIONS) while the others below are considered ‘UNSAFE’ (may modify resource).</li>
+    </ul>
+  </li>
+  <li><strong>HEAD</strong>
+    <ul>
+      <li>Similar to GET except server doesn’t return a message-body in response. Instead, it gets only the metadata of an existing resource.</li>
+    </ul>
+  </li>
+  <li><strong>POST</strong>
+    <ul>
+      <li>Creates a new resource.  This is like <code>INSERT</code> in SQL</li>
+    </ul>
+  </li>
+  <li><strong>PUT</strong>
+    <ul>
+      <li>Updates an existing resource.  This is like <code>UPDATE</code> in SQL</li>
+    </ul>
+  </li>
+  <li><strong>PATCH</strong>
+    <ul>
+      <li>Usually not implemented.  Updates part of an existing resource.  This is like <code>UPDATE</code> in SQL</li>
+    </ul>
+  </li>
+  <li><strong>DELETE</strong>
+    <ul>
+      <li>Deletes an existing resource.  This is like <code>DELETE</code> in SQL</li>
+    </ul>
+  </li>
+  <li><strong>OPTIONS</strong>
+    <ul>
+      <li>This returns the HTTP methods that the server supports at this specified URL (used for checking functionality of a web server by requesting ‘*’ instead of a specific resource; e.g. <code>*</code> instead of say resource id <code>2</code>)</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="important-http-status-codes">Important HTTP Status Codes</h2>
+
+<ul>
+  <li><strong>200 OK</strong> means Success
+    <ul>
+      <li>GET returns resource</li>
+      <li>PUT provides status message or returns message</li>
+    </ul>
+  </li>
+  <li><strong>201 Created</strong> means Success
+    <ul>
+      <li>POST provides status message or returns newly created resource</li>
+    </ul>
+  </li>
+  <li><strong>204 No Content</strong> means Success
+    <ul>
+      <li>Completed, but nothing to return (because of no content)</li>
+    </ul>
+  </li>
+  <li><strong>304 Unchanged</strong> means Redirect
+    <ul>
+      <li>There’s no changes since the last request (usually used to checking a field like ‘Last-Modified’ and ‘Etag’ headers, which is a mechanism for web cache validation)</li>
+    </ul>
+  </li>
+  <li><strong>400 Bad Request</strong> means Failure
+    <ul>
+      <li>PUT returns error message, including form validation errors</li>
+      <li>POST returns error message, including form validation errors</li>
+    </ul>
+  </li>
+  <li><strong>401 Unauthorized</strong> means Failure
+    <ul>
+      <li>Authentication required but user did not provide credentials</li>
+    </ul>
+  </li>
+  <li><strong>403 Forbidden</strong> means Failure
+    <ul>
+      <li>User attempted to access restricted content</li>
+    </ul>
+  </li>
+  <li><strong>404 Not Found</strong> means Failure
+    <ul>
+      <li>Resource was not found</li>
+    </ul>
+  </li>
+  <li><strong>405 Method Not Allowed</strong> means Failure
+    <ul>
+      <li>An invalid HTTP method was attempted</li>
+    </ul>
+  </li>
+  <li><strong>410 Gone</strong> means Failure
+    <ul>
+      <li>A method was attempted that is no longer supported.  E.g. mobile apps can test for this condition and if it occurs, tell the user to upgrade</li>
+    </ul>
+  </li>
+  <li><strong>500 Internal Server Error</strong> means Failure
+    <ul>
+      <li>The server encountered an unexpected condition</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="sample-api-urls">Sample API URLs</h4>
+
+<ul>
+  <li>api/v1/resume
+    <ul>
+      <li>for GET and POST</li>
+    </ul>
+  </li>
+  <li>api/v1/resume/:slug/
+    <ul>
+      <li>for GET, PUT, DELETE</li>
+    </ul>
+  </li>
+  <li>api/v1/job
+    <ul>
+      <li>for GET and POST</li>
+    </ul>
+  </li>
+  <li>api/v1/job/:slug/
+    <ul>
+      <li>for GET, PUT, DELETE</li>
+    </ul>
+  </li>
+  <li>Same goes for say api/v1/education and api/v1/experience</li>
+  <li>slug represents a variable (e.g. the resume id)</li>
+</ul>
+
+<h4 id="example-api-commands">Example API Commands</h4>
+
+<p>A common HTTP library is <strong>cURL</strong>.  Assumming a local dev server running at <code>http://127.0.0.1:8000</code>, here are some sample commands.</p>
+
+<ul>
+  <li>GET with <code>curl -v http://127.0.0.1:8000/api/v1/experiences/</code></li>
+  <li>DELETE with <code>curl -v -X DELETE http://127.0.0.1:8000/api/v1/experiences/2/</code></li>
+  <li>POST with authentication using <em>curl</em>: <code>curl -v -X POST http://127.0.0.1:8000/api/v1/experiences/ --data "title=mytitle"</code></li>
+  <li>POST with authentication using <em>http</em>: <code>http -a will@jobwaffle.com:test POST http://127.0.0.1:8000/api/v1/experiences/ title='jobtitle' q_like_dislike='stuff'</code></li>
+</ul>
+
+<h4 id="rate-limiting">Rate limiting</h4>
+
+<p>It is standard practice to rate limit access to an API.  At a minimum, include these headers.</p>
+
+<ul>
+  <li><code>X-Rate-Limit-Limit</code> - the number of allowed requests in the current period</li>
+  <li><code>X-Rate-Limit-Remaining</code> - the number of remaining requests in the current period</li>
+  <li><code>X-Rate-Limit-Reset</code> - the number of seconds left in the current period.  Note: do not use a UNIX timestamp (seconds since epoch) for this field.</li>
+</ul>
+
+<h4 id="considerations-when-making-a-restful-api">Considerations when making a RESTful API</h4>
+
+<ul>
+  <li>Version the API
+    <ul>
+      <li>If the API is still being used by someone, it doesn’t force them to update their code.</li>
+      <li>Even if you think there’s only going to be one version, someone will probably ask for version 2 so just put <code>/api/v1/</code> instead of just <code>/api/</code></li>
+    </ul>
+  </li>
+  <li>Each state should have all the information necessary
+    <ul>
+      <li>Don’t create just a direct link between resources and the model because this fails when you want to return a denormalized model.  </li>
+      <li>For example don’t create links like this, <code>{'resume': 'will', education: [1, 2, 3]}</code> should be <code>{'resume': 'will', education: [ 'api/v1/education/1', 'api/v1/education/2', 'api/v1/education/3' ]}</code></li>
+      <li>If we use the first example we don’t know how to construct the url for education (we only have 1, 2, 3).</li>
+      <li>If we use the latter example we have the complete web URL</li>
+    </ul>
+  </li>
+  <li>Don’t hardcode the format
+    <ul>
+      <li>For example, <code>?format=JSON, ?format=XML</code> allows you to specify the format; the output format should be determined from the HTTP ‘Accept’ header</li>
+    </ul>
+  </li>
+  <li>Consistent Naming (Plural or singular)
+    <ul>
+      <li>I think either is fine (as long as it’s consistent) or go with whatever your company has already.  Some say use plural because lots of file structures are setup that way (e.g. Program Files in Windows).  Some say use singular because that’s how database table names work.</li>
+    </ul>
+  </li>
+  <li>Documentation - Always have good public documentation.
+    <ul>
+      <li>My favorite so far is the stripe api.  Codecademy also has a list of API lessons where you can learn how to use the ‘requests’ library to interface with them.</li>
+    </ul>
+  </li>
+  <li>Security - Make all API requests over HTTPS (which is HTTP over SSL) for security purposes
+    <ul>
+      <li>People might be accessing the API through a coffee shop or airport wifi that isn’t secure and the communication isn’t encrypted.  Someone can eavesdrop or impersonate someone if the credentials are openly accessible</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="authentication">Authentication</h2>
+
+<p><strong>Authentication</strong> is determining who the user is (Note: This is different than <strong>Permissions</strong>, which checks if the credentials has the permission to allow or disallow an action).  If you’re implementing a server side authentication using an API, you can do a <strong>Cookie-Based Authentication</strong> (that uses server side cookies to authenticate the user on every request) or a <strong>Token-Based Authentication</strong> (that rlies on a signed token that is sent to the server on each request).</p>
+
+<p><strong>Token Benefits</strong></p>
+
+<p>Tokens are stateless (i.e. helps with server side scalability) so don’t require a session store, the token is a self-contained entity that has all the user information.</p>
+
+<p>With Tokens, you can have your server as just an API while the rest of your assests (the HTML, images, javascript, etc) can be served from a CDN.</p>
+
+<h2 id="django-rest-framework">Django REST Framework</h2>
+
+<p><strong>Authentication</strong> is how we check who the user is (normally by username, password, or some type of session or token).  E.g. BasicAuthentication, SessionAuthentication, TokenAuthentication.  If no authentication is specified, we get a <code>request.user</code> is set to an instance of <code>django.contrib.auth.models.AnonymousUser</code> and <code>request.auth</code> is set to <code>None</code>.</p>
+
+<p><strong>Permission</strong> is what we check to see if the logged in user should be allowed or disallowed to do an action.  E.g. IsOwnerOrReadOnly, IsAuthenticatedOrReadOnly</p>
+
+<p><strong>ViewSet</strong> is a single class that lets you combine the logic of a set of related views.  In other REST Frameworks, this might be called ‘Resources’ or ‘Controllers’.</p>
+
+<ul>
+  <li>In DRF, a <code>ViewSet</code> is a class-based view that does not provide implementation of actions like <code>.get()</code> or <code>.post()</code> and instead provides actions like <code>.list()</code>, <code>.create()</code>, <code>.retrieve()</code>, <code>.update()</code>, <code>.partial_update()</code>, and <code>.destroy()</code>.</li>
+  <li>In DRF, a <code>GenericViewSet</code> inherits from <code>GenericAPIView</code> and provides default set of <code>get_object</code>, <code>get_queryset</code> methods, but also does not provide actions by default.</li>
+  <li>In DRF, a <code>ModelViewSet</code> inherits from <code>GenericAPIView</code> and provides actions like <code>.list()</code>, <code>.retrieve()</code>, <code>.create()</code>, <code>.update()</code>, and <code>.destroy()</code>.  You only need to provide the <code>queryset</code> and <code>serializer_class</code> attributes.</li>
+</ul>
+
+<p><strong>ModelViewSet</strong> takes your existing base class and provides some default behavior, like a set of views specifically for listing, creating, retrieving, and destroying objects of a Model.</p>
+
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

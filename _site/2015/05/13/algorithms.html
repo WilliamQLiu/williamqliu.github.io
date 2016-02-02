@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Algorithms</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="algorithms">Algorithms</h2>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a>
+    <ul>
+      <li><a href="#datastructure">Structure of Data</a></li>
+      <li><a href="#whatisalgorithm">What is an Algorithm</a></li>
+      <li><a href="#algorithmcorrect">Is the algorithm correct?</a></li>
+      <li><a href="#algorithmefficient">Is the algorithm efficient?</a></li>
+    </ul>
+  </li>
+  <li><a href="#bigo">Big O</a>
+    <ul>
+      <li><a href="#bigoexample">Big O Example</a></li>
+      <li><a href="#bigotime">Evaluating Runtimes</a></li>
+      <li><a href="#bigoasymptotic">Asymptotic Notation</a></li>
+      <li><a href="#bigoamortized">Amortized Notation</a></li>
+      <li><a href="#lognruntimes">Log N Runtimes</a></li>
+      <li><a href="#recursiveruntimes">Recursive Runtimes</a></li>
+      <li><a href="#bigospace">Space Complexity</a></li>
+    </ul>
+  </li>
+  <li><a href="#arraysandstrings">Arrays and Strings</a>
+    <ul>
+      <li><a href="#hashing">Hashing</a></li>
+      <li><a href="#hashtables">Hash Tables</a></li>
+      <li><a href="#arrayresize">Array Resizing</a></li>
+    </ul>
+  </li>
+  <li><a href="#linkedlists">Linked Lists</a>
+    <ul>
+      <li><a href="#">Create a linked list</a></li>
+      <li><a href="#">Delete a Node from a Singly Linked List</a></li>
+      <li><a href="#">The ‘Runner’ Technique</a></li>
+      <li><a href="#">Recursive Problems</a></li>
+    </ul>
+  </li>
+  <li><a href="#stacksqueues">Stacks and Queues</a>
+    <ul>
+      <li><a href="#">Implement a Stack</a></li>
+      <li><a href="#">Implement a Queue</a></li>
+    </ul>
+  </li>
+  <li><a href="#algorithmdesign">Algorithm Design</a>
+    <ul>
+      <li><a href="#incremental">Incremental</a>
+        <ul>
+          <li><a href="#mathmaticalinduction">mathmatical induction</a></li>
+          <li><a href="#loopinvariant">loop invariant</a></li>
+        </ul>
+      </li>
+      <li><a href="#divideandconquer">Divide and Conquer</a>
+        <ul>
+          <li><a href="#recursion">recursion</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#comparisonsortalgorithms">Sorting Algorithms using Comparison Sort</a>
+    <ul>
+      <li><a href="#insertionsort">Incremental: insertion sort</a></li>
+      <li><a href="#bubblesort">Incremental: bubble sort</a></li>
+      <li><a href="#mergesort">Divide and Conquer: merge sort</a></li>
+      <li><a href="#quicksort">Divide and Conquer: quick sort</a></li>
+    </ul>
+  </li>
+  <li><a href="#decisiontreemodels">Sorting Algorithms using Decision-Tree Models</a>
+    <ul>
+      <li>[Counting Sort]</li>
+      <li>[Radix Sort]</li>
+      <li>[Bucket Sort]</li>
+    </ul>
+  </li>
+  <li><a href="#growthfunctions">Growth of Functions</a>
+    <ul>
+      <li><a href="#bigonotation">Big O Notation</a></li>
+    </ul>
+  </li>
+  <li><a href="#probabilisticanalysis">Probabilistic Analysis</a>
+    <ul>
+      <li><a href="#hiringproblem">The Hiring Problem</a></li>
+      <li><a href="#birthdayparadox">The Birthday Paradox</a></li>
+      <li><a href="#ballsbins">Balls and Bins</a></li>
+      <li><a href="#streaks">Streaks (coin flips)</a></li>
+    </ul>
+  </li>
+  <li><a href="#graphtheory">Graph Theory</a>
+    <ul>
+      <li><a href="#trees">Trees</a></li>
+      <li><a href="#graphs">Graphs</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p>TODO:</p>
+
+<ul>
+  <li><a href="#datastructures">Data Structures</a></li>
+  <li><a href="#algorithmtechnique">Algorithm Techniques</a></li>
+  <li><a href="#graphtheory">Graph Theory</a></li>
+  <li><a href="#greedy">Greedy Methods</a></li>
+  <li><a href="#dynamicprogramming">Dynamic Programming</a></li>
+  <li><a href="#npcomplete">NP complete</a></li>
+  <li><a href="#parallelism">Parallelism</a></li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<h4 id="a-iddatastructurestructure-of-dataa"><a id="datastructure">Structure of Data</a></h4>
+
+<p>An individual data piece (i.e. a <strong>record</strong>) is usually part of a bigger collection of data.  Each record has a <strong>key</strong> (the value to be sorted) and the rest of the record has <strong>satellite data</strong> (data carried around with the key).</p>
+
+<p>So what goes on behind the scenes?  When we move data around, we apply a sorting algorithm; usually there’s a large amount of satellite data that makes it slow to physically move (e.g. erase from hard drive, write to another place in hard drive) so instead we normally just move our pointer to the records.</p>
+
+<p>A <strong>sorting algorithm</strong> is the method that we determine the sorted order (regardless of individual fields or large satellite data).</p>
+
+<h4 id="a-idwhatisalgorithmwhat-is-an-algorithma"><a id="whatisalgorithm">What is an Algorithm?</a></h4>
+
+<p>So let’s take a step back.  An <strong>algorithm</strong> is a sequence of steps that takes an <strong>input</strong> (i.e. some value(s)) and produces an <strong>output</strong> (some value(s)).  For example, we might encounter a <em>sorting problem</em> where we want to sort a sequence of numbers into nondecreasing order.  Most of these notes below are taken from reading the book ‘Introduction to Algorithms’ by Thome H. Cormen.</p>
+
+<h4 id="a-idalgorithmcorrectis-the-algorithm-correcta"><a id="algorithmcorrect">Is the algorithm correct?</a></h4>
+
+<p>An algorithm is correct if <em>every</em> input instance halts with the correct output.  A single input is an <strong>instance of a problem</strong>.  For example:</p>
+
+<pre><code>// an instance of a problem
+Input Sequence of {31, 41, 59, 26, 41, 58}
+Output Sequence of {26, 31, 41, 41, 58, 59}  
+</code></pre>
+
+<h4 id="a-idalgorithmefficientis-the-algorithm-efficienta"><a id="algorithmefficient">Is the algorithm efficient?</a></h4>
+
+<p>There are different algorithms to solve the same problem and they are often drastically different in efficiency.  We normally measure efficiency by looking at <strong>running time</strong>, which is mainly affected by the <strong>size of input</strong>.  See <strong>Big O</strong> for further details.</p>
+
+<ol>
+  <li>the <strong>size of input</strong> normally means looking at the <em>number of items in the input</em>; for other problems like multiplying integers, we look at the <em>total number of bits</em> used.</li>
+  <li>the <strong>running time</strong> is the number of ‘steps’ (i.e. the number of times something is executed).</li>
+</ol>
+
+<h2 id="a-idbigobig-oa"><a id="bigo">Big O</a></h2>
+
+<p>We use <strong>Big O notation</strong> to give an estimated running time based on the input size (as it tends toward infinity).  Big O is basically a math formula that counts how many steps of computations get executed given a specified input size; the more computational steps the slower it is.  We characterize these functions according to their <strong>rate of growth</strong> (aka <strong>growth rate</strong>), which is represented using the <strong>O Notation</strong>.</p>
+
+<h4 id="a-idbigoexamplebig-o-examplea"><a id="bigoexample">Big O Example</a></h4>
+
+<p>Say you want to get a hard drive of information to your friend across the country.  We can do an ‘electronic transfer’ through email or a ‘physical transfer’ by flying out there with the hard drive.  Each method has a different time complexity:</p>
+
+<ul>
+  <li>‘Electronic Transfer’ can be described as <code>O(s)</code> where <code>s</code> is the size of the file (for this example we say this is a linear function, but it can have a different <strong>rate of growth</strong>)</li>
+  <li>‘Airplane Transfer’ can be described as <code>O(1)</code> where <code>1</code> is a constant that simply means as the data gets larger, it doesn’t affect our flight time.</li>
+</ul>
+
+<p>If we compare these two scenarios, the ‘Airplane Transfer’ time is slower for small files, but at some point beats out the ‘Electronic Transfer’.  This general idea is that the <em>running time of an algorithm is a function of the size of its inputs</em>.</p>
+
+<h4 id="a-idbigocommoncommon-o-notationsa"><a id="bigocommon">Common O Notations</a></h4>
+
+<p>Common <strong>O Notation</strong> runtimes are below (from the fastest first to slowest last):</p>
+
+<ul>
+  <li><code>O(1)</code> - <strong>constant</strong>; e.g. check if a number is even or odd (uses a constant-size lookup or hash table)</li>
+  <li><code>O(log N)</code> - <strong>logarithmic</strong>; e.g. find an item in a sorted array with a binary search (because we split in half)</li>
+  <li><code>O(N)</code> - <strong>linear</strong>; e.g. find an item in an unsorted list</li>
+  <li><code>O(N log N)</code> - <strong>loglinear</strong>; e.g. heapsort, quicksort (best and avg case), merge sort</li>
+  <li><code>O(N^2)</code> - <strong>quadratic</strong>; e.g. selection sort, insertion sort, worst case for bubble sort, quicksort</li>
+  <li><code>O(2^N)</code> - <strong>exponential</strong>; e.g. finding exact solution to traveling salesman problem using dynamic programming</li>
+  <li><code>O(N!)</code> - <strong>factorial</strong>; e.g. solving traveling salesman problem via brute-force search</li>
+</ul>
+
+<p>A good cheatsheet is <a href="http://bigocheatsheet.com/" title="Big O Cheatsheet">here</a></p>
+
+<h4 id="a-idbigotimeevaluating-runtimesa"><a id="bigotime">Evaluating Runtimes</a></h4>
+
+<p>When evaluating time, we can look at the <strong>O Notation</strong> a few different ways.</p>
+
+<ul>
+  <li><strong>big omega</strong> looks at the <strong>worst-case running time</strong>; this is the norm</li>
+  <li><strong>big theta</strong> looks at the <strong>average-case running time</strong>; this is usually used for <em>probabilistic analysis</em>.</li>
+  <li><strong>big O (aka O)</strong> looks at the <strong>best-case running time</strong>.</li>
+</ul>
+
+<h4 id="a-idbigoasymptoticasymptotic-notationa"><a id="bigoasymptotic">Asymptotic Notation</a></h4>
+
+<p>What really happens is that we’re interested in the <strong>asymptotic notation</strong> runtime, which is how the algorithm runtime scales for very large inputs and not in the minute details or small inputs.  This means we:</p>
+
+<ul>
+  <li>Drop the Constants (e.g. <code>O(2N)</code> is actually <code>O(N)</code>)</li>
+  <li>Drop the Non-Dominant Terms (e.g. <code>O(N^2 + N^2)</code> is actually <code>O(N^2)</code>)
+    <ul>
+      <li>E.g. <code>O(N + log N)</code> becomes <code>O(N)</code></li>
+      <li>E.g. <code>O(N^2 + N)</code> becomes <code>O(N^2)</code></li>
+    </ul>
+  </li>
+  <li>Keep the terms that grow bigger when <code>N</code> approaches <code>infinity</code></li>
+</ul>
+
+<p><strong>Add or Multiple</strong></p>
+
+<p>If we do code chunk A completely then start code chunk B, the notation should look like <code>O(A + B)</code>.  If we do code chunk A and code chunk B is in code A (e.g. for-loop in a for-loop), the notation should look like <code>O(A * B)</code>.</p>
+
+<h4 id="a-idbigoamortizedamortized-timea"><a id="bigoamortized">Amortized Time</a></h4>
+
+<p><strong>Amortized time</strong> is like doing an operation say a million times.  You don’t care about the worse-case or best-case scenario every once in a while.  We only care about the time taken in total to do the million operations.</p>
+
+<h4 id="a-idlognruntimeslog-n-runtimesa"><a id="lognruntimes">Log N Runtimes</a></h4>
+
+<p><code>O(log N)</code> is a common runtime because of the <strong>elements being halved</strong> scenario.  For example, in a binary search for <code>x</code> in an N-element sorted array, the options are:</p>
+
+<ol>
+  <li>if <code>x==middle</code> then return middle</li>
+  <li>if <code>x&lt;middle</code> then search left</li>
+  <li>if <code>x&gt;middle</code> then search right</li>
+</ol>
+
+<p>The runtime for this looks like this (say given an N-element array of 16):</p>
+
+<ol>
+  <li>N=16 # divide by 2</li>
+  <li>N=8  # divide by 2</li>
+  <li>N=4  # divide by 2</li>
+  <li>N=2  # divide by 2</li>
+  <li>N=1  # divide by 2</li>
+</ol>
+
+<p>We could reverse this to say how many times can we multiply by 2 until we get N?</p>
+
+<ol>
+  <li>N=1  # multiply by 2</li>
+  <li>N=2  # multiply by 2</li>
+  <li>N=4  # multiply by 2</li>
+  <li>N=8  # multiply by 2</li>
+  <li>N=16 # multiply by 2</li>
+</ol>
+
+<p>We then get <code>2^k=N</code>, which is what <code>log</code> expresses.  For example:</p>
+
+<ul>
+  <li><code>2^4=16</code>, which is <code>logBase(16,2)=4</code>  where <code>logBase(value, base)</code></li>
+  <li><code>logBase(N,2)=k</code>, which is <code>2^k=N</code></li>
+</ul>
+
+<h4 id="a-idbigorecursiverecursive-runtimesa"><a id="bigorecursive">Recursive Runtimes</a></h4>
+
+<p>When you have a recursive functions that makes multiple calls, the runtimes will often (not always) look like <code>O(branches^depth)</code> where ‘branches’ is the number of times each recursive call branches.</p>
+
+<h4 id="a-idbigospacespace-complexitya"><a id="bigospace">Space Complexity</a></h4>
+
+<p>Besides time, other considerations in real life (that we won’t consider for now) are things like space (RAM, hard drive), bandwidth speed, caches, and parallelism (single, multiple cores).</p>
+
+<p>The general rule is if we need to create an array of size <code>n</code>, we would require <code>O(n)</code> space.</p>
+
+<h2 id="a-idarraysandstringsarrays-and-stringsa"><a id="arraysandstrings">Arrays and Strings</a></h2>
+
+<h4 id="a-idhashinghashinga"><a id="hashing">Hashing</a></h4>
+
+<p>We do <strong>hashing</strong> because of its speed.  If we know information about the structure of our data (e.g. if a list is ordered or not), we can use this knowledge to do efficient searches (e.g. in <code>O(log N)</code> runtime using a <em>binary search</em> instead of <code>O(N)</code>).</p>
+
+<p>If we know where every item should be, then our search can do a single comparison to find the item.  This concept is called <strong>hashing</strong> and it has a really efficient runtime.  The idea is that when we input a key (e.g. Will) through a <strong>hash function</strong>, this returns a map to where the data is stored (aka the <strong>hash values</strong>, <strong>hash codes</strong>, <strong>hash sums</strong>, <strong>hashes</strong>).</p>
+
+<h4 id="a-idhashtablehash-tablea"><a id="hashtable">Hash Table</a></h4>
+
+<p>A <strong>hash table</strong> (aka <strong>hash map</strong>) is a collection of items that are stored in a way where we can find the items very quickly.  Each position in the hash table is called a <strong>slot</strong> (sometimes the entire slot is refered to as a <strong>bucket</strong>) and can hold an item.</p>
+
+<h4 id="a-idhashfunctionhash-functiona"><a id="hashfunction">Hash Function</a></h4>
+
+<p>A <strong>hash function</strong> is the function that distributes key/value pairs across an array of slots.  A sample function would look like <code>index = f(key, array_size</code> and <code>hash = hashfunc(key)</code>.  The goal of the hash function is to:</p>
+
+<ul>
+  <li>Be deterministic - i.e. equal keys produce the same hash value all the time</li>
+  <li>Be efficient - Computing the hash should be quick</li>
+  <li>Be uniform - distribute the keys uniformly so they do not cluster</li>
+</ul>
+
+<p>A <strong>perfect hash function</strong> is the case where every item is mapped to a unique slot, which then runs in <code>O(1)</code> time.  We don’t need a perfect hash function in order for the hash to be efficient.</p>
+
+<h4 id="a-idhashexamplehash-examplea"><a id="hashexample">Hash Example</a></h4>
+
+<p>Say we have a small <strong>hash table</strong> represented by a list of 11 empty slots (<code>m=11</code>) that have Python value of <code>None</code>.  Note that the number of empty slots should ideally be <strong>prime</strong> (so we can have an easier way of resolving <em>hash collisions</em>, more on that later).</p>
+
+<pre><code>slots       0    1    2    3    4    5    6    7    8    9    10
+values      None None None None None None None None None None None
+</code></pre>
+
+<p>Say we need to put in a set of integer items, like this: <code>54, 26, 93, 73</code></p>
+
+<p>We can create a <strong>hash function</strong> that takes an item in the collection and returns an integer that tells what slot (between <code>0</code> and <code>m-1</code>) to place the item.  A common hash function is the <strong>remainder method</strong>, where we take an item and divide by the table size, returning the remainder as the hash value.  </p>
+
+<pre><code>54 % 11 = remainder of 10
+26 % 11 = remainder of 4
+93 % 11 = remainder of 5
+73 % 11 = remainder of 7
+</code></pre>
+
+<p>After we calculate the hash values, we enter them into the hash table.  The <strong>load factor</strong> is the <code>numberofitems / tablesize</code> (e.g. 4 items/ 10 buckets).  Conceptually, if the <em>load factor</em> is small, there are potentially less collisions; if the <em>load factor</em> is large, there are potentially more collisions (which also means <em>collision resolution</em> is more difficult). Usually a load factor of <code>.8</code> or higher is where linear probing’s performance really degrades and you should definitely do <code>chaining</code>.  Here we have our updated hash table:</p>
+
+<pre><code>slots       0    1    2    3    4    5    6    7    8    9    10
+values      None None None None 26   93   None 73   None None 54
+</code></pre>
+
+<h4 id="a-idhashcollisionhash-collisiona"><a id="hashcollision">Hash Collision</a></h4>
+
+<p>So what happens in our example if we add a new item of <code>71</code>?  We would get a remainder of <code>5</code>, which would create a <strong>hash collision</strong> with <code>93</code>; this means at least two values are trying to fit into the same bucket (in our example, the values of <code>93</code> and <code>71</code>).  We have two goals:</p>
+
+<ol>
+  <li><strong>minimize hash collisions</strong> - what can we do to prevent hash collisions?</li>
+  <li><strong>hash resolution</strong> - despite our best efforts to prevent hash collision, we’ll probably run into them; what can we do once a hash collision happens?</li>
+</ol>
+
+<h4 id="a-idhashminimizecollisionminimizing-hash-collisiona"><a id="hashminimizecollision">Minimizing Hash Collision</a></h4>
+
+<p>As we look at different ways to minimize hash collision, we should keep in mind that you want a function to <strong>uniformly distribute</strong> hash values.  These can be tested using statistical tests (e.g. <strong>Pearson’s chi-squared test</strong> for <em>discrete uniform distributions</em>)</p>
+
+<h4 id="a-idhashfoldingminimizing-hash-collision-with-the-folding-methoda"><a id="hashfolding">Minimizing Hash Collision with the Folding Method</a></h4>
+
+<p>One way of trying to minimize hash collision is with the <strong>folding method</strong>.</p>
+
+<ol>
+  <li>The idea is that we divide our items into equal sized pieces (with the last piece probably not the same size).  e.g. if we have a phone number of <code>436-555-4601</code>, we would take the numbers and divide them into groups of 2, like <code>43, 65, 55, 46, 01</code>.</li>
+  <li>We then add all the pieces together to get a resulting hash value.  e.g. <code>43+65+55+46+1 = 210</code></li>
+  <li>With the resulting hash value (e.g. <code>210</code>), we do the modulus to get a remainder of <code>1</code> (<code>210%11=1</code>) to place the value <code>210</code> into position <code>1</code>.</li>
+  <li>Optionally: Some <em>folding methods</em> reverse every other piece before the addition.  e.g. <code>43+65+55+46+01</code> turns into <code>43+56+55+64+01=219</code>, which <code>219%11=10</code></li>
+</ol>
+
+<h4 id="a-idhashmidsquareminimizing-hash-collision-with-the-mid-square-methoda"><a id="hashmidsquare">Minimizing Hash Collision with the Mid-Square Method</a></h4>
+
+<p>Another way of trying to minimize hash collision is with the <strong>mid-square method</strong>.</p>
+
+<ol>
+  <li>The idea is that we first square the item, then extract some porition of the resulting digits.  e.g. if the item is <code>44</code>, we calculate <code>44^2=1936</code>.</li>
+  <li>The next step is extracting the middle two digits (e.g. <code>93</code> from <code>1936</code>) and taking the modulus to get the remainder (<code>93%11=5</code>)</li>
+</ol>
+
+<h4 id="a-idhashcharsminimizing-hash-collision-when-hashing-charactersa"><a id="hashchars">Minimizing Hash Collision when Hashing Characters</a></h4>
+
+<p>We can create hash functions for character-based items like strings.  For example, we have: <code>99+97+116=312</code>, then <code>312%11=4</code>.</p>
+
+<pre><code>ord('c')  # 99
+ord('a')  # 97
+ord('t')  # 116
+</code></pre>
+
+<p>If we do a hash function that just simply adds up all the characters and gets the modulus, we end up with <em>hash collision</em> for anagrams (e.g. <code>dad</code>).  We can fix this by adding a weighted position to the character (e.g. multiply by 1 for first char, multiply by 2 for second char, etc).  For example:</p>
+
+<pre><code>def hash(astring, tablesize):
+    sum = 0
+    for position in range(len(astring)):
+        sum = sum * position + ord(astring[position])
+    return sum%tablesize
+</code></pre>
+
+<h3 id="a-idhashcollisionresolutioncollision-resolutiona"><a id="hashcollisionresolution">Collision Resolution</a></h3>
+
+<p><strong>Collision resolution</strong> is the method for resolving <em>hash collision</em>, which means what do we do when two or more items are hashed to the same slot in the <em>hash table</em>.  There are many ways of attempting to address this including <strong>open addressing</strong> and <strong>separate chaining</strong>. </p>
+
+<h4 id="a-idhashopenaddressresolving-hash-collision-with-open-addressinga"><a id="hashopenaddress">Resolving Hash Collision with Open Addressing</a></h4>
+
+<p><strong>Open Addressing</strong> (aka <strong>closed hashing</strong>) is a method to resolve <em>hash collisions</em> by trying to find the next open slot in the <em>hash table</em> through some <strong>probe sequence</strong>, which systematically visits each slot until an open slot is found.  The name comes from the fact that the location (‘address’) of the item is not determined by its ‘hash value’.  The downside of <em>open addressing</em> is that the number of stored entries cannot exceed the number of slots.</p>
+
+<p>There are many probe sequences, which has different takes on trying to minimize clustering of hash values.  These probing sequences include:</p>
+
+<ul>
+  <li><strong>linear probing</strong> - where the interval between probes is fixed (e.g. 1, every other)</li>
+  <li><strong>quadratic probing</strong> - where the interval between probes is increased by adding the successive outputs of a quadratic polynomial to the starting value given by the original hash</li>
+  <li><strong>double hashing</strong> - where the interval between probes is computed by another hash function</li>
+</ul>
+
+<h4 id="a-idhashlinearproberesolving-hash-collision-with-open-addressing-and-linear-probinga"><a id="hashlinearprobe">Resolving Hash Collision with Open Addressing and Linear Probing</a></h4>
+
+<p>When we visit each bucket one at a time, we are using a technique called <strong>linear probing</strong>.  With the given example above, if we added <code>71</code>, we would have a <em>hash collion</em> since <code>93</code> is already in position <code>5</code> (<code>71%11=5</code> and <code>93%11=5</code>).  We call this <strong>rehashing</strong> when we try to make <code>71</code> into a new hash.</p>
+
+<pre><code>slots       0    1    2    3    4    5    6    7    8    9    10
+values      None None None None 26   93   None 73   None None 54
+</code></pre>
+
+<h4 id="a-idhashquadraticproberesolving-hash-collision-with-open-addressing-and-quadratic-probinga"><a id="hashquadraticprobe">Resolving Hash Collision with Open Addressing and Quadratic Probing</a></h4>
+
+<p>Instead of making the skip a constant value (e.g. 1, 2), we can use a rehash function that increments the hash value by 1, 3, 5, 7, etc.  This means that if the first hash value is <code>h</code>, the successive hash values are <code>h+1</code>, <code>h+4</code>, <code>h+9</code>, <code>h+16</code>, <code>h+25</code> etc.  This ‘skip’ value is successive perfect squares.</p>
+
+<h4 id="a-idhashquadraticproberesolving-hash-collision-with-separate-chaininga"><a id="hashquadraticprobe">Resolving Hash Collision with Separate Chaining</a></h4>
+
+<p><strong>Separate chaining</strong> (aka <strong>chaining</strong>) allows many items to exist at the same location in the hash table.  When a hash collision happens, the item does not do probing and instead is placed in the proper slot.</p>
+
+<p>When we search for an item, we use the hash function to generate the slot where it should be.  Each slot has a collection so we use a searching technique to decide if the item is present.  The advantage is that on average, there are likely to be very few items in each slot so the search should be more efficient.</p>
+
+<h2 id="a-idlinkedlistslinked-listsa"><a id="linkedlists">Linked Lists</a></h2>
+
+<h4 id="a-idsingelinkedlistsingly-linked-lista"><a id="singelinkedlist">Singly Linked List</a></h4>
+
+<h2 id="a-idalgorithmdesigndesigning-algorithmsa"><a id="algorithmdesign">Designing Algorithms</a></h2>
+
+<p>We briefly cover the structure of data, then go into a couple of design approaches with <strong>incremental</strong> and <strong>divide and conquer</strong>, which are opposites of each other.</p>
+
+<ul>
+  <li><strong>incremental approach</strong> (aka <strong>iteration</strong>) is used in algorithms like <em>insertion sort</em>.  This means working with <em>iterables</em>, objects that can be used in <code>for</code> or <code>while</code> loops.</li>
+  <li><strong>divide and conquer approach</strong> breaks the problem into several subproblems that are similar to the original problem, but smaller in size.  This is used in algorithms like <em>merge sort</em>.</li>
+</ul>
+
+<h4 id="a-idincrementalapproach-incrementala"><a id="incremental">Approach: Incremental</a></h4>
+
+<p><strong>Incremental</strong> is the repetition of a block of statements.  An example is:</p>
+
+<pre><code>a = 0
+for i in range(10):  #0, 1, 2...8, 9
+    a+=1
+print a  #10
+</code></pre>
+
+<h4 id="a-idloopinvariantloop-invarianta"><a id="loopinvariant">loop invariant</a></h4>
+
+<p>As we create our loops, we need to be aware of <strong>loop invariants</strong> (aka <strong>invariant</strong>), which simply means that these general conditions have to be true.</p>
+
+<ol>
+  <li><strong>initialization</strong> means it is true before the first iteration of the loop</li>
+  <li><strong>maintenance</strong> means it remains true before the next iteration</li>
+  <li><strong>termination</strong> means when the loop terminates, the invariant gives us a useful property that helps show that the algorithm is correct.</li>
+</ol>
+
+<h4 id="a-iddivideandconquerapproach-divide-and-conquera"><a id="divideandconquer">Approach: Divide and Conquer</a></h4>
+
+<p>The <strong>divide and conquer</strong> approach is to break apart a large problem into several subproblems that are similar to the original problem but smaller in size.  We solve the subproblems <strong>recursively</strong> (i.e. they call themselves) until they reach the <strong>base case</strong>, and then combine these solutions to create a solution to the original problem.</p>
+
+<ol>
+  <li><strong>divide</strong> means to split the problem into subproblems that are smaller instances of the same problem.</li>
+  <li><strong>conquer</strong> means solving the subproblems recursively.  If the subproblem size is small enough, just solve the subproblems in a straightforward manner.</li>
+  <li><strong>combine</strong> means to combine the subproblem solutions into the solution for the original problem.</li>
+</ol>
+
+<h4 id="a-idrecursionrecursiona"><a id="recursion">recursion</a></h4>
+
+<p><strong>Recursion</strong> is a method where the solution to a problem depends on solutions to smaller instances of the same problem.  You can visually see this as a <strong>recursion tree</strong>, which is a tree diagram of recursive calls.  Recursion has to obey three laws:</p>
+
+<ol>
+  <li>A recursive algorithm must have a <strong>base case</strong>.</li>
+  <li>A recursive algorithm must changes its state and move toward the base case.</li>
+  <li>A recursive algorithm must call itself, recursively.</li>
+</ol>
+
+<p><strong>Recursive Example of calculating the Fibonacci number</strong></p>
+
+<pre><code>def fib(n):
+    """ return the Fibonacci number """
+    if n==0:
+        return 0
+    elif n==1:
+        return 1
+    else:
+        return fib(n-1) + fib(n-2)
+</code></pre>
+
+<p><strong>Recursive Example of Removing Duplicates Letters next to each other</strong></p>
+
+<pre><code>def removeDups(word):
+    if len(word) &lt;= 1:
+        return word
+    elif word[0] == word[1]:
+        return removeDups(word[1:])
+    else:
+        return word[0] + removeDups(word[1:])
+word = 'aaaabbbbbcccdd'
+print word
+print removeDups(word)  # abcd
+</code></pre>
+
+<p>Other examples of recursive problems include:</p>
+
+<ul>
+  <li>The Tower of Hanoi</li>
+  <li>Exploring a Maze</li>
+</ul>
+
+<h2 id="a-idcomparisonsortalgorithmssorting-algorithms-with-comparison-sortsa"><a id="comparisonsortalgorithms">Sorting Algorithms with Comparison Sorts</a></h2>
+
+<p>A basic computational problem is the <strong>sorting problem</strong>, where you sort a sequence of <em>n</em> numbers (aka <strong>keys</strong>).  We apply the above general approaches (<em>insertion</em>, <em>divide and conquer</em>) using different types of algorithms.  The following algorithms (<em>insertion sort</em>, <em>bubble sort</em>, <em>selection sort</em>, <em>merge sort</em>, <em>heapsort</em>, and <em>quicksort</em>) are all <strong>comparison sorts</strong> (i.e. they determine the order of an input array by comparing elements).</p>
+
+<h4 id="a-idinsertionsortincremental-insertion-sorta"><a id="insertionsort">Incremental: insertion sort</a></h4>
+
+<p><strong>Insertion sort</strong> is a simple sorting algorithm based on the incremental approach and is efficient at sorting a small number of elements in place.  The idea is to always maintain a sorted sublist in the lower portions of the list. Each new item is then ‘inserted’ back into the previous sublist so that the sorted sublist is one item larger.  For example, if we want to sort a hand of playing cards:</p>
+
+<ol>
+  <li>Start with an empty left hand and all cards face down on the table</li>
+  <li>We remove one card from the table and insert it into the correct position on the left hand</li>
+  <li>To find the correct position, we compare it with each of the cards already in the left hand (from right to left); this way left hand cards are always sorted</li>
+</ol>
+
+<p>Example Code: </p>
+
+<pre><code>""" Insertion Sort """
+
+def insertionSort(mylist):
+    for index in range(1, len(mylist)):
+        print "Index is ", index  # 1, 2, 3, 4, 5, 6, 7, 8; this is the outer loop
+
+        # setup first case (only one item)
+        currentvalue = mylist[index]
+        position = index
+
+        # this is the inner loop, loops through the sorted list backwards and compares values
+        while position &gt; 0 and mylist[position-1] &gt; currentvalue:
+            mylist[position] = mylist[position-1]
+            position = position - 1
+
+        mylist[position] = currentvalue  # found spot in inner sorted loop to place item
+
+if __name__ == '__main__':
+    mylist = [54,26,93,17,77,31,44,55,20]
+    print "Original: ", mylist
+    insertionSort(mylist)
+    print "Insertion Sorted: ", mylist
+</code></pre>
+
+<h4 id="a-idbubblesortincremental-bubble-sorta"><a id="bubblesort">Incremental: bubble sort</a></h4>
+
+<p><strong>Bubble sort</strong>  (aka <strong>sinking sort</strong>, <strong>ripple sort</strong>) is a simple but inefficient sorting algorithm that repeatedly goes through the list to be sorted, compares each pair of adjacent items, and swaps them if they are in the wrong order.  For example, say we were sorting scrabble tiles into alphabetical order.</p>
+
+<ol>
+  <li>Place letters on tile holder and look at the first block.</li>
+  <li>Look at the block to the right of it.</li>
+  <li>If the block to the right should come before the block on the left, swap them.</li>
+  <li>Compare the next block in line with the first and repeat step 3</li>
+  <li>Begin step 1 again with the second block</li>
+</ol>
+
+<p>The name bubble sort is because elements tend to move up into the correct order like bubbles rising to the surface and you see a rippling effect for the ones that are not in the correct order.  After each pass of the bubble sort, one item is definitely sorted; a total of <code>n-1</code> passes to sort <code>n</code> items.  Big Oh Runtime is <code>O(n^2)</code>.</p>
+
+<p>Example Code</p>
+
+<pre><code># Bubble Sort
+def bubbleSort(mylist):
+    for passnum in range(len(mylist)-1, 0, -1):
+        #print passnum  # backwords (8,7,6,..2,1) b/c other items are already sorted
+        for i in range(passnum):
+            if mylist &gt; mylist[i+1]:  # compare neighbors
+                mylist, mylist[i+1] = mylist[i+1], mylist  # swap
+
+if __name__ == '__main__':
+    mylist = [54,26,93,17,77,31,44,55,20]
+    print "Original: ", mylist
+    bubbleSort(mylist)
+    print "Bubble Sorted: ", mylist
+</code></pre>
+
+<h4 id="a-idselectionsortincremental-selection-sorta"><a id="selectionsort">Incremental: selection sort</a></h4>
+
+<p><strong>Selection sort</strong>  improves on <em>bubble sort</em> by making only one exchange for every pass through the list.  The selection sort finds the largest value as it makes its pass and after completing the pass, places it in the correct location/order.  What happens is that there is a ‘swap’ (where we put the largest value into the largest index; the item that was previously in the largest index is swapped over to where the previous largest value was).</p>
+
+<p>Similar to bubble sort, after the initial pass, the largest item appears in place.  The final item is in place after <code>n-1</code> passes to sort <code>n</code> items.  This is slightly faster than bubble sort since we don’t have to do as many exchanges.  Big Oh Runtime is still <code>O(n^2)</code>.</p>
+
+<pre><code>""" Selection Sort """
+
+def selectionSort(mylist):
+    for fillslot in range(len(mylist)-1, 0, -1):
+        #print fillslot  # backwords (8,7,6,..2,1) b/c other items are already sorted
+        positionOfMax = 0
+        for i in range(1, fillslot+1):
+            if mylist[i] &gt; mylist[positionOfMax]:  # is value greater than value at max
+                positionOfMax = i
+
+        # to move the largest value to the largest index, we 'swap' the item
+        # currently in the largest index position
+        mylist[fillslot], mylist[positionOfMax] = mylist[positionOfMax], mylist[fillslot]
+
+
+if __name__ == '__main__':
+    mylist = [54,26,93,17,77,31,44,55,20]
+    print "Original: ", mylist
+    selectionSort(mylist)
+    print "Selection Sorted: ", mylist
+</code></pre>
+
+<h4 id="a-idmergesortdivide-and-conquer-merge-sorta"><a id="mergesort">Divide and Conquer: merge sort</a></h4>
+
+<p><strong>Merge sort</strong> is a recursive algorithm that uses the divide-and-conquer approach to keep splitting a list in half until there are individual items.  We then go in reverse (instead of splitting), we combine the items back together using a <strong>merge</strong>.</p>
+
+<p>For example, if we want to sort a hand of playing cards:</p>
+
+<ol>
+  <li><strong>divide</strong> means splitting the n-element sequence into two subsequences of n/2 elements each</li>
+  <li><strong>conquer</strong> by sorting the two subsequences recursively using merge sort</li>
+  <li><strong>combine</strong> by merging the two sorted subsequences to produce the sorted answer</li>
+</ol>
+
+<p>Merge sort is good for data that is too big to fit into memory at once because the pattern of storage is regular.  It is especially good for data stored as linked lists.</p>
+
+<p>Example Code:</p>
+
+<pre><code>""" Merge Sort """
+
+def mergeSort(mylist):
+    print "Splitting", mylist
+
+    if len(mylist) &gt; 1:
+        mid = len(mylist) // 2
+        lefthalf = mylist[:mid]
+        righthalf = mylist[mid:]
+    
+        mergeSort(lefthalf)
+        mergeSort(righthalf)
+    
+        # below code merges the two smaller sorted lists to larger sorted list
+        i = 0  # left half index
+        j = 0  # right half index
+        k = 0  # main / large sorted list
+    
+        while i &lt; len(lefthalf) and j &lt; len(righthalf):
+            # take the smallest value from either left or right half
+            if lefthalf[i] &lt; righthalf[j]:
+                mylist[k] = lefthalf[i]  # smaller value on lefthalf
+                i += 1
+            else:
+                mylist[k] = righthalf[j]  # smaller value on righthalf
+                j += 1
+            k += 1
+    
+        # insert remaining values from lefthalf
+        while i &lt; len(lefthalf):
+            mylist[k] = lefthalf[i]
+            i += 1
+            k += 1
+    
+        # insert remaining values from righthalf
+        while j &lt; len(righthalf):
+            mylist[k] = righthalf[j]
+            j += 1
+            k += 1
+    print "Merging", mylist
+
+if __name__ == '__main__':
+    mylist = [54,26,93,17,77,31,44,55,20]
+    print "Original: ", mylist
+    mergeSort(mylist)
+    print "Merge Sorted: ", mylist
+</code></pre>
+
+<h4 id="a-idquicksortdivide-and-conquer-quick-sorta"><a id="quicksort">Divide and Conquer: quick sort</a></h4>
+
+<p><strong>Quick sort</strong> is an efficient algorithm that does a sort ‘in place’ by splitting the array into two smaller arrays, one with low elements and one with high elements based off a ‘pivot’ element.  It’s similar to <em>merge sort</em> in that it does the divide and conquer approach.  The advantage is that you do not need as much storage over <em>merge sort</em>, but the performance could possibly be diminished (depending on if the <strong>pivot value</strong> selected is near the middle).</p>
+
+<ol>
+  <li>Pick an element from the array; this element is called a <strong>pivot</strong></li>
+  <li>We now want to do a <strong>partition</strong> operation; this means we want to reorder the array so that all elements with values less than the pivot are on one side while all elements with values greater than the pivot are on the other side (equal values can go either way).  After this paritioning, the pivot element is in its final position.</li>
+  <li>Partitions begin by locating two position markers (e.g. <em>leftmark</em> and <em>rightmark</em>) at the beginning and end of the remaining items in the list.  The goal of the partition process is to move items that are on the wrong side with respect to the pivot value while also converging on the split point.</li>
+  <li>We increment <strong>leftmark</strong> until we locate a value that is greater than the pivot value.  We then decrement <strong>rightmark</strong> until we locate a value less than the pivot value.  When this happens, we exchange the two items and repeate the process again.</li>
+</ol>
+
+<p>Example Code:</p>
+
+<pre><code>#quicksort
+</code></pre>
+
+<h4 id="a-idheapsortdivide-and-conquer-heap-sorta"><a id="heapsort">Divide and Conquer: heap sort</a></h4>
+
+<p><strong>Heap sort</strong> takes the best properties of merge sort (the run time) and the efficency of insertion sort’s ability to sort in place (i.e. only a constant number of elements are stored outside the input array at any time).  What makes heapsort unique is that it uses a data structure called a <strong>heap</strong> to help manage information (instead of a <strong>linear-time search</strong>); heapsort divides its input into a sorted and an unsorted region and it iteratively shrinks the unsorted region by extracting the largest element and moving that to the sorted region.  This heapsort is really efficient at managing <strong>priority queues</strong>.</p>
+
+<p>Note: In programming languages like Java or Lisp, heap refers to ‘garbage-collected storage’; this is not what we’re talking about here.</p>
+
+<p>Given an array <em>A</em> that represents a heap, we can look at the two attributes (<em>length</em>, <em>heap-size</em>) and determine what part is valid (i.e. this is the correctly sorted region) and what is still the heap (i.e. unsorted):</p>
+
+<ul>
+  <li><code>A.length</code> gives us the number of elements in the array</li>
+  <li><code>A.heap-size</code> gives us how many elements in the heap are stored within array <em>A</em>.</li>
+  <li>The heap would then be calculated as <code>A[1 ... A.heap-size]</code> where <code>0 &lt;= A.heap-size &lt;= A.length</code></li>
+</ul>
+
+<h4 id="a-idbinaryheapbinary-heapa">«a id=”binaryheap”&gt;(Binary) Heap&lt;/a&gt;</h4>
+
+<p>A <strong>(binary) heap</strong> data structure is an array object that we can view as a binary tree.  Think of this algorithm as two parts:</p>
+
+<ol>
+  <li>We have some data (e.g. a list of <code>[6, 5, 3, 1, 8, 7, 2, 4]</code>) that we use to create the <em>heap</em>, a data structure that looks like a binary tree.  As we’re building this binary tree, the heap swaps elements depending on the type (e.g. min or max) of the binary heap (e.g. sorting smallest to largest, larger nodes don’t stay below smaller node parents and end up swapping; <code>8</code> can’t be below <code>5</code> on the heap).  Once the binary tree is built, we have a tree where each array index represents a node and also has the index of the node’s parent, left child branch, or right child branch.</li>
+  <li>We then create a <em>sorted array</em> by repeatedly removing the largest element from the root of the heap and inserting it into the array.  The heap is updated after each removal to maintain the heap.  The heap incrementally gets smaller until all objects have been removed from the heap, resulting in only a sorted array left.</li>
+</ol>
+
+<h4 id="a-idpriorityqueuepriority-queuea">«a id=”priorityqueue”&gt;Priority Queue&lt;/a&gt;</h4>
+
+<p>As mentioned earlier, <strong>heap sort</strong> is great for creating <strong>priority queues</strong>, which is a data structure for maintaining a set <em>S</em> of elements, each with an associated value called a <strong>key</strong>.  There’s <strong>max-priority queue</strong> (e.g. used to schedule jobs on a server and set their relative priorities) and a <strong>min-priority queue</strong> (e.g. used for <em>discrete event-driven simulation</em> models like determining how many patients can be served from changing 8 hours to 9 hours of operation when avg surguery takes say 4 hours).</p>
+
+<h2 id="a-iddecisiontreesorting-algorithms-with-linear-time-decision-tree-modelsa"><a id="decisiontree">Sorting Algorithms with Linear Time (Decision Tree Models)</a></h2>
+
+<p>Previously mentioned algorithms are <strong>comparison sorts</strong>, which determines the sort order based only on comparisons between the input elements.  If we make the assumption that all the input elements are distinct, we can sort by <strong>linear time</strong>.  This means we can do comparison sorts in terms of <strong>decision trees</strong>, which is a full binary tree that represents the comparisons between elements in a sorting algorithm (say elements <code>i</code> : <code>j</code>).  </p>
+
+<h4 id="a-idcountingsortcounting-sorta"><a id="countingsort">Counting Sort</a></h4>
+
+<p>Placeholder for smart stuff.</p>
+
+<h4 id="a-idradixsortradix-sorta"><a id="radixsort">Radix Sort</a></h4>
+
+<p>Placeholder for smart stuff.</p>
+
+<h4 id="a-idbucketsortbucket-sorta"><a id="bucketsort">Bucket Sort</a></h4>
+
+<p>Placeholder for smart stuff.</p>
+
+<h2 id="a-idprobabilisticanalysisprobabilistic-analysisa"><a id="probabilisticanalysis">Probabilistic Analysis</a></h2>
+
+<p><strong>Probabilistic analysis</strong> is the use of probability in the analysis of problems.  We can use this in analyzing the running time of an algorithm or we can use it to analyze other quantities, such as who to hire.  We have some examples:</p>
+
+<ul>
+  <li>Determine the probability that in a room of k people, two of them share the same birthday.</li>
+  <li>What happens when we randomly toss balls into bins</li>
+  <li>Where ‘streaks’ of consecutive heads come from when we flip coins</li>
+</ul>
+
+<h4 id="a-idhiringproblemthe-hiring-problema"><a id="hiringproblem">The Hiring Problem</a></h4>
+
+<p>For this example, we want to hire an office assistant.  We interview candidates and determine if they are better than the current assistant (if so, replace the current assistant right then and there).  There is a cost to hiring and firing someone.  We want to find the expected cost after interviewing everyone (which is a fixed n candidates).</p>
+
+<p>Say we have a list and rank them into an ordered list of best possible candidate using: <code>[rank1, rank2, rank3, rankn]</code>.  Saying that applicants come in a random order is equivalent to saying there is _n!__ permutations of the numbers 1 through n.  We call this <strong>uniform random permutation</strong>, which means that each of the possible n! permutations appears with equal probability.</p>
+
+<p>We first assume (or make sure we randomly select) candidates for hire.  We can check probabilities and expectations using an <strong>indicator random variable</strong>.  For example, if we flip a coin, we count the number of times it actually comes up heads (saying using a <strong>random number generator</strong>) to what we expect.</p>
+
+<h4 id="a-idbirthdayparadoxthe-birthday-paradoxa"><a id="birthdayparadox">The Birthday Paradox</a></h4>
+
+<p>How many people must there be in a room before there is a 50% chance that two of them are born on the same day of the year?  We have:</p>
+
+<ul>
+  <li><code>k = number of people in the room</code>; we index the people in the room with integers (e.g. 1, 2, 3, … k)</li>
+  <li><code>n = 365 days</code>; we ignore leap years</li>
+  <li>Assume that birthdays are uniformly distributed across n days and are independent.</li>
+</ul>
+
+<h4 id="a-idballsbinsballs-and-binsa"><a id="ballsbins">Balls and Bins</a></h4>
+
+<p>If we randomly toss identical balls into <em>b</em> bins (1 through <em>b</em>) and assuming the tosses are independent with an equal chance of ending up in any bin, we have the probability that a tossed ball lands in any given bin as <code>1/b</code> of success (where success is falling into the given bin).  The ball tossing can be seen as a sequence of <strong>Bernoulli trials</strong> (i.e. a binomial trial, a random experiment where there are exactly two possible outcomes; success and failure).  This answers questions like:</p>
+
+<ul>
+  <li>How many balls fall in a given bin?</li>
+  <li>How many balls must we toss, on average, until a given bin contains a ball?</li>
+  <li>How many balls must we toss until every bin contains at least one ball?  (aka the <strong>coupon collector’s problem</strong>, which says that a person trying to collect each of <em>b</em> different coupons expects to acquire aprpoximately <em>b</em> ln <em>b</em> randomly obtained coupons in order to succeed).</li>
+</ul>
+
+<h4 id="a-idstreaksstreaksa"><a id="streaks">Streaks</a></h4>
+
+<p>If you flip a fair coin <em>n</em> times, what is the longest streak of consecutive heads that you expect to see?</p>
+
+<h2 id="a-idgraphtheorygraph-theorya"><a id="graphtheory">Graph Theory</a></h2>
+
+<p><strong>Graph theory</strong> is the study of graphs, which are mathematical structures used to model pairwise relations between objects.  A <strong>graph</strong> is made up of <strong>vertices</strong> (aka <strong>nodes</strong>; note that a node is called a <strong>leaf</strong> if it has no children) and lines that connect them are called <strong>edges</strong>.</p>
+
+<h4 id="a-idtreestreesa"><a id="trees">Trees</a></h4>
+
+<p><strong>Trees</strong> are a type of graph and they’re described as:
+*  Each tree has a <strong>root node</strong>
+*  The root node has zero or more child nodes
+*  Each child node has zero or more child nodes, and so on.</p>
+
+<p>The tree cannot contain cycles.  The nodes may or may not be in a particular order, they could have any data type as values, and they may or may not have links back to their parent nodes.</p>
+
+<p><strong>Real life examples of trees</strong></p>
+
+<ul>
+  <li>A web site
+    <ul>
+      <li>Starts at <code>&lt;html&gt;</code></li>
+      <li>Next level has <code>&lt;head&gt;</code> node and <code>&lt;body&gt;</code> node</li>
+      <li><code>&lt;head&gt;</code> splits into <code>&lt;meta&gt;</code> and <code>&lt;title&gt;</code>; <code>&lt;body&gt;</code> splits into <code>&lt;h1&gt;</code> and <code>&lt;h2&gt;</code></li>
+    </ul>
+  </li>
+  <li>File system on a computer (e.g. UNIX)
+    <ul>
+      <li>Starts at <code>/</code></li>
+      <li>Next level has <code>dev/</code>, <code>etc/</code>, <code>usr/</code>, <code>var/</code>, etc.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Pieces of Trees</strong></p>
+
+<ul>
+  <li><strong>Node</strong> has a name (the <strong>key</strong>) and can also contain additional information (the <strong>payload</strong>).  The highest node is the <strong>root node</strong>, which has no parent.</li>
+  <li><strong>Edge</strong> - an edge connects two nodes to show that there is a relationship between them.  Every node except the root node has one incoming edge from another node.  Each node can have several outgoing edges.</li>
+  <li><strong>Path</strong> - a path is an ordered list of nodes that are connected by edges.  E.g. <code>C:</code> -&gt; <code>Users\</code> -&gt; <code>WLiu</code> -&gt; <code>My Documents</code></li>
+  <li><strong>Parent</strong> - node A is the parent node of B if A has outgoing edges that connect to B.</li>
+  <li><strong>Children</strong> - node B is a child node of node A if B has incoming edges from A.</li>
+  <li><strong>Siblings</strong> - node C and B are siblings if they share the same parent node A.</li>
+  <li><strong>Subtree</strong> - A subtree is a set of nodes and edges with parent A and all the descendants of that parent.</li>
+  <li><strong>Leaf Node</strong> - A leaf node is a node that has no children.</li>
+  <li><strong>Level</strong> - the level of a node n is the number of edges on the path from the root node to n.  The level of the root node is zero.</li>
+  <li><strong>Height</strong> - the height of a tree is the maximum level of any node in the tree.</li>
+</ul>
+
+<p><strong>How to appraoch trees</strong></p>
+
+<p>We can think of trees two different ways, as a large set of rules or as a smaller recursive set of rules:</p>
+
+<ol>
+  <li>A tree consists of a set of nodes and a set of edges that connect pairs of nodes.  Trees have the following properties:
+    <ul>
+      <li>One node of the tree is designed as the root node</li>
+      <li>Every node <em>n</em>, except the <em>root node</em>, is connected by an edge from exactly one other node <em>p</em>, where <em>p</em> is the parent of <em>n</em>.</li>
+    </ul>
+  </li>
+  <li>Think recurisvely; a tree is either empty or consists of a root and zero or more subtrees, each of which is also a tree.</li>
+</ol>
+
+<p><strong>Types of Trees</strong>
+There are different types of trees that can take on different properties:</p>
+
+<ul>
+  <li>We can describe a tree as a <strong>binary tree</strong> (a node has up to 2 children), <strong>ternary tree</strong> (a node has up to 3 children) and so forth.</li>
+  <li>A <strong>binary tree</strong> means each node has up to 2 children vs a <strong>binary search tree</strong>, which has the <em>additional</em> requirement that <code>all left descendants &lt;= n &lt; all right descendents</code> for every node.  Note that some definitions of a binary search tree cannot have duplicates, others the duplicate values will be on the right or can be on either side.  All are valid definitions.</li>
+  <li><strong>balanced</strong> vs <strong>unbalanced</strong> does not mean that the left aznd right subtrees are exactly the same size (like a <em>perfect binary tree</em>).  It simply means that they’re balanced enough to ensure <code>O(log n)</code> run times for <code>insert</code> and <code>find</code> operations.</li>
+  <li>A <strong>complete binary tree</strong> is a binary tree where every level of the tree is fully filled, except for possibly the last level (filled left to right).  Examples of these include <strong>min binary heaps</strong> and <strong>max binary heaps</strong>.</li>
+  <li>A <strong>full binary tree</strong> is a binary tree in which every node has either zero or two children (no nodes have only one child)</li>
+  <li>A <strong>perfect binary tree</strong> is a tree that is both full and complete.  All leaf nodes will be at the same level and this level has the maximum number of nodes.</li>
+</ul>
+
+<p><strong>Traversing Trees</strong>
+You can traverse binary trees using a variety of methods (the most common being ‘in-order’ traversal):</p>
+
+<ul>
+  <li><strong>pre-order traversal</strong> means to visit the current node before its child nodes (thus the name, pre-order).  The root is always the first node visited.</li>
+  <li><strong>in-order traversal</strong> means to visit the left branch, then the current node, and finally the right branch.  When performed on a binary search tree, it visits the nodes in ascending order (thus the name, in-order)</li>
+  <li><strong>post-order traversal</strong> means to visit the current node after its child nodes (thus the name, post-order).  The root is always the last node visited.</li>
+</ul>
+
+<p><strong>Tries (prefix trees)</strong></p>
+
+<p>A <strong>trie</strong> (aka <strong>prefix tree</strong>) is a special kind of tree; a trie is like an n-ry tree in which characters are stored at each node and each path down the tree may represent a word.  </p>
+
+<p>There are <code>*</code> nodes (aka <strong>null nodes</strong>) that are used to indicate complete words (e.g. <code>Many*</code> means many is a complete word or <code>Ma*</code> means there are lots of words that start with <code>Ma</code>).</p>
+
+<p>A trie is commonly used to store the entire English language for quick prefix lookups.  A hash table can quickly look up whether a string is a valid word, but it cannot tell us if a string is a prefix of any valid words.</p>
+
+<h4 id="a-idgraphsgraphsa"><a id="graphs">Graphs</a></h4>
+
+<p>A tree is a type of <strong>graph</strong>, but not all graphs are trees.  A tree is a connected graph without cycles.  A graph is a collection of nodes with edges between (some of) them.  Graphs are used to model pairwise relations between objects.</p>
+
+<ul>
+  <li>graphs can be either <strong>directed</strong> (where edges are like a one way street) or <strong>undirected</strong> (where edges are like a two way street).</li>
+  <li>graphs might consist of multiple isolated subgraphs.</li>
+  <li>if there is a path between every pair of vertices, it is a <strong>connected graph</strong></li>
+  <li>graphs can (or not) have cycles.  an <strong>acyclic graph</strong> is a graph without cycles</li>
+</ul>
+
+<h4 id="a-idrlexamplegraphsreal-life-examples-of-graphsa"><a id="rlexamplegraphs">Real Life examples of Graphs</a></h4>
+
+<p>Computers can use graphs to find the shortest, quickest, or easiest path from one place to another.  Some real life scenarios include:</p>
+
+<ul>
+  <li>systems of roads</li>
+  <li>airline flights from city to city</li>
+  <li>how the internet is connected</li>
+  <li>sequence of classes you must take to complete your college major</li>
+</ul>
+
+<h4 id="a-idclassicexamplegraphsclassic-examples-of-graphsa"><a id="classicexamplegraphs">Classic examples of Graphs</a></h4>
+
+<ul>
+  <li>The ‘Word Ladder Problem’ puzzle by Lewis Carroll where you change a word into another word, can only change one letter at a time and each step you transform the word must still be another word (e.g. FOOL &gt; POOL &gt; POLL &gt;… &gt; SAGE)</li>
+  <li>The ‘Knights Tour Problem’ is a puzzle on the chess board with a single chess piece (the knight).  The object of the puzzle is to find a sequence of moves that allow the knight to visit every square on the board exactly once.  One sequence is a ‘tour’.
+    <ul>
+      <li>Each square on the chessboard is represented as a node in the graph.</li>
+      <li>Each legal move by the knight is represented as an edge</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idvocabdefinegraphsvocabulary-and-definitions-for-graphsa"><a id="vocabdefinegraphs">Vocabulary and Definitions for Graphs</a></h4>
+
+<p>A graph can be represented by <code>G=(V,E)</code> for the graph <code>G</code>, <code>V</code> is a set of vertices and <code>E</code> is a set of edges.  Each edge is a tuple <code>(v, w)</code> where <code>w, v</code> makes up <code>V</code>.  Optionally, we can add a third component to the edge tuple to represent a weight.</p>
+
+<ul>
+  <li><strong>vertex</strong> (aka a <strong>node</strong>) has a name (the <strong>key</strong>) with additional information (the <strong>payload</strong>).</li>
+  <li><strong>edge</strong> (aka an <strong>arc</strong>) connects two vertices to show their relationship.  Edges can be <strong>one-way</strong> (creating a <strong>directed graph</strong>, aka <strong>digraph</strong>) or <strong>two-way</strong> (creating an <strong>undirected graph</strong>).
+    <ul>
+      <li>When two ‘vertices’ are connected by an edge, they are <strong>adjacent</strong>.</li>
+      <li>Example of a ‘directed graph’ is if Person A knows Person B, but Person B does not necessarily know Person A</li>
+      <li>Example of an ‘undirected graph’ is if Person A shakes hands with Person B, Person B has also shaken hands with Person A</li>
+    </ul>
+  </li>
+  <li><strong>weight</strong> is the cost to go from one vertex to another.
+    <ul>
+      <li>Example is a graph of roads that connect one city to another; the weight on the edge might represent the distance between the two cities.</li>
+    </ul>
+  </li>
+  <li><strong>Path</strong> in a graph is a sequence of vertices that are connected by edges.</li>
+  <li><strong>Cycle</strong> in a directed graph is a path that starts and ends at the same vertex.
+    <ul>
+      <li>A graph with no cycles is an <strong>acyclic graph</strong>.</li>
+      <li>A ‘directed graph’ with no cycles is called a <strong>directed acyclic graph</strong> (aka a <strong>DAG</strong>).</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idgraphabstractdatatypegraph-abstract-data-type-adta"><a id="graphabstractdatatype">Graph Abstract Data Type (ADT)</a></h4>
+
+<p>This is how to setup a graph abstract data type (ADT) that we can build off of:</p>
+
+<ul>
+  <li><code>Graph()</code> creates a new, empty graph</li>
+  <li><code>addVertex(vert)</code> adds an instance of <code>Vertex</code> to the graph</li>
+  <li><code>addEdge(fromVert, toVert)</code> adds a new, directed edge to the graph that connects two vertices</li>
+  <li><code>addEdge(fromVert, toVert), weight)</code> adds a new, weighted, directed edge to the graph that connects two vertices</li>
+  <li><code>getVertex(vertKey)</code> finds the vertex in the graph named <code>vertKey</code></li>
+  <li><code>getVertices()</code> returns a list of all vertices in the graph</li>
+  <li><code>in</code> returns <code>True</code> for the statement: <code>vertex in graph</code> if the given vertex is in the graph, <code>False</code> otherwise</li>
+</ul>
+
+<h4 id="a-idstoregraphsways-to-store-a-graph-adjacency-list-and-matrixa"><a id="storegraphs">Ways to store a graph (adjacency list and matrix)</a></h4>
+
+<p>You can store graphs as an <strong>adjacency list</strong> (most common way) or as an <strong>adjacency matrices</strong>.  When two verticies are connected by an edge, they are <strong>adjacent</strong>, thus the name of list and matrix.  There are advantages and disadvantages to both.</p>
+
+<ul>
+  <li>an <strong>adjacency matrix</strong> is a two-dimensional matrix, more precisely a N*N boolean matrix (where N is the number of nodes).  A value at <code>matrix[v][w]</code> means row <code>v</code> and column <code>w</code>, which indicates an edge from node v to node w.
+    <ul>
+      <li>Advantages: The adjacency matrix is simple, especially for small graphs where you can see which nodes are connected to other nodes.</li>
+      <li>Disadvantages: Usually searches on an adjacency matrix are less efficient than an adjacency list since you have to search through all the nodes to identify a node’s neighbors.  Since most of the cells are usually empty (i.e. a <strong>sparse matrix</strong>), this is not an efficient way to store data.  It is rare to see a real world problem where most vertexes connect to most other vertexes.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Example adjacency matrix</strong></p>
+
+<pre><code>    v0  v1  v2  v3  v4  v5
+v0       5               2
+v1           4
+v2               9
+v3                   7   3
+v4   1
+v5           1       8
+</code></pre>
+
+<ul>
+  <li>an <strong>adjacency list</strong> implementation involves keeping a master list of all the vertices in the Graph object and then each vertex object in the graph maintains a list of the other vertices that it is connected to.  We can implement the <code>Vertex</code> class as a dictionary or a list (below sample is as a dict where the keys are the vertices and the values are the weights)
+    <ul>
+      <li>Advtanges:  More space-efficient to implement a sparesely connected graph.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Example adjacency list</strong></p>
+
+<pre><code>v0: id=v0, adj={v1:5, v5:2}
+v1: id=v1, adj={v2:4}
+v2: id=v2, adj={v3:9}
+v3: id=v3, adj={v4:7, v5:3}
+v4: id=v4, adj={v0:1}
+v5: id=v5, adj={v2:1, v4:8}
+</code></pre>
+
+<h4 id="a-idadjacencylistimplementadjacency-list-implementationa"><a id="adjacencylistimplement">Adjacency List Implementation</a></h4>
+
+<p>To implement an ‘adjacency list’, we need to implement:</p>
+
+<ul>
+  <li><code>Graph</code>, which is a master list of the vertices; this contains a dictionary that maps vertex names to vertex objects.</li>
+  <li><code>Vertex</code>, which represents each vertex in the graph.  Each vertex uses a dictionary to keep track of the vertices to which it is connected and the weight of each edge.</li>
+</ul>
+
+<h4 id="a-idsearchgraphsways-to-search-a-grapha"><a id="searchgraphs">Ways to search a graph</a></h4>
+
+<p>After constructing a graph.  The two most common ways to search a graph are <strong>depth-first search</strong> and <strong>breadth-first search</strong>.</p>
+
+<ul>
+  <li>
+    <p>In <strong>depth-first search (DFS)</strong>, we start at the root (or an arbitrarily selected node) and explore each branch completely before moving on to the next branch (thus the name depth-first) before we go wide.  This is usually a simpler approach.</p>
+  </li>
+  <li>
+    <p>In <strong>breadth-first search (BFS)</strong>, we start at the root (or an arbitrarily selected node) and explore each edge/neighbor before going on to any of their children (thus the name breadth-first) before we go deep.  To keep track of which vertices have been visited, we color them to:</p>
+    <ul>
+      <li><code>white</code> - all vertices are initialized as white when constructed; this means the vertex is undiscovered (i.e. not visited yet)</li>
+      <li><code>gray</code> - when a vertex is initially discovered it is colored gray.  When a vertex is colored gray, there may be some white vertices adjacent to it (indicating that there are still additional vertices to explore)</li>
+      <li><code>black</code> - when a vertex is completely explored, it is colored black.  Once a vertex is black, there are no white vertices adjacent to it.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>The heart of a <strong>BFS</strong> is a <code>Queue</code>, which decides which vertex to explore next.  </p>
+
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

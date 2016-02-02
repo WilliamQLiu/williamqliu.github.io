@@ -36,13 +36,53 @@
 
 <hr />
 
-<p><strong>Summary</strong></p>
+<p><strong>Table of Contents</strong></p>
+
+<ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#aboutnp">About NumPy</a>  </li>
+  <li><a href="#arrayobjects">Array objects: ndarray</a>
+    <ul>
+      <li><a href="#create">Create (zeros, ones, empty, arange, linspace)</a></li>
+      <li><a href="#shape">Shape (shape, ndim, reshape, ravel, transform)</a></li>
+      <li><a href="#datatypes">Data Types (dtype, astype)</a></li>
+      <li><a href="#random">Random function (seed, rand, distributions)</a></li>
+    </ul>
+  </li>
+  <li><a href="#arraymanip">Array manipulation: copy, slice, index</a>
+    <ul>
+      <li><a href="#copy">Copy</a></li>
+      <li><a href="#sliceindex">Basic Slice and Index</a></li>
+      <li><a href="#advindex">Advanced Indexing (integer, boolean, fancy)</a></li>
+    </ul>
+  </li>
+  <li><a href="#descstats">Descriptive statistical methods</a>
+    <ul>
+      <li><a href="#aggsum">Aggregate, Summarize</a></li>
+      <li><a href="#sort">Sorting</a></li>
+      <li><a href="#setlogic">Set logic (unique, intersect1d, union1d, setdifference)</a></li>
+      <li><a href="#linalg">Linear Algebra Methods</a></li>
+      <li><a href="#matrix">Matrix Operations</a></li>
+    </ul>
+  </li>
+  <li><a href="#unifun">Universal Functions: ufuncs, vectorized operations</a>
+    <ul>
+      <li><a href="#unafun">Unary ufuncs (abs, exp, log, sqrt, floor, isnan)</a></li>
+      <li><a href="#binfun">Binary ufuncs (add, subtract, multiple, divide, mod)</a></li>
+    </ul>
+  </li>
+  <li><a href="#arrayiter">Array Iteration</a></li>
+</ul>
+
+<hr />
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
 
 <p>NumPy takes Python's <strong>sequence data type</strong> (things like a list, which is flexible and lets you put in any data type) and takes it a step more specific by making it much more efficient at the cost of making data <strong>homogeneous</strong> (only the same <code>dtype</code>, like float64 or string).  The idea is that with this new array type (<code>ndarray</code>), you can <strong>broadcast</strong> (work with different array sizes) and apply <strong>vectorized</strong> operation (i.e. no for-loops) to the entire array at the same time instead of element by element (i.e. like a <strong>scalar</strong>).  This makes it really quick and there are a bunch of useful statistical methods.  Because NumPy is optimized for speed, the operations (e.g. modifying sliced objects, sorting) is done inplace instead of making copies.  If you want copies, you need to explicitly state it.</p>
 
 <hr />
 
-<p><strong>About Numpy</strong></p>
+<h2 id="a-idaboutnumpyabout-numpy--a"><a id="aboutnumpy">About Numpy  </a></h2>
 
 <p>NumPy stands for Numerical Python and is a fundamental package for scientific computing in Python.  With NumPy, we get array-oriented computing, which includes:</p>
 
@@ -60,49 +100,7 @@
 
 <hr />
 
-<p><strong>Table</strong></p>
-
-<ul>
-  <li>Array objects (i.e. <code>ndarray</code>)
-    <ul>
-      <li>Create (zeros, ones, empty, arange, linspace)</li>
-      <li>Data Types (dtype, astype)</li>
-      <li>Shape (shape, ndim, reshape, ravel, transform)</li>
-      <li>Random function (seed, rand, distributions)</li>
-    </ul>
-  </li>
-  <li>Array manipulation: copy, slice, index
-    <ul>
-      <li>Copy</li>
-      <li>Basic Slice and Index</li>
-      <li>Advanced Indexing (integer, boolean, fancy)</li>
-    </ul>
-  </li>
-  <li>Descriptive statistical methods
-    <ul>
-      <li>Aggregate, Summarize</li>
-      <li>Sorting</li>
-      <li>Set logic (unique, intersect1d, union1d, setdifference)</li>
-      <li>Linear Algebra Methods</li>
-      <li>Matrix Operations</li>
-    </ul>
-  </li>
-  <li>Universal Functions (ufuncs, vectorized operations)
-    <ul>
-      <li>Unary ufuncs (abs, exp, log, sqrt, floor, isnan)</li>
-      <li>Binary ufuncs (add, subtract, multiple, divide, mod)</li>
-    </ul>
-  </li>
-  <li>Array Iteration
-    <ul>
-      <li>Single array iteration</li>
-    </ul>
-  </li>
-</ul>
-
-<hr />
-
-<h2 id="ndarray">ndarray</h2>
+<h2 id="a-idndarrayarray-objects-with-ndarraya"><a id="ndarray">Array objects with ndarray</a></h2>
 
 <p><code>ndarray</code> is a N-dimensional array object, which is a collection of <strong>homogeneous data</strong> (i.e. all items must be the same type).  Items can be indexed and each item takes up the same size block of memory.  Note that this is not Python’s standard library of <code>array.array</code>, which is only one-dimensional and more limited functionality.</p>
 
@@ -114,7 +112,7 @@
 
 <hr />
 
-<h2 id="create">CREATE</h2>
+<h2 id="a-idcreatecreatea"><a id="create">Create</a></h2>
 
 <h4 id="array-creating-an-ndarray">array (creating an ndarray)</h4>
 
@@ -168,11 +166,11 @@ temp = np.ones((1, 2, 3))  # create multidimensional with tuple
 
 <hr />
 
-<h2 id="shape">SHAPE</h2>
+<h2 id="a-idshapeshapea"><a id="shape">Shape</a></h2>
 
 <p>You can see and modify the shape of your ndarray using a variety of tools, including: <strong>shape</strong>, <strong>ndim</strong>, <strong>reshape</strong>, <strong>ravel</strong>, <strong>t</strong></p>
 
-<h4 id="shape-1">shape</h4>
+<h4 id="shape">shape</h4>
 
 <p>Each ndarray has a <strong>shape</strong>, a tuple indicating the size of each dimension.  The first argument is the rows, second argument is the number of columns.</p>
 
@@ -223,7 +221,7 @@ temp.T
 
 <hr />
 
-<h2 id="data-types">DATA TYPES</h2>
+<h2 id="a-iddatatypesdata-typesa"><a id="datatypes">Data Types</a></h2>
 
 <h4 id="dtype">dtype</h4>
 
@@ -251,7 +249,7 @@ float_array.dtype  #dtype('float64')
 
 <hr />
 
-<h2 id="random">RANDOM</h2>
+<h2 id="a-idrandomrandoma"><a id="random">Random</a></h2>
 
 <p><strong>random</strong> returns random numbers in a given shape, specifies different seed values, shuffles, types, ranges, and distributions.  There are a lot of other random functions (e.g. for multinomial, multivariate_normal), these are just a few:</p>
 
@@ -354,9 +352,9 @@ np.random.normal(mu, sigma, 1000)  # get 1000 normal distribution samples
 
 <hr />
 
-<h2 id="array-manipulation-copy-slice-index">ARRAY MANIPULATION: COPY, SLICE, INDEX</h2>
+<h2 id="a-idarraymaniparray-manipulation-with-copy-slice-indexa"><a id="arraymanip">Array Manipulation with Copy, Slice, Index</a></h2>
 
-<h3 id="copy">Copy</h3>
+<h3 id="a-idcopycopya"><a id="copy">Copy</a></h3>
 
 <p>When working with arrays, the data is not copied because NumPy is made for fast performance and some datasets can get very large.  To make a copy, you need to explicitly state <code>.copy()</code></p>
 
@@ -364,7 +362,7 @@ np.random.normal(mu, sigma, 1000)  # get 1000 normal distribution samples
 test = arr[5:8].copy()
 </code></pre>
 
-<h3 id="slice-and-index">Slice and Index</h3>
+<h3 id="a-idsliceindexslice-and-indexa"><a id="sliceindex">Slice and Index</a></h3>
 
 <p>There are a variety of ways to select a subset of your data or individual elements.  <strong>Slicing</strong> is selecting a subset of your data.  The axis 0 is y (vertical, the row) and axis 1 is x (horizontal, the column).  <strong>Indexing</strong> is accessing the values of your data.  Array slicing are <strong>views</strong> on the original array, meaning the data is not copied and any modifications to the view will be reflected in the source array.</p>
 
@@ -443,7 +441,7 @@ arr[0]
 #       [4, 5, 6]])
 </code></pre>
 
-<h3 id="advanced-indexing">Advanced Indexing</h3>
+<h3 id="a-idadvindexadvanced-indexinga"><a id="advindex">Advanced Indexing</a></h3>
 
 <p><strong>Advanced array indexing</strong> happens when the selection object is a non-tuple sequence object, an <code>ndarray</code> of data type <code>integer</code> or <code>bool</code>, or a tuple with at least one sequence object or ndarray (of data type integer or bool).  There are two types of advanced indexing, <strong>integer</strong> and <strong>Boolean</strong>; these always return a copy of the data (instead of a view).</p>
 
@@ -494,7 +492,7 @@ arr[[2, 5, 4]]  # select a subset of your rows in this order
 
 <hr />
 
-<h2 id="descriptive-statistical-methods">DESCRIPTIVE STATISTICAL METHODS</h2>
+<h2 id="a-iddescstatsdescriptive-statistical-methodsa"><a id="descstats">Descriptive Statistical Methods</a></h2>
 
 <p>NumPy provides statistical methods, regardless of whether they are applying to a <code>np.ndarray</code> (i.e. a n-dimensional array) or a <code>np.matrix</code> (i.e. a 2-dimensional array).</p>
 
@@ -509,7 +507,7 @@ arr[[2, 5, 4]]  # select a subset of your rows in this order
   <li><code>cumprod</code> is the cumulative product of elements starting from 1</li>
 </ul>
 
-<h4 id="aggregation">AGGREGATION</h4>
+<h3 id="a-idaggsumaggregation-and-suma"><a id="aggsum">Aggregation and Sum</a></h3>
 
 <p>Aggregations really just <strong>reduce</strong> a lot of data (e.g. an entire array) into a smaller chunk of data (e.g. a value like the mean or sum).  You can do <strong>aggregations</strong> on specific axis (0 for row, 1 for column) or on the entire array.</p>
 
@@ -549,7 +547,7 @@ np.max(temp)  #8.0
 
 <hr />
 
-<h2 id="sorting-unique-set-logic">SORTING, UNIQUE, SET LOGIC</h2>
+<h3 id="a-idsetlogicsorting-unique-set-logica"><a id="setlogic">Sorting, Unique, Set Logic</a></h3>
 
 <h4 id="npsort">np.sort</h4>
 
@@ -597,7 +595,7 @@ array([-2, -1,  0,  1,  2])
 
 <hr />
 
-<h2 id="linear-algebra">LINEAR ALGEBRA</h2>
+<h2 id="a-idlinalglinear-algebraa"><a id="linalg">Linear Algebra</a></h2>
 
 <ul>
   <li><code>dot</code> returns the dot product of two vectors</li>
@@ -633,7 +631,7 @@ np.linalg.solve(a, b)
 
 <hr />
 
-<h2 id="matrix-operations">MATRIX OPERATIONS</h2>
+<h3 id="a-idmatrixmatrix-operationsa"><a id="matrix">Matrix Operations</a></h3>
 
 <p>A <code>np.matrix</code> is just a 2-dimensional <code>np.ndarray</code>.  Here are some additional functions for them that can help with matrix operations.</p>
 
@@ -648,9 +646,11 @@ np.linalg.solve(a, b)
 
 <hr />
 
-<h2 id="universal-functions">UNIVERSAL FUNCTIONS</h2>
+<h2 id="a-idunifununiversal-functionsa"><a id="unifun">Universal Functions</a></h2>
 
-<p>A <strong>universal function</strong> (aka <strong>ufunc</strong>) is a function that performs elementwise operations on data in ndarrays.  They’re fast vectorized wrappers for simple functions.</p>
+<p>A <strong>universal function</strong> (aka <strong>ufunc</strong>) is a function that performs elementwise operations on data in ndarrays.  They’re fast vectorized wrappers for simple functions.  We have Unary Universal Functions and Binary Universal Functions.</p>
+
+<h4 id="a-idunafununary-universal-functionsa"><a id="unafun">Unary Universal Functions</a></h4>
 
 <ul>
   <li><code>abs</code> computes the absolute value element-wise for that value</li>
@@ -664,7 +664,7 @@ np.linalg.solve(a, b)
   <li><code>cos</code>, <code>sin</code>, <code>tan</code> applies the trigonometric functions </li>
 </ul>
 
-<p>There is also a list of <strong>binary universal functions</strong></p>
+<h4 id="a-idbinfunbinary-universal-functionsa"><a id="binfun">Binary Universal Functions</a></h4>
 
 <ul>
   <li><code>add</code> adds corresponding elements in arrays</li>
@@ -676,7 +676,7 @@ np.linalg.solve(a, b)
 
 <hr />
 
-<h2 id="array-iteration">ARRAY ITERATION</h2>
+<h3 id="a-idarrayiterarray-iterationa"><a id="arrayiter">Array Iteration</a></h3>
 
 <p>Sometimes you just have to iterate over an array; you can do this with <strong>nditer</strong></p>
 
@@ -696,11 +696,11 @@ for x in np.nditer(a):
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>05 Apr 2015</span> <a href="/2015/04/05/pandas.html">Pandas</a></li>
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
     
-      <li><span>03 Apr 2015</span> <a href="/2015/04/03/statistical-analysis.html">Statistical Analysis</a></li>
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
     
-      <li><span>02 Apr 2015</span> <a href="/2015/04/02/python-basics.html">Python Basics</a></li>
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
     
   </ul>
 </div>

@@ -36,72 +36,101 @@
 
 <hr />
 
-<p><strong>Summary</strong></p>
-
-<p>Pandas is built on top of NumPy and takes the <code>ndarray</code> a step even further into high-level data structures with <code>Series</code> and <code>DataFrame</code> objects; these data objects contain metadata like column and row names as an <code>index</code> with an <code>index.name</code>.  There are also a lot of helper functions for loading, selecting, and chunking data.  If you are using something like <code>SQL</code> for anything that goes beyond a simple query or a large dataset, its time to switch to pandas.</p>
-
-<p>Pandas is similar to <code>R</code> and follows the same patterns of using the <code>split-apply-combine</code> strategy using the <code>groupby</code> method.  Melting is done through the <code>melt</code> method.</p>
-
-<hr />
-
-<p><strong>About Pandas</strong></p>
-
-<p>Pandas is a high-level data structure and is built on top of NumPy.  This includes:</p>
+<p><strong>Table of Contents</strong></p>
 
 <ul>
-  <li>Series
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#setup">Setup</a></li>
+  <li><a href="#axis">Axis</a></li>
+  <li><a href="#series">Series</a>
     <ul>
-      <li>Creating</li>
-      <li>Selecting</li>
+      <li><a href="#createseries">Creating</a></li>
+      <li><a href="#selectseries">Selecting</a></li>
+      <li><a href="#seriesdict">Dict similarities</a></li>
     </ul>
   </li>
-  <li>DataFrame
+  <li><a href="#dataframe">DataFrame</a>
     <ul>
-      <li>Creating</li>
-      <li>Selecting (ix, iloc)</li>
-      <li>Transpose</li>
+      <li><a href="#createdf">Creating</a></li>
+      <li><a href="#selectdf">Selecting (ix, iloc)</a></li>
+      <li><a href="#selectfilterdf">Filtering (ix, iloc)</a></li>
+      <li><a href="#querydf">Query</a></li>
+      <li><a href="#assigndf">Assign Values</a></li>
+      <li><a href="#transposedf">Transpose</a></li>
+      <li><a href="#iteration">Iteration</a></li>
     </ul>
   </li>
-  <li>Object Properties
+  <li><a href="#object">Object Properties</a>
     <ul>
-      <li>index, reindex, values</li>
-      <li>dtype, astype</li>
-      <li>isnull, notnull</li>
+      <li><a href="#objectindex">index, reindex, values</a></li>
+      <li><a href="#objecttype">dtype, astype</a></li>
+      <li><a href="#objectnull">Find Missing Values with isnull, notnull</a></li>
+      <li><a href="#objectreplace">Replace Values with replace</a></li>
+      <li><a href="#objectduplicated">duplicated</a></li>
     </ul>
   </li>
-  <li>Operations
+  <li><a href="#datetime">Datetime / TimeSeries</a>
     <ul>
-      <li>NumPy ufuncs</li>
-      <li>Arithmetic Operations</li>
-      <li>Arithmetic Methods (add, sub, div, mul)</li>
+      <li><a href="#datetimeconvert"><code>convert_object</code> and <code>to_datetime</code></a></li>
+      <li><a href="#datetimeindex">DatetimeIndex</a></li>
+      <li><a href="#datetimeresample">Datetime Resample</a></li>
+      <li><a href="#datetimeoffset">Datetime Offset</a></li>
+      <li><a href="#datetimehow">Datetime How</a></li>
     </ul>
   </li>
-  <li>Functions, Apply, Map
+  <li><a href="#operations">Operations</a>
     <ul>
-      <li>apply</li>
-      <li>map</li>
-      <li>applymap)</li>
+      <li><a href="#numpyops">NumPy ufuncs</a></li>
+      <li><a href="#arithmetic">Arithmetic</a></li>
+      <li><a href="#arithmeticmethods">Arithmetic Methods (add, sub, div, mul)</a></li>
     </ul>
   </li>
-  <li>Sorting, Ranking, Categorical
+  <li><a href="#functions">Functions, Apply, Map</a>
     <ul>
-      <li>Sorting</li>
-      <li>Ranking</li>
-      <li>Categorical</li>
+      <li><a href="#apply">apply</a></li>
+      <li><a href="#map">map</a></li>
+      <li><a href="#applymap">applymap</a></li>
     </ul>
   </li>
-  <li>Summary Statistics
+  <li><a href="#sorting">Sorting, Ranking, Categorical</a>
     <ul>
-      <li>describe</li>
-      <li>sum, mean, cumsum, diff, skew, pct_change</li>
-      <li>correlation, covariance</li>
-      <li>unique values, value counts</li>
-      <li>working with null and na</li>
+      <li><a href="#sorting">Sorting</a></li>
+      <li><a href="#ranking">Ranking</a></li>
+      <li><a href="#categories">Categories</a></li>
+      <li><a href="#dummies">Dummies</a></li>
     </ul>
   </li>
-  <li>Split-Apply-Combine
+  <li><a href="#summarystats">Summary Statistics</a>
     <ul>
-      <li>groupby</li>
+      <li><a href="#summarystats">describe, sum, mean, cumsum, diff, skew, pct_change</a></li>
+      <li><a href="#corcov">correlation, covariance</a></li>
+      <li><a href="#value">unique values, value counts</a></li>
+      <li><a href="#null">working with null, dropna, fillna</a></li>
+    </ul>
+  </li>
+  <li><a href="#split-apply-combine">Split-Apply-Combine</a>
+    <ul>
+      <li><a href="#groupby">groupby</a></li>
+      <li><a href="#aggregate">aggregate</a></li>
+      <li><a href="#filtration">filtration</a></li>
+      <li><a href="#sort">sort</a></li>
+      <li><a href="#groupbyiteration">groupby iteration</a></li>
+    </ul>
+  </li>
+  <li><a href="#reshaping">Reshaping</a>
+    <ul>
+      <li><a href="#melt">melt</a></li>
+      <li><a href="#pivot">pivot</a></li>
+      <li><a href="#pivottable">pivot table</a></li>
+      <li><a href="#crosstab">crosstab</a></li>
+    </ul>
+  </li>
+  <li><a href="#cmc">Concatenate, Merge, Combine</a>
+    <ul>
+      <li><a href="#concatenate">concat</a></li>
+      <li><a href="#append">append</a></li>
+      <li><a href="#merge">merge</a></li>
+      <li><a href="#combine_first">combine_first</a></li>
     </ul>
   </li>
 </ul>
@@ -113,24 +142,22 @@
     <ul>
       <li>Ordering and sorting levels</li>
       <li>Summary statistics by levels  </li>
-    </ul>
-  </li>
-  <li>Combining and Merging Data
-    <ul>
-      <li>merge</li>
-      <li>concat</li>
-      <li>combine_first</li>
       <li>stack, unstack</li>
-      <li>pivot_table, pivot</li>
-      <li>melt, wide_to_long</li>
-      <li>get_dummies</li>
     </ul>
   </li>
 </ul>
 
 <hr />
 
-<h2 id="setup">Setup</h2>
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<p>Pandas is built on top of NumPy and takes the <code>ndarray</code> a step even further into high-level data structures with <code>Series</code> and <code>DataFrame</code> objects; these data objects contain metadata like column and row names as an <code>index</code> with an <code>index.name</code>.  There are also a lot of helper functions for loading, selecting, and chunking data.  If you are using something like <code>SQL</code> for anything that goes beyond a simple query or a large dataset, its time to switch to pandas.</p>
+
+<p>Pandas is similar to <code>R</code> and follows the same patterns of using the <code>split-apply-combine</code> strategy using the <code>groupby</code> method.  Melting is done through the <code>melt</code> method.</p>
+
+<hr />
+
+<h2 id="setup--a-idsetupa">Setup  <a id="setup"></a></h2>
 
 <p>Import the pandas library</p>
 
@@ -140,11 +167,25 @@ import pandas as pd
 
 <hr />
 
-<h2 id="series">SERIES</h2>
+<h2 id="axis--a-idaxisa">Axis  <a id="axis"></a></h2>
+
+<ul>
+  <li>When <code>axis=0</code> to apply a method down each column.</li>
+  <li>Use <code>axis=1</code> to apply a method across each row.</li>
+</ul>
+
+<p>So when there is <code>df.mean(axis=1)</code> it means to take the mean of entries horizontally across columns (i.e. along each individual row).</p>
+
+<p>![Image of Axis]
+(https://williamqliu.github.com/images/pd_axis.jpg)</p>
+
+<hr />
+
+<h2 id="series--a-idseriesa">SERIES  <a id="series"></a></h2>
 
 <p>A <strong>Series</strong> is a one-dimensional array-like object containing any NumPy data type as <code>values</code> as well as data labels called the <code>index</code>.  If no index is specified, a default one is created using integers that span 0 through N-1 (where N is the length of data).</p>
 
-<h4 id="creating-series">Creating Series</h4>
+<h4 id="creating-series--a-idcreateseriesa">Creating Series  <a id="createseries"></a></h4>
 
 <pre><code>from pandas import Series
 
@@ -159,7 +200,7 @@ obj
 #dtype: int64
 </code></pre>
 
-<h4 id="selecting-series-values">Selecting Series Values</h4>
+<h4 id="selecting-series-values--a-idselectseriesa">Selecting Series Values  <a id="selectseries"></a></h4>
 
 <p>You can select single values or a set of values by specifying the index within <code>[]</code>.</p>
 
@@ -173,7 +214,7 @@ obj2[['c', 'a', 'd']]  # Get values to this list of indexes
 #dtype: int64
 </code></pre>
 
-<h4 id="dict">Dict</h4>
+<h4 id="dictionary-and-series-similarities--a-idseriesdicta">Dictionary and Series Similarities  <a id="seriesdict"></a></h4>
 
 <p>You can think of a Series as a fixed-length, ordered dictionary since it maps the <code>index</code> to <code>values</code>.  You can even pass in a Python dict to create a Series.</p>
 
@@ -202,17 +243,17 @@ obj4
 
 <hr />
 
-<h2 id="dataframe">DATAFRAME</h2>
+<h2 id="dataframe--a-iddataframea">DATAFRAME  <a id="dataframe"></a></h2>
 
 <p>A <strong>DataFrame</strong> is a tabular, spreadsheet-like data structure (like Excel) and contains an ordered collection of columns, each of which can be a different value type (numeric, string, boolean, etc.).  There is both a row and column <code>index</code>.</p>
 
-<h4 id="creating-from-a-dict-of-lists-or-arrays">Creating (from a dict of lists or arrays)</h4>
+<h4 id="creating-from-a-dict-of-lists-or-arrays--a-idcreatedfa">Creating (from a dict of lists or arrays)  <a id="createdf"></a></h4>
 
 <pre><code># Create a dict of equal-length lists or NumPy arrays
 data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada'],
         'year': [2000, 2001, 2002, 2001, 2002],
         'pop': [1.5, 1.7, 3.6, 2.4, 2.9]}
-df = DataFrame(data)
+df = pd.DataFrame(data)
 
 df
 #   pop   state  year
@@ -223,9 +264,9 @@ df
 #4  2.9  Nevada  2002
 
 # Can specify column names, order, and index names
-df2 = DataFrame(data,
-               columns=['year', 'state', 'pop', 'debt'],
-               index=['one', 'two', 'three', 'four', 'five'])
+df2 = pd.DataFrame(data,
+                   columns=['year', 'state', 'pop', 'debt'],
+                   index=['one', 'two', 'three', 'four', 'five'])
 df2
 #       year     state   pop  debt
 #one    2000      Ohio   1.5   NaN
@@ -243,7 +284,7 @@ df2
 #Index([u'year', u'state', u'pop', u'debt'], dtype='object')
 </code></pre>
 
-<h4 id="selecting-columns-using-dict-and-attribute">Selecting Columns (using dict and attribute)</h4>
+<h4 id="selecting-columns-using-dict-and-attribute--a-idselectdfa">Selecting Columns (using dict and attribute)  <a id="selectdf"></a></h4>
 
 <p>If you want to select a column, this will return a <code>Series</code>; you can do this by calling the column index as a dictionary (i.e. <code>[]</code>) or by calling the column index as an attribute (i.e. <code>.</code>).</p>
 
@@ -258,7 +299,7 @@ df2
 df2.state  # get 'state' column using attribute notation, same as above
 </code></pre>
 
-<h4 id="selecting-rows-ix">Selecting Rows (ix)</h4>
+<h4 id="selecting-rows-and-columns-ix">Selecting Rows and Columns (ix)</h4>
 
 <p>With <code>ix</code>, you can select a row index by either position (e.g. <code>df.ix[2]</code>) or the <code>name</code> (say <code>df.ix['state']</code>).  Since this is built on top of NumPy, these selections are <strong>views</strong> (which means they are the actual values); if you want a copy, then use <code>copy()</code>.</p>
 
@@ -273,7 +314,53 @@ df2.ix['three']['state']  # Get value of index 'three', column 'state'
 #'Ohio'
 </code></pre>
 
-<h4 id="selecting-rows-and-columns-iloc">Selecting Rows and Columns (iloc)</h4>
+<h4 id="selecting-and-filtering-rows-and-columns-a-idselectfilterdfa">Selecting and Filtering Rows and Columns #<a id="selectfilterdf"></a></h4>
+
+<p>You can select and filter for specific rows and columns.</p>
+
+<pre><code># Filter on specific column value only
+df.ix[df.state == 'Ohio']
+#       year  state
+#one    2000   Ohio
+#two    2001   Ohio
+#three  2002   Ohio
+
+# Filter by chaining (e.g. multiple columns)
+df.ix[(df.state == 'Ohio') &amp; (df.year.isin([2001, 2002]))]
+#  pop state  year
+#1 1.7  Ohio  2001
+#2 3.6  Ohio  2002
+
+# Filter on specific row 
+df2.ix['three']
+#year   2002
+#state  Ohio
+#pop     3.6
+#debt    NaN
+</code></pre>
+
+<h4 id="query--a-idquerydfa">query  #<a id="querydf"></a></h4>
+
+<p>You can also query the columns of a dataframe with a boolean expression.</p>
+
+<pre><code>df.query(df.year &gt; 2001)
+#   pop    state  year
+#2  3.6     Ohio  2002
+#4  2.9   Nevada  2002
+</code></pre>
+
+<h4 id="selecting-rows-and-columns-by-label-loc">Selecting Rows and Columns by label (loc)</h4>
+
+<p>You can use the <code>loc</code> position to return based off of label names.</p>
+
+<pre><code>df = DataFrame({'sepallength': [1, 2, 3, 4, 5, 6, 7],
+                'sepalwidth': [7, 6, 5, 4, 3, 2, 1],
+                'class': ['Iris-setosa', 'Iris-versicolor', 'Iris-setosa', 'Iris', 'Iris', 'Iris', 'Iris']})
+df.loc[df['class'] == 'Iris-setosa']  # Filter on single column value
+df.loc[df['class'].isin(['Iris-setosa', 'Iris'])]  # Filter multiple col values
+</code></pre>
+
+<h4 id="selecting-rows-and-columns-by-position-iloc">Selecting Rows and Columns by position (iloc)</h4>
 
 <p>You can also select rows or columns by an integer based indexing using the <code>iloc</code> method or by using <code>[]</code>; either way requires arguments for the <code>start</code>, <code>stop</code> and optionally an <code>interval</code>.</p>
 
@@ -295,7 +382,7 @@ df2.iloc[:, 1:3]
 #five  Nevada  2.9
 </code></pre>
 
-<h4 id="assigning-values">Assigning values</h4>
+<h4 id="assigning-values--a-idassigndfa">Assigning values  <a id="assigndf"></a></h4>
 
 <p>You can assign values similar to how you select items.  The value's length must match the length of the DataFrame.</p>
 
@@ -325,7 +412,7 @@ df2.columns
 #Index([u'year', u'state', u'pop', u'debt'], dtype='object')
 </code></pre>
 
-<h4 id="transposing">Transposing</h4>
+<h4 id="transposing--a-idtransposedfa">Transposing  <a id="transposedf"></a></h4>
 
 <p>You can transpose a DataFrame using <code>T</code>.</p>
 
@@ -345,13 +432,26 @@ df2.T
 #debt    NaN  -1.2   NaN    -1.5    -1.7
 </code></pre>
 
+<h4 id="iteration--a-iditerationa">Iteration  <a id="iteration"></a></h4>
+
+<p>The advantage of a DataFrame is the vectorized operations, but sometimes you just have to iterate through pieces of a DataFrame.  You can do this with <code>iterrows()</code></p>
+
+<pre><code>for index, row in df2.iterrows():
+    print index, row['year'], row['state']
+# one 2000 Ohio
+# two 2001 Ohio
+# three 2002 Ohio
+# four 2001 Nevada
+# five 2002 Nevada
+</code></pre>
+
 <hr />
 
-<h2 id="object-properties">OBJECT PROPERTIES</h2>
+<h2 id="object-properties--a-idobjecta">OBJECT PROPERTIES  <a id="object"></a></h2>
 
 <p>Series and DataFrame have an <strong>index</strong> and corresponding <strong>values</strong>.  The index appears on the left (accessible through <code>index)</code>) and the values are on the right (accessible through <code>values</code>).  There are also corresponding <strong>names</strong> (accessible through the <code>name</code> attribute).</p>
 
-<h2 id="index">index</h2>
+<h2 id="index--a-idobjectindexa">index  <a id="objectindex"></a></h2>
 
 <p>Indexes are <strong>immutable</strong> (can't be modified); the main thing to know is that later we will go into different types of indexes, including <code>DatetimeIndex</code>, which gives more functions for working with datetimes.  </p>
 
@@ -425,11 +525,11 @@ new_obj
 #dtype: float64
 </code></pre>
 
-<h2 id="reindex">reindex</h2>
+<h2 id="reindex--a-idobjectreindexa">reindex  <a id="objectreindex"></a></h2>
 
 <p><strong>Reindex</strong> creates a new object with the data conformed to the new index, even if there are no index values present.  For a scalar value, you can specify a <code>fill_value</code> (e.g. <code>0</code>), otherwise the default is a <code>NaN</code>.  You can also specify <code>method</code> to fill (e.g. <code>ffill</code> to  fill values forward).  To reindex columns, go see the <code>ix</code> method.</p>
 
-<h4 id="reindex-1">reindex</h4>
+<h4 id="reindex">reindex</h4>
 
 <pre><code>obj = Series([4.5, 7.2, -5.3, 3.6], index= ['d', 'b', 'a', 'c'])
 
@@ -467,7 +567,7 @@ obj3
 #dtype: object
 </code></pre>
 
-<h2 id="dtype-astype">dtype, astype</h2>
+<h2 id="dtype-astype--a-idobjecttypea">dtype, astype  <a id="objecttype"></a></h2>
 
 <p>Pandas uses many of the same <code>dtype</code> as NumPy, but there are additional types like <code>dtype=category</code>.  You can also forcefully assign type with the <code>astype</code> method.</p>
 
@@ -497,7 +597,7 @@ df.dtypes
 obj.values  #array([ 4,  7, -5,  3])
 </code></pre>
 
-<h4 id="missing-values-isnull-notnull">Missing Values (isnull, notnull)</h4>
+<h4 id="missing-values-isnull-notnull--a-idobjectnulla">Missing Values (isnull, notnull)  <a id="objectnull"></a></h4>
 
 <p>A <code>NaN</code> or <code>NA</code> is returned if a value cannot be found (i.e. a missing value).  You can search your data for these missing values using <code>isnull</code> and <code>notnull</code> functions.</p>
 
@@ -516,13 +616,179 @@ pd.notnull(obj4)
 #dtype: bool
 </code></pre>
 
+<h4 id="replacing-values-replace--a-idobjectreplacea">Replacing Values (replace)  <a id="objectreplace"></a></h4>
+
+<p>You can replace a value with another value.  You can use replace() with a lot of variations including replacing a single value with a single value, a list with a single value, a list with a list, and a dict with a dict.</p>
+
+<pre><code>mydata = pd.Series([1., -999., 2., -999., -1000., 3.])
+print mydata
+#0       1
+#1    -999
+#2       2
+#3    -999
+#4   -1000
+#5       3
+#dtype: float64
+
+# Replace value of x with value of y
+mydata.replace(-999, np.nan)
+#0       1
+#1     NaN
+#2       2
+#3     NaN
+#4   -1000
+#5       3
+
+# Replace list x with value of y
+mydata.replace([-999, -1000], np.nan)
+#0     1
+#1   NaN
+#2     2
+#3   NaN
+#4   NaN
+#5     3
+#dtype: float64
+
+# Replace list of x with list of y
+mydata.replace([-999, -1000], [numpy.nan, 0])
+#0     1
+#1   NaN
+#2     2
+#3   NaN
+#4     0
+#5     3
+#dtype: float64
+
+# Replace a dict of x with a dict of y
+mydata.replace({-999:np.NaN, -1000:0})
+#0     1
+#1   NaN
+#2     2
+#3   NaN
+#4     0
+#5     3
+#dtype: float64
+</code></pre>
+
+<h4 id="duplicated-values--a-idobjectduplicateda">Duplicated Values  <a id="objectduplicated"></a></h4>
+
+<p>To check if a DataFrame has duplicated values, you can use duplicated().</p>
+
+<pre><code>df = pd.DataFrame({
+    'k1': ['one'] * 3 + ['two'] * 4,
+    'k2': [1, 1, 2, 3, 3, 4, 4]
+    })
+df
+#    k1  k2
+#0  one   1
+#1  one   1
+#2  one   2
+#3  two   3
+#4  two   3
+#5  two   4
+#6  two   4
+
+# Return a Series of whether the row is duplicated
+df.duplicated()
+#0    False
+#1     True
+#2    False
+#3    False
+#4     True
+#5    False
+#6     True
+#dtype: bool
+
+# Return a DataFrame of unique rows
+df.drop_duplicates()
+#    k1  k2
+#0  one   1
+#2  one   2
+#3  two   3
+#5  two   4
+
+# You can specify what columns are used to determine if row is unique
+df.drop_duplicates(['k1'])
+#    k1  k2
+#0  one   1
+#3  two   3
+</code></pre>
+
 <hr />
 
-<h2 id="numerical-operations">NUMERICAL OPERATIONS</h2>
+<h2 id="datetime--timeseries--a-iddatetimea">DATETIME / TIMESERIES  <a id="datetime"></a></h2>
 
-<h4 id="numpy-operations">NumPy Operations</h4>
+<p>Pandas really starts to show how powerful it is when working with DateTimes.</p>
 
-<p>You can apply NumPy array operations (e.g. filtering, scalar multiplication, applying math functions) to our Series and DataFrames.</p>
+<h4 id="convertobjects-and-todatetime--a-iddatetimeconverta"><code>convert_objects</code> and <code>to_datetime</code>  <a id="datetimeconvert"></a></h4>
+
+<p>First you want to make sure that the data type is correct (i.e. it’s a time)  You can convert dataframe objects a couple different ways.  There’s a generic <code>convert_objects</code> that you can use to also use to convert numbers.  If you want a more specific time function, use <code>to_datetime</code>.</p>
+
+<pre><code>mydf = mydf.convert_objects(convert_dates)  # also, convert_numeric, convert_timedeltas
+
+mydf['SomeDateColumn'] = pd.to_datetime(mydf['SomeDateColumn'], coerce=True)
+</code></pre>
+
+<h4 id="datetimeindex--a-iddatetimeindexa">DatetimeIndex  <a id="datetimeindex"></a></h4>
+
+<p>To utilize the datetime specific methods, you need to set an index that is a <code>DatetimeIndex</code>.</p>
+
+<pre><code>df.set_index(pd.DatetimeIndex(df['someDate']), inplace=True)
+
+df  # say this is: 'someDate', 'cookiesEaten', 'Notes'
+#2009-02-16 23:26:40, 5, someotherstuff
+#2009-02-16 23:45:43, 7, someotherstuff
+#2009-02-17 22:05:31, 10, someotherstuff
+</code></pre>
+
+<h4 id="datetime-resample--a-iddatetimeresamplea">Datetime Resample  <a id="datetimeresample"></a></h4>
+
+<p>You can now resample our counts of say ‘cookiesEaten’.</p>
+
+<pre><code>df.resample('5Min', how='sum')  # default is mean
+
+df.resample('D', how=np.max)
+#2009-02-16, 12
+#2009-02-17, 10
+</code></pre>
+
+<h4 id="datetime-offset--a-iddatetimeoffseta">Datetime Offset  <a id="datetimeoffset"></a></h4>
+
+<p>With the first argument of a resample, you can specify the offset alias.  For example:</p>
+
+<ul>
+  <li><code>D</code> is for calendar day frequency</li>
+  <li><code>B</code> is for business day frequency</li>
+  <li><code>W</code> is for weekly frequency</li>
+  <li><code>M</code> is for month end frequency</li>
+  <li><code>MS</code> is for month start frequency</li>
+  <li><code>Q</code> is for quarter end frequency</li>
+  <li><code>QS</code> is for quarter start frequency</li>
+  <li><code>H</code> is for hourly frequency</li>
+  <li><code>T</code> is for minute frequency</li>
+  <li><code>S</code> is for secondly frequency</li>
+  <li><code>U</code> is for microseconds frequency</li>
+</ul>
+
+<h4 id="datetime-how--a-iddatetimehowa">Datetime How  <a id="datetimehow"></a></h4>
+
+<p>With the second argument of a resample, you can specify how.  For example:</p>
+
+<ul>
+  <li><code>how='mean'</code></li>
+  <li><code>how='min'</code></li>
+  <li><code>how='median'</code></li>
+  <li><code>how='first'</code></li>
+  <li><code>how='last'</code></li>
+  <li><code>how='ohlc'</code>  # first, last, highest, lowest value (mainly used for finance to see what opening stock is, ending stock for the day, etc.)</li>
+</ul>
+
+<hr />
+<p>##NUMERICAL OPERATIONS  <a id="operations"></a></p>
+
+<h4 id="numpy-operations-and-ufuncs--a-idnumpyopsa">NumPy Operations and uFuncs  <a id="numpyops"></a></h4>
+
+<p>You can apply NumPy array operations (e.g. filtering, scalar multiplication, applying math functions) and uFuncs to our Series and DataFrames.</p>
 
 <pre><code>obj2  # Setup Series
 #d  4
@@ -552,7 +818,7 @@ np.sqrt(obj2)  # Apply ufunc
 #dtype: float64
 </code></pre>
 
-<h4 id="basic-arithmetic">Basic Arithmetic</h4>
+<h4 id="basic-arithmetic--a-idarithmetica">Basic Arithmetic  <a id="arithmetic"></a></h4>
 
 <p>One of the advantages of pandas is that data is automatically aligned on the index.  For example, even though obj4 has the index ‘California’ that obj3 does not have, we can still do arithmetic.</p>
 
@@ -578,7 +844,7 @@ obj3 + obj4
 #dtype: float64
 </code></pre>
 
-<h4 id="arithmetic-methods">Arithmetic Methods</h4>
+<h4 id="arithmetic-methods--a-idarithmeticmethodsa">Arithmetic Methods  <a id="arithmeticmethods"></a></h4>
 
 <p>You can apply arithmetic methods between Series and DataFrame objects.  These methods let you send in additional arguments (like <code>fill_value</code>, <code>axis</code>)</p>
 
@@ -626,7 +892,7 @@ df1.add(df2, fill_value=0)  # using method allows fill_value
 
 <hr />
 
-<h2 id="functions-apply-and-map">FUNCTIONS, APPLY, AND MAP</h2>
+<h2 id="functions-apply-and-map--a-idfunctionsa">FUNCTIONS, APPLY, AND MAP  <a id="functions"></a></h2>
 
 <p>You can apply NumPy's <strong>ufuncs</strong> (element-wise array methods) on Pandas objects.  For example, we apply <code>np.abs</code> onto a DataFrame.</p>
 
@@ -647,7 +913,7 @@ np.abs(df)
 #Oregon  0.108305  0.588943  0.073157
 </code></pre>
 
-<h4 id="apply">apply</h4>
+<h4 id="apply--a-idapplya">apply  <a id="apply"></a></h4>
 
 <p>Besides the ufuncs above, you can apply your own custom function to a column or row by using the DataFrame <code>apply</code> method.  You do not have to return a scalar value; you can also return a Series with multiple values.</p>
 
@@ -679,7 +945,7 @@ df.apply(my_func)
 
 <p>If you do not want to apply based on the axis (i.e. column or row), you can instead apply your own functions across every element.  If this is a Series, then you use <code>map</code>.  If this is a DataFrame, then use <code>applymap</code>.</p>
 
-<h4 id="map">map</h4>
+<h4 id="map--a-idmapa">map  <a id="map"></a></h4>
 
 <pre><code>#For Series, use map
 my_format = lambda x: '%.2f' % x  #2 decimal places
@@ -691,7 +957,7 @@ df['c'].map(my_format)
 #Name: c, dtype: object
 </code></pre>
 
-<h4 id="applymap">applymap</h4>
+<h4 id="applymap--a-idapplymapa">applymap  <a id="applymap"></a></h4>
 
 <pre><code>#For DataFrames, use applymap
 my_format = lambda x: '%.2f' % x  #2 decimal places
@@ -706,7 +972,7 @@ df
 
 <hr />
 
-<h2 id="sorting">Sorting</h2>
+<h2 id="sorting--a-idsortinga">Sorting  <a id="sorting"></a></h2>
 
 <p>You may want to sort by some criteria, either the index or the value.  To sort based on the index, use the <code>sort_index</code> method.  To sort by value, you use <code>order</code> method for a Series and for DataFrames you pass in parameter(s) to the argument <code>by</code>.</p>
 
@@ -740,9 +1006,9 @@ obj.order()  #sort by value
 
 <h4 id="sort-and-order-with-dataframe">Sort and Order with DataFrame</h4>
 
-<p>For a DataFrame, you use <code>sort_index</code> for both sorting by index (where you can specify which axis to sort) or by values.  You can pass in additional parameters like a boolean value for <code>ascending</code>, what to do with <code>NaN</code> with <code>na_position</code>, or multiple columns to sort with <code>by</code>.</p>
+<p>For a DataFrame, you use <code>sort</code> by values or <code>sort_index</code> to sort by index (where you can specify which axis to sort).  You can pass in additional parameters like a boolean value for <code>ascending</code>, what to do with <code>NaN</code> with <code>na_position</code>, or multiple columns to sort with <code>by</code>.</p>
 
-<pre><code>df = DataFrame({'Song': ['Hey Jude', 'Help!', 'Do it', 'Let it be'],
+<pre><code>df = pd.DataFrame({'Song': ['Hey Jude', 'Help!', 'Do it', 'Let it be'],
 'Weeks': [24, 7, 2, 90], 'Plays': [20, 10, 1, 1]}, index=[3, 2, 4, 1])
 df
 #   Plays       Song  Weeks
@@ -751,6 +1017,15 @@ df
 #4      1      Do it      2
 #1      1  Let it be     90
 
+# Sort by Values
+df.sort(['Plays', 'Weeks'], ascending=[True, True])
+#   Plays       Song  Weeks
+#4      1      Do it      2
+#1      1  Let it be     90
+#2     10      Help!      7
+#3     20   Hey Jude     24
+
+# Sort by Index
 df.sort_index(axis=0, ascending=True)  # sort index on x axis (default)
 #   Plays       Song  Weeks
 #1      1  Let it be     90
@@ -766,7 +1041,7 @@ df.sort_index(by=['Plays', 'Weeks'], ascending=[True, True])
 #3     20   Hey Jude     24
 </code></pre>
 
-<h2 id="ranking">Ranking</h2>
+<h2 id="ranking--a-idrankinga">Ranking  <a id="ranking"></a></h2>
 
 <p>You can assign ranks from one through the number of valid data points.  This is useful for statistical methods.  By default, the <code>rank</code> method breaks ties by assigning each group the mean rank.  You can specify additional parameters like <code>ascending</code> and <code>method</code>.</p>
 
@@ -789,7 +1064,7 @@ obj.rank(ascending=True)
 #5    2.0
 </code></pre>
 
-<h2 id="categories">Categories</h2>
+<h2 id="categories--a-idcategoriesa">Categories  <a id="categories"></a></h2>
 
 <p>There is a <code>pandas.Categorical</code> object that you can assign to a Series or DataFrame.  You pass in the categories as well as an optional boolean value to <code>Ordered</code>.  You can rename categories using <code>Categorical.rename_categories()</code> method.  To convert back to another type (say int), use <code>astype</code> method.</p>
 
@@ -827,9 +1102,25 @@ num_choices
 #Categories (5, int64): [1 &lt; 2 &lt; 3 &lt; 4 &lt; 5]
 </code></pre>
 
+<h2 id="dummies--a-iddummiesa">Dummies  <a id="dummies"></a></h2>
+
+<p>A lot of times in statistical analysis you will want to convert a categorical into a dummy/indicator variables.</p>
+
+<pre><code>my_choices
+my_choices = pd.Categorical(['Like', 'Like', 'Hate', 'Neutral'],
+                            categories=['Like', 'Neutral', 'Hate'],
+                            ordered=True)    
+pd.get_dummies(my_choices)
+#   Like  Neutral  Hate
+#0     1        0     0
+#1     1        0     0
+#2     0        0     1
+#3     0        1     0
+</code></pre>
+
 <hr />
 
-<h2 id="summary-statistics">SUMMARY STATISTICS</h2>
+<h2 id="summary-statistics--a-idsummarystatsa">SUMMARY STATISTICS  <a id="summarystats"></a></h2>
 
 <p>Pandas has a lot of summary statistics as methods.  They include:</p>
 
@@ -929,7 +1220,7 @@ max            1  35.000000  35.000000
 
 <hr />
 
-<h2 id="correlation-covariance">Correlation, Covariance</h2>
+<h2 id="correlation-covariance--a-idcorcova">Correlation, Covariance  <a id="corcov"></a></h2>
 
 <p><strong>Correlation</strong> and <strong>Covariance</strong> is computed from pairs of arguments.  For correlation, use <code>corr()</code> (or <code>corrwith</code> method to compute pairwise correlations) and for covariance use <code>cov()</code></p>
 
@@ -953,7 +1244,7 @@ df.corrwith(temp)  #correlations with column 'temp'
 #dtype: float64
 </code></pre>
 
-<h2 id="unique-values-value-counts-isin">Unique Values, Value Counts, isin</h2>
+<h2 id="unique-values-value-counts-isin--a-idvaluea">Unique Values, Value Counts, isin  <a id="value"></a></h2>
 
 <p>In a one-dimensional Series, you can get the unique objects using the <code>unique</code> method.  You can get the number of times an item occurs with the <code>value_counts</code> method.  You can also see if a value is in a passed sequence with <code>isin</code>.</p>
 
@@ -976,7 +1267,7 @@ obj.isin(['a','e'])  #usually can use this as a mask
 #8    False
 </code></pre>
 
-<h2 id="missing-data">Missing Data</h2>
+<h2 id="missing-data--a-idnulla">Missing Data  <a id="null"></a></h2>
 
 <p>There are a few ways that you can deal with missing data, which appears as <code>np.nan</code> and Python's <code>None</code> data type.  Methods include:</p>
 
@@ -1074,7 +1365,7 @@ data2.fillna({'Cars': -1, 'People': -5})  # Specify dict for fill
 
 <hr />
 
-<h2 id="split-apply-combine-ie-groupby">Split-Apply-Combine (i.e. groupby)</h2>
+<h2 id="split-apply-combine-ie-groupby--a-idsplit-apply-combinea">Split-Apply-Combine (i.e. groupby)  <a id="split-apply-combine"></a></h2>
 
 <p><strong>split-apply-combine</strong> is a process for group operations.  This involes:</p>
 
@@ -1084,7 +1375,7 @@ data2.fillna({'Cars': -1, 'People': -5})  # Specify dict for fill
   <li>The results of all these function applications are <strong>combined</strong> into a result object.  The type of object returned depends on the previous operations.</li>
 </ol>
 
-<h4 id="groupby">groupby</h4>
+<h4 id="groupby--a-idgroupbya">groupby  <a id="groupby"></a></h4>
 
 <p><strong>groupby</strong> accomplishes the first step of the split-apply-combine method; it splits the data into multiple groups and return a grouped object (which can be a <code>SeriesGroupBy</code> or <code>DataFrameGroupBy</code>).  Say we want to <strong>split</strong> by the key (e.g. <code>key2</code>) and we are interested in the value (<code>data1</code>), <strong>apply</strong> a function (e.g. <code>mean</code> method), and return this as a <strong>combined</strong> result.</p>
 
@@ -1167,7 +1458,83 @@ df.groupby(['key1', 'key2'])[['data2']].mean()
 #dtype: int64
 </code></pre>
 
-<h4 id="groupby-iteration">GroupBy iteration</h4>
+<h4 id="getgroup">get_group</h4>
+
+<p>With a GroupBy object, you can select a specific group using <code>get_group</code>.</p>
+
+<pre><code># One Key
+grouped = df.groupby('key1')
+grouped.get_group('a')
+#      data1     data2 key1 key2
+#0 -1.299062  0.214834    a  one
+#1  1.624373  0.301559    a  two
+#4 -1.427448 -1.142078    a  one
+
+# Multiple Keys
+grouped = df.groupby(['key1', 'key2'])
+grouped.get_group(('a', 'one'))
+grouped.get_group(('a', 'one'))
+#      data1     data2 key1 key2
+#0 -1.299062  0.214834    a  one
+#4 -1.427448 -1.142078    a  one
+</code></pre>
+
+<h4 id="aggregate-function--a-idaggregatea">aggregate function  <a id="aggregate"></a></h4>
+
+<p>With a GroupBy object, you can get the aggregation with <code>aggregate</code>.  If you need more complex aggregations, go see <code>apply</code>.</p>
+
+<pre><code>grouped = df.groupby('key1')
+grouped.aggregate(np.sum)
+#         data1     data2
+#key1
+#a    -1.102138 -0.625684
+#b    -1.694854 -1.843882
+</code></pre>
+
+<h4 id="filtration--a-idfiltrationa">Filtration  <a id="filtration"></a></h4>
+
+<p>You can filter and get a subset of an original object using <code>filter</code> (e.g. we want to get the elements that belong to a group with a group sum greater than 2).</p>
+
+<pre><code>#Filtering a simple Series
+sf = Series([1, 1, 2, 3, 3, 3])
+sf.groupby(sf).filter(lambda x: x.sum() &gt; 2)
+#3    3
+#4    3
+#5    3
+#dtype: int64
+
+#Filtering a DataFrame
+df = DataFrame({'A': np.arange(8), 
+                'B': list('aabbbbcc'),
+                'C': np.arange(8, 0, -1)})
+df
+#   A  B  C
+#0  0  a  8
+#1  1  a  7
+#2  2  b  6
+#3  3  b  5
+#4  4  b  4
+#5  5  b  3
+#6  6  c  2
+#7  7  c  1
+
+#Group by col 'B' and only return values where there is a count of more than 2
+df.groupby('B').filter(lambda x: len(x['C']) &gt; 2)
+</code></pre>
+
+<h4 id="sort--a-idsorta">Sort  <a id="sort"></a></h4>
+
+<p>You can just pass in the method <code>sort</code> to sort an item.</p>
+
+<pre><code>df.groupby('B').filter(lambda x: len(x['C']) &gt; 2).sort('C')
+#   A  B  C
+#5  5  b  3
+#4  4  b  4
+#3  3  b  5
+#2  2  b  6
+</code></pre>
+
+<h4 id="groupby-iteration--a-idgroupbyiterationa">GroupBy iteration  <a id="groupbyiteration"></a></h4>
 
 <p>You can iterate over a GroupBy object to return a sequence of 2-tuples containing the group name along with the chunk of data.</p>
 
@@ -1214,6 +1581,310 @@ type(pieces['b'])
 #&lt;class 'pandas.core.frame.DataFrame'&gt;
 </code></pre>
 
+<h2 id="reshaping--a-idreshapinga">Reshaping  <a id="reshaping"></a></h2>
+
+<p>At times you want to reshape your data (e.g. from wide to long or vice versa).  Pandas has a few tools for this, including melt, pivot, pivot_table, and crosstab.</p>
+
+<h4 id="melt--a-idmelta">melt  <a id="melt"></a></h4>
+
+<p>Melt ‘unpivots’ a table from wide to long format.  You have 1+ variables as identifiers (id_vars) and the remaining fields fall into two variables: variable and value.</p>
+
+<pre><code>cheese = pd.DataFrame({'first_name': ['Will', 'Laura', 'Mike', 'Mandy'],
+                       'last_name': ['Liu', 'Summers', 'Liu', 'Summers'],
+                       'height': [5.10, 5.3, 5.9, 5.2],
+                       'weight': [150, 120, 190, 110]})
+
+print cheese
+#   first_name  height  last_name   weight
+#0        Will    5.11        Liu     150
+#1       Laura     5.3    Summers     120
+#2        Mike     5.9        Liu     190
+#3       Mandy     5.2    Summers     110
+
+# Melt and specify variable name
+print pd.melt(cheese, id_vars=['first_name', 'last_name'])
+#   first_name  last_name  variable  value
+#0        Will        Liu    height   5.11
+#1       Laura    Summers    height    5.3
+#2        Mike        Liu    height    5.9
+#3       Mandy    Summers    height    5.2
+#4        Will        Liu    weight    150
+#5       Laura    Summers    weight    120
+#6        Mike        Liu    weight    190
+#7       Mandy    Summers    weight    110
+
+# Filter for a specific variable
+print pd.melt(cheese, id_vars=['first_name', 'last_name'],
+              var_name='quantity', value_vars='height')
+#   first_name  last_name  quantity  value
+#0        Will        Liu    height   5.11
+#1       Laura    Summers    height    5.3
+#2        Mike        Liu    height    5.9
+#3       Mandy    Summers    height    5.2    
+</code></pre>
+
+<h4 id="pivot--a-idpivota">pivot  <a id="pivot"></a></h4>
+
+<p>You use pivot for transforming long to wide on categorical values or numerical values.  This is the opposite of melt.</p>
+
+<pre><code>df = pd.DataFrame({
+    'id': [25418726, 25418726, 25418731, 25418731, 25418740],
+    'question': ['A', 'B', 'A', 'B', 'A'],
+    'answer': ['V', 'W', 'X', 'Y', 'Z']
+})
+
+print df
+#  answer        id question
+#0      V  25418726        A
+#1      W  25418726        A
+#2      X  25418731        A
+#3      Y  25418731        A
+#4      Z  25418726        B
+
+temp = df.pivot(index='id', columns='question', values='answer')
+print temp
+#question  A    B
+#id
+#25418726  V    W
+#25418731  X    Y
+#25418740  Z  NaN
+</code></pre>
+
+<h4 id="pivottable--a-idpivottablea">pivot_table  <a id="pivottable"></a></h4>
+
+<p>You use pivot tables to transform data from long to wide (creating a spreadsheet-like dataset).  The main reason of having pivot tables over pivot is that data has to be numerical, which lets you use an ‘aggfunc’ on it (e.g. sum, mean).</p>
+
+<pre><code>print pd.pivot_table(cheese, values='height', index=['last_name', 'first_name'])
+#last_name  first_name
+#Liu        Mike          5.9
+#           Will          5.1
+#Summers    Laura         5.3
+#           Mandy         5.2
+#Name: height, dtype: float64
+
+print pd.pivot_table(cheese, values='height', index=['last_name'], aggfunc='mean')
+Liu          5.50
+Summers      5.25
+Name: height, dtype: float64
+</code></pre>
+
+<h4 id="crosstab--a-idcrosstaba">crosstab  <a id="crosstab"></a></h4>
+
+<p>A crosstab creates a cross-tabulation of two or more factors, usually giving a frequency table of the factors.</p>
+
+<pre><code>pd.crosstab(cheese.last_name, cheese.first_name)
+#first_name  Laura  Mandy  Mike  Will
+#last_name
+#Liu             0      0     1     1
+#Summers         1      1     0     0
+</code></pre>
+
+<h2 id="concatenate-merge-combine--a-idcmca">Concatenate, Merge, Combine  <a id="cmc"></a></h2>
+
+<p>You can combine objects together with Series and DataFrame objects using various logic.  You can pass in different objects including dicts, list, Series, DataFrames.</p>
+
+<h4 id="concatenate--a-idconcatenatea">Concatenate  <a id="concatenate"></a></h4>
+
+<p>This operation concatenates (i.e. stacks together) objects along an axis and does optional logic (axis, join, join_axes, keys).  Default concatentation axis=0, default join is ‘outer’.</p>
+
+<h4 id="concat-with-series">Concat with Series</h4>
+
+<pre><code>series1 = pd.Series([0, 1], index=['a', 'b'])
+series2 = pd.Series([2, 3, 4], index=['c', 'd', 'e'])
+series3 = pd.Series([5, 6], index=['f', 'g'])
+
+# Concat for a list of Series links the values and indexes together
+pd.concat([series1, series2, series3])
+#a    0
+#b    1
+#c    2
+#d    3
+#e    4
+#f    5
+#g    6
+#dtype: int64
+
+# Default concat is along axis=0
+series4 = pd.concat([series1 * 5, series3])
+#a    0
+#b    5
+#f    5
+#g    6
+#dtype: int64
+
+# Concat along axis=1, series1 has no 'f', 'g' indexes so returns a NaN
+pd.concat([series1, series4], axis=1)
+#    0  1
+#a   0  0
+#b   1  5
+#f NaN  5
+#g NaN  6
+
+# Can specify how to join
+pd.concat([series1, series4], axis=1, join='inner')
+#   0  1
+#a  0  0
+#b  1  5
+
+# Can specify the join_axes
+pd.concat([series1, series4], axis=1, join_axes=[['a', 'c', 'b', 'e']])
+#    0   1
+#a   0   0
+#c NaN NaN
+#b   1   5
+#e NaN NaN
+</code></pre>
+
+<h4 id="concat-with-dataframe">Concat with DataFrame</h4>
+
+<pre><code>df1 = pd.DataFrame(np.arange(6).reshape(3, 2), \
+                   index=['a', 'b', 'c'],
+                   columns=['one', 'two'])
+df1
+#   one  two
+#a    0    1
+#b    2    3
+#c    4    5
+
+df2 = pd.DataFrame(5 + np.arange(4).reshape(2, 2), \
+                   index=['a', 'c'],
+                   columns=['three', 'four'])
+df2
+#    three  four
+#a      5     6
+#c      7     8
+
+# Using list of objects and axis=0
+pd.concat([df1, df2], axis=0, join='inner')
+#   four  one  three  two
+#a   NaN    0    NaN    1
+#b   NaN    2    NaN    3
+#c   NaN    4    NaN    5
+#a     6  NaN      5  NaN
+#c     8  NaN      7  NaN
+
+# Using list of objects and axis=1
+pd.concat([df1, df2], axis=1, join='inner')
+#   one  two  three  four
+#a    0    1      5     6
+#c    4    5      7     8
+</code></pre>
+
+<h4 id="append--a-idappenda">Append  <a id="append"></a></h4>
+
+<p>Append is actually just a shortcut to concatenate (i.e. shorter more assumptions filled).  An append concatenates along axis=0 using the index.</p>
+
+<pre><code># Append with Series
+s = pd.Series(np.random.randn(10), index=np.arange(10))
+s1 = s[:5]
+s2 = s[6:]
+s1.append(s2)
+
+# Append with DataFrame
+df1.append(df2)
+#   four  one  three  two
+#a   NaN    0    NaN    1
+#b   NaN    2    NaN    3
+#c   NaN    4    NaN    5
+#a     6  NaN      5  NaN
+#c     8  NaN      7  NaN
+
+# Append can take multiple items
+df1.append([df2, df1])
+#   four  one  three  two
+#a   NaN    0    NaN    1
+#b   NaN    2    NaN    3
+#c   NaN    4    NaN    5
+#a     6  NaN      5  NaN
+#c     8  NaN      7  NaN
+#a   NaN    0    NaN    1
+#b   NaN    2    NaN    3
+#c   NaN    4    NaN    5
+</code></pre>
+
+<h4 id="merge--a-idmergea">Merge  <a id="merge"></a></h4>
+
+<p>Merge allows you to connect rows in DataFrames based on either the <em>key</em> and/or the <em>index</em>.  This is similar to database join operations.  There actually is a join function that is exactly equivalent.  You can specify the type of join with ‘how’.</p>
+
+<pre><code>df1 = pd.DataFrame({'key':['b', 'b', 'a', 'c', 'a', 'a', 'b'],
+                    'data1':range(7)})
+df1
+#   data1 key
+#0      0   b
+#1      1   b
+#2      2   a
+#3      3   c
+#4      4   a
+#5      5   a
+#6      6   b
+
+df2 = pd.DataFrame({'key':['a', 'b', 'd'],
+                    'data2':range(3)})
+df2
+#   data2 key
+#0      0   a
+#1      1   b
+#2      2   d
+
+#### Merge on Key
+pd.merge(df1, df2, on='key', how='inner')
+#   data1 key  data2
+#0      0   b      1
+#1      1   b      1
+#2      6   b      1
+#3      2   a      0
+#4      4   a      0
+#5      5   a      0
+
+#### Merge on Index
+pd.merge(df1, df2, left_index=True, right_index=True, how='inner')
+#   data1 key_x  data2 key_y
+#0      0     b      0     a
+#1      1     b      1     b
+#2      2     a      2     d
+
+#### Merge on Key and Index
+pd.merge(df1, df2, left_index=True, right_on='data2', how='inner')
+#   data1 key_x  data2 key_y
+#0      0     b      0     a
+#1      1     b      1     b
+#2      2     a      2     d
+</code></pre>
+
+<h4 id="combine-first--a-idcombinefirsta">Combine First  <a id="combine_first"></a></h4>
+
+<p>Combine_first combines two DataFrame objects and defaults to non-null values in the frame calling the method.  The result index columns is the union of the respective indexes and columns (i.e. df1 is prioritized, use df2 values to fill in any missing holes)</p>
+
+<pre><code>df1 = pd.DataFrame({
+    'a': [1., np.nan, 5., np.nan],
+    'b': [np.nan, 2., np.nan, 6.],
+    'c': np.arange(2, 18, 4)})
+df1
+#    a   b   c
+#0   1 NaN   2
+#1 NaN   2   6
+#2   5 NaN  10
+#3 NaN   6  14
+
+df2 = pd.DataFrame({
+    'a': [5., 4., np.nan, 3., 7.],
+    'b': [np.nan, 3., 4., 6., 8.]})
+df2
+#    a   b
+#0   5 NaN
+#1   4   3
+#2 NaN   4
+#3   3   6
+#4   7   8
+
+df1.combine_first(df2)
+#   a   b   c
+#0  1 NaN   2
+#1  4   2   6
+#2  5   4  10
+#3  3   6  14
+#4  7   8 NaN
+</code></pre>
 
 </div>
 
@@ -1221,11 +1892,11 @@ type(pieces['b'])
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>04 Apr 2015</span> <a href="/2015/04/04/numpy.html">NumPy</a></li>
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
     
-      <li><span>03 Apr 2015</span> <a href="/2015/04/03/statistical-analysis.html">Statistical Analysis</a></li>
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
     
-      <li><span>02 Apr 2015</span> <a href="/2015/04/02/python-basics.html">Python Basics</a></li>
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
     
   </ul>
 </div>

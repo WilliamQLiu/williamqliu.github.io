@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Django REST Framework (DRF)</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="django-rest-framework-drf">Django REST Framework (DRF)</h2>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a>
+    <ul>
+      <li><a href="#rest">REST</a></li>
+      <li><a href="#drf">Django REST Framework (DRF)</a></li>
+    </ul>
+  </li>
+  <li><a href="#drfserializers">DRF Serializers</a>
+    <ul>
+      <li><a href="#drfrelationships">DRF Serializer Relationships</a></li>
+      <li><a href="#stringrelatedfield">String Related Field</a></li>
+      <li><a href="#primarykeyrelatedfield">Primary Key Related Field</a></li>
+      <li><a href="#hyperlinkrelatedfield">Hyperlinked Related Field</a></li>
+      <li><a href="#slugrelatedfield">Slug Related Field</a></li>
+      <li><a href="#hyperlinkedidentityfield">Hyperlinked Identity Field</a></li>
+      <li><a href="#nestedrelationships">Nested Relationships</a></li>
+    </ul>
+  </li>
+  <li><a href="#drfviews">DRF Views</a>
+    <ul>
+      <li><a href="#drfgenericapiview">GenericAPIView</a></li>
+      <li><a href="#drfgenericapiviewmixins">GenericAPIView Mixins</a></li>
+      <li><a href="#drfconcreteviews">Concrete Views</a></li>
+      <li><a href="#drfapiview">APIView</a></li>
+      <li><a href="#drfapiviewrouting">GenericAPIView and APIView Routing</a></li>
+      <li><a href="#drfviewsets">ViewSets</a></li>
+      <li><a href="#drfrouters">Routers</a></li>
+    </ul>
+  </li>
+  <li><a href="#drfauthentication">DRF Authentication</a>
+    <ul>
+      <li><a href="#drfcreatetoken">Create Token</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<h4 id="a-idrestresta"><a id="rest">REST</a></h4>
+
+<p><strong>Representational State Transfer (REST)</strong> is a software architecture style that includes best practices for scaling web services.  The idea is that client-server is separated for portability of code and ability to scale.  REST systems communicate over Hypertext Transfer Protocol and uses commands like (GET, POST) to retrieve and send data.  REST basically exposes application data through an API and with django, it’s easy to use django-rest-framework to expose our models and views.</p>
+
+<h4 id="a-iddrfdjango-rest-framework-drfa"><a id="drf">Django REST Framework (DRF)</a></h4>
+
+<p><strong>Django REST Framework (DRF)</strong> is a quick and standard way of building REST APIs.  It has a browsable GUI interface, many built-in forms of authentication, and supports many types of serialization.  You don’t technically need to use this to make an API (instead send payloads with requests and responses), but DRF is recommended since it is standardized.</p>
+
+<h2 id="a-iddrfserializersdrf-serializersa"><a id="drfserializers">DRF Serializers</a></h2>
+
+<p>In Django, you have data in Model objects/instances and querysets.  <strong>Serializers</strong> allow you to convert from these objects and querysets into native Python that can then be rendered into web friendly formats like JSON.</p>
+
+<h4 id="a-iddrfrelationshipsdrf-serializer-relationshipsa"><a id="drfrelationships">DRF Serializer Relationships</a></h4>
+
+<p>While creating your serializers, you’ll want to know their relationships (just like in Django how you define the model relationships).  You can always check your current relationships in Django and DRF by using <code>python manage.py shell</code> to import, instantiate, and <code>print repr(myserializer)</code> or <code>print repr(mymodel)</code>.  For example:</p>
+
+<pre><code>&gt;&gt;&gt; from myapp.serializers import StuffSerializer
+&gt;&gt;&gt; serializer = StuffSerializer()
+&gt;&gt;&gt; print repr(serializer)
+</code></pre>
+
+<p>Here we’ll see what the possible serializer relationships are:</p>
+
+<h4 id="a-idstringrelatedfieldstring-related-fielda"><a id="stringrelatedfield">String Related Field</a></h4>
+
+<p><code>StringRelatedField</code> represents the target of the relationship using its <code>__unicode__</code> method in the Django Model.  Pretty straightforward; if my model has a <strong>unicode</strong> of ‘Stuff’, the serializer output shows ‘Stuff’.</p>
+
+<h4 id="a-idprimarykeyrelatedfieldprimary-key-related-fielda"><a id="primarykeyrelatedfield">Primary Key Related Field</a></h4>
+
+<p><code>PrimaryKeyRelatedField</code> represents the target of the relationship usings its primary key.  So say we have a Django Model with a primary key (usually its the <code>id</code> field) with a value of 10.  Our serializer now shows the field as 10.</p>
+
+<h4 id="a-idhyperlinkrelatedfieldhyperlinked-related-fielda"><a id="hyperlinkrelatedfield">Hyperlinked Related Field</a></h4>
+
+<p><code>HyperlinkedRelatedField</code> represents the target of a relationship using a hyperlink.  This field is just a hyperlink of where the object is, e.g. <code>http://williamqliu.com/stuff/10</code>.</p>
+
+<h4 id="a-idslugrelatedfieldslug-related-fielda"><a id="slugrelatedfield">Slug Related Field</a></h4>
+
+<p><code>SlugRelatedField</code> represents the target of a relationship using a field on the target.  So this one is basically creating a new field in your serializer that is an existing field in another model.  Default is Read and Write (though you can change flag to <code>read_only</code> if you want).</p>
+
+<h4 id="a-idhyperlinkedidentityfieldhyperlinked-identity-fielda"><a id="hyperlinkedidentityfield">Hyperlinked Identity Field</a></h4>
+
+<p><code>HyperlinkedIdentityField</code> represents the target of a relationship using a field on a hyperlink’s identity.  This field is applied to an identity relationship (e.g. the url) or added as an attribute to your serializer.  Always Read Only.</p>
+
+<h4 id="a-idnestedrelationshipsnested-relationshipsa"><a id="nestedrelationships">Nested Relationships</a></h4>
+
+<p>You can nest relationships by using serializers as fields.  By default, these are read only.  If you want to be able to write to them, then you need to create either or both <code>create()</code> and/or <code>update</code> methods to explicitly specify how the child relationships should be saved.</p>
+
+<h2 id="a-iddrfviewsdrf-viewsa"><a id="drfviews">DRF Views</a></h2>
+
+<p>So there’s a few different ways that DRF gives you to create views.  Starting from most generic to more specific, we have the following:</p>
+
+<ul>
+  <li>A <strong>GenericAPIView</strong> is a pre-built skeleton view that has the ability to extend functionality through the use of other pre-built views (like ListAPIView, CreateAPIView, DestroyAPIView) or add specific functionality with ModelMixins (like CreateModelMixin, UpdateModelMixin, etc.)  These generic pre-built views define actions (e.g. <code>.list()</code>, <code>.create()</code> instead of HTTP methods (e.g. <code>.get()</code> or <code>.post()</code>).  The idea is that you can mix and match Mixins to your liking or use one of those pre-built views.  For example, a <code>CreateAPIView</code> is only a <code>GenericAPIView</code> + <code>CreateModelMixin</code>.  In my opinion, using something like <code>CreateAPIView</code> is a little confusing; either use <strong>GenericAPIView</strong> or use <strong>APIView</strong>.</li>
+  <li>Class based View with <strong>APIView</strong> - this is similar to a regular Django View class where the incoming request is dispatched to an appropriate HTTP method (like <code>.get()</code> or <code>.post()</code>).  You return a rest_framework <code>Response()</code>.  This is more detailed / specific than a <strong>GenericAPIView</strong>.</li>
+  <li>Function based View by adding the <strong>@api_view()</strong> decorator in a function based view.  This is similar to a regular Django View where you check if <code>request.method == 'POST'</code>, etc.</li>
+</ul>
+
+<h4 id="a-iddrfgenericapiviewdrf-apigenericview-ie-a-base-view-classa"><a id="drfgenericapiview">DRF APIGenericView (i.e. a Base View Class)</a></h4>
+
+<p>With a <strong>GenericAPIView</strong>, you have a skeleton API View that has things every View would need, like what the <strong>queryset</strong> is, the <strong>serializer_class</strong>, etc.  From this basic skeleton, you can add in some built-in functionality for the most common operations with Mixins (e.g. <code>CreateModelMixin</code>).  When you combine the GenericAPIView with Mixins, you get some generic views (e.g. <code>DestroyAPIView</code> = <code>GenericAPIView</code> + <code>DestroyModelMixin</code>.  You basically set some class attributes and override the view functions as needed.  Since this is a Generic API View, we define the <strong>http methods</strong> (e.g. GET, POST, PATCH) and then we call the Mixin’s <strong>actions</strong> (e.g. list, create, retrieve, update).</p>
+
+<h4 id="a-iddrfgenericapiviewmixinsdrf-generic-view---using-mixinsa"><a id="drfgenericapiviewmixins">DRF Generic View - Using Mixins</a></h4>
+
+<p><strong>Mixins</strong> are reusable components for class based views.  We add Mixins to a GenericAPIView class so that the class can gain additional functionality, in this case it provides an action that has <code>.something()</code> functionality where something is say <code>.list()</code>, <code>.create()</code>, <code>.retrieve()</code>, <code>.update()</code>, <code>.destroy()</code>.  Note that these actions are abstractions of <strong>http methods</strong> (like GET, POST).  That means we define say our GET, then when we return we use the <code>.list()</code> functionality.  In this example, the <code>ListModelMixin</code> gives the <code>.list()</code> functionality and the <code>CreateModelMixin</code> gives the <code>.create()</code> functionality to our <strong>GenericAPIView</strong>.</p>
+
+<pre><code>from rest_framework import mixins, generics
+
+from .models import Post
+from .serializers import PostSerializer
+
+
+class PostListCreate(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+</code></pre>
+
+<p>This is the same as the Concrete View below (though I prefer to stay away from the Concrete View):</p>
+
+<pre><code>class PostListCreate(generics.ListCreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def list(self, request):  # define to override list
+        queryset = self.get_queryset()
+        serializer = PostSerializer(queryset)
+        return Response(serializer.data)
+</code></pre>
+
+<h4 id="a-iddrfconcreteviewsdrf-concrete-viewsa"><a id="drfconcreteviews">DRF Concrete Views</a></h4>
+
+<p>I prefer not to use a Concrete View like <code>ListCreateAPIView</code> or <code>UpdateAPIView</code>.  The reasoning is that we abstract away from <strong>http_methods</strong> (e.g. GET, POST) and instead only define the actions (e.g. list, retrieve).  To me, it’s difficult to go from the action (e.g. list) and tie that to the http method (e.g. GET)</p>
+
+<pre><code>from django.contrib.auth.models import User
+from rest_framework import generics
+from rest_framework.permissions import IsAdminUser
+
+from myapp.serializers import UserSerializer
+
+class UserList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminUser,)
+    paginate_by = 100
+
+    def get_queryset(self):
+        """ Override default queryset to only get user's account """
+        user = self.request.user
+        return user.accounts.all()
+ 
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = UserSerializer(queryset, many=True)
+        return Response(serializer.data)
+</code></pre>
+
+<h4 id="a-iddrfapiviewdrf-apiviewa"><a id="drfapiview">DRF APIView</a></h4>
+
+<p>The class based <strong>APIView</strong> is a great balance between boilerplate and custom code.</p>
+
+<pre><code>from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from myapp.serializers import PostSerializer
+from myapp.models import Post
+
+
+class ListPost(APIView):
+
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    def get(self, request, format=None):
+        queryset = Post.objects.all()
+        serializer = PostSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+</code></pre>
+
+<h4 id="a-iddrfapiviewroutingdrf-genericapiview-and-apiview-routinga"><a id="drfapiviewrouting">DRF GenericAPIView and APIView Routing</a></h4>
+
+<p>In your main urls.py file, link to your existing app api urls.py.</p>
+
+<pre><code>#urls.py
+urlpatterns = patterns('',
+    (r'^api/', include(patterns('',
+        url(r'^blog/', include('blog.api.urls')),
+        url(r'^accounts/', include('accounts.api.urls')),
+), namespace='api')),
+...
+</code></pre>
+
+<h4 id="a-iddrfviewsetsdrf-viewsetsa"><a id="drfviewsets">DRF ViewSets</a></h4>
+
+<p>DRF allows you to combine the logic for a set of related views into a single class called a <strong>ViewSet</strong> (aka ‘Resources’, ‘Controllers’).  A ViewSet is simply a Class Based View that does not provide any method handlers (like <code>.get()</code>, <code>.post()</code>) and instead provides actions (like <code>.list()</code>, <code>.create()</code>).  You have your standard <strong>ViewSet</strong> (inherits from <strong>APIView</strong>), <strong>GenericViewSet</strong> (inherits from <strong>GenericAPIView</strong>), and <strong>ModelViewSet</strong> (inherits from <strong>GenericAPIView</strong>).</p>
+
+<pre><code>from django.contrib.auth.models import User
+from django.shortcut import get_object_or_404
+from myapp.serializers import UserSerializer
+from rest_framework import viewsets
+from rest_framework.response import Response
+
+
+class UserViewSet(viewsets.ViewSet):
+    
+    def list(self, request):
+        queryset = User.objects.all()
+        serializer = UserSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = User.objects.all()
+        user = get_object_or_404(queryset, pk=pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+</code></pre>
+
+<p>Personally I think this has too much magic and you should avoid viewsets; instead opt for APIGenericView with Mixins or APIView.</p>
+
+<h4 id="a-iddrfroutersdrf-routersa"><a id="drfrouters">DRF Routers</a></h4>
+
+<p>You can wire up your urls manually or if you used a <strong>ViewSet</strong>, you can then use DRF’s <strong>routers</strong> to automatically do URL routing for you.  There’s a couple of default routers including <strong>SimpleRouter</strong> and <strong>DefaultRouter</strong>.  In my opinion, don’t use ViewSets because of the additional magic (so thus you can’t use these router functions), but the patterns here are good to know and follow since they offer a standardized approach to API design.</p>
+
+<pre><code>from rest_framework import routers
+
+router = routers.SimpleRouter()
+
+router.register(r'users', UserViewSet)
+urlpatterns += router.urls
+</code></pre>
+
+<p>We pass in a <strong>prefix</strong> (in this case <code>users</code>) and the ViewSet.  For example, the pattern for the above <strong>SimpleRouter</strong> is this:</p>
+
+<ul>
+  <li><code>^users/$</code> Name: <code>user-list</code>  # from UserViewSet.list</li>
+  <li><code>^users/{pk}/$</code> Name: <code>user-detail</code>  # from UserViewSet.retrieve</li>
+</ul>
+
+<p>With <strong>DefaultRouter</strong> we have an API root view and allows for an optional style format suffix (e.g. <code>.json</code>)</p>
+
+<p>See the DRF documentation <a href="http://www.django-rest-framework.org/api-guide/routers/">here</a> for details</p>
+
+<h2 id="a-iddrfauthenticationdrf-authenticationa"><a id="drfauthentication">DRF Authentication</a></h2>
+
+<p>You can use DRF to authenticate that you are you.</p>
+
+<h4 id="a-iddrfcreatetokencreate-tokena"><a id="drfcreatetoken">Create Token</a></h4>
+
+<p>You can create a token by going into the dbshell.</p>
+
+<pre><code>will = User.objects.create(username='will')
+new_token = Token.objects.create(user=will)
+print new_token
+&lt;Token: fjsdaklfjdsalfdsjaflasjflsa&gt;
+</code></pre>
+
+<p>Then in Postman, insert in ‘Headers’ the following key and value:</p>
+
+<pre><code>Authorization   Token fjsdaklfjdsalfdsjaflasjflsa
+</code></pre>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>02 Oct 2015</span> <a href="/2015/10/02/tmux.html">Tmux</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

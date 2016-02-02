@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Git Commands</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="git-commands">Git Commands</h2>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a>
+    <ul>
+      <li><a href="#howgitworks">How Git works</a></li>
+      <li><a href="#stages">Stages of Git</a></li>
+      <li><a href="#setup">Setup</a></li>
+      <li><a href="#workflow">Basic Workflow</a></li>
+    </ul>
+  </li>
+  <li><a href="#init">Initialize a Repository</a>
+    <ul>
+      <li><a href="#initrepo">Create a new repository</a></li>
+      <li><a href="#clone">Clone an existing repository</a></li>
+    </ul>
+  </li>
+  <li><a href="#basiccommands">Basic Git Commands</a>
+    <ul>
+      <li><a href="#addcommit">Add and Commit</a></li>
+      <li><a href="#branches">Branches</a></li>
+      <li><a href="#merging">Merging</a></li>
+      <li><a href="#stash">Stash</a></li>
+    </ul>
+  </li>
+  <li><a href="#undo">Undo with Reset, Checkout, and Revert</a>
+    <ul>
+      <li><a href="#undoscope">Undo Scope</a></li>
+      <li><a href="#undocommands">Undo Commands</a></li>
+      <li><a href="#undoparameters">Undo Parameters</a></li>
+    </ul>
+  </li>
+  <li><a href="#cleanup">Cleanup with BFG</a>
+    <ul>
+      <li><a href="#removesecrets">Remove passwords, secret info</a></li>
+      <li><a href="#removefile">Remove file</a></li>
+    </ul>
+  </li>
+  <li><a href="#pull">Pull Request</a></li>
+  <li><a href="#rebase">Rebase</a></li>
+  <li><a href="#diffworkflows">Different Workflows</a>
+    <ul>
+      <li><a href="#featurebranch">Feature Branch</a></li>
+      <li><a href="#gitflow">GitFlow</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<p><strong>Git</strong> is a local software version control system.  The service <strong>GitHub</strong> is one of many companies that does remote hosting of your git repositories.</p>
+
+<h4 id="a-idhowgitworkshow-git-worksa"><a id="howgitworks">How Git works</a></h4>
+
+<p>The concept of git is that data is seen as a set of snapshots of this mini filesystem.  Every time you commit and save your project, it basically takes a picture of what all your files look like at that moment and stores a reference to the snapshot.</p>
+
+<p>If files have not changed, git does not store the file again (just a link to the previous identical file it has already stored).  Git is different than some other systems (like <strong>mercurial</strong>) in that some other systems store the deltas between saves (which saves space).</p>
+
+<h4 id="a-idstagesstages-of-gita"><a id="stages">Stages of Git</a></h4>
+
+<p>To see your current status and branch, do: <code>git status</code>.  This tells you the state (tracked or untracked) of each file.  The three main stages are:</p>
+
+<ol>
+  <li><strong>Modified</strong> means you changed the file, but have not tracked the changes yet.</li>
+  <li><strong>Staged</strong> means you marked a modified file in its current version to go to your next commit snapshot.</li>
+  <li><strong>Committed</strong> means this change has been safely snapshotted.</li>
+</ol>
+
+<h4 id="a-idsetupsetupa"><a id="setup">Setup</a></h4>
+
+<p>Download git and optionally signup for GitHub.</p>
+
+<ul>
+  <li>To see your setup config, do: <code>git config --list</code></li>
+  <li>You can edit the following:
+    <ul>
+      <li><code>$git config --global user.name "William Liu</code></li>
+      <li><code>$git config --global user.email "william.q.liu@gmail.com"</code></li>
+    </ul>
+  </li>
+  <li>Setup SSH-KeyGen with <code>ssh-keygen -t rsa -c "william.q.liu@gmail.com"</code>
+    <ul>
+      <li>On Windows, ssh is by default setup like <code>C:\Users\wliu.ssh</code></li>
+      <li>On Mac, ssh is by default setup like <code>Mac HD &gt; Users &gt; williamliu</code></li>
+      <li>Assuming you name the file <code>id_rsa</code>, you get two files:
+        <ul>
+          <li><code>id_rsa</code> is the private half of the key (keep this secret)</li>
+          <li><code>id_rsa.pub</code> is the public half of the key (free to give away)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idworkflowbasic-workflowa"><a id="workflow">Basic Workflow</a></h4>
+
+<p>So how does Git work in the real world?</p>
+
+<ol>
+  <li>The idea is that we will program on say a ‘features’ branch (or anything that is not the ‘master’ branch).</li>
+  <li>When the code is ready, you issue a pull request to merge the ‘features’ branch with the master.</li>
+  <li>Pull requests are the time for code reviews and to potentially make any changes before merging to master.</li>
+  <li>Once approved, merge the feature branch back into master.</li>
+  <li>Optionally Tag the releases.</li>
+</ol>
+
+<h2 id="a-idinitinitialize-a-repositorya"><a id="init">Initialize a Repository</a></h2>
+
+<p>To get started, you can either create an empty project or copy an existing repository from another server (like GitHub).</p>
+
+<h4 id="a-idinitrepocreate-a-new-repositorya"><a id="initrepo">Create a new repository</a></h4>
+
+<p>If you want to create a new project, you can do the following:</p>
+
+<ol>
+  <li><code>git init</code> initializes a new project directory</li>
+  <li>This step creates a <code>.git</code> subdirectory that has all your necessary repository files (e.g. your <code>.gitignore</code> file, a file that says what files to ignore)</li>
+  <li>You may want to create your <code>.gitignore</code> file (what to ignore) and add a License</li>
+</ol>
+
+<h4 id="a-idcloneclone-an-existing-repositorya"><a id="clone">Clone an existing repository</a></h4>
+
+<p>You can clone an existing repository from another server (like GitHub) using the command:  <code>git clone https://github.com/WilliamQLiu/myrepo.git</code>.</p>
+
+<ul>
+  <li>You can change the option from <code>https</code> to <code>git</code> if you want to use SSH transfer.</li>
+  <li>If you want to call this something else, just add an additional argument (e.g. <code>mynewrepo</code> after <code>myrepo.git</code>)</li>
+</ul>
+
+<h2 id="a-idbasiccommandsbasic-commandsa"><a id="basiccommands">Basic Commands</a></h2>
+
+<h4 id="a-idaddcommitadd-and-commita"><a id="addcommit">Add and Commit</a></h4>
+
+<pre><code>git add .   # Adds all files or specify the specific files
+git commit -m "This is a git message for the commit"  # Commit with msg
+git commit -a -m "Made a change"  # Automatic Adds and Commits
+</code></pre>
+
+<h4 id="a-idbranchescreate-branch-checkout-brancha"><a id="branches">Create Branch, Checkout Branch</a></h4>
+
+<pre><code>git branch features  # Create a branch called features
+git checkout features  # Check out a branch named features
+git checkout master  # Check out the master branch
+</code></pre>
+
+<h4 id="a-idbranchesmerging-changes-back-to-master-brancha"><a id="branches">Merging changes back to master branch</a></h4>
+
+<pre><code>git pull # Fetch and merge changes on the remote server to your working dir
+git merge features # Merge a different branch into your active branch
+git diff  # View all the merge conflicts
+git reset --hard  # Undo a bad merge
+git push # push changes back to a remote repository (e.g. on GitHub)
+</code></pre>
+
+<h4 id="a-idstashstashinga"><a id="stash">Stashing</a></h4>
+
+<pre><code>git stash  # hide your current changes on branch
+git stash pop  # get your hidden changes on branch
+</code></pre>
+
+<h2 id="a-idundoundo-with-reset-checkout-and-reverta"><a id="undo">Undo with Reset, Checkout, and Revert</a></h2>
+
+<p>To undo changes to your repository, you first need to think about the scope of what you want to change and then what command to use.</p>
+
+<h4 id="a-idundoscopeundo-scopea"><a id="undoscope">Undo Scope</a></h4>
+
+<p>In a Git repository, we have the following components.</p>
+
+<ul>
+  <li>the working directory</li>
+  <li>the staged snapshot</li>
+  <li>the commit history</li>
+</ul>
+
+<h4 id="a-idundocommandsundo-commandsa"><a id="undocommands">Undo Commands</a></h4>
+
+<p>With these git commands, you can pass in the above component (e.g. the working directory) as a parameter (e.g. <code>--soft</code>, <code>--mixed</code>, <code>--hard</code>) and that determines the scope of the undo.</p>
+
+<ul>
+  <li><code>git reset</code> - moves the tip of a branch to a different commit; this is used to remove commits from the current branch (e.g. go back two commits would be <code>git checkout hotfix</code> and then <code>git reset HEAD~2</code>).  We end up throwing away these last two commits.</li>
+  <li><code>git checkout</code> - moves <code>HEAD</code> to a different branch and updates the working directory to match.  If there are any differences, you have to commit or stash any changes in the working directory first.</li>
+  <li><code>git revert</code> - undoes a commit by creating a new commit.  This is safe since it does not re-write a commit history.</li>
+</ul>
+
+<h4 id="a-idundoparamtersundo-parametersa"><a id="undoparamters">Undo Parameters</a></h4>
+
+<p>Again when you do an undo, you can pass in an optional parameter with your command to specify the scope of the change.  To be safe, only use <code>HEAD</code> as the parameter.</p>
+
+<p>For example, with a <code>git reset</code>, we have:</p>
+
+<ul>
+  <li><code>--soft</code> means we reset only the commit history (code in the working directory and staged snapshot is untouched)</li>
+  <li><code>--mixed</code> means we reset the staged snapshot and the commit history (code in the working directory is untouched)</li>
+  <li><code>--hard</code> means we reset everything</li>
+</ul>
+
+<p><code>git revert</code> is the only one that does not have a file-level counterpart.</p>
+
+<h2 id="a-idcleanupcleanup-with-bfga"><a id="cleanup">Cleanup with BFG</a></h2>
+
+<p>BFG Repo-Cleaner is a tool to remove large (e.g. blobs bigger than 1M) or bad data (e.g. passwords, credentials, private data) and this is faster and easier to use than the <code>git-filter-branch</code> command.</p>
+
+<h4 id="a-idremovesecretsremove-passwords-and-secret-informationa"><a id="removesecrets">Remove passwords and secret information</a></h4>
+
+<ol>
+  <li>Clone your repo using the <code>--mirror</code> flag: e.g. <code>git clone --mirror https://github.com/WilliamQLiu/reponame.git</code></li>
+  <li>Download <code>BFG Repo-Cleaner</code> <a href="https://rtyley.github.io/bfg-repo-cleaner/" title="BFG Repo-Cleaner">here</a>.  You will get a file that looks like this <code>bfg-1.12.3.jar</code>.  If you are on a mac, just setup with homebrew using <code>brew install bfg</code> and then you can use the <code>bfg</code> command.</li>
+  <li>Create a <code>passwords.txt</code> file and add in all the data you want to remove (e.g. mypassword, ‘mypassword’)</li>
+  <li>Run the command <code>java -jar bfg-1.12.3.jar --replace-text passwords.txt</code></li>
+  <li>Then run <code>git reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressive</code></li>
+  <li>Finally, <code>git push</code></li>
+</ol>
+
+<p>Funny story: When I first ran this, I accidentally put the passwords.txt file in Git.  I had to rerun BFG to remove the passwords file.  Oops.</p>
+
+<h4 id="a-idremovefileremove-a-filea"><a id="removefile">Remove a file</a></h4>
+
+<ol>
+  <li>Go to your repository</li>
+  <li>Delete your file, commit and save to repo (make sure to list what files were deleted)</li>
+  <li>Then use BFG to erase your history of that file: <code>bfg --delete-files myfile.txt</code> (files from earlier step)</li>
+  <li><code>git reflog expire --expire=now --all &amp;&amp; git gc --prune=now --aggressive</code> when you’re complete with all the files from Option 3</li>
+</ol>
+
+<h2 id="a-idpullpull-requesta"><a id="pull">Pull Request</a></h2>
+
+<p>Once you start working with other people, you may want to make suggestions to their code or they might have suggestions for your code.  This is called a pull request and involves these steps:</p>
+
+<ol>
+  <li>Fork a repository (the one that you want to make a pull request/repo where you want to have the code changed).  Click on the fork button on the GitHub repo page.</li>
+  <li>Clone the repo to your local machine.  Click the clone in desktop button beside the repo name.</li>
+  <li>Make the local changes/commits to the files (trying to touch as few files as possible)</li>
+  <li>Sync the changes</li>
+  <li>Go to your github forked repository and click ‘Compare, review, create a pull request’ (a green icon button that has no text).</li>
+  <li>A new page opens that shows the changes, then click the pull request link and it will send the request to the original owner of the repo.</li>
+</ol>
+
+<h2 id="a-idrebaserebasea"><a id="rebase">Rebase</a></h2>
+
+<p><strong>Rebasing</strong> (<code>git rebase</code>) is an alternative to <strong>merging</strong> (<code>git merge</code>), but does this in a destructive manner (opposed to merging’s non-destructive operation).</p>
+
+<p>What this means is that if you work on a feature branch, <strong>merge</strong> ties together the histories of both branches.  The advantage is that this is <strong>non-destructive</strong>, but the issue is that we can have a polluted feature branch history if there were a lot of commits in the master branch (which makes it hard for other developers to understand the history of the project).  If this happens, look into <code>git log</code> options.</p>
+
+<p>With <strong>rebase</strong>, you can rebase the feature branch to begin on the tip of the master branch.  This basically moves the entire feature branch to begin at the end of the master branch.  The issue with rebase is that you <strong>re-write</strong> the project history by creating brand new commits for each commit in the original branch.  You get a cleaner project history (linear project history), but this is dangerous.  If you have to, consider doing an <strong>interactive rebasing</strong> to alter commits as they are moved to the new branch so you can get complete control over the branch’s commit history.  Helpful commands are <code>pick</code> and <code>fixup</code>.  Do NOT use rebase on a public branch (i.e. if someone else might be looking at the branch).</p>
+
+<pre><code>git checkout feature
+git rebase -i master
+</code></pre>
+
+<h2 id="a-iddiffworkflowsdifferent-workflowsa"><a id="diffworkflows">Different Workflows</a></h2>
+
+<p>Besides using git as just a simple save in time on one branch workflow, we can have other options depending on project and team size.</p>
+
+<h4 id="a-idfeaturebranchfeature-branch-workflowa"><a id="featurebranch">Feature Branch Workflow</a></h4>
+
+<p>The <strong>Feature Branch Workflow</strong> is a git workflow where all feature development takes place in a dedicated branch instead of the <strong>master</strong> branch.  This means that the master branch will only contain valid code and that work on a particular feature does not disturb the main code.</p>
+
+<h4 id="a-idgitflowgitflow-workflowa"><a id="gitflow">GitFlow Workflow</a></h4>
+
+<p>GitFlow is a specific type of workflow for larger projects and is built off of the <strong>Feature Branch Workflow</strong>.  The branch structure is slightly more complicated by having more specific roles to different branches and adding in tags around a project release.</p>
+
+<ul>
+  <li>Historical Branches - instead of a single master branch, there is now <strong>master</strong> and <strong>develop</strong></li>
+  <li>Feature Branches - each feature resides in its own branch.  Feature branches branch from <strong>develop</strong> instead of master.</li>
+  <li>Once develop has enough features for a release, you fork a release branch off of develop.  No new features are added and only bug fixes, document generation are added.  Once this is ready to ship, the release gets merged into <strong>master</strong> and tagged with a version number.  Once merged back to master, we merge back into develop.</li>
+</ul>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-   <title>First Post</title>
+   <title>Tmux</title>
    <meta name="William Liu" content="William Liu" />
 
    <!-- syntax highlighting CSS -->
@@ -32,16 +32,49 @@
     </div>
 
     <div id="post">
-<h3 id="first-post">First Post</h3>
+<h2 id="tmux">Tmux</h2>
 
-<p>This is contents of a first post.  This is for testing out neat features.</p>
+<hr />
 
-<p>Testing out inline Math Equations $a^2 + b^2 = c^2$ and \( sin(x^2) \)</p>
+<h2 id="table-of-contents">Table of Contents</h2>
 
-<p>Testing out separate line Math Equations:</p>
+<ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#basiccommands">Basic Commands</a></li>
+</ul>
 
-<script type="math/tex; mode=display">a^2 + b^2 = c^2</script>
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
 
+<p><strong>tmux</strong> stands for terminal multiplexer.  To start, type <strong>tmux</strong> and you should see a yellow bar below. </p>
+
+<h2 id="a-idbasiccommandsbasic-commandsa"><a id="basiccommands">Basic Commands</a></h2>
+
+<h4 id="a-idnewwindowcreate-new-windowa"><a id="newwindow">Create new window</a></h4>
+
+<p>Press <strong>Ctrl</strong> and <strong>b</strong>, then press <strong>c</strong>.  You’ll see more tabs on the bottom right hand window (e.g. 0:bash, 1:bash, 2:bash)</p>
+
+<h4 id="a-idnavigatewindownavigate-windowsa"><a id="navigatewindow">Navigate windows</a></h4>
+
+<p>You can have multiple tabs up at a time.  Press <strong>Ctrl</strong> and <strong>b</strong>, then press:</p>
+
+<ul>
+  <li><strong>n</strong> to move to the next window</li>
+  <li><strong>p</strong> to move to the previous window</li>
+  <li><strong>l</strong> to move to the previously selected window</li>
+  <li><strong>w</strong> to list all windows / window numbers</li>
+  <li><strong>[window number]</strong> to move between the specified windows</li>
+</ul>
+
+<p>You will see a <strong>*</strong> on your current window and a <strong>-</strong> sign to your previous window.</p>
+
+<h4 id="a-idsplitwindowssplit-windowsa"><a id="splitwindows">Split windows</a></h4>
+
+<p>You can split windows a few different ways.  Press <strong>Ctrl</strong> and <strong>b</strong>, then press:</p>
+
+<ul>
+  <li><strong>%</strong> to split the window vertically</li>
+  <li><strong>:”split-window”</strong> to split the window horizontally</li>
+</ul>
 
 </div>
 

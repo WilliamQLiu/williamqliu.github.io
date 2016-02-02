@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Statistical Analysis Primer</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="statistical-analysis-primer">Statistical Analysis Primer</h2>
+
+<hr />
+
+<h1 id="table-of-contents">Table of Contents</h1>
+<ul>
+  <li><a href="#overview">Overview</a></li>
+  <li><a href="#whatdata">What kind of data are we measuring?</a>
+    <ul>
+      <li><a href="#variables">Independent and Dependent Variables</a></li>
+      <li><a href="#categoricalcontinuous">Categorical and Continuous Variables</a></li>
+      <li><a href="#reliability">Reliability</a></li>
+      <li><a href="#validity">Validity</a></li>
+    </ul>
+  </li>
+  <li><a href="#howdata">How are we collecting the data?</a>
+    <ul>
+      <li><a href="#correlationcausation">Correlation and Causation</a></li>
+      <li><a href="#correlationcausation">Independent Subjects and Between Subjects</a></li>
+    </ul>
+  </li>
+  <li><a href="#descriptivestatistics">Descriptive Statistics</a>
+    <ul>
+      <li><a href="#histogram">Frequency Distribution (Histogram)</a></li>
+      <li><a href="#modemedianmean">Mode, Median, Mean</a></li>
+      <li><a href="#quantilequartilepercentages">Quantile, Quartile, Percentages</a></li>
+      <li><a href="#dispersion">Dispersion</a></li>
+      <li><a href="#probability">Probability</a></li>
+      <li><a href="#populationssamples">Populations and Samples</a></li>
+    </ul>
+  </li>
+  <li><a href="#inferentialstatistics">Inferential Statistics</a>
+    <ul>
+      <li><a href="#models">Statistical Models</a></li>
+      <li><a href="#nhst">Null Hypothesis Significance Testing</a></li>
+      <li><a href="#typeerrors">Type I and Type II Errors</a></li>
+      <li><a href="#parametric">Parametric Statistics</a></li>
+      <li><a href="#geneityvariance">Homogeneity and Heterogeneity of Variance</a></li>
+    </ul>
+  </li>
+  <li><a href="#linreg">Linear Regression</a>
+    <ul>
+      <li><a href="#linregdatatransformation">Data Transformation</a></li>
+      <li><a href="#linregcovariancecorrelation">Covariance and Correlation</a></li>
+      <li><a href="#linreganalysis">Regression Analysis</a></li>
+      <li><a href="#linregpredictors">Selecting Predictors</a></li>
+      <li><a href="#linregevaluatemodel">Evaluating Model</a></li>
+      <li><a href="#linregassumptions">Assumptions</a></li>
+      <li><a href="#linregviolations">Violating Assumptions</a></li>
+    </ul>
+  </li>
+  <li><a href="#logreg">Logistic Regression</a>
+    <ul>
+      <li><a href="#logregtypes">Types of Logistic Regressions</a></li>
+      <li><a href="#logregcompare">Comparing Linear to Logistic Regression</a></li>
+      <li><a href="#logregpredictors">Selecting Predictors</a></li>
+      <li><a href="#logregassumptions">Assumptions</a></li>
+      <li><a href="#logregissues">Issues</a></li>
+    </ul>
+  </li>
+  <li><a href="#ttest">T-test</a>
+    <ul>
+      <li><a href="#ttestinddep">Independent and Dependent Means t-test</a></li>
+      <li><a href="#ttestcalcs">Calculations</a></li>
+    </ul>
+  </li>
+  <li><a href="#onewayanova">One-way ANOVA</a>
+    <ul>
+      <li><a href="#onewayanovaconcept">Concept</a></li>
+      <li><a href="#onewayanovaassumptions">Assumptions</a></li>
+      <li><a href="#onewayanovacomparegroups">Comparing Different Groups</a></li>
+      <li><a href="#onewayanovaplannedcontrasts">Planned Contrasts</a></li>
+      <li><a href="#onewayanovaposthoccomparison">Post Hoc Comparison</a></li>
+    </ul>
+  </li>
+  <li><a href="#ancova">ANCOVA</a>
+    <ul>
+      <li><a href="#ancovaassumptions">Assumptions</a></li>
+      <li><a href="#ancovacalculations">Calculations</a></li>
+    </ul>
+  </li>
+  <li><a href="#factorialanova">Factorial ANOVA</a>
+    <ul>
+      <li><a href="#factorialanovanaming">ANOVA Naming Convention</a></li>
+      <li><a href="#factorialanovaindependent">Independent Factorial Design ANOVA</a></li>
+      <li><a href="#factorialanovarepeatedmeasures">Repeated-Measures Factorial Design ANOVA</a></li>
+      <li><a href="#factorialanovamixeddesigns">Mixed Designs ANOVA</a></li>
+    </ul>
+  </li>
+  <li><a href="#nonparametric">Non-parametric Tests</a>
+    <ul>
+      <li><a href="#wilcoxonranksum">Wilcoxon Rank Sum Test</a> </li>
+      <li><a href="#wilcoxonsignedrank">Wilcoxon Signed-Rank Test</a></li>
+      <li><a href="#kruskalwallis">Kruskal-Wallis Test</a></li>
+      <li><a href="#friedmansanova">Friedman’s ANOVA</a></li>
+    </ul>
+  </li>
+  <li><a href="#manova">MANOVA</a>
+    <ul>
+      <li><a href="#matrices">Matrices</a></li>
+      <li><a href="#manovauses">When to use MANOVA</a></li>
+      <li><a href="#manovavariancecovariance">Variances and Covariances of MANOVA</a></li>
+      <li><a href="#manovapredicting">Predicting</a></li>
+      <li><a href="#manovaeigenvalues">Eigenvalues</a></li>
+      <li><a href="#manovaassumptions">Assumptions</a></li>
+      <li><a href="#manovawhichgroupeffect">Which group caused effect</a></li>
+      <li><a href="#manovarobust">Robust Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#factoranalysis">Factor Analysis</a>
+    <ul>
+      <li><a href="#factoranalysisfactorscores">Calculating Factor Scores</a></li>
+      <li><a href="#factoranalysiswhattodo">What to do with Factor Scores</a></li>
+      <li><a href="#factoranalysisfactorextraction">Factor Extraction</a></li>
+      <li><a href="#factoranalysisinterpretation">Factor Analysis Interpretation</a></li>
+    </ul>
+  </li>
+  <li><a href="#comparecategorical">Categorical Variables</a>
+    <ul>
+      <li><a href="#comparecategoricalpearsonchisquare">Pearson’s Chi-Square Statistic</a></li>
+    </ul>
+  </li>
+  <li><a href="#loglinearanalysis">Loglinear Analysis</a></li>
+  <li><a href="#multilevellinear">Multilevel Linear Models</a></li>
+</ul>
+
+<h2 id="overview-a-idoverviewa">Overview <a id="overview"></a></h2>
+<p>Welcome!  This is a short onboarding course for new data analysts.  I’ll cover the basics of statistics.  No other knowledge is necessary.</p>
+
+<h2 id="what-data-are-we-measuring-a-idwhatdataa">What data are we measuring? <a id="whatdata"></a></h2>
+
+<h4 id="independent-and-dependent-variables-a-idvariablesa">Independent and Dependent Variables <a id="variables"></a></h4>
+<p>Data is made up of variables.  Variables can have any value (like a category or number).  <code>y = 10</code> says that the variable ‘<em>y</em>’ has the value of ‘<em>10</em>’.  There are two types of variables:</p>
+
+<ul>
+  <li><strong>Independent Variable (aka cause, predictor)</strong> - the variable(s) does not depend on any other variable (e.g. <em>Smoked Cigarettes Per Day</em>, <em>Time Spent Studying</em>, <em>How much you eat</em>).  This variable is thought to be the cause of some effect.  In experimental research, this variable(s) is manipulated.</li>
+  <li><strong>Dependent Variable (aka effect, outcome)</strong> - the variable(s) that we think are an effect because the value depends on the independent variables (e.g. <em>Has Lung Cancer</em>, <em>Test Score</em>).  This variable(s) is thought to be affected by the independent variable.</li>
+  <li><strong>Example</strong>: ‘<em>Time Spent Studying</em>’ causes a change in ‘<em>Test Score</em>’.  ‘<em>Test Score</em>’ can’t cause a change in ‘<em>Time Spent Studying</em>’.  ‘<em>Test Score</em>’ (<em>independent variable</em>) depends on ‘<em>Time Spent Studying</em>’ (<em>dependent variable</em>)</li>
+  <li>Summary: What you’re trying to do is see if the <em>independent variable(s)</em> causes some kind of change in the <em>dependent variable(s)</em>; we’re checking if there’s any relationship, which later we’ll understand it to be as part of the overall: <code>outcome = model + error</code>.</li>
+</ul>
+
+<h4 id="categorical-and-continuous-variables-a-idcategoricalcontinuousa">Categorical and Continuous Variables <a id="categoricalcontinuous"></a></h4>
+<p>There are different levels of measurement used to categorize and quantify variables.  Variables can be categorized ‘<em>categorical</em>’ or ‘<em>continuous</em>’ as well as quantified at different levels.  As we go down the list, the measurements become more detailed and useful for statistical analysis.</p>
+
+<ul>
+  <li><strong>Categorical (aka Qualitative)</strong> - Deals with unmeasurables/can’t do arithmetic with it (e.g. ‘<em>species</em>’ could have values of ‘<em>human</em>’, ‘<em>cat</em>’, or ‘<em>dog</em>’).  Your choices are discrete (as in you can be a human or a cat, but not both).  Categoricals are further categorized as:
+    <ul>
+      <li><strong>Dichotomous (aka Binary)</strong> - Two distinct possibilities (e.g. pregnant or not pregnant)</li>
+      <li><strong>Nominal</strong> - Two or more possibilities (e.g. human, cat, dog) </li>
+      <li><strong>Ordinal</strong> - Two or more possibilities and there is a logical order (e.g. first, second).  You know which is bigger or smaller, but not by how much (e.g. you know who won race, but not how close race was)</li>
+      <li><em>Programming</em> - In R, this is ‘factor()’ and Python’s Pandas, this is ‘categorical’ with an optional order</li>
+    </ul>
+  </li>
+  <li><strong>Continuous (aka Quantitative)</strong> - Deals with numbers (e.g. ‘<em>length</em>’, ‘<em>age</em>’).  Continuous are further categorized as:
+    <ul>
+      <li><strong>Interval</strong> - Two or more possibilities, there is a logical order that you can measure (i.e. numbers that you can do arithmetic with), and there are equal intervals (e.g. Fahrenheit measurement of 40 to 50 degrees is the same difference as 50 to 60 degrees)</li>
+      <li><strong>Ratio</strong> - Two or more possibilities, there is a logical order that you can measure, there are equal intervals, and there is a true zero point (e.g. the weight of an object cannot weigh less than 0) </li>
+    </ul>
+  </li>
+  <li><em>Note: Parametric and Non-parametric</em>: The types of data determines the types of tests: <em>parametric</em> or <em>non-parametric</em>, and they affect the type of statistical procedures you can use.  The main differences are that parametric tests have either ‘interval’ or ‘ratio’ scales and uses information about the mean and deviation from the mean (meaning it has a relatively normal distribution), which gives it more statistical power.  Nonparametric statistics uses ‘nominal’ or ‘ordinal’ data, (i.e. less information) in their calculation and are thus less powerful.</li>
+</ul>
+
+<h4 id="reliability-a-idreliabilitya">Reliability <a id="reliability"></a></h4>
+
+<ul>
+  <li><strong>Measurement Error</strong> - the discrepancy between the numbers we use to represent the thing we’re measuring and the actual value of measuring it directly (e.g. I measure my height with a ruler, but might be a little inaccurate)</li>
+  <li><strong>Reliability</strong> - whether an instrument can be interpreted consistently across different situations.  The easiest method is through <em>test-retest reliability</em>, which tests the same group of people twice (e.g. if I weighed myself within minutes of each other, would I get the same result?)</li>
+  <li><strong>Counterbalancing</strong> - order in which a person participates in an experiment may affect their behavior.  Counterbalancing fixes this; say there are two possible conditions (A and B), subjects are divided into two groups with Group 1 (A then B), Group 2 (B then A)</li>
+  <li><strong>Randomization</strong> - randomly allocates experimental units across groups; reduces <em>confounding</em> by dispersing at chance levels (hopefully roughly evenly)</li>
+</ul>
+
+<h4 id="validity-a-idvaliditya">Validity <a id="validity"></a></h4>
+<p>Validity is whether an instrument actually measures what it sets out to measure (e.g. does a scale actually measure my weight?).  Validity is usually divided into three forms including <em>Criterion</em>, <em>Content</em>, and <em>Construct</em>.</p>
+
+<ul>
+  <li><strong>Criterion Validity</strong> - looks at the correlation between one set of variable(s) predicts an outcome based on information from another set of criterion variable(s).  e.g. IQ tests are often validated against measures of academic performance (the criterion).  Criterion Validity can be either <em>concurrent</em> or <em>predictive</em>:
+    <ul>
+      <li><strong>Concurrent Validity</strong> - assess the ability to distinguish between groups (e.g. check if an AP exam can substitute taking a college course; all students take AP exam and college course, check if there is a strong correlation between exam scores and college course grade)</li>
+      <li><strong>Predictive Validity</strong> - assess the ability to predict observations at a later point in time (e.g. how well does SAT test predict academic success?  Determine usefulness by correlating SAT scores to first-year student’s GPA)</li>
+      <li><em>Note</em>: Difficult because objective criteria that can be measured easily may not exist</li>
+    </ul>
+  </li>
+  <li><strong>Content Validity (aka Logical Validity)</strong> - a non-statistical type of validity that assesses the degree to which individual items represent the construct being measured (e.g. test of the ability to add two numbers should include adding a combination of digits including odd, even and not multiplying)
+    <ul>
+      <li><strong>Face Validity</strong> - an estimate of whether a test appears to measure a certain criterion</li>
+      <li><strong>Representation Validity (aka Translation Validity)</strong> - the extent to which an abstract theoretical construct can be turned into a specific practical test</li>
+    </ul>
+  </li>
+  <li><strong>Construct Validity</strong> - a construct is an abstraction (attribute, ability or skill) created to conceptualize a <em>latent variable</em>.  (e.g. someone’s English proficency is a construct).  Construct Validity is whether your test measures the construct adequately  (e.g. how well does your test measure someone’s English proficiency).  In order to have <em>construct validity</em>, you need both <em>convergent</em> and <em>discriminant</em> validity.
+    <ul>
+      <li><strong>Convergent Validity</strong> - the degree to which two measures of constructs that should be related, are in fact related (e.g. if a construct of general happiness had convergent validity, then it should correlate to a similar construct, say of marital satisfaction)</li>
+      <li><strong>Discriminant Validity</strong> - the degree to which two measures of constructs that should be unrelated, are in fact unrelated (e.g. if a construct of general happiness had discriminant validity, then it should correlate to an unrelated construct, say of depression)</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="how-are-we-measuring-data--a-idhowdataa">How are we measuring data?  <a id="howdata"></a></h2>
+
+<h4 id="types-of-research-methods--a-idcorrelationcausationa">Types of Research Methods  <a id="correlationcausation"></a></h4>
+<p>We’re interested in <em>correlation</em> as well as <em>causality</em> (cause and effect).  To test a hypothesis, we can do the following types of research.</p>
+
+<ul>
+  <li><strong>Observational/Correlational Research</strong> - observe what naturally goes on without directly inferring.  Correlation suggests a relationship between two variables, but cannot prove that one caused another.  Correlation does not equal causation.
+    <ul>
+      <li><strong>Cross-sectional Study</strong> - a snapshot of many different variables at a single point in time (e.g. measure cholesterol levels of daily walkers across two age groups, but can’t consider past or future cholestral levels of snapshot)</li>
+      <li><strong>Longitudinal Study</strong> - measure variables repeatedly at different time points (e.g. we might measure workers’ job satisfaction under different managers)</li>
+      <li><strong>Limitations of Correlational Research</strong>
+        <ul>
+          <li><strong>Continuity</strong> - we view the co-occurrence of variables so we have no timeline (e.g. we have people with low self-esteem and dating anxiety, can’t tell which came first)</li>
+          <li><strong>Confounding Variables (aka Teritum Quid)</strong> - extraneous factors (e.g. a correlation between breast implants and suicide; breast implants don’t cause suicide, but a third factor like low self-esteem might cause both)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Experimental Research</strong> - manipulate one variable to see its effect on another.  We do a comparison of situations (usually called <em>treatments</em> or <em>conditions</em>) in which cause is present or absent (e.g. we split students into two groups: one with motivation and the other as control, no motivation)
+    <ul>
+      <li><strong>Between-Subjects Design (aka independent measures, between-groups)</strong> - Participants can be part of the treatment group or the control group, but not both.  Every participant is only subjected to a single treatment (e.g. motivational group gets motivation, control gets no motivation through entire experiment)</li>
+      <li><strong>Within-Subjects Design (aka repeated measures)</strong> - Participants are subjected to every single treatment, including the control (e.g. give positive motivation for a few weeks, then no motivation)</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="descriptive-statistics--a-iddescriptivestatisticsa">Descriptive Statistics  <a id="descriptivestatistics"></a></h2>
+
+<h4 id="frequency-distribution-aka-histogram--a-idhistograma">Frequency Distribution (aka Histogram)  <a id="histogram"></a></h4>
+<p>A count of how many times different values occur.  The two main ways a distribution can deviate from normal is by <em>skew</em> and <em>kurtosis</em></p>
+
+<ul>
+  <li><strong>N</strong> - <em>N</em> is the size of the sample and <em>n</em> represents a subsample (e.g. number of cases within a particular group)</li>
+  <li><strong>skew</strong> - the symmetry (tall bars are clustered at one end of the scale); <em>positively skewed</em> means clustered at the lower end / left side) while <em>negatively skewed</em> means clustered at the higher end / right side)</li>
+  <li><strong>kurtosis</strong> - the pointyness (degree that scores cluster at the end of the distributions/ the <em>tails</em>); <em>positive kurtosis</em> has many scores in the tails (aka <em>leptokurtic distribution</em>, <em>has heavy-tailed distribution</em>) while <em>negative_kurtosis</em> is relatively thin (aka <em>platykurtic distribution</em>, <em>has light tails</em>)</li>
+  <li><strong>Normal Distribution</strong> - a bell-shaped curve (majority of bars lie around the center of the distribution); has values of <code>skew=0</code> and <code>kurtosis=0</code></li>
+</ul>
+
+<h4 id="mode-median-mean--a-idmodemedianmeana">Mode, Median, Mean  <a id="modemedianmean"></a></h4>
+<p>Used in frequency distribution to describe central tendancy</p>
+
+<ul>
+  <li><strong>Mode</strong> - the value that occurs most frequently.  Modes can have many ‘highest points’
+    <ul>
+      <li><strong>bimodal</strong> - two bars that are the highest</li>
+      <li><strong>multimodal</strong> - more than two bars that are the highest</li>
+    </ul>
+  </li>
+  <li><strong>Median</strong> - the middle value when ranked in order of magnitude</li>
+  <li><strong>Mean</strong> - the average, represented as:</li>
+</ul>
+
+<h4 id="quantiles-quartiles-percentages--a-idquantilequartilepercentagesa">Quantiles, Quartiles, Percentages  <a id="quantilequartilepercentages"></a></h4>
+<ul>
+  <li><strong>Range</strong> - largest value minus the smallest value</li>
+  <li><strong>Quantiles</strong> - quantiles split data into equal portions.  Quantiles include <em>quartiles</em> (split into four equal parts), <em>percentages</em> (split into 100 equal parts), <em>noniles</em> (points that split the data into nine equal parts)</li>
+  <li><strong>Quartiles</strong> - the three values that split sorted data into four equal parts.  <em>Quartiles</em> are special cases of <em>quantiles</em>
+    <ul>
+      <li><strong>Lower Quartile (aka First Quartile, Q1)</strong> - the median of the lower half of the data</li>
+      <li><strong>Second Quartile (aka Q2)</strong> - the median, which splits our data into two equal parts</li>
+      <li><strong>Upper Quartile (aka Third Quartile, Q3)</strong> - the median of the upper half of the data</li>
+      <li><em>Note</em>: For discrete distributions, there is no universal agreement on selecting quartile values</li>
+      <li><strong>Interquartile Range (aka IQR)</strong> - exclude values at the extremes of the distribution (e.g. cut off the top and bottom 25%) and calculate the range of the middle 50% of scores.  <code>IQR = Q3 - Q1</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="dispersion-a-iddispersiona">Dispersion <a id="dispersion"></a></h4>
+
+<ul>
+  <li><strong>Variation (aka spread, dispersion)</strong> - a change or difference in condition, amount, level</li>
+  <li><strong>Variance</strong> - a particular measure of <em>variation</em>; how far a set of numbers are spread out around the mean or expected value; low variance means values are clumped together (zero means all values are identical), high variance means values are spread out from the mean and each other
+    <ul>
+      <li><strong>Unsystematic Variation (aka random variance)</strong> - random variability within individuals and/or groups (e.g. I feel better today than yesterday)  <code>Unsystematic Variance = Measurement Error + Individual Differences</code></li>
+      <li><strong>Systematic Variation (aka between-groups variance)</strong> - variance between-groups created by a specific experimental manipulation (e.g. give bananas to reward monkeys for successfully completing tasks); doing something in one condition but not in the other condition</li>
+    </ul>
+  </li>
+  <li><strong>Deviance</strong> - quality of fit for a model, the difference between each score and the fit.  Used in the <em>sum of squares of residuals in ordinary least squares</em> where model-fitting is achieved by maximum likelihood.  Can be calculated as: <code>deviance = &lt;insert deviance equation&gt;</code></li>
+  <li><strong>Sum of Squared Errors (aka SS, sum of squares)</strong> - we can’t just add up all the deviance (or else the total spread is just zero, which is meaningless) so we square all the values in order to get the total dispersion / total deviance of scores (i.e. gets rid of negatives)</li>
+  <li><strong>Variance</strong> - <em>SS</em> works nicely until the number of observations (<em>n</em>) changes, then we’ll need to recalculate.  Instead of using total dispersion, we use the average dispersion, which is the <em>variance</em></li>
+  <li><strong>Standard Deviation</strong> - Since the <em>variance</em> is still squared, we need to do the square root of the variance, as calculated here: <code>standard deviation = &lt;insert standard deviation formula&gt;</code></li>
+  <li><strong>Test Statistic</strong> - the ratio of systematic to unsystematic variance or effect to error (i.e. the signal-to-noise).  Depending on the model, we have a different name for the test statistic.  Examples include:
+    <ul>
+      <li><em>F-test</em></li>
+      <li><em>Leven’s test</em></li>
+      <li><em>Bartlett’s test</em></li>
+      <li><em>Brown-Forsythe test</em></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="from-frequency-to-probability--a-idprobabilitya">From Frequency to Probability  <a id="probability"></a></h4>
+<p>So what does the frequency tell us?  Instead of thinking of it as as the frequency of values occuring, think of it as how likely a value is to occur (i.e. probability).  For any distribution of scores, we can calculate the probability of obtaining a given value.</p>
+
+<ul>
+  <li><strong>Probability Density Functions (aka probability distribution function, probability function)</strong> -  just like a histogram, except that lumps are smoothed out so that we have a smooth curve.  The area under curve tells us the probability of a value occurring.
+    <ul>
+      <li>Common distributions include <em>z-distribution</em>, <em>t-distribution</em>, <em>chi-square distribution</em>, <em>F-distribution</em></li>
+      <li>We use a normal distribution with a mean of 0 and a standard deviation of 1 (this lets us use tabulated probabilities instead of calculating ourselves)</li>
+      <li>To ensure a standard deviation of 1, we calculate the <em>z-scores</em> using: <code>z = &lt;insert z-score equation&gt;</code></li>
+      <li>Check tabulated values and you’ll get the probability <em>P</em> of a value occurring</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="populations-and-samples--a-idpopulationssamplesa">Populations and Samples  <a id="populationssamples"></a></h4>
+<p>We want to find results that apply to an entire population.</p>
+
+<ul>
+  <li><strong>Population</strong> - summation of the same group or species; can be very general or very specific (e.g. humans, cats named Will)</li>
+  <li><strong>Sample</strong> - small subset of the population</li>
+  <li><strong>Degrees of Freedom</strong> - number of values in the final calculation that are free to vary (e.g. mean is 5 for the values 4, 6, and <blank>.  <blank> must then be 5)</blank></blank></li>
+  <li><strong>Sampling Variation</strong> - samples will vary because they contain different members of the population (e.g. grab random samples of people off the street, some samples you’ll get a sample/group of people that is smarter, some samples not so much) </li>
+  <li><strong>Sampling Distribution (aka finite-sample distribution)</strong> - the distribution of a sample statistic (based on a random sample); this tells us about the behavior of samples from the population</li>
+  <li><strong>Standard Error (aka SE)</strong> - a measure of how representative a sample is likely to be of the population.  A large standard error means there is a lot of variability so samples might not be representative of the population.  A small standard error means that most samples are likely to be an accurate reflection of the population</li>
+  <li><strong>Central Limit Theorem</strong> - as samples get large (greater than 30), the sampling distribution has a normal distribution and a standard deviation of: <code>insert standard deviation formula</code></li>
+  <li><strong>Confidence Intervals (for large samples)</strong> - along with standard error, we can calculate boundaries that we believe the population will fall.  In general, we could calculate confidence intervals using the <em>central limit theorem</em>:
+    <ul>
+      <li><code>lower boundary of confidence interval = formula</code></li>
+      <li><code>upper boundary of confidence interval = formula</code></li>
+      <li>Note: Different for 95% confidence interval (most common) or 99% or 90%</li>
+    </ul>
+  </li>
+  <li><strong>Confidence Intervals (for small samples)</strong> - for smaller samples, we can’t calculate boundaries using the <em>central limit theorem</em> because the <em>sampling distribution</em> isn’t a <em>normal distribution</em>.  Instead, smaller samples have a <em>t-distribution</em> and would be calculated with:
+    <ul>
+      <li><code>lower boundary of confidence interval = formula</code></li>
+      <li><code>upper boundary of confidence interval = formula</code></li>
+    </ul>
+  </li>
+  <li><strong>p-value</strong> - the probability of obtaining the observed sample results when the null hypothesis is true.  If the <em>p-value</em> is very small (threshold based on the previously chosen <em>significance level</em>, traditionally 5% or 1%) then the hypothesis must be rejected.
+    <ul>
+      <li>p &lt;= 0.01 means very strong presumption against null hypothesis</li>
+      <li>0.01 &lt; p &lt;= 0.05 means strong presumption against null hypothesis</li>
+      <li>0.05 &lt; p &lt;= 0.1 means low presumption against null hypothesis</li>
+      <li>p &gt; 0.1 means no presumption against the null hypothesis</li>
+      <li><em>Note</em>: <em>NHST</em> only works if you generate your hypothesis and decide on threshold before collecting the data (otherwise chances of publishing a bad result will increase; as is with 95% confidence level you’ll only report 1 bad in 20)</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="inferential-statistics--a-idinferentialstatisticsa">Inferential Statistics  <a id="inferentialstatistics"></a></h2>
+
+<h4 id="statistical-model--a-idmodelsa">Statistical Model  <a id="models"></a></h4>
+
+<p>We can predict values of an outcome variable based on some kind of model.  All models follow the simple equation of <code>outcome = model + error</code>.</p>
+
+<ul>
+  <li><strong>Model</strong> - Models are made up of <em>variables</em> and <em>parameters</em>
+    <ul>
+      <li><strong>Variables</strong> - are measured constructs that vary across entities in the sample</li>
+      <li><strong>Parameters</strong> - are estimated from the data (rather than being measured) and are (usually) constants.  E.g. the mean and median (which estimate the center of the distribution) and the correlation and regression coefficients (which estimate the relationship between two variables).  We say ‘estimate the parameter’ or ‘parameter estimates’ because we’re working with a sample, not the entire population.</li>
+    </ul>
+  </li>
+  <li><strong>Outcome</strong> - <code>outcome = model + error</code></li>
+  <li><strong>Error (aka deviance)</strong> - Error for an entity is the score predicted by the model subtracted from the observed score for that entity.  <code>error = outcome - model</code></li>
+</ul>
+
+<h4 id="null-hypothesis-significance-testing-aka-nhst-a-idnhsta">Null Hypothesis Significance Testing (aka NHST) <a id="nhst"></a></h4>
+
+<p><strong>Null Hypothesis Significance Testing (aka NHST)</strong> is a method of statistical inference used for testing a hypothesis.  A test result is <em>statistically significant</em> if it has been predicted as unlikely to have occurred by chance alone, according to a threshold probability (the significance level)</p>
+
+<ul>
+  <li><strong>Alternative Hypothesis (aka H1, Ha, experimental hypothesis)</strong> - the hypothesis or prediction that sample observations are influenced by some non-random cause</li>
+  <li><strong>Null Hypothesis (H0)</strong> - Opposite of the <em>alternative hypothesis</em>, refers to the default position that there is no relationship between two measured phenomena</li>
+  <li><strong>Directional and Nondirectional Hypothesis</strong> - hypothesis can be either <em>directional</em> if it predicts whether an effect is larger or smaller (e.g. if I buy cookies, I’ll eat more) or <em>non-directional</em> if it does not predict whether effect is larger or smaller (e.g. if I buy cookies, I’ll eat more or less).
+    <ul>
+      <li><strong>One-tailed test</strong> -  a statistical model that tests a directional hypothesis (Note: Basically, do not ever do a one-tailed test unless you are absolutely sure of the direction)</li>
+      <li><strong>Two-tailed test</strong> -  a statistical model that tests a non-directional hypothesis</li>
+    </ul>
+  </li>
+  <li><strong>Sample Size and Statistical Significance</strong> - there is a close relationship between <em>sample size</em> and statistical significance (the <em>p-value</em>).  The same effect will have different <em>p-values</em> in different sized samples (i.e. small differences can be ‘significant’ in large samples and large effects might be deemed ‘non-significant’ in small samples)</li>
+  <li><strong>Effect Size and Cohen’s d</strong> - statistical significance does not tell us about the importance of an effect.  The solution is to measure the size of the effect, which is a quantitative measure of the strength of a phenomenon.  In order to compare the mean of one sample to another, we calculate <em>Cohen’s d</em>.</li>
+  <li><strong>Pearson’s correlation coefficient (aka r)</strong> - measure of strength of relationship between two variables (thus it’s an <em>effect size</em>)
+    <ul>
+      <li>r ranges between 0 (no effect) and 1 (a perfect effect)</li>
+      <li>r=.10 means a small effect</li>
+      <li>r=.30 means a medium effect</li>
+      <li>r=.50 means a large effect</li>
+      <li><em>Note</em>: r=.6 does not mean it has twice the effect of r=.3</li>
+    </ul>
+  </li>
+  <li><strong>Meta-analysis</strong> - statistical methods for contrasting and combining results from different studies in the hope of identifying patterns among study results (i.e. conducting research about previous research).  Meta-analysis allows to achieve a higher <em>statistical power</em>.</li>
+</ul>
+
+<h4 id="type-i-and-type-ii-errors-a-idtypeerrorsa">Type I and Type II Errors <a id="typeerrors"></a></h4>
+
+<p>There are two types of errors that we can make when testing a hypothesis.  These two errors are linked; if we correct for one, the other is affected.  You can visualize this with a <strong>confusion matrix (aka contingency table, error matrix)</strong></p>
+
+<ul>
+  <li><strong>Type I error (aka false positive)</strong> - occurs when we believe there is an effect in our population, when in fact there isn’t (e.g. a doctor thinking a man is pregnant).  Using conventional 95% confidence level, the probability is 5% of seeing this error.  This means if we repeated our experiment, we would get this error 5 out of 100 times.
+    <ul>
+      <li><strong>Familywise (FWER) or Experimentwise Error Rate (EER)</strong> - the error rate across statistical tests conducted on the same data for <em>Type I errors</em>.  This can be calculated using the following equation (assuming .05 level of significance): <code>familywise error=1=(0.95)^n</code> where <em>n</em> is the number of tests carried out.</li>
+      <li><strong>Bonferroni correction</strong> - the easiest and most popular way to correct <em>FWER</em>, which fixes familywise error rate, but at the loss of <em>statistical power</em>.</li>
+    </ul>
+  </li>
+  <li><strong>Type II error (aka false negative, lack of Statistical Power)</strong> - opposite of <em>Type I error</em>, occurs when we believe there is no effect in the population when in fact there is an effect (e.g. a doctor thinks a woman is not pregnant, but she is).  The maximum acceptable probability of a <em>Type_II error</em> is 20%.  This means we miss 1 in 5 genuine effects.
+    <ul>
+      <li><strong>Statistical Power</strong> - statistical power is the ability of a test to find an effect; the power of the test is the probability that a given test will find an affect assuming that one exists in the population.  Basically, <em>statistical power</em> is linked with the <em>sample size</em>.  We aim to achieve a power of 80% chance of determining an effect if one exists.  </li>
+      <li><em>Note</em>: For <em>R</em>, use the package ‘pwr’ to use power to calculate the necessary sample size.  You can also calculate the power of a test after the experiment, but if you find a non-significant effect, it might be that you didn’t have enough power.  If you find a significant effect, then you had enough power.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="parametric-statistics---a-idparametrica">Parametric Statistics   <a id="parametric"></a></h4>
+<p>A branch of statistics that assumes the data comes from a type of probability distribution and makes inferences about the parameters of the distribution.  The assumptions are:</p>
+
+<ul>
+  <li><strong>normal distribution</strong> - different depending on the test you’re using (remember sample size affects how we test for <em>normal distribution</em>).  What we want is a <code>skew = 0</code> and <code>kurtosis = 0</code>.  We can eye-ball this in R with ‘stat_function()’ and ‘Q-Q plot’.  To get more accurate (instead of just eye-balling), we can use ‘describe()’.
+    <ul>
+      <li><strong>stat_function()</strong> - draws a function over the current plot layer; for example, using the argument <em>fun = dnorm()</em>, which returns the probability (i.e. the density) for a given value.</li>
+      <li><strong>Q-Q plot (quantile-quantile plot)</strong> - a <em>quantile</em> is the proportion of cases we find below a certain value; using the <code>stat = "qq"</code> argument in a <em>qplot()</em>, we can plot the cumulative values we have in our data against the cumulative probability of a normal distribution (i.e. data is ranked and sorted).  If data is normally distributed, then the actual scores will have the same distribution as the score so we’ll get a straight diagonal line.</li>
+      <li><strong>describe() or stat.desc()</strong> - We can get descriptive summaries of our data with the <em>describe()</em> function of the ‘psych’ package or <em>stat.desc()</em> function of the ‘pasetcs’ package.  Again, we’re interested in <code>skew = 0</code> and <code>kurtosis = 0</code>, which we can then calculate the <em>z-score</em> (so that we can compare to different samples that used different measures and so that we can see how likely our values of <em>skew</em> and <em>kurtosis</em> are likely to occur).</li>
+      <li><strong>z-score skewness calculation</strong> - we get a z-score for skewness</li>
+      <li><strong>z-score kurtosis calculation</strong> - we get a z-score for kurtosis</li>
+      <li><em>Note:</em> interpretting z-scores depends on the sample size.  Absolute value greater than 1.96 is significant at ‘p &lt; .05’, greater than 2.58 at ‘p &lt; .01’, greater than 3.29 is significant at ‘p &lt; .001’
+        <ul>
+          <li><em>small samples (&lt;30)</em> - it’s okay to look for values above 1.96</li>
+          <li><em>large samples(&gt;30 and &lt;200)</em> - it’s okay to look for values above 2.58</li>
+          <li><em>very large samples (_200+)</em> - look at the shape’s distribution visually and value of the skew and kurtosis statistics instead of calculating their significance (because they are likely to be significant even when skew and kurtosis are not too different than normal)</li>
+        </ul>
+      </li>
+      <li><strong>skew.2SE and kurt.2SE</strong> - <em>stat.desc()</em> gives us <em>skew.2SE.</em> and <em>kurt.2SE</em>, which stands for the <em>skew</em> and <em>kurtosis</em> value divided by 2 standard errors (i.e. instead of values above, we can say if the absolute value greater than 1 is significant at ‘p &lt; 0.5’, greater than 1.29 at ‘p &lt; .01’, greater than 1.65 is significant at ‘p &lt; .001’)</li>
+      <li><strong>Shapiro-Wilk Test of Normality</strong> - <em>Shapiro-Wilk</em> is a way of looking for normal distribution by checking whether the distribution as a whole deviates from a comparable normal distribution.  This is represented as <em>normtest.W</em> (W) and <em>normtest.p</em> (p-value) through either the <em>stat.desc()</em> or <em>shapiro.test()</em> functions</li>
+      <li><strong>interval data</strong> - data should be measured at least in the interval level (tested with common sense)</li>
+      <li><strong>independence</strong> - different depending on the test you’re using</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="homogeneity-and-heterogeneity-of-variance---a-idgeneityvariancea">Homogeneity and Heterogeneity of Variance   <a id="geneityvariance"></a></h4>
+<p>Variances should be the same throughout the data (i.e. data is tightly packed around the mean).  For example, say we measured the number of hours a person’s ear rang after a concert across multiple concerts.</p>
+
+<ul>
+  <li><strong>Homogeneity of Variance</strong> - After each concert, the ringing lasts about 5 hours (even if this is sometimes 10-15 hours, 20-25 hours, 40-45 hours)</li>
+  <li><strong>Heterogeneity of Variance</strong> - After each concert, the ringing lasts from 5 to 30 hours (say first concert is 5-10 hours, last concert is 20-50 hours)</li>
+  <li><strong>Levene’s test (F)</strong> - <em>Levene’s test</em> tests that the variances in different groups are equal (i.e. the difference between variances is equal to zero).
+    <ul>
+      <li>Test is significant at p &lt;= .05, which we can then conclue that the variances are significantly different (meaning it is not <em>homogeneity of variance</em>)</li>
+      <li>Test is non-significant at p &gt; .05, then the variances are roughly equal and it is <em>homogeneity of variance</em></li>
+      <li><em>Note:</em> in large samples, Leven’s test can be significant even when group variances are not very different; for this reason, it should be interpreted with the <em>variance ratio</em></li>
+    </ul>
+  </li>
+  <li><strong>Hartley’s Fmax (aka variance ratio)</strong> - the ratio of the variances between the group with the biggest variance the group with the smallest variance.  This value should be smaller than the critical values.</li>
+</ul>
+
+<h2 id="linear-regression--a-idlinrega">Linear Regression  <a id="linreg"></a></h2>
+
+<h4 id="data-transformations--a-idlinregdatatransformationa">Data Transformations  <a id="linregdatatransformation"></a></h4>
+<p>If you cannot make data fit into a normal distribution and you checked that the data was entered in correctly, you can do the following:</p>
+
+<ul>
+  <li><strong>Remove the outlier</strong> - delete the case only if you believe this is not representative (e.g. for Age someone puts 200, pregnant male)</li>
+  <li><strong>Data transformation</strong> - do trial and error data transformations.  If you’re looking at differences between variables you must apply the same transformation to all variables.  Types of transformations include:
+    <ul>
+      <li><strong>Log transformation log(Xi)</strong> - taking the logarithm of a set of numbers squashes the right tail of the distribution.  Advantages is this corrects for <em>positive skew</em> and <em>unequal variances</em>.  Disadvantage is that you can’t take the log of zero or negative numbers (though you can do log(x +1) to make it positive where 1 is the smallest number to make the value positive.</li>
+      <li><strong>Square root transformation</strong> - Taking the square root centers your data (square root affects larger values more than smaller values).  Advantage is it corrects <em>positive skew</em> and <em>unequal variances</em>.  Disadvantage is same as log, no square root of negative numbers</li>
+      <li><strong>Reciprocal transformation (1/Xi)</strong> - divide 1 by each score reduces the impact of large scores.  This reverses the score (e.g. a low score of 1 would create 1/1 = 1; a high score of 10 would create 1/10 = 0.1).  The small score becomes the bigger score.  You can avoid score reversal by reversing the scores before the transformation 1/(X highest - Xi).Advantages is this corrects <em>positive skew</em> and <em>unequal variances</em></li>
+      <li><strong>Reverse Score transformation</strong> - The above transformations can correct for <em>negative skew</em> by reversing the scores.  To do this, subtract each score from the highest score obtained or the highest score + 1 (depending if you want lowest score to be 0 or 1).  Big scores have become small and small scores have become big.  Make sure to reverse this or interpret the variable as reversed. </li>
+    </ul>
+  </li>
+  <li><strong>Change the score</strong> - if transformation fails, consider replacing the score (it’s basically the lesser of two evils) with one of the following:
+    <ul>
+      <li>Change the score to be one unit above the next highest score in the data set</li>
+      <li>The mean plus three standard deviations (i.e. this converts back from a z-score)</li>
+      <li>The mean plus two standard deviations (instead of three times above)</li>
+    </ul>
+  </li>
+  <li><strong>Dummy coding</strong> - is a way of representing groups of people using only zeros and ones.  To do this, we create several variables (one less than the number of groups we’re recoding) by doing:
+    <ul>
+      <li>Count the number of groups you want to recode and subtract 1</li>
+      <li>Create as many new (dummy) variables as step above</li>
+      <li>Choose one of your groups as a baseline; this should be your control group or the group that represents the majority of your people (because it might be interesting to compare other groups against the majority)</li>
+      <li>Assign the baseline group value of 0 for all of your dummy variables</li>
+      <li>For the first dummy variable, assign value of 1 to the first group that you want to compare against the baseline and 0 for all other groups</li>
+      <li>Repeat above step for all dummy variables</li>
+      <li>Place all your dummy variables into analysis</li>
+    </ul>
+  </li>
+  <li><strong>Robust test (robust statistics)</strong> - statistics that are not unduly affected by outliers or other small departures from model assumptions (i.e. if the distribution is not normal, then consider using a <em>robust test</em> instead of a <em>data tranformation</em>).  These tests work using these two concepts <em>trimmed mean</em> and <em>bootstrap</em>:
+    <ul>
+      <li><strong>trimmed mean</strong> - a mean based on the distribution of scores after you decide that some percentage of scores will be removed from each extreme (i.e. remove say 5%, 10%, or 20% of top and bottom scores before the mean is calculated)
+        <ul>
+          <li><strong>M-estimator</strong> - slightly different than <em>trimmed mean</em> in that the <em>M-estimator</em> determines the amount of trimming empiraccly.  Advantage is that we never over or under trim the data.  Disadvantage is sometimes <em>M-estimators</em> don’t give an answer.</li>
+        </ul>
+      </li>
+      <li><strong>bootstrap</strong> - <em>bootstrap</em> estimates the properties of the sampling distribution from the sample data.  It treats the sample data as a population from which smaller samples (<em>bootstrap samples</em>) are taken with replacement (i.e. puts the data back before a new sample is taken again).</li>
+      <li><em>Note:</em> <em>R</em> has a package called <em>WRS</em> that has these <em>robust tests</em>, including <em>boot()</em>
+        <ul>
+          <li><code>my_object &lt;- boot(data, function, replications)</code> where <em>data</em> is the dataframe, <em>function</em> is what you want to bootstrap, <em>replications</em> is the number of bootstrap samples (usually 2,000)</li>
+          <li><em>boot.ci(my_object)</em> returns an estimate of bias, empirically derived standard error, and confidence intervals</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="linear-regression---covariance-and-correlation--a-idlinregcovariancecorrelationa">Linear Regression - Covariance and Correlation  <a id="linregcovariancecorrelation"></a></h4>
+<p>We can see the relationship between variables with <em>covariance</em> and the <em>correlation coefficient</em>.</p>
+
+<ul>
+  <li><strong>variance</strong> - remember that <em>variance</em> of a single variable represents the average amount that the data vary from the mean</li>
+  <li><strong>covariance</strong> - <em>covariance</em> is a measure of how one variable changes in relation to another variable.  Positive covariance means if one variable moves in a certain direction (e.g. increases), the other variable also moves in the same direction (e.g. increases).  Negative covariance means if one variable moves in a certain direction (e.g. increases), the other variable moves in the opposite direction (e.g. decreases).
+    <ul>
+      <li><strong>deviance</strong> - remember that <em>deviance</em> is the difference in value vertically (i.e. the quality of fit)</li>
+      <li><strong>cross-product deviations</strong> - when we multiple the <em>deviation</em> of one variable by the corresponding <em>deviation</em> of another variable</li>
+      <li><strong>covariance</strong> - the average sum of combined deviations (i.e. it’s the cross-product deviation, but also divided by the number of observations, N-1)</li>
+      <li><em>Note:</em> <em>covariance</em> is NOT a good standardized measure of the relationship between two variables because it depends on the scales of measurement (i.e. we can’t say whether a covariance is particularly large relative to another data set unless both data sets used the same units).</li>
+      <li><strong>standardization</strong> - is the process of being able to compare one study to another using the same unit of measurement (e.g. we can’t compare attitude in metres)</li>
+      <li><strong>standard deviation</strong> - the unit of measurement that we use for <em>standardization</em>; it is a measure of the average <em>deviation</em> from the mean</li>
+    </ul>
+  </li>
+  <li><strong>correlation coefficient</strong> - this is the standardized covariance; we basically get the standard deviation of the first variable, multiply by the standard deviation of the second variable, and divide by the product of the multiplication.  There’s two types of correlations including <em>bivariate</em> and <em>partial</em>:
+    <ul>
+      <li><strong>bivariate correlation</strong> - correlation between two variables.  Can be:
+        <ul>
+          <li><strong>Pearson product-moment correlation (aka Pearson correlation coefficient)</strong> - for parametric data that requires interval data for both variables</li>
+          <li><strong>Spearman’s rho</strong> - for non-parametric data (so can be used when data is non-normally distributed data) and requires only ordinal data for both variables.  This works by first ranking the data, then applying <em>Pearson’s equestion</em> to the ranks.</li>
+          <li><strong>Kendall’s tau</strong> - for non-parametric data, similar to Spearman’s, but use this when there’s a small number of samples and there’s a lot of tied ranks (e.g. lots of ‘liked’ in ordinal ranks of: dislike, neutral, like)</li>
+        </ul>
+      </li>
+      <li><strong>partial correlation</strong> - correlation between two variables while ‘controlling’ the effect of one or more additional variables</li>
+      <li><em>Note:</em> values range from -1 (negatively correlated) to +1 (positively correlated)
+        <ul>
+          <li>+1 means the two variables are perfectly positively correlated (as one increases, the other increases by a proportional amount)</li>
+          <li>0 means no linear relationship (if one variable changes, the other stays the same)</li>
+          <li>-1 means the two variables are perfectly negatively correlated (as one increases, the other decreases in a proportional amount)</li>
+          <li><strong>correlation matrix</strong> - if you want to get correlation coefficients for more than two variables (a gird of correlation coefficients)</li>
+          <li><strong>correlation test</strong> - if you only want a single correlation coefficient</li>
+        </ul>
+      </li>
+      <li><em>R</em> to calculate correlation, we can the <em>Hmisc</em> package, specifically with <em>cor()</em>, <em>cor.test()</em>, and <em>rcorr()</em></li>
+      <li><strong>causaulity</strong> - <em>correlation</em> does not give the direction of causality (i.e. correlation does not imply causation)</li>
+      <li><strong>third-variable problem (aka tertium quid)</strong> - <em>causality</em> between two variables cannot be assumed because there may be other measured or unmeasured variables affecting the results</li>
+    </ul>
+  </li>
+  <li><strong>coefficient of determination (R^2)</strong> - a measure of the amount of variability in one variable that is shared by the other (i.e. indicates how well data fit a statistical model); this is simply the <em>correlation coefficient</em> squared.  If we multiply this value by 100, we can say that variable A CAN (not necessarily does) account up to X% of variable B.</li>
+  <li><strong>biserial and point-biserial correlation coefficient</strong> - these correlational coefficients are used when one of the two variables is <em>dichotomous (aka binary)</em>.  <em>point-biserial correlation</em> is used when one variable is a <em>discrete</em> dichotomy (i.e. dead or alive, can’t be half-dead).  <em>biserial correlation</em> is used when that one variable is a <em>continuous</em> dichotomy (i.e. your grade is pass or fail, but it can have multiple levels including A+, C-, F).</li>
+  <li><strong>partial correlation and semi-partial correlation (aka part correlation)</strong> - a <em>partial correlation</em> is the relationship between two variables while controlling for the effects of a third variable on both variables in the original correlation.  <em>semi-partial correlation</em> is the relationship between two variables while controlling for the effects of a third variable on only one of the variables in the original correlation.</li>
+</ul>
+
+<h4 id="linear-regression-analysis--a-idlinreganalysisa">Linear Regression Analysis  <a id="linreganalysis"></a></h4>
+<p><em>Regression Analysis</em> is a way of predicting an outcome variable from one predictor variable (<em>simple regression</em>) or from several predictor variables (<em>multiple regression</em>).  We fit a model to our data and use it to predict values of the <em>dependent variable</em> from one or more <em>independent variables</em>.</p>
+
+<ul>
+  <li><strong>method of least squares</strong> - method to find the line of best fit, which finds the smallest <em>residuals</em> (aka the difference, <em>variance</em>) between the actual data and our model</li>
+  <li><strong>regression model (aka regression line)</strong> is the line of best fit resulting from the <em>method of least squares</em>.  Remember that even though this is the best fitting line, the model could still be a bad fit to the data</li>
+  <li><strong>residual sum of squares (aka sum of squared residuals)</strong> - represents the degree of inaccuracy when the best model is fitted to the data</li>
+  <li><strong>model sum of squares</strong> - the improvement going from the worst fit line (which just uses the mean for every value) to the best fit line (our <em>regression model</em>).  If this value is large, then the <em>regression model</em> has made a big improvement on how well the outcome variable can be predicted.  If this value is small, then the model isn’t much of an improvement.</li>
+  <li><strong>t-test (aka Student’s t-test)</strong> - is a method to test the hypothesis about the mean of a small sample from a <em>normally distributed</em> population when the population <em>standard deviation</em> is unknown.  This is when you can’t compute a <em>z-score</em> because samples are too small or we don’t know the population variance of the population.</li>
+  <li><strong>t-statistic (aka t-score)</strong> - usually used in <em>t-tests</em>, helps us assess predictor variables in whether they improve our model.</li>
+  <li><strong>t-distribution (aka Student’s t-distribution)</strong> is the distribution of the <em>t-statistic</em>.  This is a probability distribution that is used to estimate population parameters when the sample size is small and/or when the population variance is unknown.</li>
+  <li><strong>Akaike Information Criterion (aka AIC)</strong> - measure of fit (like R^2), except that it penalizes the model for having more variables (whereas R^2 only fits the data better with more predictors).  The bigger the value means a worse fit, smaller the value means better fit.  Only compare the AIC to models of the same data (there’s no reference; can’t say 10 is small or big).</li>
+  <li><strong>Bayesian Information Criterion (aka BIC)</strong>, a measure of fit like <em>AIC</em>, but has a larger penalty for more variables than <em>AIC</em>.</li>
+</ul>
+
+<h4 id="linear-regression---selecting-predictors--a-idlinregpredictorsa">Linear Regression - Selecting Predictors  <a id="linregpredictors"></a></h4>
+<p>If you’re making a complex model, the selection of predictors and its order can have a huge impact.  Put predictors methodically, not just add a bunch and see what results happen.  Here’s a few methods:</p>
+
+<ul>
+  <li><strong>Hierarchical Regression</strong> is where predictors are selected based on past work and the experimenter decides what order to enter the predictors into the model.  Known predictors should be entered in first in order of importance in predicting the outcome.</li>
+  <li><strong>Forced entry</strong> is where all predictors are carefully chosen, then forced into the model simultaneously in random order.</li>
+  <li><strong>Stepwise methods</strong> is where all predictors and their order are based off a mathematical criterion and has a direction of <em>forward, backward, both</em>.
+    <ul>
+      <li><strong>Forward Direction (aka Forward Selection)</strong> - An initial model is defined that contains only the constant, then the computer searches for the predictor (out of the ones available) that best predicts the outcome variable.  If the model improves the ability to predict the outcome, the predictor is retained.  The next predictor selected is based on the largest semi-partial correlation (i.e. the ‘new variance’; if predictor A explains 40% of the variation in the outcome variable, then there’s 60% variation left unexplained.  If predictor B is measured only on the remaining 60% variation).  We stop selecting predictors when the <em>AIC</em> goes up on the remaining variables (remember lower <em>AIC</em> means better model)</li>
+      <li><strong>Backward Direction (aka Backward Elimination)</strong> - An initial model that starts with all predictor variables, removes one at a time, stops if remaining variables makes <em>AIC</em> go up (remember lower <em>AIC</em> means better model).  This is the preferred method because of <em>suppressor effects</em>, which occurs when a predictor has an effect but only when another variable is held constant.  <em>Forward Direction</em> is more likely than <em>Backward Direction</em> to exclude predictors involved in suppressor effects (and thus make a <em>Type II error</em>)</li>
+      <li><strong>Both Direction (aka stepwise)</strong> - Starts the same as <em>Forward Direction</em>, but whenever you add a predictor, a removal test of the least useful predictor is done to see if there’s any redundant predictors</li>
+      <li><em>Note:</em> If you used one of the above stepwise methods to get dressed on a cold day, you might put on pants first instead of underwear.  It’ll see that underwear doesn’t fit now that you have pants on so it’ll skip.  If you don’t mind your computer doing lots of calculations, try the <em>all-subsets</em> method.</li>
+      <li><strong>All-subsets methods</strong> is where we try every combination of predictors to see which is the best fit (using a statistic called <em>Mallow’s Cp</em>).  You can increase accuraccy, but the possibilities increase exponentially so calculations take much longer.</li>
+      <li><em>Another Note:</em> There’s a huge danger of over-fitting with too many variables so it’s important to <strong>cross-validate</strong> the model by splitting into train/test sets.  Remember, the fewer predictors the better.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="linear-regression---hows-my-model-doing--a-idlinregevaluatemodela">Linear Regression - How’s my model doing?  <a id="linregevaluatemodel"></a></h4>
+<p>When making a model, we should check for two things 1.) how well the model fits the observed data through <em>outliers, residuals, influence cases</em> and 2.) for <em>generalization</em>, which is how the model generalizes to other cases outside your sample.</p>
+
+<ul>
+  <li><strong>Outliers and Residuals</strong> - We want to look at outliers to see if a small number of cases heavily influence the entire model.  What we do is look for <em>residuals</em>, which is the error pressent in the model (smaller the value, the better the fit.  Large values mean outliers).
+    <ul>
+      <li><strong>Unstandardized residuals (normal residuals)</strong> are measured in the same units as the outcome variable and are difficult to interpret across different models.  We cannot define a universal cut-off point of what is an <em>outlier</em>.  Instead, we need <em>standardized residuals</em>.</li>
+      <li><strong>Standardized residuals</strong> are <em>residuals</em> divided by an estimate of their <em>standard deviation</em>, which gives us the ability to compare residuals from different models using the properties of <em>z-scores</em> to determine universal guidelines on acceptable and unacceptable values.  E.g. Normally distributed sample, 99% of z-scores should lie between -3.29 and 3.29.  Anything above or below these values are cause for concern and thus the model is a bad fit.</li>
+    </ul>
+  </li>
+  <li><strong>Influential Cases</strong> - We should also check to see that any influential cases aren’t greatly biasing the model.  We can assess the influence of a particular case using multiple methods:
+    <ul>
+      <li><strong>Adjusted Predicted Value</strong> - So basically, two models are created; one without a particular case and with the case.  The models are then compared to see if the predicted value is the same regardless of whether the value is included.  If the predicted value is the same, the model is good.  If the predicted value is not the same, the model is a bad fit.  The <em>adjusted predicted value</em> is the predicted value for the model without the case.<br />
+        <ul>
+          <li><strong>DFFit</strong> is the difference between the <em>adjusted predicted value</em> (when the model doesn’t include a case) from the original predicted value (when the model includes the case).</li>
+          <li><strong>DFBeta</strong> is the difference between a parameter estimated using all cases and estimated when one case is excluded</li>
+        </ul>
+      </li>
+      <li><strong>Studentized Residual</strong> is when the residual is divded by the standard error so it gives us a standardized value; this can be compared across different regression analyses because it is measured in standard units.  It’s called the studentized residual because it follows a <em>Student’s t-distribution</em>.  This is useful to assess the influence of a case on the ability of the model to predict the case, but doesn’t provide info on how a case influences the model as a whole (i.e. the ability to predict all cases)</li>
+      <li><strong>Cook’s distance</strong> is a statistic that considers the effect of a single case on the model as a whole (i.e. the overall influence of a case on the model); any values greater than 1 may be cause for concern.  Use to test outliers.</li>
+      <li><strong>hat values (aka leverage)</strong> is another way to check the influence of the observed value of the outcome variable over the predicted values (0 means the case has no influence up to 1 meaning the case has complete influence).  If no cases exert undue influence over the model, then all leverage values should be close to the average value.  Some recommend investigating cases greater than twice to three times the average.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="linear-regression---assumptions--a-idlinregassumptionsa">Linear Regression - Assumptions  <a id="linregassumptions"></a></h4>
+<ul>
+  <li><strong>Generalization</strong> asks the question of whether our model can generalize to other cases outside of this sample (i.e. apply to a wider population)?  We need to check for these assumptions in regression analysis.  Once these below assumptions are met, the coefficients and parameters of the regression equation are said to be <em>unbiased</em>.  An <em>unbiased model</em> tells us that on average, the regression model from the sample is the same as the population model (but not 100%)
+    <ul>
+      <li><strong>Variable types</strong> - All predictor variables must be quantitative or categorical (with two categories).  The outcome variable must be quantitative (measured at the interval level), continuous, and unbounded (no constraints on the variability of the outcome; e.g. if the outcome is a measure ranging from 1 to 10 yet the data collected vary between 3 and 7, then its constrained)</li>
+      <li><strong>Non-zero variance</strong>  - Predictors should have some variation in value (i.e. do not have variances of 0)</li>
+      <li><strong>No perfect multicollinearity</strong> - Should be no perfect linear relationship between two or more predictors (and don’t correlate too highly).</li>
+      <li><strong>Predictors are uncorrelated with ‘external variables’</strong> - external variables that haven’t been included in the regression model which influence the outcome variable.  If external variables do correlate with the predictors, then the conclusions we draw from the model are unreliable (because other variables exist that can predict the outcome)</li>
+      <li><strong>Homoscedasticity</strong> - At each level of the predictor variable(s), the variance of the residual terms should be constant.  The residuals at each level of the predictor(s) should have the same variance (<em>homoscedasticity</em>); when the variances are very unequal there is <em>heteroscedasticity</em></li>
+      <li><strong>Independent Errors</strong> - For any two observations the residual terms should be uncorrelated (i.e. independent, sometimes called lack of <em>autocorrelation</em>).
+        <ul>
+          <li><strong>Durbin-Watson test</strong> is a test that checks for serial correlations between errors (i.e. whether adjacent residuals are correlated).  The test statistic can vary between 0 and 4:
+            <ul>
+              <li>2 means that the residuals are uncorrelated</li>
+              <li>&lt;2 means a positive correlation between adjacent residuals</li>
+              <li>
+                <blockquote>
+                  <p>2 means a negative correlation between adjacent residuals</p>
+                </blockquote>
+              </li>
+              <li>&lt;1 or &gt;3 means definite cause for concern</li>
+              <li>Even if value is close to 2, can still be cause for concern (this is just a quick test, still depends on sample size and model)</li>
+              <li><em>Note:</em> this test depends on the order; if you reorder the data, you’ll get a different value</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><strong>Normally Distributed Errors</strong> - assumed that the residuals in the model are random, normally distributed variables with a mean of 0, which means the differences between the model and the observed data are most frequently zero or close to zero and that differences greater than zero are rare.  <em>Note:</em> does not mean that predictors have to be normally distributed.</li>
+      <li><strong>Independence</strong> - All the values of the outcome variable are independent</li>
+      <li><strong>Linearity</strong> - the mean values of the outcome variable for each increment of the predictor(s) lie along a straight line (i.e. this is a regression, we should be modeling a linear relationship)</li>
+    </ul>
+  </li>
+  <li><strong>Cross-validation</strong> - A way to assess the accuracy of our model/ how well our model can predict the outcome in a different sample.  If a model is generalized, it can predict another sample well.  If the model is not generalized, it can’t predict another sample well. 
+    <ul>
+      <li><strong>Adjusted R^2</strong> - this adjusted value indicates the loss of predictive power (aka <em>shrinkage</em>).  The equation is <strong>Stein’s Formula</strong>.  Note this is different than R^2, which uses <em>Wherry’s equation</em>.</li>
+      <li><strong>Data splitting</strong> - Usually split data randomly to 80% train, 20% test</li>
+      <li><strong>Sample size</strong> - Depends on the size of effect (i.e. how well our predictors predict the outcome), how much statistical power we want and the number of predictors.  As a general rough guide, check out Figure 7.10 in the book (Page 275)</li>
+      <li><strong>Multicollinearity</strong> - exists when there is a strong relationship between two or more predictors in a regression model.  <em>Perfect collinearity</em> exists when at least one predictor is a perfect linear combination of the others (e.g. two predictors have a correlation coefficient of 1).  As <em>collinearity</em> increases, these three problems arise:
+        <ul>
+          <li><em>Untrustworthy b</em> - b coefficients increase as collinearity increase; big standard errors for b coefficients mean that bs are more variable across samples, thus b is less likely to represent the population, thus predictor equations will be unstable across samples</li>
+          <li><em>limits size of R</em> - Having uncorrelated predictors gives you better <em>unique variance</em></li>
+          <li><em>importance of predictors</em> - multicollinearity makes it difficult to assess the individual importance of a predictor.  If the predictors are highly correlated then we can’t tell which of say two variables is important</li>
+        </ul>
+      </li>
+      <li><strong>Testing collinearity</strong> - To test for collinearity, you can do the following:
+        <ul>
+          <li><em>correlation matrix</em> shows relationships between variables to variables with anything above say above .8 as an indicator of really highly correlated and might be an issue, however it misses on detecting <em>multicollinearity</em> since it only looks at one variable at a time</li>
+          <li><strong>variance inflation factor (VIF)</strong> is a collinearity diagnostic that indicates whether a predictor has a strong linear relationship with another predictor(s) and is good for spotting relationships between multiple variables.  There’s no hard and fast rules, but a 10 is a good value to start worrying or if the average <em>VIF</em> is close to 1, then <em>multicollinearity</em> might be biasing the model</li>
+          <li><strong>tolerance statistic</strong> is the reciprocal of <em>variance inflation factor (i.e. 1/VIF)</em> Any values below .1 are serious concerns</li>
+        </ul>
+      </li>
+      <li><strong>Plotting</strong> is a good way to check assumptions of regression to make sure the model generalizes beyond your sample.</li>
+    </ul>
+  </li>
+  <li><strong>Plotting</strong> - You can check assumptions quickly with graphs
+    <ul>
+      <li>Graph the <em>standardized residuals</em> against the <em>fitted (predicted) values</em>.<br />
+        <ul>
+          <li>If the plot looks like a random array of dots, then it’s good.</li>
+          <li>If the dots seem to get more or less spread out over the graph (like a funnel shape) then is probably a violation of the assumption of <em>homogeneity of variance</em>.</li>
+          <li>If the dots have a pattern to them (like a curved shape) then this is probably a violation of the assumption of <em>linearity</em></li>
+          <li>If the dots have a pattern and are more spread out at some points on the plot than others then this probably reflects violations of both <em>homogeneity of variance</em> and <em>linearity</em></li>
+        </ul>
+      </li>
+      <li>Graph the histogram of the residuals
+        <ul>
+          <li>If the histogram looks like a normal distribution (and the <em>Q-Q plot</em> looks like a diagonal line) then its good</li>
+          <li>If the histogram looks non-normal, then things might not be good</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="violating-linear-regression-assumptions--a-idlinregviolationsa">Violating Linear Regression Assumptions  <a id="linregviolations"></a></h4>
+<p>If assumptions are violated, then you cannot generalize your findings beyond your sample.  You can try correcting the samples using:</p>
+
+<ul>
+  <li>If residuals show problems with <em>heteroscedasticity</em> or <em>non-normality</em>, you could try transforming the raw data (though might not affect the residuals)</li>
+  <li>If there’s a violation of the <em>linearity</em> assumption, then you could do a <em>logistic regression</em> instead</li>
+  <li>You can also try a <em>robust regression (aka bootstrapping, robust statistics)</em>, which is an alternative to the <em>least squares regression</em> when there’s too many outliers or influential cases</li>
+</ul>
+
+<h2 id="logistic-regression--a-idlogrega">Logistic Regression  <a id="logreg"></a></h2>
+
+<h4 id="logistic-regression---types-of-logistic-regressions--a-idlogregtypesa">Logistic Regression - Types of Logistic Regressions  <a id="logregtypes"></a></h4>
+<p>Logistic Regression is multiple regression, but with an outcome variable that is a categorical and predictor variables that are continuous or categorical.  There’s two types of logistic regression:</p>
+
+<ul>
+  <li><strong>binary logistic regression</strong> is used to predict an outcome variable with a binary response (e.g. tumor cancerous or benign).</li>
+  <li><strong>multinomial (or polychotomous) logistic regression</strong> predicts an outcome variable that has more than two categories (e.g. favorite color).</li>
+  <li>There’s no additional formulas between these two types of <em>logistic regression</em>; the reason is that <em>multinomial logistic regression</em> just breaks the outcome variable down into a series of comparisons between two categories.  Say we have three outcome categories (A, B, C) then the analysis will consist of a series of two comparisons (e.g. A vs B and A vs C) or (A vs C and B vs C) or (B vs A and B vs C); basically you have to select a baseline category.</li>
+</ul>
+
+<h4 id="comparing-the-linear-and-logistic-regression-models-a-idlogregcomparea">Comparing the Linear and Logistic Regression Models <a id="logregcompare"></a></h4>
+<ul>
+  <li>What are we measuring?  (A comparison between linear and logistic regressions)</li>
+  <li><strong>logit</strong> - In <em>linear/simple regression</em>, you predict the value of Y given X.  In <em>logistic regression</em>, you predict the probability of Y occuring given X.  You can’t use <em>linear regression</em> equations on a <em>logistic regression</em> problem (i.e. outcome is a categorical instead of continuous) unless you do some data transformations (like <em>logit</em>, which logs the data)</li>
+  <li><strong>log-likelihood</strong> - In <em>linear/simple regression</em>, we used R^2 (the <em>Pearson correlation</em>) to check between observed values of the outcome and the values predicted by the regression model.  For <em>logistic regression</em>, we use the <em>log-likelihood</em> given by <code>insert equation</code>, which is based on summing the probabilities associated with the predicted and actual outcomes (i.e. how much unexplained information there is after the model has been fitted).  A larger <em>log-likelihood</em> means poor fitting model because there’s more unexplained observations.  This is good for overall fit.  For partial fit, see <em>R-statistic</em>.
+    <ul>
+      <li><strong>maximum-likelihood estimation (MLE)</strong> is a method to estimate the parameters of a statistical model (i.e. given a sample population, it estimates what most likely would have occured).  <em>MLE</em> gives you the coefficients most likely to have occurred.</li>
+      <li><strong>deviance (aka -2LL)</strong> is related to the <em>log-likelihood</em> and its equation is <code>deviance =-2*log-likelihood</code> and sometimes used instead of the <em>log-likelihood</em> because it has a <em>chi-square distribution</em>, which makes it easy to calculate the significance of the value.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="logistic-regression---selecting-predictors-a-idlogregpredictorsa">Logistic Regression - Selecting Predictors <a id="logregpredictors"></a></h4>
+<p>Using R, we can see how the model fits the data</p>
+
+<ul>
+  <li><strong>R-statistic</strong> is the partial correlation between the outcome variable and each of the predictor variables (opposed to <em>log-likelihood</em> which is for the overall correlation instead of partial); can be between -1 (meaning as the the predictor value increases, likelihood of the outcome occurring decreases) to 1 (meaning that as the predictor variable increases, so does the likelihood of the event occurring).</li>
+  <li><strong>Hosmer and Lemeshow’s RL^2 measure</strong> is the proportional reduction in the absolute value of the log-likelihood measure and thus is a measure of how much the badness of fit improves as a result of the inclusion of the predictor values.  Values range from 0 (predictors are useless at predicting the outcome variable) to 1 (model predicts the outcome variable perfectly)</li>
+  <li><strong>Cox and Snell’s RCS^2</strong> and <strong>Nagelkerke’s RN^2</strong> are another way of getting a equivalent of R^2 in linear regression.</li>
+  <li>Information Criteria - Penalize a model for having more predictors
+    <ul>
+      <li><strong>Akaike Information Criterion (AIC)</strong> for logistic regression is <code>AIC = -2LL +2k</code> where <code>-2LL</code> is the <em>deviance</em> and <code>k</code> is the number of predictors</li>
+      <li><strong>Bayes Information Criterion (BIC)</strong> for logistic regression is <code>BIC = -2LL +2k * log(n)</code> where <code>n</code> is the number of cases</li>
+    </ul>
+  </li>
+  <li>How much are each predictor(s) contributing?
+    <ul>
+      <li><strong>t-statistic</strong> - in linear regression, the regression coefficient <em>b</em> and their standard errors created the <em>t-statistic</em>, which tells us how much a preditor was contributing</li>
+      <li><strong>z-statistic (aka the Wald statistic)</strong> - in logistic regression, the <em>z-statistic</em> tells us if the <em>b</em> coefficient for that predictor is significantly different than zero.  If a coefficient <em>b</em> is much greater than zero, then that predictor is making a significant contribution to the prediction of the outcome.  <code>z = b / (SEb)</code>.  Be warned, when the z-statistic value is large, the <em>standard error</em> tends to be inflated, resulting in <em>z-statistic</em> being underestimated.  An inflated <em>standard error</em> increases the probability of rejecting a predictor as being significant when in reality it is making a significant contribution (i.e. <em>Type II error</em>)</li>
+    </ul>
+  </li>
+  <li>So the coefficient <em>b</em> in a <em>logistic regression</em> is an exponent instead of multiplying, how does that work out / what does it mean?
+    <ul>
+      <li><strong>odds</strong> as we normally know it is the probability of something happening / something not happening (e.g. probability becoming pregnant divided by / probability of not becoming pregnant).  This isn’t the same as the <em>logistic regression</em>’s <em>odds ratio</em> mentioned below.</li>
+      <li><strong>odds ratio</strong> is the exponential of B (i.e., e^B), which is the change in odds resulting from a unit changes in the predictor.  E.g. calculate the odds of becoming pregnant when a condom is not used, calculate the odds of becoming pregnant when a condom is used, then calculate the proportionate change in odds between the two.<br />
+        <ul>
+          <li>Formula is: <code>change in odds = odds after a unit change in the predictor / original odds</code></li>
+          <li>if the value is greater than 1, then it means as the predictor increases, the odds of the outcome occuring also increases</li>
+          <li>if the value is less than 1, then it means as the predictor increases, the odds of the outcome occuring decrease</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>How do we know what order to put in / take out predictors in <em>logistic regression</em>?
+    <ul>
+      <li><strong>forced entry method</strong> - the default method for conducting regression; place in one block and estimate parameters for each predictor</li>
+      <li><strong>stepwise method</strong> - select a forward, backward, or both stepwise method (remember the issues with it though).</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="logistic-regression---assumptions--a-idlogregassumptionsa">Logistic Regression - Assumptions  <a id="logregassumptions"></a></h4>
+<p>What are Logistic Regression assumptions?</p>
+
+<ul>
+  <li><strong>Linearity</strong> - In linear regression we assume the outcome had a linear relationship with the predictors.  However, logistic regression’s outcome is categorical so our linear regression assumptions don’t apply.  Instead, with logistic regression we check if there are any linear relationships between any continuous predictors and the <em>logit</em> of the outcome variable.</li>
+  <li><strong>Independence of errors</strong> - Same as linear regression where the cases of data are not related</li>
+  <li><strong>Multicollinearity</strong> - Same as linear regression where predictors should not be too highly correlated; can check with <em>tolerance statistic</em> and <em>VIF statistics</em>, the eigenvalues of the scaled, uncentred cross-roducts matrix, the condition indices and the variance proportions.</li>
+</ul>
+
+<h4 id="logistic-regression---issues--a-idlogregissuesa">Logistic Regression - Issues  <a id="logregissues"></a></h4>
+<p>What are situations where Logistic Regression can cause trouble and return invalid results?</p>
+
+<ul>
+  <li>Not enough samples for specific categories (e.g. checking if people are happy, but only <em>n</em> of 1 for people that are 80-year old, Buddhist, left-handed lesbian).  To spot, create a crosstabulations and look for really high <em>standard errors</em>.  To fix, collect more data.</li>
+  <li><strong>complete separation</strong> is where the outcome variable can be perfectly predicted by one variable or a combination of variables.  This causes issues in that there’s no data in the middle probabilities (where we’re not very sure of the probability) which can cause a wide range of curves/probabilities.  E.g. tell between cats and burglars, there’s no cats that weigh more than 15kg and no burgulars that weigh less than 30kg.  The issue is usually caused when there’s too many variables fitted to too few cases.  To fix, collect more data or use a simpler model.</li>
+</ul>
+
+<h2 id="comparing-two-means-ie-t-test--a-idttesta">Comparing two means (i.e. t-test)  <a id="ttest"></a></h2>
+
+<p>We’ve looked at relationships between variables, but sometimes we’re interested in differences between groups of people.  This is useful in making causal inferences (e.g. two groups of people, one gets a sugar pill and other gets actual pill).  There’s two different ways to expose people to experiments: <em>independent-means t-test</em> and <em>dependent-means t-test</em>.  <em>t-tests</em> are basically <em>regressions</em> so it has much of the same assumptions (<em>parametric tests</em> based on a <em>normal distribution</em>).</p>
+
+<h4 id="t-test---independent-and-dependent-means-t-test-a-idttestinddepa">t-test - Independent and Dependent Means t-test <a id="ttestinddep"></a></h4>
+
+<ul>
+  <li><strong>independent-means t-test (aka between groups, independent-measures, independent-samples t-test)</strong> is used when there are two experimental conditions and different participants were assigned to each condition (e.g. Group 1 gets Treatment A, Group 2 gets Treatment B).  <em>independent t-tests</em> also assume that scores in different treatment conditions are <em>independent</em> (because they come from different people) and that there is <em>homogeneity of variance</em> (but this only really matters if you have unequal group sizes.  Also if this is violated, you can use <em>Welch’s t-test</em> to adjust your data, which you should always do)</li>
+  <li><strong>dependent-means t-test (aka within subjects, repeated measures design, matched-pairs, pair-samples t-test, paired t-test)</strong> - is used when there are two experimental conditions and the same participants took part in both conditions of the experiment (e.g. Group 1 gets Treatment A, Group 2 gets Treatment B, then swap with Group 1 gets Treatment B, Group 2 gets Treatment A).  The sampling distribution of the differences between scores should be a <em>normal distribution</em> (not the scores themselves)</li>
+</ul>
+
+<h4 id="t-test---calculations-a-idttestcalcsa">t-test - Calculations <a id="ttestcalcs"></a></h4>
+
+<p>Calculations for <em>t-tests</em> can be viewed as if the t-test were a <em>linear regression (GLM)</em>.  The <em>independent t-test</em> compares the means between two unrelated groups on the same continuous dependent variable  (e.g. blood pressure of patients who were given a drug vs control group of a placebo).  The <em>dependent t-test</em> can be seen as a <em>within-subjects</em> (aka <em>repeated-measures</em>) test (e.g. blood pressure of patients ‘before’ vs ‘after’ they received a drug)  Note: Don’t really worry about the below, <em>R</em> will do the calculations:</p>
+
+<ul>
+  <li><strong>Generalized Linear Model (GLM), (i.e. t-test as a linear regression)</strong> the <em>t-test</em> can be thought of as a form of <em>linear regression</em>.  It’ll allow you to test differences between two means.  </li>
+  <li>E.g. say you have two groups (one looks at picture of spider versus other that looks at a real spider and you measure their anxiety as heartrate).  The <em>t-test</em> as a <em>GLM</em> would setup each group (picture vs real spider) with the equation <code>outcome = (model) + error</code>.  We <em>dummy code</em> the group variable (say Group 1 has value of 0 and Group 2 has value of 1).  We calculate the anxiety across both groups and then test whether the difference between group means is equal to 0.  The <em>t-statistic</em> tests if the difference between group means is significantly different than zero.</li>
+  <li><strong>Independent t-test</strong> This means that when different groups participate in different conditions, pairs of scores will differ not just because of the experiment’s manipulation, but also because of other sources of variance (e.g. IQ).  Therefore, we make comparisons on a ‘per condition’ basis’.  By looking at the ‘per condition basis’, we assess whether the difference between two sample means is statistically meaningful or by chance (through numerous sampling and looking at the sampling means distribution).</li>
+  <li><strong>Dependent t-test</strong> Since we put the same group through multiple experiments, we need to see the score in condition A compared to condition B and add up the differences (could be large or small) for all participants.  We divide by the number of participants in the group and get the average difference (on average, how much each person’s score changed in condition A to condition B).  We then compare (divide) this by the standard error (which represents if we just randomly sampled from the population and not done any experiments).  This gives us the <em>test statistic</em> that represents the model/error. 
+  <strong>t-statistic (aka test statistic)</strong> - <em>t-tests</em> produce the <em>t-statistic</em>, which tells us how extreme a statistical estimate is.  If the experiment had any kind of effect, we expect the systematic variation to be much greater than the unsystematic variation (i.e. if <em>t</em> is much greater than 1, there’s an effect; if <em>t</em> is less than 1, there’s no effect.  If <em>t</em> exceeds the critical value for an effect, we’re confident that this reflects an effect of our independent variable)</li>
+  <li><strong>effect-size and t-tests</strong> - even though a <em>t-statistic</em> might not be statistically significant, it doesn’t mean that our effect is unimportant.  To check if an <em>effect-size</em> is substantive, we use the following equation: <code>insert formula</code></li>
+  <li>Reporting <em>t-tests</em> should involve stating the finding to which the test relates, report the <em>test statistic</em>, <em>degrees of freedom</em>, an estimate of the <em>effect-size</em>, and the <em>probability</em> of that test statistic.  E.g. On average, participants experienced greater anxiety from real spiders (M = 47.00, SE = 3.18), than from pictures of spiders (M=40.00, SE = 2.68).  This difference was not significant t(21.39) = -1.68, p&gt;.05; however, it did represent a medium-sized effect r=.34</li>
+</ul>
+
+<h2 id="one-way-anova--a-idonewayanovaa">One-way ANOVA  <a id="onewayanova"></a></h2>
+
+<h4 id="comparing-several-means-with-anova-analysis-of-variance-glm-1-aka-one-way-anova--a-idonewayanovaconcepta">Comparing Several Means with ANOVA (Analysis of Variance GLM 1, aka One-way ANOVA)  <a id="onewayanovaconcept"></a></h4>
+<p>If we want to compare more than two conditions, we use <em>one-way ANOVA</em>.  <em>t-tests</em> checked whether two samples have the same mean while <em>ANOVA</em> checks if three or more groups have the same means.  <em>ANOVA</em> is an <em>omnibus</em> test, which means it tests for an overall effect between all groups and does not say what group has a different mean.</p>
+
+<ul>
+  <li><strong>familywise (aka experimentwise error rate)</strong> is the error rate across statistical tests conducted on the same experimental data.  For example, we use <em>ANOVA</em> instead of using multiple <em>t-tests</em> on each pair of groups because the probability of <em>Type I</em> errors would quickly stack (e.g. say .05 level of significance with 3 pairs would be .95 * .95 * .95 = .857 probability of no <em>Type I error</em>).  The more groups the more chance of an error.</li>
+  <li><strong>F-statistic (aka F-ratio, F-test)</strong> is a <em>test statistic</em> that is the systematic variance divided by the unsystematic variance (i.e. a measure of how much the model has improved the prediction of the outcome compared to the level of inaccuracy of the model).  A large value (greater than at least 1) means a good model.  Basically, its the ratio of the model to its error (much like the <em>t-statistic</em>).  Say we have Groups A, B, C.  The <em>F-ratio</em> tells us if the means of these three groups (as a whole) are different.  It can’t tell what groups are different (e.g. if groups A and B are the same and C is different, if groups A, B, C are all different).  <em>F-ratio</em> says that the experimental manipulation has some effect, but doesn’t say what causes the effect.  The <em>F-ratio</em> can be used to fit a multiple regression model and test the differences between the means (again, much like the <em>t-statistic</em> with a linear regression).  The <em>F-ratio</em> is based on the ratio of the improvement due to the <em>model sum of squares</em> and the difference between the model and the observed data <em>residual sum of squares</em>.</li>
+  <li>When creating <em>dummy variables</em> for <em>ANOVA</em> groups (e.g. Group A, B, C) where we have one less dummy variable than the number of groups in the experiment.  We choose a <em>control group (aka baseline group)</em> that acts as a baseline for other categories.  This baseline group is usually the one with no experiments (e.g. baseline is no viagra and others are low dose and high dose viagra).  When group sizes are unequal, the baseline group should have a large number of samples.</li>
+  <li><strong>Assessing variation (deviance)</strong>
+At every stage of the <em>ANOVA</em> we’re assessing <em>variation</em> (or <em>deviance</em>) from a particular model using the formula <code>deviation = change in (observed - model)^2</code>.  We calculate the fit of the most basic model, then the fit of the best model; if the model is any good then it should fit the data significantly better than the basic model.
+    <ul>
+      <li><strong>Total Sum of Squares (aka TSS, SST)</strong> gives us the total amount of variation.  We calculate the difference between each observed data point and the grand mean.  We then square these differences and add them together to get us the <em>total sum of squares</em>.<br />
+        <ul>
+          <li>For <em>TSS</em>, the <em>degrees of freedom</em> is one less than the total sample size (N-1); the mean is the constant being held.  The equation is <code>N-1</code>  E.g. we have 15 participants, the degrees of freedom is 14.</li>
+        </ul>
+      </li>
+      <li><strong>grand variance</strong> is the variance between all scores, regardless of the experimental condition, and can be used to calculate the <em>total sum of squares</em> with the equation <code>&lt;insert equation&gt;</code></li>
+      <li><strong>Model Sum of Squares (SSm)</strong> tells us how much of the total variation can be explained by the fact that different data points come from different groups.  We calculate the difference between the mean of each group and the grand mean, square the differences, multiply each result by the number of participants within that group, then add the values for each group together.<br />
+        <ul>
+          <li>For <em>SSm</em>, the <em>degrees of freedom</em> is one less than the number of parameters estimated.  The equation is: <code>k-1</code>  E.g. with 3 groups of participants, we have 2 degrees of freedom.</li>
+        </ul>
+      </li>
+      <li><strong>Residual Sum of Squares (SSr)</strong> tells us how much of the variation cannot be explained by the model (e.g. individual differences in weight, testosterone, etc in particpants).  <em>SSr</em> can be seen by looking at the difference between the score obtained by a person and the mean of the group that the person belongs.
+        <ul>
+          <li>For <em>SSr</em>, the <em>degrees of freedom</em> are the total degrees of freedom (i.e. the total sample size <code>N</code>) minus the degrees of freedom for the model (i.e. the number of groups <code>k</code>).  The equation is: <code>N-k</code>.  E.g. with 15 participants and 3 groups, we have (14 - 2 = 12) degrees of freedom. </li>
+        </ul>
+      </li>
+      <li><strong>Mean Squares (MS)</strong> eliminates the bias of the number of scores (because <em>SSm</em> and <em>SSr</em> tells us the total, not the average).  <em>MS</em> gives us the the <em>sum of squares</em> divided by the <em>degrees of freedom</em>.
+        <ul>
+          <li><em>MSm</em> is the average amount of variation explained by the model (the systematic variation)</li>
+          <li><em>MSr</em> is the average amount of variation explained by extraneous variables (the unsystematic variation)</li>
+          <li><em>F-ratio</em> is the measure of the ratio of the variation explained by the model and the variation explained by unsystematic factors (i.e. how good the model is against how much error there is).  The equation is: <code>(_MSm_)/(_MSr_)</code>  </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="one-way-anova---assumptions--a-idonewayanovaassumptionsa">One-way ANOVA - Assumptions  <a id="onewayanovaassumptions"></a></h4>
+
+<ul>
+  <li><em>Homogeneity of variance</em> - the variances of the groups are equal.  You can check this using <em>Levene’s test</em>, which is an <em>ANOVA test</em> done on the absolute differences between the observed data and the mean or median.  If <em>Levene’s test</em> is significant (i.e. p-value is less than .05) then the variances are significantly different and we shouldn’t use <em>ANOVA</em>.</li>
+  <li>Note that <em>ANOVA</em> is a <em>robust test</em>, which means it doesn’t matter if we break some assumptions (the <em>F-ratio is still accurate</em>).  When group sizes are equal, then <em>F-ratio</em> is quite robust.  However, when group sizes are not equal, the accuracy of <em>F-ratio</em> is affected by <em>skew</em>.</li>
+  <li>If <em>homogeneity of variance</em> has been violated, you can try different data transformations or you can try a different version of the <em>F-ratio</em>, like <em>Welch’s F</em>.</li>
+  <li>If there’s distributional problems, there are other methods like <em>bootstrapping</em> or <em>trimmed means</em> and <em>M-estimators</em> that can correct for it.</li>
+</ul>
+
+<h4 id="comparing-different-groups-planned-contrasts-and-post-hoc-comparisons--a-idonewayanovacomparegroupsa">Comparing different groups (Planned Contrasts and Post Hoc Comparisons)  <a id="onewayanovacomparegroups"></a></h4>
+
+<p><strong>Planned contrasts</strong> and <strong>Post Hoc Comparisons</strong> are two methods that tells us which groups differ in an <em>ANOVA</em>.  This is important because <em>F-ratio</em> tells if there’s an effect, but not what group causes it.  <em>Planned contrasts</em> and <em>Post hoc comparisons</em> are a way of comparing different groups without causing <em>familywise error rate</em>.</p>
+
+<p><strong><a id="onewayanovaplannedcontrasts"></a>Planned Contrasts (aka Planned Comparisons)</strong> - break down the <em>variance</em> accounted for by the model into component parts.  This is done when you have a specific hypotheses to test.  Some rules:</p>
+
+<ul>
+  <li>If we have a control group, we compare this against the other groups</li>
+  <li>Each comparison must compare only two ‘chunks’ of variation (e.g. low dose, high dose)</li>
+  <li>Once a group has been singled out in a comparison, it can’t be used in another comparison (we’re slicing up the data like a cake, the same part of a cake can’t be on multiple slices)</li>
+  <li>When we’re comparing two groups, we’re just comparing the mean of the group to the mean of the other group</li>
+  <li>E.g. We compare the average of the placebo group to the average of the low dose and high dose groups; if the standard errors are the same, the experimental group with the highest mean (high dose) will be significantly different from the mean of the placebo group.</li>
+</ul>
+
+<p>Planned contrasts can be either: <em>Orthogonal comparisons</em> or <em>Non-orthogonal comparisons</em></p>
+
+<ul>
+  <li><strong>Orthogonal comparisons</strong>
+    -  Now we want to answer, what groups do we compare?  Instead of creating dummy variables of 0 and 1 as we would the main <em>ANOVA</em>, we instead assign a <em>weight</em>.  Here’s a few basic rules for that:
+    <ul>
+      <li>Choose sensible comparisons</li>
+      <li>Groups coded with positive weights will be compared against groups coded with negative weights (so assign one chunk a positive, the other a negative; it’s arbitrary which one is positive or negative)</li>
+      <li>The sum of weights for a comparison should be zero</li>
+      <li>If a group is not involved in a comparison, it’s automatically assigned a weight of 0 (which eliminates it from all calculations)</li>
+      <li>
+        <p>For a given comparison, the weights assigned to the group in one chunk of variation should be equal to the number of groups in the opposite chunk of variation
+    -  Let’s go through an example of how to apply these:
+   1.)  Example (Step 1): Chunk1 (Low Dose vs High Dose) vs Chunk2 (Placebo)
+   2.)  Example (Step 2): Chunk1 (Positive weight) vs Chunk2 (Negative Weight)
+   3.)  Example (Step 3): Chunk1 has two chunks (‘Low Dose’ and ‘High Dose’), they each have a magnitude of 1 (for a sum of 2), weight of +1 each (for a sum of +2).  Chunk2 only has one chunk (‘Placebo’) so it has a magnitude of 2, weight of -2.
+   4.)  The sum of the weights should add up on both sides so this means Chunk1 has weight of +1 (for Low Dose) and +1 (for High Dose) -2 (for Placebo) = <code>1+1-2=0</code>
+   5.)  To compare just two groups (Low Dose and High Dose), we set the Placebo with a weight of 0 (which eliminates it from calculations).  We now have a comparison of Chunk1 (High Dose, 1 Magnitude, +1 Weight) vs Chunk2 (Low Dose, 1 Magnitude, -1 Weight).
+   6.)  We now have the following dummy variables:</p>
+
+        <pre><code>   Dum_var1 (comp1), Dum_var2 (comp2), Product (comp1* comp2)   Grp Placebo              -2,                0,                     0   Grp Low Dose              1,               -1,                    -1   Grp High Dose             1,                1,                     1   Total                     0                 0                      0
+</code></pre>
+      </li>
+    </ul>
+
+    <p>7.)  We want to do an <strong>orthogonal</strong> comparison (basically make sure that <em>Total</em> row is 0) and this means our comparisons are independent (so we can use <em>t-tests</em>).  The <em>p-values</em> won’t be correlated so we won’t get <em>familywise errors</em>
+   8.)  From the significance values of the <em>t-tests</em> we can see if the experimental groups (Low Dose, High Dose) were significantly different from the control (Placebo).</p>
+  </li>
+  <li>
+    <p><strong>Non-orthogonal comparisons</strong>
+    -  Similar to <em>orthogonal comparisons</em> except the comparisons don’t have to sum to zero.
+    -  Example, you can compare across different levels, say Chunk1 is ‘High Dose’ only and Chunk2 is ‘Placebo’</p>
+
+    <pre><code>         Dum_var1 (comp1), Dum_var2 (comp2), Product (comp1* comp2)   Grp Placebo              -2,               -1,                     2   Grp Low Dose              1,                0,                     0   Grp High Dose             1,                1,                     1   Total                     0                 0                      3
+</code></pre>
+  </li>
+</ul>
+
+<pre><code>-  The _p-values_ here are correlated so you'll need to be careful how to interpret the results.  Instead of .05 probability, you might want to have a more conservative level before accepting that a given comparison is statistically meaningful.
+</code></pre>
+
+<ul>
+  <li><strong>Polynomial Contrast (trend analysis)</strong> is a more complex way of looking at comparisons.  The different groups usually represent a different amount of a single common variable (e.g. amount of dosage for drug) and its effect
+    <ul>
+      <li><strong>Linear Trend</strong> is where the group means increase proportionately (e.g. a positive linear trend is where the more of the drug we give, the more effect, looks like a linear line)</li>
+      <li><strong>Quadratic Trend</strong> is where the the group means increase at the beginning, peak in the middle, then goes down (e.g. drug enhances performance if given a certain amount, then after a certain amount, the more you give the worse the performance); basically there’s one direction change.  This requires at least 3 groups.</li>
+      <li><strong>Cubic Trend</strong> is where the group means goes up, down, up (or vice versa); basically there’s two direction changes.  This requires at least 4 groups.</li>
+      <li><strong>Quartic Trend</strong> is where the group goes up, down, up, down (or vice versa); basically there’s at least four direction changes. </li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong><a id="onewayanovaposthoccomparison"></a>Post hoc comparisons (aka post hoc test, data mining, exploring data)</strong>
+  Compare every group (like you’re doing multiple <em>t-tests</em>) but using a stricter acceptance criterion so that the familywise error rate doesn’t rise above the acceptable .05.  This is done when you have no specific hypothesis to test.</p>
+
+<ul>
+  <li><em>post hoc comparisons</em> is kinda cheating since this consits of <strong>pairwise comparisons</strong> that compare all different combinations of the treatment groups.  However, <em>pairwise comparisons</em> control <em>familywise errors</em> by correcting the level of significance for each test so that the overall <em>Type I error rate</em> across all comparisons remains at .05.  This is accomplished in multiple ways:
+    <ul>
+      <li><strong>Bonferroni correction</strong> is a trade-off for controlling the <em>familywise error rate</em> with a loss of <em>statistical power</em>; this means that the probability of rejecting an effect that does actually exist is increased (<em>Type II error</em>).  For example, we do 10 tests, we use .005 as our criterion for significant (instead of .05).  Formula is <code>&lt;insert formula&gt;</code></li>
+      <li><strong>Holm’s method</strong> computes the <em>p-values</em> for all of the pairs of groups in your data, then order them from smallest to largest.  We start similar with the normal <em>Bonferroni correction</em> for the first comparison, but then each subsequent comparison the <em>p-value</em> gets bigger (i.e. less conservative).  This method is <em>stepped</em>, which means we continue as long as comparisons are significant.  If there’s a non-significant comparison we stop and assume all remaining comparisons are also non-significant.</li>
+      <li><strong>Benjamini-Hochberg</strong>’s method doesn’t focus on making <em>Type I error rate</em> like the above methods (basically, if we make a <em>Type I</em> error, it’s not that bad) and instead focuses on <strong>False Discovery Rate (FDR)</strong>, which is the proportion of falsely rejected null hypothesis to the total number of rejected null hypothesis.  The <em>Benjamini-Hochberg</em> tries to keep the <em>FDR</em> under control instead of the <em>familywise error rate</em>.  Like <em>Holm’s method</em>, you comput the <em>p-value</em> for all pairs of groups in your data and order them similarly (smallest to largest).  The difference is that this method is <em>step-up</em>, which means instead of working down the talbe we work up.  We say the bottom value is non-significant and continue moving up the table until we see a significant comparison, then assume that all other comparisons are also significant.</li>
+    </ul>
+  </li>
+  <li>So which <em>post hoc procedure</em> should you use?  There’s these and numerous others that R doesn’t do out of the box.  When deciding, consider:
+    <ol>
+      <li>Whether the test controls the <em>Type I error rate</em></li>
+      <li>Whether the test controls the <em>Type II error rate</em> (i.e. has good statistical power)</li>
+      <li>Whether the test is reliable when the test assumptions of <em>ANOVA</em> have been violated</li>
+    </ol>
+  </li>
+  <li><strong>Bonferroni</strong> and <strong>Tukey’s Honest Significant Difference (HSD) tests (aka Tukey’s range test, Tukey method</strong> both control the <em>Type I error rate</em>, but are conservative so they lack <em>statistical power</em>.  <em>Bonferroni</em> has more power when the number of comparisons is small.  <em>Tukey</em> is more powerful when testing large numbers of means.</li>
+  <li><em>Benjamini-Hochberg</em> has more power than <em>Holm’s</em>; <em>Holm’s</em> has more power than <em>Bonferroni</em>.  Just remember <em>Benjamini-Hochberg</em> doesn’t attempt to control <em>Type I errors</em>.</li>
+  <li><strong>Warning</strong>: The above <em>post-hoc comparisons</em> perform badly when group sizes are unequal and when population variances are different.  If this is the case, look up <em>bootstrapping</em> or <em>trimmed means</em> and <em>M-estimators</em> (both of which include a bootstrap).  Use <em>bootstrap</em> to control <em>Type I errors</em> and <em>M-estimators</em> if you want more <em>statistical power</em>.</li>
+  <li>Note: for some reason, the effect size <em>r^2</em> specifically for <em>ANOVAs</em> are called <strong>eta squared</strong> and looks like <code>n^2</code></li>
+</ul>
+
+<h2 id="comparing-several-means-with-ancova-analysis-of-covariance-glm-2-a-idancovaa">Comparing Several Means with ANCOVA (Analysis of Covariance GLM 2) <a id="ancova"></a></h2>
+<p><em>ANCOVA</em> is like <em>ANOVA</em>, but also includes <strong>covariates</strong>, which are one or more continuous variables that are not part of the main experimental manipulation, but have an influence on the outcome (aka dependent variable).  We include <em>covariates</em> because of two reaons:</p>
+
+<ol>
+  <li>To reduce within-group error variance: In <em>ANOVA</em>, if we can explain some of the ‘unexplained’ variance <em>(SSr)__ in terms of _covariates</em>, then we reduce the error variance, allowing us to more accurately assess the effect of the independent variable <em>(SSm)</em> </li>
+  <li>Elimination of confounds: this means that an experiment has unmeasured variables that confound the results (i.e. variables other than the experimental manipulation that affect the outcome variable).  <em>ANCOVA</em> removes the bias from the variables that influence the independent variable.
+    <ul>
+      <li>E.g. Say we look at the example with the effects of Viagra on the libido; the <em>covariates</em> would be other things like medication (e.g. antidepressants).  <em>ANCOVA</em> attempts to measure these continuous variables and include them in the regression model.</li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="ancova-assumptions-a-idancovaassumptionsa">ANCOVA Assumptions <a id="ancovaassumptions"></a></h4>
+
+<p>ANCOVA has the same assumptions as any linear model with these two additional considerations:
+  1. independence of the covariate and treatment effect - Unexplained variance <em>(SSr)</em> should only overlap with the <em>Variance explained by Covariate</em> (and not with <em>Variance explained by the independent variable</em> or else the effect is obscured).
+  2. <strong>homogeneity of regression slopes</strong> - the slopes of the different regression lines should all be equivalent (i.e. parallel among groups)  For example, if there’s a positive relationship between the covariate and the outcome in one group, then we assume there’s a positive relationship for all other groups</p>
+
+<h4 id="ancova-calculations-a-idancovacalculationsa">ANCOVA Calculations <a id="ancovacalculations"></a></h4>
+
+<ul>
+  <li><strong>Sum of Squares (Type I, II, III, IV)</strong></li>
+  <li>Remember that order matters when evaluating</li>
+  <li><strong>Type I Sum of Squares</strong> We put one predictor into the model first (it gets evaluated), then the second (then it gets evaluated), etc.  Use if the variables are completely independent of each other (unlikely), then <em>Type I SS</em> can evaluate the true effect of each variable.  </li>
+  <li><strong>Type II Sum of Squares</strong> Use if you’re interested in main effects; it gives an accurate picture of a main effect because they’re evaluated ignoring the effect of any interactions involving the main effect under consideration.  However, if an interaction is present, then <em>Type II</em> can’t evaluate main effects (because variance from the interaction term is attributed to them)</li>
+  <li><strong>Type III Sum of Squares</strong> is usually the default; use this when sample sizes are unequal, however they work only when predictors are encoded with <em>orthogonal contrasts</em> instead of a <em>non-orthogonal contrast</em>.</li>
+  <li><strong>Type IV Sum of Squares</strong> is the same as <em>Type III</em>, but is designed for situations in which there’s missing data.</li>
+  <li><strong>Interpreting the covariate</strong> - Draw a scatterplot of the covariate against the outcome (e.g. participant’s libido as y, partner’s libido as x).  If covariate is positive, then there’s a positive relationship where the covariate increases, so does the outcome.  If covariate is negative, then there’s a negative relationship where the covariate increases, the outcome decreases.</li>
+  <li><strong>Partial eta squared (aka partial n^2)</strong> is an effect size measure for <em>ANCOVA</em> (kinda similar to <em>eta squared (n^2)</em> in <em>ANOVA</em> or <em>r^2</em>).  This differs from <em>eta squared</em> in that it looks not at the proportion of total variance that a variable explains, but at the proportion of variance that a variable explains that is not explained by other variables in the analysis.</li>
+</ul>
+
+<h2 id="factorial-anova-a-idfactorialanovaa">Factorial ANOVA <a id="factorialanova"></a></h2>
+<p><em>ANOVA</em> and <em>ANCOVA</em> looks at differences between groups with only a single independent variable (i.e. just one variable being manipulated).  <em>Factorial ANOVA</em> looks at differences between groups with two or more independent variables.  When there are two or more independent variables, it is <strong>factorial design</strong> (because sometimes variables are known as <em>factors</em>).  There are multiple types of this design including:</p>
+
+<ul>
+  <li><strong>independent factorial design</strong> - there are several independent variables and each has been measured using different entities </li>
+  <li><strong>repeated-measures (related) factorial design</strong> - there are several independent variables measured, but the same entities have been used in all conditions</li>
+  <li><strong>mixed design</strong> - several independent variables have been measured, some have been measured with different entities and some used the same entities</li>
+</ul>
+
+<h4 id="anova-naming-convention--a-idfactorialanovanaminga">ANOVA Naming Convention  <a id="factorialanovanaming"></a></h4>
+<p>The names of _ANOVA_s can seem confusing, but are easy to break down.  We’re simply saying how many independent variables and how they were measured.  This means:</p>
+
+<ol>
+  <li>The quantity of independent variables (e.g. one independent variable translates to ‘one-way independent’)</li>
+  <li>Are the people being measured the same or different participants?
+    <ul>
+      <li>If the same participants, we say <strong>repeated measures</strong></li>
+      <li>If different participants, we say <strong>independent</strong></li>
+      <li>If there are two or more independent variables, then it’s possible some variables use the same participants while others use different participants so we say <strong>mixed</strong></li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="independent-factorial-design-anova-aka-between-groups-between-subjects-anova-glm-3--a-idfactorialanovaindependenta">Independent Factorial Design ANOVA (aka Between Groups, Between-Subjects ANOVA, GLM 3)  <a id="factorialanovaindependent"></a></h4>
+<p>An example of <em>Factorial ANOVA</em> using two independent variables is looking at the effects of alcohol on mate selection at nightclubs.  The hypothesis was that after alcohol has been consumed (the first independent variable), subjective perceptions of physical attractiveness would become more inaccurate.  Say we’re also interested if this effect is different for men and women (this is the second independent variable).  We break groups into gender (male, female), drinks (none, 2 pints, 4 pints), and measured based off an independent assessment of attractiveness (say 1 to 100).</p>
+
+<ul>
+  <li>Calculations for a <em>Two-way ANOVA</em> is very similar to a <em>One-way ANOVA</em> with the exception that in a <em>Two-way ANOVA</em> the variance that is explained by the experiment (<em>SSm</em>) is broken down into the following:
+    <ul>
+      <li><em>SSa (aka main effect of variable A)</em> is the variance explained by Variable A</li>
+      <li><em>SSb (aka main effect of variable B)</em> - is the variance explained by Variable B</li>
+      <li><em>SSa*b (aka the interaction effect)</em> - is the variance explained by the interaction of Variable A and Variable B</li>
+    </ul>
+  </li>
+  <li>For the <em>F-ratio</em>, each one of the above effects (<em>SSa</em>, <em>SSb</em>, and <em>SSa*b</em>) all have their own <em>F-ratio</em> so that we can tell if each effect happened by chance or reflects an effect of our experimental manipulations</li>
+  <li><strong>interaction graphs</strong> can help you interpret and visualize significant interaction effects</li>
+  <li>Once again, we run <em>Levene’s test</em> to see if there are any significant differences between group variances (<em>homogeneity of variance</em>); for example, check if the variance in attractiveness differs across all different gender and alcohol group combinations.</li>
+  <li>For choosing <em>contrasts</em>, we need to define contrasts for all of the independent variables.  If we use <em>Type II sums of squares</em>, then we have to use an <em>orthogonal contrast</em>.  If we want to look at the <em>interaction effect</em> (i.e. the effect of one independent variable at individual levels of the other independent variable), we use a technique called <strong>simple effects analysis</strong></li>
+  <li>Like <em>ANOVA</em>, do a <em>post hoc test</em> on the <em>main effects</em>(e.g. <em>SSa</em>, <em>SSb</em>) in order to see where the differences between groups are.  If you want to see the <em>interaction effect</em> (e.g. <em>SSa*b</em>) then look at <em>contrasts</em>.</li>
+</ul>
+
+<h4 id="repeated-measures-factorial-designs-anova-aka-within-groups-within-subjects-anova-anova-for-correlated-samples-glm-4--a-idfactorialanovarepeatedmeasuresa">Repeated-Measures Factorial Designs ANOVA (aka Within Groups, Within-Subjects ANOVA, ANOVA for correlated samples, GLM 4)  <a id="factorialanovarepeatedmeasures"></a></h4>
+<p><em>Repeated measures</em> is when the same entities participate in all conditions of the experiment.  A <em>Repeated-Measures ANOVA</em> is like a regular <em>ANOVA</em>, but it violates the assumption that scores in different conditions are independent (scores are likely to be related because they’re from the same people), which will cause the <em>F-test</em> to lack accuracy.</p>
+
+<ul>
+  <li>Since the <em>F-test</em> lacks accuracy, we have to make a different assumption called the <strong>assumption of sphericity (aka circularity)</strong>, which is an assumption about the structure of the covariance matrix; we assume the relationship between pairs of experimental conditions is similar (More precisely, the variances of the differences between treatment levels is about the same).  That means we calculate the differences between pairs of scores for all combinations of the treatment level.  We then calculate the variance of these differences.  As such, <em>sphericity</em> is only an issue with three or more variables.</li>
+  <li><strong>compound symmetry</strong> is a stricter requirement than sphericity (if this is met, so is <em>sphericity</em>; if this is not met, you still need to check for <em>sphericity</em>).  This requirement is true when both the variances across conditions are equal (same as the <em>homogeneity of variance assumption</em> in <em>between-group designs</em>) and the covariances between pairs of conditions are equal.</li>
+  <li><strong>Mauchly’s test</strong> is a way to assess <em>sphericity</em> and let you know if the variances of the differences between conditions are equal.  If <em>Mauchly’s test</em> is significant, then we have to be wary of the <em>F-ratio</em>, otherwise you’re okay.  However, remember that this is also dependent on sample size; large samples can have small deviations from sphericity to be significant while in small samples large violations can be non-significant.</li>
+  <li>Violating <em>sphericity</em> means a loss of statistical power and it also impacts <em>post hoc tests</em>.  If <em>sphericity</em> is definitely not violated, use <em>Tukey’s test</em>.  If <em>sphericity</em> is violated, then using the <em>Bonferroni method</em> is usually the most robust of the univariate techniques in terms of power and control of <em>Type I error rate</em>.</li>
+  <li><strong>epsilon</strong> is a descriptive statistic that indicates the degree to which <em>sphericity</em> has been violated.  The formula is: <code>epsilon = 1/(k-1)</code> where <code>k</code> is the number of repeated-measures conditions.  If epsilon is closer to 1, the more homogeneous the variances of differences (and closer to the data being spherical).</li>
+  <li>If data violates the <em>assumption of sphericity</em>, then we can apply a correction factor that is applied to the degrees of freedom used to assess the <em>F-ratio</em> (or we can not use the <em>F-ratio</em>).
+    <ul>
+      <li><strong>Greenhouse-Geisser correction</strong> - Use if epsilon is less than .75 or if nothing is known about sphericity (otherwise the correction is too conservative and there’s too many false null hypothesis that fail to be rejected).  Go look up how to do this.</li>
+      <li><strong>Huynh-Feldt correction</strong> - Use if estimate is more than .75</li>
+      <li>Use a different test other than the <em>F-ratio</em> like using multivariate test statistics (<em>multivariate analysis</em>, <em>MANOVA</em>) because they don’t depend on the <em>assumption of sphericity</em>.  There’s a trade-off in power between <em>univariate</em> and <em>multivariate tests</em>.  Go look up how to do this.</li>
+      <li>Analyze the data as a <em>multilevel model</em> so we can interpret the model coefficients without worrying about sphericity because dummy-coding our group variables ensures that we only compare two things at once (and sphericity is only an issue when comparing three or more means).  Not for the faint of heart (think about doing a <em>multivariate test</em> first)</li>
+    </ul>
+  </li>
+  <li>The calculations for <em>repeated-measures ANOVA</em> can be seen as <code>SSt = SSb + SSw</code> where <em>SSt</em> is the Total Variability, <em>SSb</em> is the Between-Participant variability and <em>SSw</em> is the Within-Participant Variability.  The main difference is that the <em>SSw</em> (‘Within-Participant Sum of Squares’) is now broken down into:
+    <ul>
+      <li><em>SSw</em> looks at the variation with an actual person, not within a group of people; some of this variation is explained by the effect of the experiment and some of it is just random fluctuation</li>
+      <li><em>SSm</em> (Model Sum of Squares) is the effect of the experiment</li>
+      <li><em>SSr</em> (Residual Sum of Squares) represents the error; the variation not explained by the experiment</li>
+    </ul>
+  </li>
+  <li>Example of this is if we tested a group of participants (Person1, Person2, Person3, Person4, Person5, Person6) each eating multiple gross foods (NastyFoodA, NastyFoodB, NastyFoodC, NastyFoodD) and measuring how long it takes to retch.  The independent variable is the type of food eaten (e.g. NastyFoodA) since that’s what we’re manipulating, the dependent variable is the time to retch (since it depends on the food).  <em>SSw</em> represents each participant’s own tolerance level for nasty food.  <em>SSm</em> is how much our manipulation (change in food) calculates the mean for each level of the independent variable (mean time to retch for say NastyFoodA, NastyFoodB, etc) and compares this to the overall mean of all foods.  <em>SSr</em> is just the error.</li>
+  <li>To check <em>effect size</em> for <em>repeated-measures designs</em>, we calculate <strong>omega squared (w^2)</strong>.  This formula is slightly different than in <em>one-way independent ANOVAs</em> and it looks pretty scary so google it up.</li>
+  <li><strong>Factorial repeated-measures designs</strong> is just extending the <em>repeated-measures designs</em> to include a second or more independent variable.  If there’s two independent measures, then it’s a <em>two-way repeated-measures ANOVA</em>.  If there’s three independent measures, then it’s a <em>three-way repeated-measures ANOVA</em>, etc.  Again we’ll need to be careful about interaction effects of multiple independent variables.</li>
+</ul>
+
+<h4 id="mixed-designs-anova-aka-split-plot-anova-glm-5--a-idfactorialanovamixeddesignsa">Mixed Designs ANOVA (aka split-plot ANOVA, GLM 5)  <a id="factorialanovamixeddesigns"></a></h4>
+<p><strong>Mixed Designs ANOVA</strong> is where you compare several means when there are two or more independent variables and at least one independent variable has been measured using the same participants (<em>repeated-measures</em>) and at least another independent variable has been measured using different participants (<em>independent measures design</em>).</p>
+
+<ul>
+  <li>You can explore the data similar to a <em>repeated-measures design ANOVA</em> or as a <em>multilevel model</em>.  If you’re using the <em>ANOVA</em> approach, check for the <em>assumption of sphericity</em>, then choose what you want to <em>contrast</em>, compute the main model (might need to run a robust version of the test), then follow up with your <em>post hoc tests</em>.</li>
+  <li>At this point you’ll realize why you want to limit the number of independent variables that you include.  The interpretation gets increasingly difficult with the more variables you have.</li>
+</ul>
+
+<h2 id="non-parametric-tests--a-idnonparametrica">Non-parametric Tests  <a id="nonparametric"></a></h2>
+<p><em>Non-parametric tests</em> are statistical procedures that make fewer assumptions about the type of data, mostly on the principle of <em>ranking</em> the data.  For example, find the lowest score (rank of 1), then next highest score (rank of 2) and so forth.  We then carry out the analysis on the rank instead of the actual data.  These tests include:</p>
+
+<ul>
+  <li><em>Wilcoxon rank-sum test (aka Mann-Whitney test)</em></li>
+  <li><em>Wilcoxon signed-rank test</em></li>
+  <li><em>Kruskal-Wallis test</em></li>
+  <li><em>Friedman’s test</em></li>
+  <li><em>McNemar’s test (aka McNemar’s Z-test)</em></li>
+</ul>
+
+<h4 id="wilcoxons-rank-sum-test--a-idwilcoxonranksuma">Wilcoxon’s rank-sum test  <a id="wilcoxonranksum"></a></h4>
+<p>The <strong>Wilcoxon’s rank-sum test (aka WRS, Mann-Whitney test, Mann-Whitney-Wilcoxon test, Wilcoxon-Mann-Whitney test)</strong> is used for the non-parametric equivalent of a <em>independent t-test</em> (i.e. if you want to test the differences between two conditions and different participants have been used in each condition).  The theory is that you rank the data and ignore the group to which a person belonged (say we’re looking at depression levels between ecstasy and alcohol users).</p>
+
+<ul>
+  <li>A <em>tied rank</em> is where multiple values are given the same rank.  Say we had two scores of 6 and they would’ve both ranked 3 and 4, we then take the average of the two potential ranks (3+4/2=3.5)</li>
+  <li>We need to correct for the number of people in the group (or else larger groups would have larger ranks) so we calculate the <em>mean rank</em> by taking the mean of the numbers with this formula: <code>mean rank = (N(N+1))/2</code> so say you have</li>
+  <li>Now for each group, calculate <code>W = sum of ranks - mean rank</code></li>
+  <li><strong>Monte Carlo method</strong> is an <em>exact approach</em> to obtain the significance level (<em>p-value</em>).  This means creating lots of data sets that match the sample, but instead of putting people into the correct groups, they’re put into a random group MANY times.  It then compares the difference that appears in the data when the null hypothesis is true is as large as the difference in your data.  This is good for small samples.  Keep in mind:
+    <ul>
+      <li>This process takes a while because it’s done MANY times; with an increase in sample size, the length of time takes more and more</li>
+      <li>If you have <em>tied ranks</em> in the data, you can’t use this method because this is an exact approach.</li>
+    </ul>
+  </li>
+  <li>If your sample size is large (say larger than 40) or if you have <em>tied ranks</em>, try a <em>normal approximation approach</em> to calculate the significance level (<em>p-value</em>).  This doesn’t need a normal distribution; it just assumes that the sampling distribution of the <em>W</em> statistic is normal, which means that the standard error can be computed that can be used to calculate a <em>z</em> and then a <em>p-value</em>.
+    <ul>
+      <li>With a <em>normal approximation</em>, you have an option to do a <strong>continuity correction</strong>, which tries to smooth out the distribution (since there’s <em>tied ranks</em>), but comes at the expensve of maybe making your <em>p-value</em> a little too high.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="wilcoxon-signed-rank-test--a-idwilcoxonsignedranka">Wilcoxon Signed-Rank Test  <a id="wilcoxonsignedrank"></a></h4>
+<p><strong>Wilcoxon signed-rank test</strong> is used in situations where there are two sets of scores to compare, but these scores come from the same participants.  This is the <em>non-parametric</em> equivalent of a <em>dependent t-test</em>.  The theory is that we’re looking at the differences between scores in the two conditions you’re comparing (e.g. see the effects of two drugs, one measured on Saturday and again on Wednesday for the same participants).  The main difference is that there’s a sign (positive or negative) assigned to the rank.</p>
+
+<ul>
+  <li>For each group, if the difference in scores are the same (from Sat to Wed) then we exclude this data from the ranking</li>
+  <li>We make a note of the sign (positve or negative) and then rank the differences (starting with the smallest) while ignoring the sign</li>
+  <li>We deal with <em>tied ranks</em> in the same way as before, we average them (e.g. say we had two scores of 6 and they would’ve both ranked 3 and 4, we then take the average of the two potential ranks (3+4/2=3.5))</li>
+  <li><strong>T+</strong> is where we collect the ranks that came from a positive difference and add them up</li>
+  <li><strong>T-</strong> is where we collect the ranks that came from a negative difference and add them up</li>
+  <li>We do <em>T+</em> and <em>T-</em> calculations for both groups (say alcohol and ecstasy)</li>
+  <li>To calculate the significance of the test statistic <em>T</em>, we need:
+    <ul>
+      <li>The mean <strong>T</strong>, which is given by <code>T = (n(n+1)/4)</code></li>
+      <li>The standard error <strong>SEt</strong>, which is given by <code>SEt = sqrt( (n(n+1)(2n+1))/24 )</code> </li>
+      <li>With the above values, we can convert the test statistic into a <em>z-score</em>, which then tells us if the test is significant based on the <em>p-value</em>.  This will tell us if there is a significant difference between depression scores on Wed and Sat for both ecstasy and alcohol.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="kruskal-wallis-test--a-idkruskalwallisa">Kruskal-Wallis Test  <a id="kruskalwallis"></a></h4>
+<p><strong>Kruskal-Wallis test</strong> looks at the differences between several independent groups.  This is the <em>non-parametric</em> counterpart to the <em>one-way independent ANOVA</em>.  The theory is also based on ranked data (ordering scores from lowest to highest ignoring the group that the score belongs, lowest score of 1 and going up).</p>
+
+<ul>
+  <li>Once you rank the data you then collect the scores back into their groups and add up the ranks for each group.  The sum of ranks for each group is denoted by <strong>Ri</strong> where <em>i</em> is used to denote the particular group</li>
+  <li>Once the sum of ranks (<em>Ri</em>) has been calculated for each group, the test statistic <strong>H</strong> is calculated <code>insert formula</code>.  <em>H</em> has a <em>chi-square distribution</em> and for this distribution, there is one value for the <em>degrees of freedom</em>, which is one less than the number of groups <code>(k-1)</code></li>
+  <li>You can visualize the comparisons by group really well by using a <em>boxplot</em>.  For example, sperm count as y, number of soya meals as groups (no soya meals, 1 soya meal, 4 soya meals, 7 soya meals a week) on x </li>
+  <li>To do a <em>non-parametric</em> <em>post hoc procedure</em> is to do a <em>Wilcoxon rank-sum test</em> on all possible comparisons; this involves taking the difference between the mean ranks of the different groups and comparing this to a value based on the value of <em>z</em> (corrected for the number of comparisons being done) and a constant based on the total sample size and the sample size in the two groups being compared.  The inequality is given in formula <code>insert formula</code></li>
+  <li><strong>Jonckheere-Terpstra test (aka Jonckheere test)</strong> is used when you think that groups are different and you want to hypothesize that there’s a trend (i.e. an ordered pattern to the medians of the groups you’re comparing).</li>
+</ul>
+
+<h4 id="friedmans-anova--a-idfriedmansanovaa">Friedman’s ANOVA  <a id="friedmansanova"></a></h4>
+<p><strong>Friedman’s ANOVA</strong> looks at differences between several related groups.  This is used for testing differences between conditions where there are more than two conditions and the same participants have been used in all conditions (each case contributes several scores to the data).  The theory is also based on <em>ranked data</em>.</p>
+
+<ul>
+  <li>In your columns (say you’re measuring weight at different times), you put down the weight at different times (start, after 1 month, after 2 months).  Each person is a row.</li>
+  <li>Now go through each row and give rank per column (e.g. if someone lost weight each month, we would have a rank of ‘3 for start’, ‘2 for the first month’, ‘1 for the last month’</li>
+  <li>Now add up the ranks across each column (e.g. sum rank for the ‘start’ column, sum rank for the ‘1 month’ column, etc.), this is the <strong>Ri</strong></li>
+  <li>Then calculate the test statistic <strong>Fr</strong> given by the equation <code>insert equation</code>.  When the number of people tested is large (bigger than 10), this test statistic has a <em>chi-square distribution</em> and there is one value for the degrees of freedom, which is one less than the number of groups <code>(k-1)</code></li>
+  <li>Again, you can follow up on the main analysis with <em>post hoc tests</em> and checking if the <em>differences</em> is significant.</li>
+</ul>
+
+<h2 id="multivariate-analysis-of-variance-manova--a-idmanovaa">Multivariate Analysis of Variance (MANOVA)  <a id="manova"></a></h2>
+
+<h4 id="matrices--a-idmatricesa">Matrices  <a id="matrices"></a></h4>
+
+<p>You should know about <strong>Matrices</strong> before learning about <em>MANOVA</em>.</p>
+
+<ul>
+  <li><strong>matrix</strong> is simply a collection of numbers arranged in columns and rows.  For example, a 2*3 matrix is 2 rows, 3 columns of data.</li>
+  <li><strong>components (aka elements)</strong> are the values within a <em>matrix</em></li>
+  <li><strong>square matrix</strong> is a matrix where there are an equal number of columns and rows.
+    <ul>
+      <li>In a <em>square matrix</em>, the <strong>diagonal component</strong> are the values that lie on the diagonal line from the top left element to the bottom right element.  The <strong>off-diagonal component</strong> are the other elements.</li>
+      <li>In a <em>square matrix</em>, the <strong>identity matrix</strong> is the <em>diagonal component</em> elements are equal to 1 and the <em>off-diagonal component</em> are 0</li>
+      <li>A <strong>row vector</strong> is a special case of a matrix where there are data for only one entity (e.g. just a row of data, like a single person’s score on four differnt variables for a 1*4 vector)</li>
+      <li>A <strong>column vector</strong> is a special case of a matrix where there are data for only one column (e.g. just a column of data, like five participants’ scores on one variable for a 5*1 vector)</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="manova---when-to-use-manova-a-idmanovausesa">MANOVA - When to use MANOVA <a id="manovauses"></a></h4>
+
+<p><strong>MANOVA (multivariate analysis of variance)</strong> is used when you want to compare groups on several dependent variables (outcomes); when you can compare against several dependent variables, this is known as a <strong>multivariate test</strong> (as opposed to <em>ANOVA</em> that can only be used on one dependent varialbe, which is known as a <strong>univariate test</strong>).  We can use <em>MANOVA</em> when there is one independent variable or when there are several.</p>
+
+<ul>
+  <li>Using <em>MANOVA</em> instead of <em>ANOVA</em>: The reason why we don’t do a separate <em>ANOVA</em> for each dependent variable is similar to why we don’t do multiple <em>t-tests</em> (if we conduct more tests on the same data, the more we inflate the <em>familywise error rate</em>, thus the increased chance of <em>Type I error</em>).  Also, if we do a bunch of <em>ANOVA_s, the relationship between dependent variables is ignored, whereas _MANOVA</em> includes all dependent variables in the same analysis and can account for the relationship between dependent variables.  <em>ANOVA</em> can only tell us if groups differ on a single dimension whereas <em>MANOVA</em> has the power to detect whether groups differ along a combination of dimensions.  For example, we can’t tell happiness by individual factors of: work, social, sexual, and self-esteem, but you can tell by the combination of factors (i.e. <em>MANOVA</em> has greater power to detect an effect)</li>
+  <li>When to use <em>MANOVA</em> - Since <em>MANOVA</em> is used to compare several dependent variables, it makes sense that it depends a lot on the correlation between dependent variables.
+    <ul>
+      <li>Use <em>MANOVA</em> with highly negatively correlated dependent variables (best scenario); <em>MANOVA</em> works acceptably well with moderately correlated dependent variables in either direction  </li>
+      <li>Don’t use <em>MANOVA</em> if there is no correlation because it is useless.  Also, as the correlation between dependent variables increases, the power of <em>MANOVA</em> decreases.</li>
+      <li>Note: The power of <em>MANOVA</em> depends on a combination of the correlation between dependent variables, the effect size to be detected, and the pattern of group differences (e.g. if measures are somewhat different, if group differences are in the same direction for each measure)</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="manova---variances-and-covariances--a-idmanovavariancecovariancea">MANOVA - Variances and Covariances  <a id="manovavariancecovariance"></a></h4>
+
+<p>We’re interested in the ratio of the effect of the <em>systematic variance</em> to the <em>unsystematic variance</em>.  In <em>ANOVA</em>, these variances were single values.  In <em>MANOVA</em>, each of these is a matrix containing many variances and covariances.</p>
+
+<ul>
+  <li><strong>hypothesis SSCP (aka H, hypothesis sum of squares and cross-products matrix, model SSCP Matrix)</strong> is the matrix that represents the systematic variance (similar to the <em>model sum of squares for all variables (SSm)</em>)</li>
+  <li><strong>error SSCP (aka E, error sum of squares and cross-products matrix, residual SSCP Matrix)</strong> is the matrix that represents the unsystematic variance (the <em>residual sums of squares for all variables (SSr)</em>)</li>
+  <li><strong>total SSCP (aka T, total sum of sqaures and cross-products matrix)</strong> is the matrix that represents the total amount of variance present for each dependent variable (the <em>total sums of squares for each dependent variable (SSt)</em>)</li>
+  <li>Note: The above are all <em>sum of squares and cross-products (SSCP) matrices</em>.  The <em>sum of squares</em> of a variable is the total squared difference between the observed values and the mean value.  The <em>cross-product</em> is the total combined error between two variables</li>
+  <li><em>MANOVA’s test statistic</em> isn’t as easy to calculate as <em>ANOVA</em>’s <em>F-ratio</em>.  For <em>ANOVA</em>’s <em>test statistic</em>, we just divide the <em>systematic variance (SSm)</em> by the <em>unsystematic variance (SSr)</em>.  You can’t just divide matrices so we can’t do this for <em>MANOVA</em>.  Instead, the <em>test statistic</em>, which for <em>MANOVA</em> is called <strong>HE^-1</strong>, is calculated from multiplying the <em>model SSCP</em> with the inverse of the <em>residual SSCP</em>.  Unlike <em>ANOVA</em>’s <em>test statistic</em>, we don’t get a single value and instead get a matrix with several values (with <em>p^2</em> values, where <em>p</em> is the number of dependent variables)</li>
+</ul>
+
+<h4 id="manova---predicting--a-idmanovapredictinga">MANOVA - Predicting  <a id="manovapredicting"></a></h4>
+
+<p>In <em>ANOVA</em>, we try to predict an outcome (dependent variable) using a combination of predictor variables (independent variables).  In essence, what we’re doing with <em>MANOVA</em> is predicting an independent variable from a set of dependent variables).</p>
+
+<ul>
+  <li><strong>variates (aka latent variables, factors)</strong> are linear combinations of the dependent variables</li>
+  <li><strong>discriminant function variates (aka discriminant functions)</strong> is when we use linear variates to predict which group a person belongs to (i.e. we’re using them to discriminate groups of people).  For example, which group of treatment did they receive (CBT, BT, no treatment)</li>
+  <li><strong>eigenvector (aka characteristic vector)</strong> are the <em>vectors</em> associated with a given matrix that are unchanged by transformation of that matrix to a diagonal matrix
+    <ul>
+      <li>A <strong>vector</strong> is just a set of numbers that tells us the location of a line in geometric space; it has both <em>magnitude</em> (how long it is) and <em>direction</em>.  For example, vector a=(8, 13).</li>
+      <li>A <strong>diagonal matrix</strong> is simply a matrix in which the the <em>off-diagonal elements</em> are zero and by changing <em>HE^-1</em> to a <em>diagonal matrix</em> we eliminate all of the <em>off-diagonal elements</em> (thus reducing the number of values that we must consider for significance testing)</li>
+      <li>Example, say that supermodels make more salary (y value) when their attractiveness (x value) increases.  Let’s say the two values are correlated and when scatterplotted, forms an ellipse.  If we draw two linse to measure the length and height of the ellipse, then they are the <em>eigenvectors</em> of the original correlation matrix for these two variables.  The two lines (one for height, one for width of the oval) are perpendicular (90 degrees, which means they’re independent of one another).  We can add additional variables (e.g. experience of the supermodel) then the scatterplot gets additional dimension(s).</li>
+      <li>Interpreting eigenvectors - If the shape is a circle (or sphere if 3D, etc) then there is no correlation (eigenvector value near 1).  If the shape is an ellipse scatterplot that looks like a diagonal straight line (height of eigenvector is almost 0), then there is high correlation.</li>
+    </ul>
+  </li>
+  <li><strong>eigenvalues (aka characteristic roots)</strong> is the length (distance from one end of the <em>eigenvector</em> to the other).  By looking at all the <em>eigenvalues</em>, we can tell the dimensions of the data (which tells us how evenly or non-evenly the variances of the matrix are distributed).</li>
+</ul>
+
+<h4 id="manova---eigenvalues--a-idmanovaeigenvaluesa">MANOVA - Eigenvalues  <a id="manovaeigenvalues"></a></h4>
+
+<p><em>Eigenvalues</em> are the equivalent to the <em>F-ratio</em> in an <em>ANOVA</em>.  Now we need to compare how large these values are compared to what we would expect by chance alone.  We can do that a few ways.
+    -  <strong>Pillai-Bartlett trace (aka V, Pillai’s trace)</strong> is the sum of the proportion of <em>explained variance</em> on the discriminant funtions; it’s similar to the ratio of <em>SSm/SSt</em>, which is known as <strong>R^2</strong>.  Formula is <code>insert formula</code>  This should usually be your default <em>test statistic</em>.
+    -  <strong>Hotelling-Lawley trace (aka Hotelling’s T^2)</strong> is the sum of the <em>eigenvalues</em> for each variate.  This <em>test statistic</em> is the sum of <em>SSm/SSt</em> for each of the variates and so it compares directly to the <em>F-ratio</em> in <em>ANOVA</em>.
+    -  <strong>Wilk’s lambda</strong> is the product of the <em>unexplained variance</em> on each of the variates.  This <em>test statistic</em> represents the ratio of error variance to total variance (<em>SSr/SSt)</em> for each variate.  Note that large eigenvalues (which represent a large experimental effect) lead to small values of <em>Wilk’s lambda</em>, which means statistical significance is found when <em>Wilk’s lambda</em> is small.
+    -  <strong>Roy’s largest root</strong> is the <em>eigenvalue</em> of the first variate.  It’s basically the same the <em>Hotelling-Lawley trace</em>, but only for the first variate.  This <em>test statistic</em> represents the proportion of <em>explained variance</em> to <em>unexplained variance</em> (<em>SSm/SSr)</em> for the first discriminant function.  <em>Roy’s root</em> represents the maximum possible <em>between-group</em> difference given nad is in many cases the most powerful.
+    -  Choosing a method
+        *  If the sample sizes are small or moderate, the four approaches differ little in terms of power.
+        *  If group differences are concentrated on the first variate, then <em>Roy’s statistic</em> should be the most powerful (since it takes account of only the first variate), followed by <em>Hotelling’s trace</em>, <em>Wilk’s lambda</em>, and <em>Pillai’s trace</em>.  If groups differ along more than one variate, the power order is reversed.
+        *  It’s recommended to use fewer than 10 dependent variables unless sample sizes are large.
+        *  When sample sizes are unequal, use the <em>Pillai-Bartlett trace</em> since it’s the most robust to violations of assumptions.  Make sure to check the <em>homogeneity of covariance matrices</em>; if they seem <em>homogeneous</em> and if the <em>assumption of multivariate normality</em> is tenable, then <em>Pillai-Bartlett trace</em> is assumed to be accurate.  </p>
+
+<h4 id="manova---assumptions--a-idmanovaassumptionsa">MANOVA - Assumptions  <a id="manovaassumptions"></a></h4>
+
+<p><em>MANOVA</em> Assumptions are similar to <em>ANOVA</em> assumptions, but extends them to <em>multivariate</em> cases instead of <em>univariate</em> cases:</p>
+
+<ul>
+  <li><em>Independence</em>: observations are statistically independent.  This can be checked the same as with univariate cases (like <em>ANOVA</em>)</li>
+  <li><em>Random Sampling</em>: data should be randomly sampled from the population of interest and measured at an interval level.  This can be checked the same as with univariate cases (like <em>ANOVA</em>)</li>
+  <li><em>Multivariate normality</em>: In <em>ANOVA</em> we assumed that our dependent variable is normally distributed within each group.  In <em>MANOVA</em> we assume that the dependent variables (collectively) have multivariate normality within groups.  This can be tested with the <em>Shapiro test</em> that we used similar to the univariate cases</li>
+  <li><em>Homogeneity of covariance matrices</em>: In <em>ANOVA</em> we assume that the variances in each group are roughly equal (i.e. <em>homogeneity of variance</em>).  In <em>MANOVA</em>, we must assume that this is true for each dependent variable, but also that the correlation between any two dependent variables is the same in all groups.  We can check this assumption by testing whether the population <strong>variance-covariance matrices</strong> of the different groups in the analysis are equal.  We can test the <em>assumption of equality of covariance matrices</em> using <em>Box’s test</em></li>
+  <li><strong>Box’s test</strong> is used to test the <em>assumption of equality of covariance matrices</em>; it’ll be non-significant if the matrices are the same.  If sample sizes are equal, ignore <em>Box’s test</em> because it’s unstable.  If group sizes are different, then the robustness of the <em>MANOVA</em> cannot be assumed.  The more dependent variables you have measured, the greater the differences in sample sizes, the more distorted the probability values become.</li>
+</ul>
+
+<h4 id="manova---which-group-caused-the-effect--a-idmanovawhichgroupeffecta">MANOVA - Which group caused the effect  <a id="manovawhichgroupeffect"></a></h4>
+
+<p>You can figure out which group caused the effect a couple different ways.  After a <em>MANOVA</em>, you can either do a <em>discriminant function analysis</em> or do a different univariate <em>ANOVA</em> for each dependent variable.</p>
+
+<ul>
+  <li><strong>ANOVA</strong> One way to figure out which group caused the effect (not recommended) is to do a univariate <em>ANOVA</em> for each dependent variable, which are then followed up with <em>contrasts</em>.  The idea behind this follow-up <em>ANOVA</em> approach is that the <em>ANOVA</em> hides behind the <em>MANOVA</em> (so it doesn’t run into the same errors as multiple <em>ANOVAs</em> by itself), but is dangerous because a significant <em>MANOVA</em> reflects a significant difference for one, but not all of the dependent variables.  If you do this approach, then <em>Bonferroni corrections</em> should be applied to the level at which you accept significance.  </li>
+  <li><strong>discriminant function analysis (aka DFA, discriminant analysis)</strong> finds the linear combination(s) of the dependent variable that best separates (or discriminates) the groups.  The main advantage for this is that it reduces and explains the dependent variables in terms of a set of underlying dimensions thought to reflect substantive theoretical dimensions.
+    <ul>
+      <li>It might be useful to look at the <strong>discriminant scores</strong>, which are scores for each participant on each variate.  These scores are useful because the variates that the analysis identifies may represent underlying constructs, which if they’re identified is useful for interpretation to know what a participcant scores on each dimension.</li>
+      <li>To find out which groups are discriminated by a variate, plot the <em>discriminant scores</em>.  Split the vertical and horizontal axes at the midpoint and look at which groups tend to fall on either side of the line.  The variate plotted on a given axis is discriminating between groups that fall on different sides of the line (i.e. the midpoint)</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="manova---robust-methods--a-idmanovarobusta">MANOVA - Robust Methods  <a id="manovarobust"></a></h4>
+
+<p>Two robust methods for <em>MANOVA</em> are <strong>Munzel and Brunner’s method (aka Munzel-Brunner rank order test)</strong> and <strong>Choi and Marden’s robust test (aka Choi-Marden Multivariate Rank Test</strong> (which is an extension of the <em>Kruskal-Wallis one-way analysis of variance by ranks test</em>)</p>
+
+<h2 id="factor-analysis---a-idfactoranalysisa">Factor Analysis   <a id="factoranalysis"></a></h2>
+<p>So the idea is that <em>factor analysis</em> identifies clusters of variables that relate to each other.  We check to make sure our variables aren’t related to each other too much or too little using a <em>correlation matrix</em>.  We then check if there’s any issues (e.g. enough sample size), then decide how many factors we want to keep (<em>factor extraction</em>), then finally decide which variables go to which factors (<em>factor loading</em>).  We finally consider whether items you have are reliable measures of what you’re trying to measure.</p>
+
+<ul>
+  <li><strong>factors (aka latent variables)</strong> are things that cannot directly be measured.  For example, we can’t directly measure ‘burnout’ (someone who has been working very hard on a project for a prolonged time suddenly finds themselves out of motivation).  However, we can measure different aspects of burnout (get an idea of motivation, stress levels, whether the person has any new ideas)</li>
+  <li><strong>factor analysis</strong> is a technique for for identifying groups or clusters of variables.  It has three main uses:
+    <ol>
+      <li>to understand the structure of a set of variables (e.g. try to find the <em>latent variable</em>  for ‘intelligence’ or ‘burnout’)</li>
+      <li>to construct a questionnaire to measure an underlying variable (e.g. create questionnaire to measure ‘burnout’)</li>
+      <li>to reduce a dataset to a more manageable size while retaining as much of the original information as possible.  We look for variables that correlate highly within a group of other variables, but do not correlate with variables outside of that group.
+ Examples: Common example of <em>factor analysis</em> is trying to assess personality traits (say extroversion-interoversion).  Another example might be looking at the traits of profit, productivity, workforce and seeing if this can be reduced down to an underlying dimension of company growth.
+ Sample Size: This technique requires a large sample size with a rule of thumb of a bare minimum of 10 observations per variable
+        <ul>
+          <li>50 = Very Poor</li>
+          <li>100 = Poor</li>
+          <li>200 = Fair</li>
+          <li>300 = Good</li>
+          <li>500 = Very Good</li>
+          <li>1000+ = Excellent</li>
+          <li>You can also calculate out the sample size needed using <strong>Kaiser-Meyer-Olkin (KMO) measure of sampling adequacy</strong>, which calculates for individual and multiple variables and represents the ratio of the squared correlation between variables to the squared partial correlation between variables.  Basically, you get back a statistic that is between 0 (<em>factor analysis</em> is unlikley to be beneficial) and 1 (<em>factor analysis</em> should be reliable).  This value should be greater than .5 as a bare minimum (or else collect more data)</li>
+        </ul>
+      </li>
+    </ol>
+  </li>
+  <li><strong>correlation-matrix (aka R-matrix)</strong> is a table of correlation coefficients between each pair of variables (with the <em>off-diagonal elements</em> as the correlation coefficients).  Clusters of large correlation coefficients between subsets of variables suggest that these are <em>factors</em>
+    <ul>
+      <li>If correlation between variables is about .3 or lower, then they’re probably not the same underlying dimension so we can exclude them</li>
+      <li><strong>Bartlett’s test</strong> examines whether the population correlation matrix resembles an <em>identity matrix</em> (i.e. the <em>off-diagonal components</em> are zero).  If <em>Bartlett’s test</em> is significant then it means that the correlations between variables are overall significantly different from zero (which means good news).  A non-significant <em>Barlett’s test</em> is cause for concern because we’re looking for clusters of variables that measure similar things and if no variables correlate then there’s no clusters to find.</li>
+      <li><strong>singularity</strong> is when variables are perfectly correlated (say above .8 or .9); this causes <em>multicollinearity</em> and causes a problem because it becomes impossible to determine the unique contribution to a factor of the variables that are highly correlated.  Considering eliminating one of these high correlated variables</li>
+    </ul>
+  </li>
+  <li>Remember that <em>total variance</em> for a particular variable is made up of <em>common variance</em> (variance shared with other variables) and <em>unique variance</em> (which itself is made up of variance specific to that measure and <em>error (aka random variance)</em>.  When we’re looking at <em>variance</em> within a <em>correlation matrix</em>, we’re interested in finding the common underlying dimensions within the data so we’re primarily interested in only the <strong>common variance (aka communality)</strong>.  If there is no <em>random variance</em>, then the <em>communality</em> is 1.  A variable that shares none of its variance with other variables has a <em>communality</em> of 0.  The issue is that in order to do the <em>Factor analysis</em>, we need to know the <em>common variance</em>, but in order to do the <em>factor analysis</em> we need to know the <em>common variance</em>.  We can solve this issue by:
+    <ol>
+      <li>Assuming <em>common variance</em> of every variable is 1 and do <em>principal components analysis</em></li>
+      <li>Estimate the <em>common variance</em> by estimating <em>communality</em> values for each variable using </li>
+    </ol>
+  </li>
+  <li><strong>principal components analysis (aka PCA)</strong> is also another technique for identifying groups or clusters of variables and is similar to <em>factor analysis</em>; the difference is that <em>factor analysis</em> typically incorporates more domain specific assumptions about the underlying structure (<em>communality=1</em>) and solves <em>eigenvectors</em> of a slightly different matrix.  Usually <em>PCA</em> and <em>factor analysis</em> differs very little.
+    <ul>
+      <li>If doing <em>PCA</em>, a <em>factor matrix</em> is known as <em>component matrix</em></li>
+      <li><em>PCA</em> works in a similar way to <em>MANOVA</em>.  We use a matrix to represent the relationships between variables.  The linear components (aka variates, factors) of that matrix are then calculated by determining the <em>eigenvalues</em> of the matrix.  The <em>eigenvalues</em> are used to calculate <em>eigenvectors</em>, the elements of which provide the loading of a particular variable on a particular factor (i.e. the <em>b</em> values).  <em>Eigenvalues</em> are also used to measure the importance of the <em>eigenvector.</em></li>
+    </ul>
+  </li>
+  <li><strong>factor loading</strong> is the relative contribution that a variable makes to a factor.  When graphically represented, if you were to plot the variables (where the factors are the axis of a graph) and we plot variables along these axis (with the axis representing correlation between -1 to 1), the <em>factor loading</em> would be the coordinate of a variable along the classification axis.  For example, say a list of traits are reduced to two factors: ‘Consideration’ is the y axis, ‘Sociability’ as the x axis.  We look at a variable (say ‘Social Skills’) and see how it correlates (Pearson correlation) between these two factors (‘Sociability’, ‘Consideration’); we get two correlations and plot this point (which this point is the <em>factor loading</em>).
+    <ul>
+      <li>To get the importance of a particular factor (represented by <em>b</em>), just square it.</li>
+    </ul>
+  </li>
+  <li><strong>factor matrix (denoted as A)</strong> is the matrix that results from converting the <em>factor loadings</em> into a matrix and is usually denoted <em>A</em>.  The columns represent each factor (say ‘Sociability’, ‘Consideration’) and the rows represent the loadings of each variable (e.g. Social Skills, Interest, Selfish, Liar, etc)</li>
+</ul>
+
+<h4 id="factor-analysis---calculating-factor-scores--a-idfactoranalysisfactorscoresa">Factor Analysis - Calculating Factor Scores  <a id="factoranalysisfactorscores"></a></h4>
+
+<p>Calculating <strong>factor scores</strong> is estimating a score on a factor, based on their scores for the constituent variables.  There’s a few different methods including:</p>
+
+<ul>
+  <li><strong>weighted averages</strong> - We assign a weight (say 1 to 10) for all our traits and then multiply the weights with the correlation and add up for each trait.  This method is overly simplistic and not really used because it requires all the variables to use the same measurement scale.</li>
+  <li><strong>regression method</strong> - We calculate <em>factor score coefficients</em> as weights rather than using <em>factor loadings</em>.  The <em>factor loadings</em> are  adjusted to take account of the initial correlations between variables and so the differences in units of measurement and variable variances are stabalized.  To get the matrix of <em>factor score coefficients (B)</em>, we multiply the matrix of factor loadings by the inverse (<em>R^-1</em>) (because we can’t divide a matrix) and multiply by the <em>factor matrix (A)</em>.  This resulting matrix is a measure of the unique relationship between variables and factors.  Equation is: <code>B = R^-1*A</code></li>
+</ul>
+
+<h4 id="what-to-do-with-factor-scores--a-idfactoranalysiswhattodoa">What to do with Factor Scores  <a id="factoranalysiswhattodo"></a></h4>
+
+<ul>
+  <li>If the goal is to reduce the size of the dataset, we can now use the <em>factor scores</em> as the smaller subset of measurement variables (e.g. here’s an individual’s scores on this subset of measures).  Any further analysis can be done on the <em>factor scores</em>.</li>
+  <li>We can even use <em>factor scores</em> to remove the issue of <em>collinearity (aka multicollinerarity)</em>.  For example, say we did a multiple regression analysis and we identified sources of multicollinerarity.  To fix this, we do a <em>PCA</em> on the predictor variables to reduce them to a subset of uncorrelated factors.  We then combine the correlated factors into a single factor.  Now we can rerun the analysis with the new factor score as a predictor variable.</li>
+</ul>
+
+<h4 id="factor-analysis---factor-extraction--a-idfactoranalysisfactorextractiona">Factor Analysis - Factor Extraction  <a id="factoranalysisfactorextraction"></a></h4>
+
+<p>Now that you have your <em>factor score</em>, you need to choose a technique to explore the factors in your data; choosing the technique depends on what you want to do:</p>
+
+<ul>
+  <li><strong>confirmatory factory analysis</strong> - used if you have a specific hypothesis to test</li>
+  <li>If you want to explore your data, then you can apply our findings using either the <em>descriptive method</em> or the <em>inferential method</em>.<br />
+    <ul>
+      <li><strong>descriptive method</strong> is to apply our findings to just the sample collected instead of extrapolating it beyond the sample.  Recommended techniques for the <em>descriptive method</em> are <em>Principal Components Analysis</em> and <em>Principal Factors Analysis (Principal Axis Factoring)</em></li>
+      <li><strong>inferential methods</strong> generalizes our findings to a population. Recommended techniques for the <em>iniferential methods</em> include the <em>maximum-likelihood method</em> and <strong>Kaiser’s alpha factoring</strong></li>
+    </ul>
+  </li>
+  <li><strong>factor extraction</strong> is deciding what factors to keep; we don’t want to keep all our factors and are interseted in keeping only the ones with a relatively large <em>eigenvalue</em>.</li>
+  <li><strong>scree plot</strong> is a plot of each <em>eigenvalue</em> (y axis) against the factor that it’s associated with (x axis).  The reason it’s called this is because it usually looks like a rock face with a pile of debris/scree at the bottom.  By plotting the <em>eigenvalues</em>, the relative importance of each is apparent (usually there’s a cut-off point called the <strong>point of inflexion</strong> where there’s a very steep slope).  For example, if the <em>point of inflexion</em> happens on the third point, only select the first two points.  Use when sample size is greater than 200.</li>
+  <li><strong>Kaiser’s criterion</strong> is usually the worst way to determine how many factors to keep; it says to keep any <em>eigenvalue</em> that is 1 or more, which usually overestimates the number of factors to retain. </li>
+  <li><strong>Jolliffe’s criterion</strong> is a way to determine how many factors to keep; it says to keep any <em>eigenvalue</em> that is .7 or more.</li>
+  <li><strong>parallel analysis</strong> is usually the best way to determine how many factors to retain (over <em>Kaiser’s criterion</em>); <em>parallel analysis</em> takes each <em>eigenvalue</em> (which represents the size of the factor) and compares against an <em>eigenvalue</em> for the corresponding factor in many randomly generated data sets that have the same characteristics as the data being analysed.</li>
+</ul>
+
+<h4 id="factor-analysis---interpretation--a-idfactoranalysisinterpretationa">Factor Analysis - Interpretation  <a id="factoranalysisinterpretation"></a></h4>
+
+<p><strong>factor rotation</strong> is a technique to interpret factor analysis by discriminating between factors; this is used after factors have been extracted and comes in two forms:</p>
+
+<ul>
+  <li><strong>orthogonal rotation</strong> is used when any underlying factors are assumed to be independent and the factor loading is the correlation between the factor and the variable, but is also the regression coefficient (i.e. values of the correlation coefficient = values of the regression coefficient)</li>
+  <li><strong>oblique rotation</strong> is used when the underlying factors are assumed to be related or correlated to each other.  The resulting correlations between variables and factors will differ from the corresponding regression coefficients.  This results in two different sets of <em>factor loadings</em>: the factor <strong>structure matrix</strong>, which is the correlation coefficients between each variable and factor and the factor <strong>pattern matrix</strong>, which is the regression and coefficients for each variable on each factor.  The math behind this is difficult and requires a <strong>factor transformation matrix</strong>, a square matrix whose size depends on how many factors were extracted (e.g. 2 factors = 2*2 matrix)</li>
+</ul>
+
+<h3 id="comparing-categorical-variables--a-idcomparecategoricala">Comparing Categorical Variables  <a id="comparecategorical"></a></h3>
+<p>For continuous variables we measure using the means, but this is useless for categorical variables (since we’d assign numbers to categories and it would just depend on how many categories there were).  Instead, for categorical variables, we count the <em>frequency</em> of the category to get a <em>contingency table</em>, which is a tabulation of the frequencies.  We use different algorithms depending on how many categorical variables there are (2 or more than 2).</p>
+
+<ul>
+  <li>An example of two categoricals is say training (if the cat was trained using either food or affect, but not both) and dance (if the cat ended up being able to dance)</li>
+  <li><a id="comparecategoricalpearsonchisquare"></a><strong>Pearson’s chi-square statistic (aka chi-square test)</strong> is used to compare the relationship between two categorical variables.  This is given by the equation ` <code>, which is a variation on </code>deviation = change in (observed -model)^2`.  Note that this is only an approximation (which works really well for large samples), but if the sample size is too small, use <em>Fisher’s exact test</em>, <em>likelihood ratio</em>, or <em>Yate’s continuity correction</em> to avoid making <em>Type I errors</em>.
+    <ul>
+      <li><strong>Fisher’s exact test</strong> is a way to compute the exact probability of the <em>chi-square statistic</em>, useful for when the sample sizes are too small.  Usually this is used on 2 * 2 contingency tables (two categorical variables each with two categorical options) and small sample size, but can be used on larger at the cost of really intensive calculations</li>
+      <li><strong>likelihood ratio statistic</strong> is an alternative to the <em>Pearson’s chi-square</em> and is based on the <em>maximum-likelihood theory</em>.  The idea is that you collect some data and create a model for which the probability of obtaining the observed set of data is maximized, then you compare this model to the probability of obtaining those data under the null hypothesis.  You then compare observed frequencies with those predicted by the model.  This is roughly the same as <em>Pearson’s chi-square</em>, but preferred when samples are small.  The equation is: ` `</li>
+      <li><strong>Yate’s continuity correction</strong> is used specifically for 2 * 2 contingency tables because for these cases <em>Pearson’s chi-square</em> tends to make <em>Type I</em> errors.  Be careful though, this sometimes overcorrects and produces a <em>chi-square</em> value that is too small .  The equation is: ` `</li>
+    </ul>
+  </li>
+  <li>Assumptions of <em>chi-square test</em> are:
+    <ul>
+      <li>Independence of data - this means that each person, item, entity contributes to only one cell of the contingency table; you can’t use this on a <em>repeated measures design</em> (e.g. train cats with food to dance, then trained the same cats with affection to see if they would dance)</li>
+      <li>Expected fequencies should be <em>greater than 5</em>; although in larger contingency tables, it’s okay to have up to 20% of expected frequencies below 5, the result is loss of statistical power (which means the test might fail to detect a genuine effect).  If there isn’t more than 5, collect more data of that particular category.</li>
+    </ul>
+  </li>
+  <li>Interpreting the <em>chi-squared test</em>; if the <em>p-value</em> is less than .05, then there is a significant relationship between your two variables</li>
+  <li><strong>odds ratio</strong> is a way to calculate <em>effect size</em> for categorical data.  <em>odds ratio</em> are good for 2 * 2 contingency tables and probably not useful for anything larger.  Example is odds of cat dancing after food = (number that had food and danced / number that had food but didn’t dance), say 28/10 = 2.8.  Repeat for odds of dancing after affection (let’s say that’s .0421).  Then to calculate the <em>odds ratio</em> = (odds dancing after food / odds dancing after affection); odds ratio = (2.8/.0421) =6.65  This means an annimal trained with food has 6.65 times higher chance to dance than being trained with affection.<br />
+    <ul>
+      <li>If we’re interested in finding out which particular factor contributed significantly in larger contingency tables, we can use the <em>standardized residuals</em>.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="comparing-multiple-categorical-variables-using-loglinear-analysis--a-idloglinearanalysisa">Comparing Multiple Categorical Variables using Loglinear Analysis  <a id="loglinearanalysis"></a></h2>
+<p><strong>loglinear analysis</strong> is used when we want to look at more than two categorical variables.  Think of this as the <em>ANOVA</em> for <em>categorical variables</em> (where for every variable we have, we get a main effect but we also get interactions between variables).  For example, say we want three variables: Animal (dog or cat), Training (food as reward or affection as reward) and Dance (did they dance or not?)  Again, this can also be seen as a regression model.  Let’s not get into the math, but basically categorical data can be expressed in the form of a linear model provided we use log values (thus loglinear analysis).  The idea is that we try to fit a simpler model without any substantial loss of predictive power through backward elimination (remove one at a time hierarchically).</p>
+
+<ul>
+  <li>For example, say we have the following interactions for these three variables: Animal (dog or cat), Training (food or reward), Dance (can they dance or not).  We take the one interaction involving all three variables (i.e. <em>highest-order interaction</em>) and remove it.  We look at whether the new model without this interaction and if the new model significantly changes the likelihood ratio statistic, then we stop here and say that we have a significant three way interaction.  If there is no change in the likelihood ratio statistic, then we move to a lower-order interaction. 
+    <ul>
+      <li>Three main effects (Animal, Training, Dance)</li>
+      <li>Three interactions involving two variables each (Animal * Training, Animal * Dance, Training * Dance)</li>
+      <li>One interaction involving all three variables (Animal * Training * Dance)</li>
+    </ul>
+  </li>
+  <li>Assumptions in loglinear analysis include:
+    <ul>
+      <li><em>Loglinear analysis</em> is an extension of the <em>chi-square test</em> so it has similar assumptions</li>
+      <li>Each cell must be independent</li>
+      <li>Expected frequencies should be large enough for a reliable analysis.  With more than two variables, it’s okay to have up to 20% of cells with expected frequencies less than 5; but all cells must have expected frequencies greater than 1.  If this assumption is broken, try to collapse the data across one or the variables</li>
+    </ul>
+  </li>
+  <li>Reporting results of a loglinear analysis - Example: The three-way loglinear analysis produced a final model that retained all effects.  The likelihood ratio of this model was this and p was that.  This indicated that the highest order interaction (Animal * Training * Dance) was significant.  To break down this effect, separate chi-square tests on the Training and Dance variables were performed separately for dogs and cats.</li>
+</ul>
+
+<h2 id="multilevel-linear-models--a-idmultilevellineara">Multilevel Linear Models  <a id="multilevellinear"></a></h2>
+<p>Sometimes data is hierarchical instead of at a single level.  This means that some variables are clustered or nested within other variables (i.e. some of our other analysis may be oversimplification).  Let’s use this example data set:</p>
+
+<ul>
+  <li><strong>Level 1 variable</strong> - Say we have a lot of children (this is the lowest level of the hierarchy)</li>
+  <li><strong>Level 2 variable</strong> - Say these students are organized by classrooms (this means children are <em>nested</em> within classes)
+    +  Note: We can have additional levels (e.g. level 3 variable is the school of that classroom, level 4 is the school in that school district)</li>
+  <li>The idea is that children at different layers (say within the same classroom or the same school) are more similar to each other.  This means that each case is not entirely independent.  To solve for this, we use <strong>intraclass correlation (ICC)</strong>, which represents the proportion of the total variability in the outcome that is attributable to the child’s classroom.  This means that if the classroom had a huge effect on the children, then the <em>ICC</em> will be small.  Howerver, if the classroom had little effect on the children, then the <em>ICC</em> will be large.  Simply, <em>ICC</em> says if this hierarchical grouping had an effect on the outcome.</li>
+  <li>So why use a <em>multilevel linear model</em>?  The benefits include:
+    <ul>
+      <li>We don’t have to assume that the relationship between our covariate and our outcome is the same across the different groups that make up our predictor variable.</li>
+      <li>We don’t need to make the assumption of independence.</li>
+      <li>It’s okay to have missing data.  You don’t have to correct and impute for missing data.</li>
+    </ul>
+  </li>
+</ul>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

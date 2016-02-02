@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>jQuery</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="jquery">jQuery</h2>
+
+<hr />
+
+<p><strong>Table of Contents</strong></p>
+
+<ul>
+  <li><a href="#summary">Summary</a>
+    <ul>
+      <li><a href="#example">Basic jQuery Example</a></li>
+    </ul>
+  </li>
+  <li><a href="#jsobjects">JavaScript Objects</a>
+    <ul>
+      <li><a href="#jsstructure">JavaScript Structure</a></li>
+      <li><a href="#jqstructure">jQuery Structure</a></li>
+      <li><a href="#documentready">Document Ready</a></li>
+    </ul>
+  </li>
+  <li><a href="#jqevents">jQuery Events</a>
+    <ul>
+      <li><a href="#mouseenter">mouseenter()</a></li>
+      <li><a href="#mouseleave">mouseleave()</a></li>
+      <li><a href="#morejqevents">More jQuery events</a></li>
+      <li><a href="#chainevents">Chaining events</a></li>
+    </ul>
+  </li>
+  <li><a href="#jqselectors">jQuery Selectors</a>
+    <ul>
+      <li><a href="#compoundselectors">Compound Selectors</a></li>
+      <li><a href="#thisselector">this Selector</a></li>
+    </ul>
+  </li>
+  <li><a href="#jqvariables">jQuery Variables</a>
+    <ul>
+      <li><a href="#diffpp">Difference $p vs $(‘p’)</a></li>
+    </ul>
+  </li>
+  <li><a href="#modifyhtmlelements">Modifying HTML elements</a>
+    <ul>
+      <li><a href="#createhtmlelements">Create HTML elements</a></li>
+      <li><a href="#addhtmlelements">Add HTML elements with append(), prepend()</a></li>
+      <li><a href="#positionhtmlelements">Position HTML elements with before(), after()</a></li>
+      <li><a href="#removehtmlelements">Remove HTML elements with empty(), remove()</a></li>
+    </ul>
+  </li>
+  <li><a href="#modifycsselements">Modify CSS elements</a>
+    <ul>
+      <li><a href="#addremovecssclasses">Add(), remove(), toggle() classes</a></li>
+      <li><a href="#modifyheightwidth">Modify height(), width()</a></li>
+      <li><a href="#modifycss">Modify general with css()</a></li>
+    </ul>
+  </li>
+  <li><a href="#modifycontent">Modify content</a>
+    <ul>
+      <li><a href="#modifyhtml">Modify html elements with html()</a></li>
+      <li><a href="#modifyval">Modify value of elements with val()</a></li>
+      <li><a href="#modifyon">Modify with event handler on()</a></li>
+    </ul>
+  </li>
+  <li><a href="#jqeffects">jQuery Effects</a>
+    <ul>
+      <li><a href="#hide">Simple effect using hide()</a></li>
+      <li><a href="#focus">Simple effect using focus()</a></li>
+      <li><a href="#animate">Complex effect using animate()</a></li>
+    </ul>
+  </li>
+  <li><a href="#jqui">jQuery UI</a></li>
+  <li><a href="#aria">ARIA</a></li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">SUMMARY</a></h2>
+
+<p>jQuery is a Javascript library that helps with manipulating HTML elements.  So what does jQuery really do?  jQuery is made up of:</p>
+
+<ul>
+  <li><strong>selectors</strong> are used to match a set of elements in a document.  These range from simple selections to complex filtering.  For example, <code>"*"</code> to select all elements, <code>"#id"</code> to select a single element with this id attribute.</li>
+  <li><strong>events</strong> are used when the user interacts with the browser.  These can be document loading or  .  For example, <code>.load()</code>, <code>.ready()</code> <code>.click()</code>, <code>.submit()</code>, <code>.mouseenter()</code>, <code>.mouseleave()</code></li>
+  <li><strong>effects</strong> are used to add animation to the page.  These include simple animations like <code>.hide()</code>, <code>.show()</code>, <code>.toggle()</code>, <code>.fadeTo()</code> to more complex animations like <code>.animate()</code></li>
+  <li><strong>ajax</strong> helper functions loads data from the server without a browser page refresh.  For example, <code>jQuery.get()</code>, <code>jQuery.post()</code></li>
+</ul>
+
+<h4 id="a-idexamplebasic-jquery-examplea"><a id="example">Basic jQuery Example</a></h4>
+
+<p>Sometimes it is easier to see code than to explain it.  Here we have a div that has an effect of sliding down slowly.  No one would ever use this, but the idea is that effects are easy to implement.</p>
+
+<p><em>index.html</em></p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"&gt;&lt;/script&gt;
+        &lt;script type="text/javascript" src="script.js"&gt;&lt;/script&gt;
+        &lt;title&gt;&lt;/title&gt;        
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div&gt;&lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p><em>script.js</em></p>
+
+<pre><code>$(document).ready(function(){
+    $(#div).slideDown('slow')
+});
+</code></pre>
+
+<h2 id="a-idjsobjectsjavascript-objectsa"><a id="jsobjects">JavaScript Objects</a></h2>
+
+<h4 id="a-idjsstructurejavascript-structurea"><a id="jsstructure">JavaScript Structure</a></h4>
+
+<p>For some quick background, JavaScript is filled with objects; a browser window, a document, variables, etc.  Objects have <em>properties</em> that describe the object.  Objects can perform actions called <em>methods</em> (can tell by the <code>()</code>, e.g. <code>bark()</code>).</p>
+
+<p>Example of real world objects</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Object</th>
+      <th>Parts</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>dog</td>
+      <td>tails</td>
+      <td>wag</td>
+    </tr>
+    <tr>
+      <td>dog</td>
+      <td>head</td>
+      <td>bark</td>
+    </tr>
+    <tr>
+      <td>car</td>
+      <td>horn</td>
+      <td>honk</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>JavaScript objects</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Object</th>
+      <th>Property</th>
+      <th>Method</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>document</td>
+      <td>title</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>document</td>
+      <td>url</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>document</td>
+      <td> </td>
+      <td>write()</td>
+    </tr>
+    <tr>
+      <td>window</td>
+      <td>innerHeight</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>window</td>
+      <td> </td>
+      <td>alert()</td>
+    </tr>
+    <tr>
+      <td>str name</td>
+      <td>length</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>str name</td>
+      <td> </td>
+      <td>split()</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="a-idjqstructurejquery-structurea"><a id="jqstructure">jQuery Structure</a></h4>
+
+<p>The basic pattern to jQuery is selecting an object with <code>$</code> and using a jquery method (e.g. <code>mouseenter()</code>), then applying another jquery method/action (e.g. <code>fadeTo()</code>) to that object.</p>
+
+<pre><code>// On mouseover, fade to 25% opacity fast
+$(document).ready(function() {
+    $('div').mouseenter(function() {  // select item with jquery function
+        $('div').fadeTo('fast', .25);  // apply an action
+    });
+});
+</code></pre>
+
+<h4 id="a-iddocumentreadydocument-readya"><a id="documentready">Document Ready</a></h4>
+
+<p>An example of the javascript and jquery structure is loading a document. The idea is that a page can’t be loaded until the document is ‘ready’.  jQuery detects this state; here we pass an anonymous function (although you can pass in named functions too) to run as soon as the document is ready.</p>
+
+<pre><code>// Passing in an anonymous function
+$(document).ready(function() {
+    console.log("ready!");
+});
+
+// Passing in a named function
+function myReadyFn(jQuery) {
+    console.log("ready!");
+}
+$(document).ready(myReadyFn)
+</code></pre>
+
+<p>If we break up the pieces, we can see what is going on behind the scenes in jQuery:</p>
+
+<ul>
+  <li><code>$(document)</code> is a jQuery object.  The <code>$()</code> is a function that turns the <code>document</code> into a jQuery object.</li>
+  <li><code>.ready()</code> is a type of function; it runs the code inside the parenthesis</li>
+  <li><code>function() {}</code> is the action that is run (or myReadyFn for the named function example)</li>
+</ul>
+
+<h2 id="a-idjqeventsjquery-eventsa"><a id="jqevents">jQuery Events</a></h2>
+
+<h4 id="a-idmouseentermouseentera"><a id="mouseenter">mouseenter()</a></h4>
+
+<p>This produces a change when your mouse enters a HTML element.  </p>
+
+<pre><code>// On mouseover, fade to 25% opacity fast
+$(document).ready(function() {
+    $('div').mouseenter(function() {
+        $('div').fadeTo('fast', .25);
+    });
+});
+</code></pre>
+
+<h4 id="a-idmouseleavemouseleavea"><a id="mouseleave">mouseleave()</a></h4>
+
+<p>This produces a change when your mouse exits a HTML element.</p>
+
+<pre><code>// On mouseleave
+$(document).ready(function() {
+    $('div').mouseenter(function() {
+        $('div').fadeTo('fast', 1);
+    });
+    $('div').mouseleave(function() {
+        $('div').fadeTo('fast', 0.5);
+    });
+});
+</code></pre>
+
+<h4 id="a-idmorejqeventsmore-jquery-eventsa"><a id="morejqevents">More jQuery events</a></h4>
+
+<p>There is a huge list of jQuery events which can be found <a href="https://api.jquery.com/category/events/">here</a>.</p>
+
+<ul>
+  <li>.click()</li>
+  <li>.dbclick()</li>
+  <li>.hide()</li>
+  <li>.fadeOut()</li>
+  <li>.fadeIn()</li>
+  <li>.hover()</li>
+  <li>.keypress()</li>
+  <li>.toggle()</li>
+  <li>.slideToggle()</li>
+</ul>
+
+<h4 id="a-idchaineventschain-eventsa"><a id="chainevents">Chain events</a></h4>
+
+<p>You can chain jQuery events like this example, where we click on id=’pull-me’ and it toggles id=’panel’.</p>
+
+<pre><code>$(document).ready(function(){
+    $('.pull-me').click(function() {
+        $('.panel').slideToggle('slow');
+    });
+});
+</code></pre>
+
+<h2 id="a-idjqselectorsjquery-selectorsa"><a id="jqselectors">jQuery selectors</a></h2>
+
+<p>jQuery selectors can help select specific items, whether they are HTML elements, CSS ids, or CSS classes.</p>
+
+<pre><code>$('button')  // select by HTML element
+$('#header')  // select by CSS id="header"
+$('.removeme')  // select by CSS class="removeme"
+</code></pre>
+
+<p>For example, say we wanted to remove the fourth list item (identified by the CSS id=”removeme”).</p>
+
+<p>index.html</p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;Simplify, Simplify&lt;/title&gt;
+        &lt;script type='text/javascript' src='script.js'&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div&gt; Remember!
+            &lt;ul&gt;
+                &lt;li&gt;
+                    &lt;ol&gt;
+                        &lt;li&gt;Start with the function keyword&lt;/li&gt;
+                        &lt;li&gt;Inputs go between ()&lt;/li&gt;
+                        &lt;li&gt;Actions go between {}&lt;/li&gt;
+                        &lt;li id="removeme"&gt;jQuery is for chumps!&lt;/li&gt;
+                    &lt;/ol&gt;
+                &lt;/li&gt;
+                &lt;li&gt;Inputs are separated by commas.&lt;/li&gt;
+                &lt;li&gt;Inputs can include other functions!&lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;   
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>script.js</p>
+
+<pre><code>$(document).ready(function() {
+    $target = $('#removeme');
+    $target.fadeOut('fast');
+});
+</code></pre>
+
+<h4 id="a-idcompoundselectorscompound-selectorsa"><a id="compoundselectors">Compound selectors</a></h4>
+
+<p>We can apply effects to multiple selectors through a <strong>compound selector</strong></p>
+
+<pre><code>$('p, li').fadeTo('slow, 0);')
+</code></pre>
+
+<h4 id="a-idthisselectorthis-selectora"><a id="thisselector">This selector</a></h4>
+
+<p>If you want to select only a particular item, use <strong>this</strong>.  For example, only this div fades out instead of all divs.</p>
+
+<pre><code>$(document).ready(function() {
+    $('div').click(function() {
+        $(this).fadeOut('slow');
+    });
+});
+</code></pre>
+
+<h2 id="a-idjqvariablesjquery-variablesa"><a id="jqvariables">jQuery variables</a></h2>
+
+<pre><code>var fav_number = 7;
+var first_name = "Will";
+var p = $('p')
+</code></pre>
+
+<h4 id="a-iddiffppdifference-p-vs-pa"><a id="diffpp">Difference $p vs $(‘p’)</a></h4>
+
+<p><code>$p</code> is just a variable name.  <code>$('p')</code> is a funtion that creates a jQuery object.</p>
+
+<h2 id="a-idmodifyhtmlelementsjquery-modifying-html-elementsa"><a id="modifyhtmlelements">jQuery modifying HTML elements</a></h2>
+
+<p>With jQuery, we can not only modify existing HTML elements, we can also modify the actual structure of our websites in response to user actions.  </p>
+
+<h4 id="a-idcreatehtmlelementscreate-html-elementsa"><a id="createhtmlelements">Create HTML elements</a></h4>
+
+<p>Here is a quick example of adding a h1 tag.</p>
+
+<pre><code>// Set $h1 variable to a text
+$h1 = $("&lt;h1&gt;Hello&lt;/h1&gt;")
+</code></pre>
+
+<h4 id="a-idaddhtmlelementsappend-prepend-appendto-prependtoa"><a id="addhtmlelements">append(), prepend(), appendTo(), prependTo()</a></h4>
+
+<p>You can add HTML elements using append(), prepend(), appendTo(), and prependTo().  The functions with ‘To’ are basically the same, just a reversed order of what you specify.</p>
+
+<pre><code>#(".info").append("&lt;p&gt;Stuff!&lt;/p&gt;");  // Add p to elements with class .info
+#("&lt;p&gt;Stuff!&lt;/p&gt;").appendTo(".info");  // Same, just specified differently
+</code></pre>
+
+<h4 id="a-idpositionhtmlelementsbefore-aftera"><a id="positionhtmlelements">before(), after()</a></h4>
+
+<p>You can specify where in the DOM to position an element with before() and after().  This lets us move elements around.</p>
+
+<p>Basic example of after</p>
+
+<pre><code>$('target').after('&lt;tag&gt;To add&lt;/tag&gt;');  // Basic format
+$('#one').after('&lt;p&gt;Stuff!&lt;/p&gt;');  // Example
+</code></pre>
+
+<p>Move elements around with after</p>
+
+<pre><code>var $paragraph = $("p");  // point to existing element
+$("div").after($paragraph);  // move a div after paragraph
+
+// Above code is the same as:
+$("div").after($("p"));  // select existing element with $("p"), put div after
+</code></pre>
+
+<h4 id="a-idremovehtmlelementsempty-removea"><a id="removehtmlelements">empty(), remove()</a></h4>
+
+<p>We also have the ability to remove HTML elements from our document.  <code>empty()</code> deletes the contents of an element along with all its descendants.  <code>remove()</code> deletes not only the contents of an element and the element itself.</p>
+
+<pre><code>$("p").remove();
+</code></pre>
+
+<h2 id="a-idmodifycsselementsjquery-modifying-css-elementsa"><a id="modifycsselements">jQuery modifying CSS elements</a></h2>
+
+<h4 id="a-idaddremovecssclassesaddclass-removeclass-toggleclassa"><a id="addremovecssclasses">addClass(), removeClass(), toggleClass()</a></h4>
+
+<p>You can add, remove, and toggle CSS classes with jQuery.  Note that you are not selecting anything, just modifying your element to add a class so we do not need a # or . in front of the class.</p>
+
+<pre><code>$('selector').addClass('className');  // Basic Format
+$('selector').removeClass('className');  // Basic Format
+
+$(document).ready(function(){
+    $('#text').click(function(){
+        $('#text').toggleClass('highlighted');  
+    });
+});
+</code></pre>
+
+<h4 id="a-idmodifyheightwidthheight-widtha"><a id="modifyheightwidth">height(), width()</a></h4>
+
+<p>You can resize elements with <code>height()</code> and <code>width()</code>.</p>
+
+<pre><code>$("div").height("100px");
+$("div").width("100px");
+</code></pre>
+
+<h4 id="a-idmodifycsscssa"><a id="modifycss">css()</a></h4>
+
+<p>You can modify specific css using a general purpose <code>.css()</code>, which takes in two inputs: a CSS element to alter and a value to set it to.</p>
+
+<pre><code>$("div").css("background-color", "#008800");
+</code></pre>
+
+<h2 id="a-idmodifycontentmodify-contenta"><a id="modifycontent">Modify Content</a></h2>
+
+<p>You can also modify the contents of HTML elements using <code>html()</code> and <code>val()</code>.</p>
+
+<h4 id="a-idmodifyhtmlhtmla"><a id="modifyhtml">html()</a></h4>
+
+<p><code>html()</code> is used to set the content of the first element match it finds.  </p>
+
+<pre><code>$("selector").html("contents");  // Example
+$("div").html("I love jQuery!");  // Sets the contents of the first element match
+</code></pre>
+
+<h4 id="a-idmodifyvalvala"><a id="modifyval">val()</a></h4>
+
+<p><code>val()</code> is used to get the value of form elements.</p>
+
+<pre><code>$("input:checkbox:checked").val();  // Get first checked checkbox
+
+var input = $('input[name=checkListItem]').val();  // get the value from an input
+</code></pre>
+
+<h4 id="a-idmodifyonona"><a id="modifyon">on()</a></h4>
+
+<p><code>on()</code> is an event handler that takes as inputs an event, its selector, and an action.  This allows you to dynamically update the content of your HTML page.</p>
+
+<pre><code>$(document).on('event', 'selector', function() {
+    //Do something!
+});
+
+$(document).on('click', '.item', function() {
+    this.remove();
+})
+</code></pre>
+
+<h2 id="a-idjqeffectsjquery-effectsa"><a id="jqeffects">jQuery effects</a></h2>
+
+<p>You can create animated effects with jQuery, some are simple like <code>hide()</code> and some are a bit more complex like <code>animate()</code></p>
+
+<h4 id="a-idhidehidea"><a id="hide">hide()</a></h4>
+
+<pre><code>$(document).ready(function() {
+    $('div').hide();
+});
+</code></pre>
+
+<h4 id="a-idfocusfocusa"><a id="focus">focus()</a></h4>
+
+<p>You can use focus on html elements that take input (like a textarea or input).</p>
+
+<pre><code>$(document).ready(function() {
+    $('#target').focus(function() {
+        alert("Target is in focus!")
+    });
+};)
+</code></pre>
+
+<h4 id="a-idanimateanimatea"><a id="animate">animate()</a></h4>
+
+<pre><code>$('div').animate({top:'+=10px'}, 500);  // move a div 10 pixels down in 500ms
+</code></pre>
+
+<h2 id="a-idjquijquery-uia"><a id="jqui">jQuery UI</a></h2>
+
+<p>For more advanced effects, look up jQuery UI.  These have:</p>
+
+<ul>
+  <li><strong>interactions</strong> like draggable, droppable, resizable, selectable, sortable objects</li>
+  <li><strong>widgets</strong> like progressbar, tabs, datepicker, slider</li>
+  <li><strong>effects</strong> like more advanced animations and classes</li>
+</ul>
+
+<h2 id="a-idariaariaa"><a id="aria">ARIA</a></h2>
+
+<p><strong>ARIA</strong> (aka <strong>Accessible Rich Internet Applications</strong> ) provides a way to add missing semantics (e.g. describe role of widgets in more detail) to assistive technologies like screen readers.  ARIA makes use of the <strong>Accessibility API</strong> to connect the <strong>User Agent</strong> (i.e. browser dom, javascript) to <strong>Assistive Technology</strong>.  The <strong>Accessibility API</strong> is split up into:</p>
+
+<ul>
+  <li><strong>states  and properties</strong> - the UI’s properties and its current state (e.g. checking the state of a widget’s properties: if aria-checked=”true”, aria-hidden=”true”)</li>
+  <li><strong>roles</strong> - describes widgets that otherwise are incorrect or no semanatics available</li>
+</ul>
+
+<p>HTML example using the <strong>aria-checked</strong> property to declare the state of the menu items in a selectable menu. http://www.oaa-accessibility.org/example/25/</p>
+
+<pre><code> &lt;ul id="fontMenu" class="menu" role="menu" aria-hidden="true"&gt;
+   &lt;li id="sans-serif"
+     class="menu-item"
+     role="menuitemradio"
+     tabindex="-1"
+     aria-controls="st1"
+     aria-checked="true"&gt;Sans-serif&lt;/li&gt;
+   &lt;li id="serif"
+     class="menu-item"
+     role="menuitemradio"
+     tabindex="-1"
+     aria-controls="st1"
+     aria-checked="false"&gt;Serif&lt;/li&gt;
+...
+</code></pre>
+
+<p>CSS example used to alter the visual appearance of a selected item using the <strong>aria-checked</strong> property.</p>
+
+<pre><code>li[aria-checked="true"] {
+    font-weight: bold;
+    background-image: url('images/dot.png');
+}
+</code></pre>
+
+<p>JavaScript example used to update the <strong>aria-checked</strong> property.</p>
+
+<pre><code>var processMenuCHoice = function(item) {
+    // 'check' the selected item
+    item.setAttribute('aria-checked', 'true');
+    // 'uncheck' the other menu items
+    var sib = item.parentNode.firstChild;
+    for (; sib; sib=sib.nextSibling) {
+        if ( sib.nodeType === 1 &amp;&amp; sib != item) {
+            sib.setAttribute('aria-checked', 'false');
+        }
+    }
+};
+</code></pre>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

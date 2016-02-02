@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>TeX and LaTeX</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="tex-and-latex">TeX and LaTeX</h2>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#setup">Setup</a></li>
+  <li><a href="#basicrules">Basic Rules</a>
+    <ul>
+      <li><a href="#usepackage">/usepackage</a></li>
+      <li><a href="#comments">Comments with %</a></li>
+      <li><a href="#whitespace">Whitespace</a></li>
+      <li><a href="#emptylines">Empty Lines</a></li>
+      <li><a href="#specialchars">Special Characters</a></li>
+      <li><a href="#commands">LaTeX Commands</a></li>
+      <li><a href="#inputfilestructure">Input File Structure</a></li>
+    </ul>
+  </li>
+  <li><a href="#overview">Overview of Sections</a>
+    <ul>
+      <li><a href="#preamble">Preamble</a></li>
+      <li><a href="#usepackage">Packages</a></li>
+      <li><a href="#topmatter">Top Matter</a></li>
+      <li><a href="#document">Document</a></li>
+      <li><a href="#abstract">Abstract</a></li>
+    </ul>
+  </li>
+  <li><a href="#commoncommands">Common Commands</a>
+    <ul>
+      <li><a href="#textsize">Text Size (small, large)</a></li>
+      <li><a href="#textstyle">Text Styling (bold, italic)</a></li>
+      <li><a href="#serifsans">Serif and Sans Serif</a></li>
+      <li><a href="#linebreaks">Line Breaks</a></li>
+      <li><a href="#generalposition">General Positioning</a></li>
+      <li><a href="#horizontalposition">Horizontal Positioning</a></li>
+      <li><a href="#verticalposition">Vertical Positioning</a></li>
+      <li><a href="#justification">Justification (center, left, right)</a></li>
+      <li><a href="#unorderedlists">Unordered Lists</a></li>
+      <li><a href="#orderedlists">Ordered Lists</a></li>
+      <li><a href="#nestedlists">Nested Lists</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<p><strong>TeX</strong> (pronounced like ‘tech’) is a typesetting engine designed to handle typesetting text and mathematical formulas.  <strong>LaTeX</strong> works with TeX and helps define the professional layout (think of it as the book designer) and is based on the TeX engine (think of this as the typesetter).</p>
+
+<p>So what does LaTeX solve?  LaTeX <em>prevents formatting errors by forcing the author to declare the logical structure of the document</em>, then LaTeX determines the most suitable layout.  Behind the scenes, LaTeX ensures that things like font size, numbering of headings and sections, etc. are clear to the reader.  This is different than a WYSIWYG system, where the author can generate any type of document with very little or inconsistent structure.</p>
+
+<h2 id="a-idsetuplatex-setupa"><a id="setup">LaTeX Setup</a></h2>
+
+<p>On a Mac, I have MacTeX installed.  On a PC, I have MikTeX installed.  The file must be plain ASCII text (default on Unix systems and make sure to specify on Windows).  There should be a ‘Package Manager’ that allows you to install specific packages.  General File formats include:</p>
+
+<ul>
+  <li><strong>.tex</strong> - a LaTeX or TeX input file.</li>
+  <li><strong>.sty</strong> - a macro package; load this into your LaTeX document using <code>\usepackage</code></li>
+  <li><strong>.dtx</strong> - documented TeX; main format for LaTeX style files</li>
+</ul>
+
+<h2 id="a-idbasicrulesbasic-rules-of-latexa"><a id="basicrules">Basic Rules of LaTeX</a></h2>
+
+<h4 id="a-idusepackageusepackagea"><a id="usepackage">\usepackage</a></h4>
+
+<p><strong>usepackage</strong> is a way to add different functionality to your LaTeX document.  These are called with <code>\usepackage{somepackage}</code>.  Packages can be found on the <a href="https://www.ctan.org/" title="CTAN Comprehensive TeX Archive Network">CTAN Comprehensive TeX Archive Network</a>.</p>
+
+<pre><code>\usepackage{fancyhdr} % allows for header of each page after cover page
+\usepackage{ifthen} % allows if then statements; if first page, etc.
+</code></pre>
+
+<h4 id="a-idcommentscomment-with-a"><a id="comments">Comment with %</a></h4>
+
+<p><strong>Comments</strong> apply by each line and start with <code>%</code>.  For longer comments, you can use the <code>\usepackage{comment}</code> and ignore multiple lines.</p>
+
+<pre><code>% This is a regular one line comment %
+
+\usepackage{comment}
+\begin{comment}
+  This is a multi-line comment using
+  the comment package
+\end{comment}
+</code></pre>
+
+<h4 id="a-idwhitespacewhitespacea"><a id="whitespace">Whitespace</a></h4>
+
+<p><strong>Whitespace</strong> (e.g. space, tabs) are all treated as a ‘space’ (e.g. multiple spaces appear as one space)</p>
+
+<pre><code>This is multiple     whitespace.
+</code></pre>
+
+<h4 id="a-idemptylinesempty-linesa"><a id="emptylines">Empty lines</a></h4>
+
+<p><strong>Empty Lines</strong> means a new paragraph. An empty line between two lines of text means the end of a paragraph. If there is no empty line, the text wraps around.</p>
+
+<pre><code>First Paragraph
+Some text goes here  % First Paragraph Some text goes here
+
+Second Paragraph % blank line creates a new paragraph
+
+
+Third Paragraph % multiple blank lines still just a new paragraph
+</code></pre>
+
+<h4 id="a-idreturnlinereturn-linea"><a id="returnline">Return Line</a></h4>
+
+<p><strong>Return Line</strong> using <code>\\</code></p>
+
+<h4 id="a-idspecialcharsspecial-charactersa"><a id="specialchars">Special Characters</a></h4>
+
+<p><strong>Special Characters</strong> will not print and are any of the following reserved characters <code># $ % ^ &amp; _ { } ~ \</code>.  To get these to print, use:</p>
+
+<pre><code>\# \$ \% \^{} \&amp; \_ \{ \} \~{} \textbackslash
+</code></pre>
+
+<h4 id="a-idcommandslatex-commandsa"><a id="commands">LaTeX commands</a></h4>
+
+<p><strong>LaTeX Commands</strong> are control sequences used to render specific logical structures like a section or math formula.  The general format is: <code>\command[optional parameter]{parameter}</code></p>
+
+<ul>
+  <li>Commands start with a backslash (e.g. <code>\begin{comment}</code>, <code>\item</code>)</li>
+  <li>Optional parameters are enclosed with <code>[]</code> (e.g. <code>\item[Badgers] are fierce</code>)</li>
+  <li>Parameters are enclosed with <code>{}</code> (e.g. <code>\textsl{lean} on me!</code>)</li>
+  <li>LaTeX ignores whitespace after a command.  To get a space after a command, put either an empty parameter <code>{}</code> and a blank or a special spacing command.</li>
+  <li>Sometimes a star is appeneded to the command name (e.g. <code>\section*{Summary)</code> where the default numbers a list item, but * removes the numbering)</li>
+</ul>
+
+<h4 id="a-idinputfilestructureinput-file-structurea"><a id="inputfilestructure">Input File Structure</a></h4>
+
+<p><strong>Input File Structure</strong> is the logical structure that every LaTeX document has to follow.</p>
+
+<pre><code>\documentclass{...} % the kind of document you want to write (e.g. article)
+\begin{document} % Start the body for the document
+% ... Stuff here
+\end{document} % End of the body for the document
+</code></pre>
+
+<h2 id="a-idoverviewoverview-of-sectionsa"><a id="overview">Overview of Sections</a></h2>
+
+<p>A document is split into the <strong>preamble</strong>, the <strong>packages</strong>, the <strong>top matter</strong>, the <strong>abstract</strong>, the <strong>sections</strong>, and then any <strong>special pages</strong>.  </p>
+
+<ul>
+  <li>The preamble specifies the type of document that we’re creating (e.g. <code>\documentclass</code>) and our global settings.  This is required.</li>
+  <li>The packages specifies what additional packages we will use (e.g. <code>\usepackage{color}</code>).  This is optional (if you want to use packages).</li>
+  <li>The top matter is the information about the document itself (e.g. title, author, date, address, email). Although this isn’t explicitly specified, this usually starts right after <code>\begin{document}</code>.  This is optional.</li>
+  <li>The abstract is a quick overview of the whole paper; this normally appears right after the top matter using <code>\begin{abstract}</code> with <code>\end{abstract}</code>.  This is optional.</li>
+  <li>The sections breaks the document into different levels (-1 to 5).  These include <code>\part</code> (-1), <code>\chapter</code> (0), <code>\section</code> (1), <code>\subsection</code> (2), <code>\subsubsection</code> (3), <code>\paragraph</code> (4), <code>\subparagraph</code> (5). This is different depending on document class.</li>
+  <li>The special pages is anything you want to put at the end, including indicies, glossaries, and bibliographies.</li>
+</ul>
+
+<h4 id="a-idpreamblepreamblea"><a id="preamble">Preamble</a></h4>
+
+<p>Setup our document class for the entire paper (i.e. whether its an article, book, slides, etc.)</p>
+
+<ul>
+  <li><code>\documentclass[]{}</code> where parameter can be:
+    <ul>
+      <li><code>article</code> - for short reports, documentation (recommended)</li>
+      <li><code>proc</code> - class for proceedings</li>
+      <li><code>minimal</code> - mainly for debugging (sets only page size and font)</li>
+      <li><code>report</code> - for longer reports containing several chapters</li>
+      <li><code>book</code> - for real books</li>
+      <li><code>slides</code> - for slides using big sans serif letters</li>
+    </ul>
+  </li>
+  <li><code>\begin{document}</code> and <code>\end{document}</code></li>
+</ul>
+
+<h4 id="a-idusepackagepackagesa"><a id="usepackage">Packages</a></h4>
+
+<p>Define what additional packages we want to use (e.g. to set custom colors, create long comments, customize hyperlinks).  For example, here’s a few:</p>
+
+<ul>
+  <li><code>\usepackage[]{}</code> where some common packages are:
+    <ul>
+      <li><code>ifthen</code> allows if… then do… otherwise do…</li>
+      <li><code>comment</code> allows commenting multi-lines</li>
+      <li><code>lipsum</code> creates lipsum text</li>
+      <li><code>mdwlist</code> (from the mdwtools package) creates more compact lists (controls spacing)</li>
+      <li><code>hyperref</code> to customize how hyperlinks look</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idtopmattertop-mattera"><a id="topmatter">Top Matter</a></h4>
+
+<p>Setting up title, author, date.</p>
+
+<ul>
+  <li><code>\title[]{}</code></li>
+  <li><code>\author[]{}</code></li>
+  <li><code>\date[]{}</code></li>
+</ul>
+
+<h4 id="a-iddocumentdocumenta"><a id="document">Document</a></h4>
+
+<p>Meat of the report.</p>
+
+<ul>
+  <li><code>\begin{document}</code></li>
+  <li><code>\end{document}</code></li>
+</ul>
+
+<h4 id="a-idabstractabstracta"><a id="abstract">Abstract</a></h4>
+
+<p>Quick abstract/summary of what report covers.</p>
+
+<ul>
+  <li><code>\begin{abstract}</code></li>
+  <li><code>\end{abstract}</code></li>
+</ul>
+
+<h2 id="a-idcommoncommandscommon-commandsa"><a id="commoncommands">Common Commands</a></h2>
+
+<p>Here’s a few useful commands:</p>
+
+<h4 id="a-idtextsizetext-sizea"><a id="textsize">Text Size</a></h4>
+
+<ul>
+  <li>Text size can be set using these commands and can be applied to a specific scope with <code>{}</code> (e.g. `{:
+    <ul>
+      <li><code>\tiny</code></li>
+      <li><code>\scriptsize</code></li>
+      <li><code>\footnotesize</code></li>
+      <li><code>small</code></li>
+      <li><code>normalsize</code></li>
+      <li><code>\large</code></li>
+      <li><code>\Large</code></li>
+      <li><code>\LARGE</code></li>
+      <li><code>\huge</code></li>
+      <li><code>\Huge</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idtextstyletext-stylea"><a id="textstyle">Text Style</a></h4>
+
+<ul>
+  <li><code>\textmd</code> - medium text (i.e. not quite bold, <code>\textmd{Sample Text}</code>)</li>
+  <li><code>\textbf</code> - bold text (e.g. <code>\textbf{Sample Text}</code>)</li>
+  <li><code>\textit</code> - italicized text (e.g. <code>\textit{Sample Text}</code>)</li>
+  <li><code>\underline</code> - underline text (e.g. <code>\underline{Sample Text}</code>)</li>
+  <li><code>\textsc</code> - small caps (e.g. <code>\textsc{Sample Text}</code>)</li>
+</ul>
+
+<h4 id="a-idserifsansserif-and-sans-serifa"><a id="serifsans">Serif and Sans Serif</a></h4>
+
+<ul>
+  <li><code>textrm</code> - serif (roman) using <code>\textrm{Sample Text}</code></li>
+  <li><code>textsf</code> - sans serif using <code>{textsf{Sample Text}</code></li>
+</ul>
+
+<h4 id="a-idlinebreaksline-breaksa"><a id="linebreaks">Line Breaks</a></h4>
+
+<pre><code>\section*{Line Breaks}
+\begin{paragraph} Hello Paragraph  \\
+This is how to break up lines \\
+You just add these little lines here \\
+And then your new line starts! \\
+Amazing!
+\end{paragraph}
+</code></pre>
+
+<h4 id="a-idgeneralpositiongeneral-positioninga"><a id="generalposition">General Positioning</a></h4>
+
+<ul>
+  <li><code>\centerline{}</code> - centers the object</li>
+  <li><code>\noindent</code> - LaTeX treats all new text as a paragraph and indents by default; this specifies do not indent</li>
+</ul>
+
+<h4 id="a-idhorizontalpositionhorizontal-positioninga"><a id="horizontalposition">Horizontal Positioning</a></h4>
+
+<ul>
+  <li><code>\hspace</code> can add horizontal spacing (e.g. <code>Horizontal \hspace{1cm} spaces</code>)</li>
+  <li><code>\hfill</code> - creates even spacing (horizontally) between whatever you put in it</li>
+</ul>
+
+<h4 id="a-idverticalpositionvertical-positioninga"><a id="verticalposition">Vertical Positioning</a></h4>
+
+<ul>
+  <li><code>\vspace</code> can add veritcal spacing (e.g. <code>Vertical \vspace{1mm} space</code>)</li>
+  <li><code>\vfill</code> - creates even spacing (vertically) between whatever you put in it</li>
+  <li>skipping with <code>\smallskip</code></li>
+  <li><code>\smallskip</code>, <code>\medskip</code> <code>\bigskip</code> - make a small or big line skip</li>
+</ul>
+
+<h4 id="a-idjustificationjustificationa"><a id="justification">Justification</a></h4>
+
+<pre><code>\begin{center} Center Me \end{center} % Center Text
+\begin{flushleft} Place me to the left! \end{flushleft} # Justify Left
+\begin{flushright} Place me to the right! \end{flushright}  % Justify Right
+</code></pre>
+
+<h4 id="a-idunorderedlistsunodered-listsa"><a id="unorderedlists">Unodered Lists</a></h4>
+
+<pre><code>\begin{itemize}
+\item Part is a very large part of, say, a book
+\item Chapter is a chapter of a book; not in article style
+\item Section is a section of the document
+\item Subsection is a section then broken into subsections
+\item Subsubsection is pieces of a subsection
+\item Paragraph contain some paragraphs
+\item Subparagraph have even smaller pieces
+\end{itemize}
+</code></pre>
+
+<h4 id="a-idorderedlistsordered-listsa"><a id="orderedlists">Ordered Lists</a></h4>
+
+<pre><code>\begin{enumerate}
+  \item This has sequential numbers
+  \item Starting with 1
+\end{enumerate}
+</code></pre>
+
+<h4 id="a-idnestedlistsnested-listsa"><a id="nestedlists">Nested Lists</a></h4>
+
+<pre><code>\begin{enumerate}
+    \item The labels consists of sequential numbers
+    \begin{itemize}
+        \item The individual entries are indicated with a black dot
+        \item The text in the entries may be of any length
+    \end{itemize}
+\end{enumerate}
+</code></pre>
+
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Django Web Framework</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="django-web-framework">Django Web Framework</h2>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#orm">Object Relational Mapper (ORM)</a>
+    <ul>
+      <li><a href="#shellplus">Shell Plus</a></li>
+      <li><a href="#objectqueryset">Object and QuerySets</a></li>
+      <li><a href="#ormdatatypes">ORM Data Types</a></li>
+      <li><a href="#ormobjectfields">Object Fields</a></li>
+      <li><a href="#ormshortcuts">ORM Shortcut Combinations</a></li>
+      <li><a href="#ormorderoperations">ORM Order of Operations</a></li>
+      <li><a href="#chainingquerysets">Chaining QuerySets</a></li>
+      <li><a href="#ormiterable">Iterating through QuerySets</a></li>
+      <li><a href="#ormlazyquerysets">Lazy Querysets</a></li>
+      <li><a href="#ormquerysetcache">Queryset Cacheing</a></li>
+      <li><a href="#ormselectrelated">Queryset <code>select_related()</code></a></li>
+      <li><a href="#ormcountagg">Queryset Counting, Aggregation</a></li>
+      <li><a href="#ormdebugsql">Queryset Debugging</a></li>
+      <li><a href="#complexqueriesq">Complex Queries with Q (allows OR)</a></li>
+      <li><a href="#annotate">ORM annotate()</a></li>
+    </ul>
+  </li>
+  <li><a href="#modelmanagers">Model Manager</a>
+    <ul>
+      <li><a href="#custommodelmanager">Custom Model Manager</a></li>
+      <li><a href="#customquerysets">Custom QuerySets</a></li>
+      <li><a href="#asmanager">As Manager</a></li>
+    </ul>
+  </li>
+  <li><a href="#migrations">Migrations</a>
+    <ul>
+      <li><a href="#makemigrations">makemigrations command</a></li>
+      <li><a href="#migrate">migrate command</a></li>
+      <li><a href="#migrationfiles">Migration Files</a></li>
+      <li><a href="#datamigrations">Data Migration with <code>RunPython</code></a></li>
+      <li><a href="#squashmigrations">Squash Migrations with <code>squashmigrations</code> command</a></li>
+    </ul>
+  </li>
+  <li><a href="#views">Views</a>
+    <ul>
+      <li><a href="#requests">requests</a></li>
+      <li><a href="#rendertoresponse">render_to_response()</a></li>
+      <li><a href="#render">render()</a></li>
+    </ul>
+  </li>
+  <li><a href="#cbv">Class Based Views and Generic Class Based Views</a>
+    <ul>
+      <li><a href="#cbvflow">CBV Workflow</a></li>
+      <li><a href="#cbvmixins">CBV Mixins</a></li>
+      <li><a href="#cbvdebug">CBV Debugging</a></li>
+    </ul>
+  </li>
+  <li><a href="#urls">URLs</a>
+    <ul>
+      <li><a href="#urlregexpatterns">Regex Patterns</a></li>
+      <li><a href="#urlnamedpattern">Named URL Patterns</a></li>
+      <li><a href="#urlpassoptional">URLs passing optional data</a></li>
+      <li><a href="#urlincludenamespace">URL include() and namespace</a></li>
+    </ul>
+  </li>
+  <li><a href="#templates">Templates</a>
+    <ul>
+      <li><a href="#templatevariables">Template Variables</a></li>
+      <li><a href="#templatetags">Template Tags</a></li>
+      <li><a href="#templatetagscustom">Custom Template Tags</a></li>
+      <li><a href="#templatetagscustomadvanced">Advanced Template Tags</a></li>
+      <li><a href="#templatefilterscustom">Custom Template Filters</a></li>
+    </ul>
+  </li>
+  <li><a href="#forms">Forms</a>
+    <ul>
+      <li><a href="#htmlforms">HTML forms</a></li>
+      <li><a href="#getpost">GET and POST</a></li>
+      <li><a href="#djangoformshtmltemplate">Django HTML Forms Template</a></li>
+      <li><a href="#djangoformsprocess">Django Form Process</a></li>
+      <li><a href="#djangoformscode">Django Forms Code</a></li>
+    </ul>
+  </li>
+  <li><a href="#context">Context</a>
+    <ul>
+      <li><a href="#contextstack">Context Stack</a></li>
+      <li><a href="#requestcontext">RequestContext</a></li>
+      <li><a href="#contextprocessor">Context Processor</a></li>
+    </ul>
+  </li>
+  <li><a href="#users">User Authentication and Authorization</a>
+    <ul>
+      <li><a href="#createsuperuser">Create Superuser</a></li>
+      <li><a href="#permissions">Permissions</a></li>
+      <li><a href="#loginrequired">@login_required</a></li>
+      <li><a href="#permissionrequired">@permission_required</a></li>
+      <li><a href="#userpassestest">@user_passes_test</a></li>
+    </ul>
+  </li>
+  <li><a href="#serializers">Serializers</a>
+    <ul>
+      <li><a href="#dumpdata"><code>dumpdata</code> command</a></li>
+      <li><a href="#loaddata"><code>loaddata</code> command</a></li>
+    </ul>
+  </li>
+  <li><a href="#middleware">Middleware</a>
+    <ul>
+      <li><a href="#middlewareorder">Middleware Order</a></li>
+      <li><a href="#middlewarefolders">Middleware Folders</a></li>
+    </ul>
+  </li>
+  <li><a href="#signals">Signals</a>
+    <ul>
+      <li><a href="#signalsbuiltin">Built-in Signals</a></li>
+      <li><a href="#signalslisten">Listening for Signals with Receivers</a>  </li>
+      <li><a href="#signalssend">Sending Signals</a></li>
+    </ul>
+  </li>
+  <li><a href="#admin">Admin</a>
+    <ul>
+      <li><a href="#adminsetup">Admin Setup</a></li>
+      <li><a href="#admincustom">Admin Customizations</a></li>
+    </ul>
+  </li>
+  <li><a href="#custommngcmd">Custom Management Commands</a>
+    <ul>
+      <li><a href="#custommngcmdsetup">Setup</a></li>
+      <li><a href="#custommngcmdcode">Code</a></li>
+    </ul>
+  </li>
+  <li><a href="#sessions">Sessions</a>
+    <ul>
+      <li><a href="#sessionsrequest">Sessions in a View with <code>request.session</code></a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<p><strong>Django</strong> is a web framework in Python.  The idea is to be able to receive requests and send responses.</p>
+
+<h2 id="a-idormobject-relational-mappera"><a id="orm">Object Relational Mapper</a></h2>
+
+<p>Django has an <strong>Object Relational Mapper (ORM)</strong> that takes database tables and represents this as Python objects (mostly Django Models, though other types are possible).</p>
+
+<ul>
+  <li>One or more objects?</li>
+</ul>
+
+<p>You can either <strong>query</strong> for one object or if there are multiple objects, you’ll get an iterable called a <strong>QuerySets</strong> (which is a collection of objects from your database).  This is like a SELECT statement in SQL.</p>
+
+<ul>
+  <li>Filters</li>
+</ul>
+
+<p>You can have zero, one, or more filters to narrow down your query results.  This is like the WHERE or LIMIT statements in SQL.  For example, <code>Stuff.objects.filter(name__contains='MyStuff')</code></p>
+
+<ul>
+  <li>Exclude</li>
+</ul>
+
+<p>If you want to get all except these specific items, then do an exclude, like <code>Stuff.objects.exclude(name__contains='MyStuff')</code></p>
+
+<ul>
+  <li>Manager</li>
+</ul>
+
+<p>You interact with a Queryset with the Model’s <strong>Manager</strong>.  Each model has at least one <strong>Manager</strong> and it’s called <strong>objects</strong> by default.  Managers are only accessible via the model classes, not from the model instances.</p>
+
+<pre><code>&gt;&gt;&gt; Blog.objects
+&lt;django.db.models.manager.Manager object at ...&gt;
+</code></pre>
+
+<ul>
+  <li>Lazy</li>
+</ul>
+
+<p>QuerySets are lazy in that they don’t do any database activity until the QuerySet is evaluated.</p>
+
+<h4 id="a-idshellshell-and-shellplusa"><a id="shell">Shell and Shell_Plus</a></h4>
+
+<p>You can interact with the ORM using <code>python manage.py shell</code>.  If you have the library <code>django-extensions</code>, you can use <code>python manage.py shell_plus</code> to automatically load in all your django models.  You can exit with the <code>exit()</code> command.</p>
+
+<h4 id="a-idobjectquerysetdifference-between-object-and-queryseta"><a id="objectqueryset">Difference between Object and QuerySet</a></h4>
+
+<p>Here’s the difference between an individual Object and a QuerySet (collection of objects).</p>
+
+<pre><code>&gt;&gt;&gt; me = User.objects.get(username='wliu')
+&gt;&gt;&gt; me
+&lt;User: wliu&gt;
+&gt;&gt;&gt; type(me)
+accounts.models.User
+
+&gt;&gt;&gt; queryset = User.objects.all()[:1]
+&gt;&gt;&gt; queryset
+[&lt;User: admin&gt;]
+&gt;&gt;&gt; type(queryset)
+django.db.models.query.QuerySet
+&gt;&gt;&gt; queryset[0].name
+u'admin'
+</code></pre>
+
+<h4 id="a-idormdatatypesorm-data-typesa"><a id="ormdatatypes">ORM Data Types</a></h4>
+
+<p>You don’t have to return just an object or a standard queryset.  Django is flexible with returning:</p>
+
+<ul>
+  <li>If you want a dictionary, you can get a <strong>ValuesQuerySet</strong>, which you can iterate to get dictionaries with: <code>a_values = BlogPost.objects.all().values()</code> and then <code>for a in a_values</code> to iterate over the items.</li>
+  <li>If you want a list, you can: <code>a_list = list(BlogPost.objects.all())</code></li>
+  <li>If you want an int of the length of the objects, you can: <code>a_len = len(BlogPost.objects.all())</code>).</li>
+</ul>
+
+<h4 id="a-idormgetorm-geta"><a id="ormget">ORM Get</a></h4>
+
+<p>You can get specific objects from the database.</p>
+
+<pre><code>&gt;&gt;&gt; me = User.objects.get(username='will')
+</code></pre>
+
+<p>To get all the models in your database, do:</p>
+
+<pre><code>&gt;&gt;&gt; from django.apps import apps
+&gt;&gt;&gt; apps.get_models()
+[django.contrib.admin.models.LogEntry,
+ accounts.models.User,
+ blog.models.BlogPost,
+ blog.models.Comment
+]
+</code></pre>
+
+<h4 id="a-idormobjectfieldsorm-object-fieldsa"><a id="ormobjectfields">ORM Object Fields</a></h4>
+
+<p>To get all the fields in your model, do:</p>
+
+<pre><code>&gt;&gt;&gt; Comment._meta.fields  # does not include reverse relations
+[&lt;django.db.models.fields.AutoField: id&gt;,
+ &lt;django.db.models.fields.related.ForeignKey: blogpost&gt;,
+ &lt;django.db.models.fields.TextField: content&gt;,
+ &lt;django.db.models.fields.DateField: date_created',
+ &lt;django.db.models.fields.related.OneToOneField: user&gt;]
+
+&gt;&gt;&gt; Comment._meta.get_all_field_names()  # includes reverse relations
+['blogpost',
+u'blogpost_id',
+ 'content',
+ 'date_created',
+ 'id',
+ 'user']
+</code></pre>
+
+<h4 id="a-idormselectorm-select-alla"><a id="ormselect">ORM Select All</a></h4>
+
+<p>You can select objects from the database.  Suppose we have a model <code>Post</code> from our app <code>blogs</code>.</p>
+
+<pre><code>&gt;&gt;&gt; from blog.models import Post
+&gt;&gt;&gt; Post.objects.all()
+[&lt;Post: my post title&gt;, &lt;Post: another post title&gt;]
+</code></pre>
+
+<h4 id="a-idormcreateorm-createa"><a id="ormcreate">ORM Create</a></h4>
+
+<p>You can create objects in the database.</p>
+
+<pre><code> &gt;&gt;&gt; from django.contrib.auth.models import User
+ &gt;&gt;&gt; Post.objects.create(author=me, title='Sample title', text='Test')
+</code></pre>
+
+<h4 id="a-idormfilterorm-filtera"><a id="ormfilter">ORM Filter</a></h4>
+
+<p>You can filter objects.  You can use two <code>_</code> characters between a field name and a filter operation (e.g. title and contains).</p>
+
+<pre><code>&gt;&gt;&gt; Post.objects.filter(author=me)
+&gt;&gt;&gt; Post.objects.filter(title__contains='title')
+</code></pre>
+
+<h4 id="a-idormrelationalorm-relationala"><a id="ormrelational">ORM Relational</a></h4>
+
+<p>So say you have a Blog model that has a field (<em>user</em>) that is related as a ForeignKey to a User model (that we’re trying to access the <em>username</em> field).  You can filter for the Blogs that are by that user using:</p>
+
+<pre><code>&gt;&gt;&gt; mypost = Blog.objects.filter(user__username__exact='william')
+</code></pre>
+
+<h4 id="a-idormrelatednameorm-relatednamea"><a id="ormrelatedname">ORM related_name</a></h4>
+
+<p>In Django, you can add a <code>related_name</code> argument on a ForeignKey, OneToOneField, or say ManyToManyField fields.  The <code>related_name</code> attribute specifies the name of the reverse relation from the Model back to your model.  For example:</p>
+
+<pre><code>class Event(models.Model):
+    creator = models.ForeignKey(User, related_name='event_creator')
+
+# Shell
+me = User.objects.first()  # this is an instance of Model User
+me.event_creator.all()  # this calls the 'related_name' of the Model User
+#[&lt;Event: stuff&gt;]  # this returns an instance of an Event
+</code></pre>
+
+<h4 id="a-idormpublishorm-publisha"><a id="ormpublish">ORM Publish</a></h4>
+
+<p>You can publish items in the database.</p>
+
+<pre><code>&gt;&gt;&gt; mypost = Post.objects.get(title='Sample title')
+&gt;&gt;&gt; mypost.publish()
+</code></pre>
+
+<h4 id="a-idormdeleteorm-deletea"><a id="ormdelete">ORM Delete</a></h4>
+
+<p>You can delete items in the database.</p>
+
+<pre><code>&gt;&gt;&gt; mypost = Post.objects.get(title='Sample title')
+&gt;&gt;&gt; mypost.delete()
+</code></pre>
+
+<h4 id="a-idormupdateorm-updatea"><a id="ormupdate">ORM Update</a></h4>
+
+<p>You can update items in the database.</p>
+
+<pre><code>&gt;&gt;&gt; mypost = Post.objects.filter(title='Sample title').update(is_active=False)
+</code></pre>
+
+<h4 id="a-idormorderbyorm-order-bya"><a id="ormorderby">ORM Order by</a></h4>
+
+<p>You can order the list of objects.</p>
+
+<pre><code>&gt;&gt;&gt; Post.objects.order_by('created_date')
+&gt;&gt;&gt; Post.objects.order_by('-created_date')
+</code></pre>
+
+<h4 id="a-idormlimitorm-limita"><a id="ormlimit">ORM Limit</a></h4>
+
+<p>You can limit the number of items.</p>
+
+<pre><code>&gt;&gt;&gt; Post.objects.all()[:5]  # return first 5 objects
+</code></pre>
+
+<h4 id="a-idormshortcutsorm-shortcut-combinationsa"><a id="ormshortcuts">ORM Shortcut Combinations</a></h4>
+
+<p>A lot of times you’ll want to get an item and if it isn’t there, do an action (like Create or return a 404 response).  This is a shortcut to doing the long way of Try/Except.</p>
+
+<pre><code># Long way
+try:
+    obj = Person.objects.get(first_name='Will', last_name='Liu')
+except Person.DoesNotExist:
+    obj = Person(first_name='Will', last_name='Liu')
+    obj.save()
+
+# Shortcut
+obj, created = Person.objects.get_or_create(first_name='Will', last_name='Liu')
+</code></pre>
+
+<p>The <code>get_or_create</code> shortcut will return the object and whether it was created (True or False).  If multiple items appear, then error <code>MultipleObjectsReturned</code> is raised.  Remember to only use this shortcut for POST (not for GET) and to keep this inside the views.</p>
+
+<p>There’s plenty of these shortcuts including:</p>
+
+<ul>
+  <li><code>get_or_create</code></li>
+  <li><code>update_or_create</code></li>
+  <li><code>get_object_or_404</code></li>
+</ul>
+
+<h4 id="a-idormorderoperationsorm-order-of-operationsa"><a id="ormorderoperations">ORM Order of Operations</a></h4>
+
+<p>Some operations when put together care about the order, others don’t.  If you do a <code>.annotate().filter()</code>, everything is annotated but you only get the filtered objects.  If you reverse the order, <code>.filter().annotate()</code>, your filtered objects are the only ones annotated.  This also applies to say <code>values()</code> instead of <code>filter()</code>.</p>
+
+<h4 id="a-idormcopyorm-copying-objectsa"><a id="ormcopy">ORM Copying Objects</a></h4>
+
+<p>You can copy objects by setting the <strong>pk</strong> to <em>None</em>.    </p>
+
+<pre><code> &gt;&gt;&gt; mypost = Post(name='My Post', comment='This is my comment')
+ &gt;&gt;&gt; mypost.save()  # mypost.pk == 1
+ &gt;&gt;&gt; mypost.pk = None
+ &gt;&gt;&gt; mypost.save()  # mypost.pk == 2
+</code></pre>
+
+<h4 id="a-idormvaluesorm-to-valuesa"><a id="ormvalues">ORM to values</a></h4>
+
+<p>Often you’ll want to take a Model object and turn that into a dictionary.  You can specify field names by passing in the field names into values() as arguments.</p>
+
+<pre><code># this list contains Model objects
+&gt;&gt;&gt; Blog.objects.filter(name__startswith='Beatles')
+&lt;Queryset [&lt;Blog: Beatles Blog&gt;]&gt;
+
+# this list contains a dictionary
+&gt;&gt;&gt; Blog.objects.filter(name__startswith='Beatles').values()
+&lt;QuerySet [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest news'}]&gt;
+</code></pre>
+
+<h4 id="a-idchainingquerysetschaining-querysetsa"><a id="chainingquerysets">Chaining QuerySets</a></h4>
+
+<p>You can chain QuerySets together to write complex queries.</p>
+
+<pre><code> &gt;&gt;&gt; Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+</code></pre>
+
+<h4 id="a-idormiterableiterating-through-querysetsa"><a id="ormiterable">Iterating through QuerySets</a></h4>
+
+<p>Since QuerySets are iterables of multiple objects, you can iterate through the objects.</p>
+
+<pre><code> &gt;&gt;&gt; queryset = Post.objects.all()
+ &gt;&gt;&gt; print([x.somefield for x in queryset])
+ &gt;&gt;&gt; print([x.someotherfield for x in queryset])  # this is cached from evaluation earlier
+</code></pre>
+
+<h4 id="a-idormlazyquerysetsquerysets-are-lazya"><a id="ormlazyquerysets">Querysets are Lazy</a></h4>
+
+<p>Since databases are one of the slower pieces in a web application, we want to limit the number of queries to them.  Querysets are just representations of rows in the database.  You can apply filters, exclude rows, etc.  The idea is that as you define your querysets, they’re not <strong>evaluated</strong> until you start iterating over them.</p>
+
+<pre><code>queryset = Post.objects.all()  # not evaluated yet
+
+for i in queryset:
+    print Post.title  # now it gets evaluated, hits the database
+
+for i in queryset:
+    print Post.comment  # Django automatically caches this
+</code></pre>
+
+<h4 id="a-idormquerysetcachequerysets-cacheinga"><a id="ormquerysetcache">Querysets Cacheing</a></h4>
+
+<p>Since Querysets are lazy (they automatically cache), we want to be efficient on how we use them.  For example, using the <code>if</code> statement reevaluates the entire queryset and sometimes you don’t need that when you can just check if the queryset just <code>.exists()</code>.</p>
+
+<pre><code>if queryset:  # this reevaluates the queryset and creates cache again
+    print "At least one Post exists"
+
+if queryset.exists():  # this will 
+    print "At least one Post exists"
+</code></pre>
+
+<p>When working with huge datasets, you might want to use an <code>iterator()</code> to avoid unnecessary cacheing.  An example would be:</p>
+
+<pre><code>data_set = Post.objects.all()
+
+if data_set.exists():
+    for data in data_set.iterator():
+        print data.title
+</code></pre>
+
+<p>Be careful that this type of optimization may actually hurt your application if not done properly.</p>
+
+<h4 id="a-idormselectrelatedorm-selectrelateda"><a id="ormselectrelated">ORM <code>select_related()</code></a></h4>
+
+<p>If you want to follow foreign-key relationships and want to do this efficiently (without hitting the database multiple times), do a <code>select_related()</code>.  This will add some complexity to the query, but will make the operations more efficient by having less lookups.  Remember that this is mainly for cacheing so you don’t have to hit the database multiple times unnecessarily.</p>
+
+<pre><code> &gt;&gt;&gt; queryset = Post.objects.select_related('User')
+</code></pre>
+
+<h4 id="a-idormcountaggorm-counting-and-aggregationa"><a id="ormcountagg">ORM Counting and Aggregation</a></h4>
+
+<p>With Models, you can count and do aggregate queries.</p>
+
+<pre><code>from django.db.models import Count, Sum, Avg, Max, Min
+
+Post.objects.count()  # 6
+Post.objects.filter(title__icontains=='cat').count()  # 1
+Post.objects.all().aggregate(Sum('likes'))  # 23
+Post.objects.all().aggregate(Avg('likes'))  # {'likes__avg': 4.53}
+Post.objects.all().aggregate(Max('likes'))  # {'likes__avg': Decimal(5.00)}
+Post.objects.all().aggregate(clicks_per_views = Sum('clicks')/Sum('views'))
+</code></pre>
+
+<h4 id="a-idormannotateorm-annotatea"><a id="ormannotate">ORM annotate()</a></h4>
+
+<p>You can <code>annotate()</code>, which will allow you to create your own annotations (i.e. a field) as key/values that you can attach to objects.  This is useful for making notes on Models about counts, aggregation, etc.</p>
+
+<pre><code>comments_per_post = Post.objects.annotate(num_comments=Count('comment'))
+print type(comments_per_post)  # &lt;class 'django.db.models.query.QuerySet'&gt;
+
+# annotated field accessed as an object
+first_post = comments_per_post[0]  # Returns an object instead of queryset
+print type(first_post)  # blog.models.Post
+print first_post.num_comments  # 1
+
+# annotated field accessed as a queryset
+print([i.num_comments for i in comments_per_post])  # [1, 1, 0, 1, 1]
+</code></pre>
+
+<h4 id="a-idormdebugsqlorm-querysets-debugginga"><a id="ormdebugsql">ORM querysets debugging</a></h4>
+
+<p>You can look into the queryset to get some additional information:</p>
+
+<pre><code>&gt;&gt;&gt; a = BlogPost.objects.select_related('User')
+
+#To see the details of a queryset
+&gt;&gt;&gt; a.query.__dict__
+&gt;&gt;&gt; {'_aggregate_select_cache': None,
+ '_aggregates': None,
+ '_extra': None,
+ '_extra_select_cache': None,
+ 'aggregate_select_mask': None,
+ 'alias_map': {},
+ 'alias_refcount': {},
+ ...
+
+# see the queryset in SQL
+&gt;&gt;&gt; print a.query
+&gt;&gt;&gt; SELECT "blog_blogpost"."id", "blog_blogpost"."title", "blog_blogpost"."content", "blog_blogpost"."date_created", "blog_blogpost"."date_updated", "blog_blogpost"."user_id" FROM "blog_blogpost" ORDER BY "blog_blogpost"."date_created" ASC
+</code></pre>
+
+<h4 id="a-idcomplexqueriesqcomplex-queries-with-qa"><a id="complexqueriesq">Complex Queries with Q</a></h4>
+
+<p>A <strong>Q object</strong> is an object used to encapsulate a collection of keyword arguments.  You can do more complex operations like <strong>OR</strong> statements.  You create a Q object with your filters, then pass the Q object into your query / queryset.</p>
+
+<pre><code># Example 1
+&gt;&gt;&gt; from django.db.models import Q
+&gt;&gt;&gt; Q(question__startswith='Who') | Q(question__startswith='What')  # Who or What
+&gt;&gt;&gt; ~Q(pub_date__year=2005) # not published on 2005
+&gt;&gt;&gt; Poll.objects.get(Q(question__startswith='Who', ~Q(pub_date__year=2005) | Q(pub_date__year=2002))
+
+# Example 2
+&gt;&gt;&gt; a = Q(title__icontains='hello') | ~Q(content__icontains='testing')
+&gt;&gt;&gt; BlogPost.objects.filter(a)
+# [&lt;BlogPost: Test&gt;, &lt;BlogPost: cats&gt;]
+</code></pre>
+
+<h2 id="a-idmodelmanagersmodel-managersa"><a id="modelmanagers">Model Managers</a></h2>
+
+<p>There’s at least one <strong>manager</strong> for every Django Model that namespaces <code>objects</code>.  You might notice that when you do a query, you’re doing <code>People.objects.all()</code>; the default Model Manager of <strong>objects</strong> has a lot of default functionality like <code>.all()</code>.  Here’s how it looks under the hood:</p>
+
+<pre><code>from django.db import models
+
+class Person(models.Model):
+    # ...
+    objects = models.Manager()
+</code></pre>
+
+<p>If you want to add functionality across <strong>tables</strong> (not just <strong>instances</strong>), then use Model Managers (otherwise just create Model methods).</p>
+
+<h4 id="a-idcustommodelmanagercustom-model-managersa"><a id="custommodelmanager">Custom Model Managers</a></h4>
+
+<p>You can create your own custom <strong>manager</strong>.  It doesn’t have to return a <strong>queryset</strong>, it can return anything you want.  If you do return a queryset, you can chain the queryset.  You can also have multiple managers per model.  Note: my preference is to use <code>as_manager()</code> below.</p>
+
+<pre><code>from django.db import models
+
+class ManagerA(models.Manager):
+    return "Stuff"  # this can be a custom queryset that applies for all tables, a dict, whatever
+
+class ManagerB(models.Manager):
+    def get_queryset(self):
+        # By returning a queryset like this, we can chain querysets
+        return super(ManagerB, self).get_queryset().filter(some_field='stuff')
+
+class Book(models.Model):
+    #
+    objects = models.Manager()  # default manager, called e.g: Book.models.all()
+    authors = ManagerA()  # called: Book.authors  # returns 'stuff'
+    baboons = ManagerB()  # called: Book.baboons.all()
+</code></pre>
+
+<h4 id="a-idcustomquerysetscustom-query-setsa"><a id="customquerysets">Custom Query Sets</a></h4>
+
+<p>You can write custom Querysets.  Note that these can also be put inside a custom Manager.  Note: my preference is to use <code>as_manager()</code> below.</p>
+
+<pre><code>class PersonQuerySet(models.Queryset):
+    def authors(self):
+        return self.filter(role='A')
+
+    def editors(self):
+        return self.filter(role='E')
+</code></pre>
+
+<h4 id="a-idasmanageras-managera"><a id="asmanager">As Manager</a></h4>
+
+<p>I don’t really use the Custom Model Manager or Custom QuerySets because they could end up with some duplication of code.  Instead, I like making a QuerySet and then putting <code>as_manager()</code> like below.</p>
+
+<pre><code>class SpecificDateQuerySet(models.QuerySet):
+    
+    def filter_month_and_year(self, month, year):
+        month_filter = Q(date__month=month)
+        year_filter = Q(date__year=year)
+        return self.filter(month_filter &amp; year_filter)
+    def get_cats(self):
+        results = self.aggregate(Sum('cats'))
+        if results['cats__sum']:
+            return results['cats__sum']
+        return 0
+
+class Pets(models.Model):
+    date = models.DateField()
+    cats = models.IntegerField(default=0)
+
+    SpecificDateQuerySet.as_manager()
+</code></pre>
+
+<h2 id="a-idmigrationsmigrationsa"><a id="migrations">Migrations</a></h2>
+
+<p>Migrations is how Django updates your database schema to fit in line with the current models of the app (on a per app basis).  This is done when you update a field, delete a model, etc.  The core commands are:</p>
+
+<ul>
+  <li><strong>makemigrations</strong> - creates new migrations based on changes you made to your model (usually the first step)
+  <strong>migrate</strong> - applies the migrations that you made above (usually the second step)</li>
+  <li><strong>sqlmigrate</strong> - displays the SQL statements for a migration (optional if you want to see the SQL)</li>
+</ul>
+
+<h4 id="a-idmakemigrationsmakemigrations-commanda"><a id="makemigrations">makemigrations command</a></h4>
+
+<p><strong>makemigrations</strong> is done after you make changes to your models (e.g. add a field).  To run, do: <code>python manage.py makemigrations [your_app_here]</code>.  Note that you can specify / limit to a single app, but this may cause issues in schemas that have relationships (like ForeignKey, OneToOneField, ManyToManyField).</p>
+
+<h4 id="a-idmigratemigrate-commanda"><a id="migrate">migrate command</a></h4>
+
+<p>This synchronizes unmigrated apps (i.e. adds or removes them if they’re new or no longer there) and then it runs the migrations that have not been applied yet.</p>
+
+<h4 id="a-idmigrationfilesmigration-filesa"><a id="migrationfiles">Migration files</a></h4>
+
+<p>Migrations are actually just a Python file that list <strong>dependencies</strong> (a list of the migration names that this depends on) and <strong>operations</strong> (list of operations that define what this migration does, like what model was deleted, what field added).</p>
+
+<h4 id="a-iddatamigrationsdata-migrations-with-runpythona"><a id="datamigrations">Data Migrations with <code>RunPython</code></a></h4>
+
+<p>You can use migrations to change the data in the database itself; this is called <strong>data migrations</strong>.  To do this, create an empty migrations file: <code>python manage.py makemigrations --empty</code>.  We then need to modify the migrations file and add in an operation called <strong>migrations.RunPython</strong>.  </p>
+
+<pre><code>from django.db import models, migrations
+
+def combine_names(apps, schema_editor):
+    Person = apps.get_model("yourappname", "Person")
+    for person in Person.objects.all():
+        person.name = "%s %s" % (person.first_name, person.last_name)
+        person.save()
+
+class Migration(migrations.Migration):
+    dependencies = [
+        ('yourappname', '0001_initial'),
+    ]
+    operations = [
+        migrations.RunPython(combine_names),
+    ]
+</code></pre>
+
+<h4 id="a-idsquashmigrationssquash-migrations-with-squashmigrationsa"><a id="squashmigrations">Squash Migrations with <code>squashmigrations</code></a></h4>
+
+<p>After enough migrations (say hundreds), you might want to reduce the number of migrations to just one file that represents the same thing.  Django extracts the operations and puts them all in a sequence (while taking into account if say we Create a Model, then Delete a Model).</p>
+
+<p>To run this, do <code>python manage.py squashmigrations myappname 0004</code> to squash the migrations up to that migration number.  Be warned, this can create errors like <strong>CircularDependencyError</strong>.  You can also try with the flag: <code>--no-optimize</code>.  Note with older versions of Django using South, you may have to use <code>python manage.py migrate --fake myappname</code> so that it runs more than one initial migration.</p>
+
+<p>After a migration is squashed successfully, make sure to:</p>
+
+<ul>
+  <li>Delete all the migration files it replaces</li>
+  <li>Remove the <strong>replaces</strong> argument in the Migration class of the squashed migration file (this tells Django that it is a squashed migration)</li>
+</ul>
+
+<h2 id="a-idviewsviewsa"><a id="views">Views</a></h2>
+
+<p>When the server gets a <strong>request</strong>, a <strong>view</strong> decides what models and templates to use.  You can render views using <code>render</code> and <code>render_to_response</code>.  A view always returns either a <code>HttpResponse</code> or a 404.</p>
+
+<h4 id="a-idrequestsrequestsa"><a id="requests">requests</a></h4>
+
+<p>When you get a request, there’s important information in the <strong>request.META</strong>, which is a Python dictionary that has all the available HTTP Headers (e.g. user IP Address, user agent info like the web browser).  Do note that this information does not have to exist.  Useful header info includes:</p>
+
+<ul>
+  <li><strong>HTTP_REFERER</strong> - The referring URL, if any.</li>
+  <li><strong>HTTP_USER_AGENT</strong> - User’s browser (e.g. Firefox)</li>
+  <li><strong>REMOTE_ADDR</strong> - The IP Address of the client</li>
+</ul>
+
+<h4 id="a-idrendertoresponserendertoresponsea"><a id="rendertoresponse">render_to_response()</a></h4>
+
+<p>You receive a request and this creates a response.  If you use this, your template is passed a <strong>Context</strong> instance by default (not a <strong>RequestContext</strong>).</p>
+
+<h4 id="a-idrenderrendera"><a id="render">render()</a></h4>
+
+<p>The render shortcut is the same as <code>render_to_response()</code> except there is a <strong>context_instance</strong> argument that forces the use of <strong>RequestContext</strong>.</p>
+
+<h2 id="a-idcbvclass-based-views-cbv-and-generic-class-based-views-gcbva"><a id="cbv">Class Based Views (CBV) and Generic Class Based Views (GCBV)</a></h2>
+
+<p><strong>Class Based Views</strong> allow you to respond to different HTTP methods (GET, POST) without using a bunch of if-statements.  Otherwise, it’s like a <strong>Function Based View</strong> in that a View still returns a <strong>HttpResponse</strong>.</p>
+
+<p><strong>Class Based Views</strong> start with one of three base views, which are: <strong>View</strong>, <strong>TemplateView</strong>, or <strong>RedirectView</strong>.  You can use the above base views with Mixins or you can use <strong>Generic Class Based Views</strong> (e.g. <strong>ListView</strong>, <strong>DetailView</strong>, <strong>CreateView</strong>, <strong>UpdateView</strong>, <strong>FormView</strong>, <strong>DeleteView</strong>, etc).  Note: This is a similar setup to say Django REST Framework.</p>
+
+<p>The docs here show a nice overview: https://docs.djangoproject.com/en/1.9/ref/class-based-views/flattened-index/</p>
+
+<h4 id="a-idcbvflowcbv-flowa"><a id="cbvflow">CBV Flow</a></h4>
+
+<p>So what happens when you use something like a base view?  The methods work like this:</p>
+
+<ul>
+  <li><strong>dispatch()</strong> accepts a request argument plus arguments and returns a response.  It looks at the HTTP method and says whether to do a GET or a POST, etc.  If you want to decorate the class, you can add a @some_decorator on this function (e.g. a login_required)</li>
+  <li><strong>http_method_not_allowed()</strong> is if the view was called with an HTTP method it doesn’t support (e.g. doing POST on a GET only view).  Default response is to return a HttpResponseNotAllowed</li>
+  <li>Additional Stuff here depending on what type of View is called (see Django docs)</li>
+</ul>
+
+<h4 id="a-idcbvmixinscbv-mixinsa"><a id="cbvmixins">CBV Mixins</a></h4>
+
+<p>So there’s a lot of methods that you can define in your Class Based Views.  For instance, if you want to get the context, you can create a <strong>get_context_data()</strong> method.  If you want to get a queryset, you can create a <strong>get_queryset()</strong> method.  If you don’t want to repeat all this code, you can also just use a Mixin.  Remember that these Mixins just add additional functionality and sometimes the Mixins conflict (so just note that you can’t just throw in a bunch of Mixins and expect things to work).</p>
+
+<h4 id="a-idcbvdebugdebugging-gcbvsa"><a id="cbvdebug">Debugging GCBVs</a></h4>
+
+<p>Use the <code>mro()</code> command to get the <strong>Method Resolution Order</strong>, which tells you the order in which methods should be inherited.</p>
+
+<pre><code>from pprint import pprint
+pprint(ListView.mro())
+</code></pre>
+
+<h2 id="a-idurlsurlsa"><a id="urls">URLs</a></h2>
+
+<p>Django has a URL dispatcher that makes clean urls.  </p>
+
+<p>The way Django knows how to route the url is that it looks for a root URLconf module (normally under a variable <strong>ROOT_URLCONF</strong> in your settings).  From that file, it will load the <strong>urlpatterns</strong>, which is just a Python list of url instances.  Python searches through the list and as soon as a pattern matches the url, the corresponding view is called (and passed an instance of the <strong>HttpRequest</strong>).  The ordering matters because the key concept is that the first pattern matched is routed.  If no pattern is found then we return an error.</p>
+
+<p>Example:</p>
+
+<pre><code># urls.py
+urlpatterns = [ 
+    url(r'^articles/([0-9]{4})/([0-9]{2})/$', views.month_archive),
+]
+</code></pre>
+
+<p>A request to the url <code>/articles/2005/03/</code> would match the urlpattern above, then call the function with the following keyword arguments: <code>views.month_archive(request, '2005', '03')</code>.</p>
+
+<p>In the view, you might see something like this:</p>
+
+<pre><code># views.py
+def month_archive(request, year=2001, month=1, template='/myapp/site.html'):
+    """ Set defaults as January 2001 """
+    ...
+    return render(request, template)
+</code></pre>
+
+<h4 id="a-idurlregexpatternsurl-regex-patternsa"><a id="urlregexpatterns">URL Regex Patterns</a></h4>
+
+<p>To make a url regular expression (aka <strong>regex</strong>) pattern, we want to make sure to:</p>
+
+<ul>
+  <li>Wrap the pattern in opening and closing parenthesis <code>( )</code>.  In regex, the <code>()</code> means to group one or more regular expressions</li>
+  <li>No need to add a starting <code>/</code> (e.g. use <code>r'^articles/'</code>)</li>
+  <li>The <code>r</code> in front of a regex pattern is to say that the python string is raw.  Always recommended to add this (e.g. <code>r'^stuff/'</code>)</li>
+  <li>The <code>\d</code> means any digit</li>
+  <li>The <code>.</code> means any single character</li>
+  <li>The <code>^</code> (carat) in front means to match the start of the line</li>
+  <li>The <code>$</code> (dollar sign) in the back means to match the end of the line</li>
+  <li>The <code>?</code> means to match 0 or 1 time</li>
+  <li>The <code>*</code> means to match 0 or more times</li>
+  <li>The <code>+</code> means one or more of the previous character</li>
+  <li>The <code>[]</code> means to match any single character from the square bracketed list (e.g. <code>[abcdefg]</code>).  Use a <code>-</code> for a range (e.g. <code>[0-9]</code>)</li>
+  <li>In Python, if you see <code>(P&lt;somename&gt;...)</code>, that means this regex has a <strong>name</strong> of <code>somename</code> where <code>...</code> would be the <strong>pattern</strong> (e.g. <code>[0-9]</code>).</li>
+</ul>
+
+<h4 id="a-idurlnamedpatternnamed-url-patternsa"><a id="urlnamedpattern">Named URL patterns</a></h4>
+
+<p>You should use named URL patterns, like the below.  When naming your url, make sure to use <code>appname-viewfunctionname</code>; this way you won’t get conflicts between multiple urls.</p>
+
+<pre><code># urls.py
+urlpatterns = [
+    url(r'^articles/([0-9]{4})/([0-9]{2})/$', views.month_archive), name='news-month_archive'  # assuming an app named 'news'
+]
+</code></pre>
+
+<p>The reasoning is that you can then use a url template tag to access data in a template.</p>
+
+<h4 id="a-idurlpassoptionalurl-passing-optional-dataa"><a id="urlpassoptional">URL Passing Optional Data</a></h4>
+
+<p>You can pass optional information as a dictionary, like this:</p>
+
+<pre><code>urlpatterns = [
+    url(r'^blog/(?P&lt;year&gt;[0-9]{4})/$', views.year_archive, {'foo': 'bar'}), name='news-year-archive'
+]
+</code></pre>
+
+<h4 id="a-idurlincludenamespaceurl-include-and-namespacea"><a id="urlincludenamespace">URL include() and namespace</a></h4>
+
+<p>With a lot of apps, we’ll have multiple <strong>urls.py</strong> files.  What happens is that when you use <code>reverse()</code> template function, we might get the wrong URL if the URL-pattern matches the name in another app.</p>
+
+<p>If you  specify the arguments <strong>namespace</strong> and <strong>app_name</strong>, we can determine the current app and call the app_name based on the namespace.  This is useful for when you have multiple apps that have a ‘polls’ view.  For example:</p>
+
+<pre><code># views.py
+# we set request.current_app = request.resolver_match.namespace
+
+#urls.py
+from django.conf.urls import patterns, url, include
+
+urlpatterns = [
+    url(r'^author-polls/', include('polls.urls', namespace='author-polls', app_name='polls')),
+    url(r'^publisher-polls/', include('polls.urls', namespace='publisher-polls', app_name='polls')),
+]
+
+# We can then call these in the template
+url 'polls:index'   # gets the current namespace (say 'author-polls'), app(poll), urlpattern name (index)
+</code></pre>
+
+<p>With <code>include()</code>, we can do something like <code>include(mysmallerapp.urls)</code> to add the urls in the file <code>mysmallerapp.urls</code> into the global namespace.</p>
+
+<h2 id="a-idtemplatetemplatea"><a id="template">Template</a></h2>
+
+<p>A template determines how to display information.  Technically, a template is a text file that can be any text format (e.g. HTML, CSV, XML).  These templates contain <strong>variables</strong>, which are replaced with values when the template is evaluated.  There are also <strong>tags</strong>, which control the logic of the template (e.g. for loop through a list of items).</p>
+
+<p>The template engine’s goal is meant to express presentation of data, not program logic.</p>
+
+<h4 id="a-idtemplatevariablestemplate-variablesa"><a id="templatevariables">Template Variables</a></h4>
+
+<p>Template variables look like ``.  When a variable is encountered, the engine replaces the variable with the result.  Use the <code>_</code> if you need spacing and the <code>.</code> if you need to access attributes of the variable.</p>
+
+<h4 id="a-idtemplatetagstemplate-tagsa"><a id="templatetags">Template Tags</a></h4>
+
+<p>Template tags can have for-loops and if, elif, else statements.  Variables can also be passed from the view to the template.  If any variables are invalid, they are seen as <strong>None</strong>.</p>
+
+<h4 id="for-loops">for-loops</h4>
+
+<pre><code>&lt;ul&gt;
+
+&lt;/ul&gt;
+</code></pre>
+
+<h4 id="a-idtemplatetagscustomcustom-template-tagsa"><a id="templatetagscustom">Custom Template Tags</a></h4>
+
+<p>If you want to make some custom presentation logic, you can create your own tags to really do anything.  For example, if you want an alert about any issues, you can define a custom tag that shows these alerts anywhere you put the tag.  Or you might want to show some debug information by simply putting a tag.  </p>
+
+<p>You can either use some of the built-in helpers that Django has (e.g. simple_tag, assignment_tag, inclusion_tag) or you can make your own tag from scratch.</p>
+
+<p>The general idea is that you can define these functions in your templatetags folder (same level as models.py, views.py), then make them available by using the <code>load</code> tag (e.g. <code>load mystuff_tags</code>) while making sure to restart your development server AND naming the file the same as the tag (e.g. <code>mystuff_tags.py</code>).</p>
+
+<pre><code>from django import template
+
+register = template.Library()  # to be valid tag library, needs this variable
+</code></pre>
+
+<h4 id="simpletag-and-assignmenttag">simple_tag and assignment_tag</h4>
+
+<p>Here’s how to use the built-in shortcut <code>simple_tag</code>, which calls the tag and accepts any number of arguments.  The idea is that you can do a custom tag to do any logic with Python (e.g. pass in a python list) and output some custom formatting in HTML all in a single tag.  There’s another tag called <code>assignment_tag</code> that saves a variable into the context so you can use it later instead of directly outputting the results using <code>as</code> argument.</p>
+
+<pre><code># block_tags.py
+import datetime
+from django import template
+
+register = template.Library()
+
+@register.simple_tag
+def current_time(format_string):
+    return datetime.datetime.now().strftime(format_string)
+
+@register.simple_tag(takes_context=True)
+def current_time(context, format_string):
+    timezone = context['timezone']
+    return your_get_current_time_method(timezone, format_string)
+
+# load block_tags
+# current_time
+</code></pre>
+
+<p>Note that if we have a lot of variables, we can use: <code>takes_context=True</code> and store the values in the context.</p>
+
+<h4 id="inclusion-tags">Inclusion tags</h4>
+
+<p>Inclusion tags displays some data by rendering another template.  This is good if you have a lot of different logic or CSS for say a button or object.</p>
+
+<pre><code># Template Tags
+@register.inclusion_tag('results.html')
+def show_results(posts):
+    blog_posts = Blog.objects.all()
+    return {'blog_posts': blog_posts}  # notice, has to be a dict
+
+# Template: results.html
+&lt;ul&gt;
+
+&lt;/ul&gt;
+
+# Template: main.html
+show_results mydata
+
+# What it looks like in main.html
+&lt;ul&gt;
+    &lt;li&gt;First Post&lt;/li&gt;
+    &lt;li&gt;Second Post&lt;/li&gt;
+    &lt;li&gt;Third Post&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+
+<h4 id="a-idtemplatetagscustomadvancedadvanced-custom-template-tagsa"><a id="templatetagscustomadvanced">Advanced Custom Template Tags</a></h4>
+
+<p>To write an advanced custom tag, we have two steps: we need to specify how to <strong>compile</strong> and then <strong>render</strong> the templating system.</p>
+
+<p>When Django compiles a template, the raw template text is split into <strong>nodes</strong> where each node is an instance of <strong>django.template.Node</strong> and has a <code>render()</code> method.  The compiled template is simply a list of <strong>Node</strong> objects.</p>
+
+<p>What we’re doing is telling how the raw template tag is converted into a node (the compilation function) and what the node’s render() method does.  For example:</p>
+
+<pre><code># Templatetags
+# Custom Template Tag: Compilation
+@register.tag
+def do_current_time(parser, token):
+    try:
+        # split_contents() knows not to split quoted strings
+        tag_name, format_string = token.split_contents()
+    except ValueError:
+        raise template.TemplateSyntaxError("%r tag requires\
+            exactly one argument" % token.contents.split()[0])
+    if not (format_string[0] == format_string[-1] and format_string[0] in ('"', "'")):
+        raise template.TemplateSyntaxError("%r tag's argument should be \
+            in quotes" % tag_name)
+    return CurrentTimeNode(format_string[1:-1])
+
+# Custom Template Tag: Rendering
+class CurrentTimeNode(template.Node):
+    def __init__(self, format_string):
+        self.format_string = format_string
+
+    def render(self, context):
+        return datetime.datetime.now().strftime(self.format_string)
+    
+register.tag(do_current_time)
+
+#Template to load custom tags, say main.html
+
+load blog_tags
+#do_current_time "%Y-%m-%d %I:%M %p"
+</code></pre>
+
+<h4 id="a-idtemplatefilterscustomcustom-template-filtersa"><a id="templatefilterscustom">Custom Template Filters</a></h4>
+
+<p>Custom filters are Python functions that take one or two arguments:</p>
+
+<ul>
+  <li>the value of the input variable (not necessarily a string)</li>
+  <li>the value of the argument (can be a default value or left out)</li>
+</ul>
+
+<p>As an example, the filter `` the filter <strong>foo</strong> would be passed the variable <strong>var</strong> and the argument <strong>“bar”</strong>.</p>
+
+<p>Example:</p>
+
+<pre><code>from django import template
+
+register = template.Library()  # to be valid tag library, needs this variable
+    
+@register.filter  # by default, Django will use the funciton's name to register
+def lower(value):  # only one argument
+    """ converts a string into all lowercase """
+    return value.lower()
+
+@register.filter(name='cut')
+def cut(value, arg):
+    """ Removes all values of arg from the given string """
+    return value.replace(arg, '')
+
+@register.filter(name='novowels')
+def novowels(value, arg):
+    """ Remove any vowels from value """
+    vowels = ['a', 'e', 'i', 'o', 'u']
+    if any(word in value for word in vowels):
+        single_letters = list(value)
+        for i, value in enumerate(single_letters):
+            if value in vowels:
+                single_letters.remove(value)
+
+return single_letters
+
+register.filter('novowels', novowels)
+register.filter('cut', cut)
+register.filter('lower', lower)
+
+# Use Case in Template
+#
+</code></pre>
+
+<h2 id="a-idformsformsa"><a id="forms">Forms</a></h2>
+
+<p>Forms allow you to accept input from users and processes how to respond.  </p>
+
+<h4 id="a-idhtmlformshtml-formsa"><a id="htmlforms">HTML Forms</a></h4>
+
+<p>In HTML, forms are a collection of elements inside the <code>&lt;form&gt; ... &lt;/form&gt;</code> tags that allow users to enter text, select options, and basically provide user input (often using the HTML <code>&lt;input&gt;</code> elements).  Forms must specify:</p>
+
+<ul>
+  <li><strong>What</strong> data should be sent (usually defined by the <code>&lt;input&gt;</code> elements).  This is could be say an input of <code>&lt;type="text"&gt;</code> for a text input box or <code>&lt;type="submit"&gt;</code> for a button.</li>
+  <li><strong>Where</strong> to send the data (i.e. the URL endpoint).  This is normally under the form’s <strong>action</strong> attribute (e.g. route to the url for <code>/admin/</code>)</li>
+  <li><strong>How</strong> to send the data (i.e. what HTTP method, for Django forms this is either a <strong>GET</strong> or <strong>POST</strong>).  </li>
+</ul>
+
+<h4 id="a-idgetpostform-get-and-posta"><a id="getpost">Form GET and POST</a></h4>
+
+<p>With Django’s <strong>GET</strong> method, a GET is used to send data that does not affect the state of the system and can be public (e.g. web search would appear as <code>website.com/search/?forms&amp;release=1</code>).</p>
+
+<p>With Django’s <strong>POST</strong> method, the browser gets all the form data together, encodes it to send, sends it to the server, then receives back a response.  POST is used to make changes in the database or for private data.</p>
+
+<h4 id="a-iddjangoformshtmltemplatedjango-html-form-templatea"><a id="djangoformshtmltemplate">Django HTML Form Template</a></h4>
+
+<p>Here is a form that gets a user’s name through the <code>&lt;input&gt;</code> tags, returns the form to the URL <code>/your-name/</code> with a POST method, displays a text field label indicating to the user to input their name, and pre-fills the `` if it exists.</p>
+
+<pre><code>&lt;form action="/your-name/" method="post"&gt;
+    &lt;label for="your_name"&gt;Your name: &lt;/label&gt;
+    &lt;input id="your_name" type="text" name="your_name" value=""&gt;
+    &lt;input type="submit" value="OK"&gt;
+&lt;/form&gt;
+</code></pre>
+
+<h4 id="a-iddjangoformsprocessdjango-form-processa"><a id="djangoformsprocess">Django Form Process</a></h4>
+
+<p>In Django, when we render an object, we typically do these steps:</p>
+
+<ul>
+  <li>Get the view (i.e. this tells us the template and model)</li>
+  <li>Pass the view the template context (i.e. a dictionary with keys and values)</li>
+  <li>Then expand it to HTML markup using template variables</li>
+</ul>
+
+<p>Rendering a form has similar steps except when we instantiate a form, we have the possible options:</p>
+
+<ul>
+  <li>Create a form that is empty</li>
+  <li>Pre-populate the form from a saved model or some other data source (i.e. there’s already data filled out)</li>
+</ul>
+
+<h4 id="a-iddjangoformscodedjango-forms-codea"><a id="djangoformscode">Django Forms Code</a></h4>
+
+<p>If we want to move away from the Django HTML Form Template and into Python code, we can do that with Django forms.  When we look at Django’s <strong>forms</strong>, we need to be aware if the form is <strong>bound</strong> (data associated with it) or <strong>unbound form</strong> (no data associated with it).  You can check if a form is bound by checking the attribute <code>.is_bound</code></p>
+
+<pre><code># forms.py
+from django import forms
+
+class NameForm(forms.Form):
+    your_name = forms.CharField(label='Your name', max_length=100)
+</code></pre>
+
+<p>This code takes the Form instance and does a <code>.is_valid()</code> method check, which runs validation routines for all the fields.  When this is called, if all fields have valid data, it returns <code>True</code> and places the form’s data in the <strong>cleaned_data</strong> attribute.</p>
+
+<pre><code>&lt;label for="your_name"&gt;Your name: &lt;/label&gt;
+&lt;input id="your_name" type="text" name="your_name" maxlength="100"&gt;
+</code></pre>
+
+<p>Note that this does not include the <code>&lt;form&gt;</code> tags or a submit button, we’ll need to manually provide these.</p>
+
+<p>The form is sent to the view.</p>
+
+<pre><code>#views.py
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+
+from .forms import NameForm
+
+def get_name(request):
+    # if POST request, we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request
+        form = NameForm(request.POST)
+        # check if form is valid
+        if form.is_valid():
+            # Process the data in form.cleaned_data
+            # Then redirect to a new URL
+            return HttpResponseRedirect('/thanks/')
+    # if GET (or any other method) we create a blank form
+    else:
+         form = NameForm()
+
+    return render(request, 'name.html', {'form': form})
+</code></pre>
+
+<p>The new HTML template would be the below, where `` unpacks the Python code into HTML:</p>
+
+<pre><code>&lt;form action="/your-name/" method="post"&gt;
+    #remember to put csrf_token
+    
+    &lt;input type="submit" value="Submit" /&gt;
+&lt;/form&gt;
+</code></pre>
+
+<p>Note that if you are creating an editable item and you want to edit existing content inside that object, you can instantiate it with the object.</p>
+
+<pre><code> obj = MyStuff.objects.get(id=pk)
+ form = MyStuffForm(instance=obj)
+</code></pre>
+
+<h2 id="a-idcontextcontexta"><a id="context">Context</a></h2>
+
+<p>Once you have a Template object, you can reuse the same template to render it several times with different contexts.  A <strong>context</strong> is basically a dictionary with variables names as the key and the values as the value.  Normally you pass a fully populated dictionary to <code>Context()</code> and modify it using standard dictionary syntax.</p>
+
+<p>The context class is under <code>django.template.Context</code> and takes a couple arguments (name of the application and a dictionary mapping of the variable names to variable values)</p>
+
+<pre><code>&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; template = Template("My name is .")
+&gt;&gt;&gt; context = Context({"my_name": "Will"})
+&gt;&gt;&gt; template.render(context)
+"My name is Will."
+&gt;&gt;&gt; context = Context({"my_name": "Bill"})
+&gt;&gt;&gt; template.render(context)
+"My name is Bill."
+</code></pre>
+
+<h2 id="a-idcontextstackcontext-stack-push-and-popa"><a id="contextstack">Context Stack: Push() and Pop()</a></h2>
+
+<p>A Context object is a stack; this means you can <strong>push()</strong> and <strong>pop()</strong>.  By default a Context has ‘True’, ‘False’, ‘None’ values defined.</p>
+
+<pre><code>&gt;&gt;&gt; c = Context()
+&gt;&gt;&gt; c['foo'] = 'first level'
+[{'False': False, 'None': None, 'foo': 'first level'}]
+&gt;&gt;&gt; c.push()
+{}
+&gt;&gt;&gt; c
+[{'False': False, 'None': None, 'foo': 'first level', 'True': True}, {}]
+&gt;&gt;&gt; c['foo'] = 'second level'
+[{'False': False, 'None': None, 'foo': 'first level', 'True': True}, {'foo': 'second level'}]
+</code></pre>
+
+<h4 id="a-idrequestcontextrequestcontexta"><a id="requestcontext">RequestContext</a></h4>
+
+<p>There’s a special subclass of the Context class called a <strong>RequestContext</strong> that instead of taking an application name, takes a <strong>HttpRequest</strong>.  This RequestContext takes in a <strong>context_processors</strong> configuration option that returns a dictionary of items to be merged into the context.  This is under <code>django.template.RequestContext</code>.</p>
+
+<h4 id="a-idcontextprocessorcontext-processora"><a id="contextprocessor">Context Processor</a></h4>
+
+<p>In Django, if you want to put the <strong>context</strong> dictionary everywhere, you can create a <strong>Context Processor</strong>.  So remember that a context is just a dictionary of keys and values being mapped into a template.  A context processor is just a variable in your <code>settings.py</code> file (<strong>TEMPLATE_CONTEXT_PROCESSORS</strong>) where the purpose is that you don’t need to specify what each context is, the key/values are automatically included in all your requests.  A use case would be to insert certain variables inside your template that you would like to use in everything (e.g. a User’s location).  If you don’t want to include these dictionaries everywhere, you can just specify for a specific instance by using only <code>RequestContext</code>.  You can also add an optional third argument called <strong>processors</strong> to pass in some additional processors.</p>
+
+<pre><code># want context processors listed in settings.py as well as some more specific ones
+return render_to_response('template.html', {'foo':'bar'}, context_instance=RequestContext(request, processors=extra_processors))
+
+# want only context processors listed in settings.py
+return render_to_response('template.html', {'foo':'bar'}, context_instance=RequestContext(request))
+
+# no context processors
+return render_to_response('template.html', {'foo':'bar'})
+</code></pre>
+
+<h2 id="a-idusersusersa"><a id="users">Users</a></h2>
+
+<p>Django handles both user authentication and authorization.  <strong>Authentication</strong> says that a user is who they claim to be (authentication is through <code>django.contrib.auth</code>).  <strong>Authorization</strong> says what a user is allowed to do (permissions is through <code>django.contrib.contenttypes</code>.</p>
+
+<pre><code>&gt;&gt;&gt; from django.contrib.auth.models import User
+&gt;&gt;&gt; user = User.objects.create_user(username='will', email='william.q.liu@gmail.com', password='mypassword')
+&gt;&gt;&gt; user.set_password('newpassword')
+&gt;&gt;&gt; user.save()
+</code></pre>
+
+<h4 id="a-idcreatesuperusercreate-superusersa"><a id="createsuperuser">Create Superusers</a></h4>
+
+<p>You can create superusers using <code>python manage.py createsuperuser --username=will --email=william.q.liu@gmail.com</code></p>
+
+<h4 id="a-idpermissionspermissionsa"><a id="permissions">Permissions</a></h4>
+
+<p>Django can assign permissions to individual users and to groups of users in the admin site.  You can extend this to your site if you want.  Users have an <strong>add</strong>, <strong>change</strong>, and <strong>delete</strong> permissions.</p>
+
+<h4 id="a-idloginrequiredlogin-requireda"><a id="loginrequired">Login Required</a></h4>
+
+<p>So what can you do with users?  You can make certain views available only if the user is logged in using the <code>@login_required</code> decorator (<code>from django.contrib.auth.decorators import login_required)</code>.  If the user isn’t logged in, it redirects them to <code>settings.LOGIN_URL</code>.</p>
+
+<h4 id="a-idpermissionrequiredpermission-requireda"><a id="permissionrequired">Permission Required</a></h4>
+
+<p>To check if a user has a particular permission, we can use the <code>permission_required</code> decorator.</p>
+
+<pre><code>from django.contrib.auth.decorators import permission_required
+
+@permission_required('polls.can_vote')
+def my_view(request):
+    ....
+</code></pre>
+
+<h4 id="a-iduserpassestestuser-passes-testa"><a id="userpassestest">User Passes Test</a></h4>
+
+<p>Additionally, you can have the logged in User pass a certain check (e.g. if email ends in @jobwaffle.com) before accessing a view.  Remember that users can be anonymous.</p>
+
+<pre><code>from django.contrib.auth.decorators import user_passes_test
+
+def email_check(user):
+    return user.email.endswith('@jobwaffle.com')
+
+@user_passes_test(email_check)
+def my_view(request):
+    ...
+</code></pre>
+
+<h2 id="a-idserializersserializersa"><a id="serializers">Serializers</a></h2>
+
+<p>Django has a serialization framework that translates Django models into other usable formats like XML, JSON, or YAML.  Note that Django’s serializers is different than the Python json library.</p>
+
+<h4 id="a-iddumpdatadumpdata-management-commanda"><a id="dumpdata"><code>dumpdata</code> management command</a></h4>
+
+<p>If you want to get data from your tables, you can run <code>python manage.py dumpdata</code>.  You can specify the format (e.g. JSON), the app, and/or database.</p>
+
+<h4 id="a-idloaddataloaddata-management-commanda"><a id="loaddata"><code>loaddata</code> management command</a></h4>
+
+<p>If you want to get data into tables, you can run <code>python manage.py loaddata</code>.  You can specify the format (e.g. JSON), the app, and/or database.  This is good for loading fixtures.</p>
+
+<h2 id="a-idmiddlewaremiddlewarea"><a id="middleware">Middleware</a></h2>
+
+<p>Middleware hooks into Django’s request and response cycle.  It’s a plugin system for globally altering the input or output.  You can activate common middleware (like Authentication, CSRF protection, messaging, sessions), or you can write your own.  Middleware is defined in your <code>settings.py</code> as <strong>MIDDLEWARE_CLASSES</strong>.  </p>
+
+<h4 id="a-idmiddlewareordermiddleware-ordera"><a id="middlewareorder">Middleware Order</a></h4>
+
+<p>Remember that the order of the middleware matters because it’ll determine when the middleware is processed.</p>
+
+<ul>
+  <li>During a <strong>request</strong>, middleware is applied top to bottom and we have the following hooks in this order.  Each function will either return <strong>None</strong>, which means it’ll continue processing or a <strong>HttpResponse</strong> object and Django will stop processing anything else.:
+    <ul>
+      <li><strong>process_request()</strong> - called on each request before Django determines the view.</li>
+      <li><strong>process_view()</strong> - called just before Django calls the view.</li>
+    </ul>
+  </li>
+  <li>Once the request hooks pass through the middleware, it hits the <strong>view</strong> function before the response hooks pass through the middleware.</li>
+  <li>During a <strong>response</strong>, middleware is applied bottom to top and we have the following hooks in this order:
+    <ul>
+      <li><strong>process_exception()</strong> - only if the view raised an exception</li>
+      <li><strong>process_template_response()</strong> - only for template responses</li>
+      <li><strong>process_response()</strong></li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idmiddlewarefoldersmiddleware-foldersa"><a id="middlewarefolders">Middleware Folders</a></h4>
+
+<p>You normally setup your middleware in:</p>
+
+<ul>
+  <li>apps
+    <ul>
+      <li>appspecific
+        <ul>
+          <li>middleware
+            <ul>
+              <li><code>__init__.py</code></li>
+              <li><code>my_middleware.py</code></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>Then the actual middleware looks like:</p>
+
+<pre><code> class MyMiddleWare(object):
+     def process_request(self, request):
+         print "My middleware has been accessed!"
+         print request.path
+</code></pre>
+
+<h2 id="a-idsignalssignalsa"><a id="signals">Signals</a></h2>
+
+<p>Django has <strong>signals</strong> that help decoupled applications get notifications when something occurs.  There are <strong>senders</strong> that send a <strong>signal</strong> to alert <strong>receivers</strong> that take some action has taken place.  In order to be decoupled from applications, I recommend placing a <strong>signals</strong> folder right under your app name, then registering a <strong>handlers.py</strong> and an <strong>apps.py</strong>.</p>
+
+<h4 id="a-idsignalsbuiltinbuilt-in-signalsa"><a id="signalsbuiltin">Built-In Signals</a></h4>
+
+<p>There are built-in senders that include:</p>
+
+<ul>
+  <li>send signal based on models <code>.save()</code> method with <strong>pre_save</strong> and <strong>post_save</strong></li>
+  <li>send signal based on models or querysets <code>.delete()</code> method with <strong>pre_delete</strong> and <strong>post_delete</strong></li>
+</ul>
+
+<h4 id="a-idsignalslistenlistening-to-signals-with-receiversa"><a id="signalslisten">Listening to Signals with Receivers</a></h4>
+
+<p>In order to receive a signal, you have to make and register a <strong>receiver</strong> function that gets called when a signal is sent.  We accomplish this with <code>Signal.connect()</code>.  </p>
+
+<p>In this example, we make the receiver function (<code>my_callback</code>) that is called when a request is finished (using the built-in <code>request_finished</code> signal).</p>
+
+<pre><code>from django.core.signals import request_finished, pre_save
+from myappname.models import MyModel
+
+# Receiver function
+def my_callback(sender, **kwargs):
+    print "Request finished!"
+
+@receiver(pre_save, sender=MyModel)  # can use a decorator instead of connect()
+def my_callback_specific_model(sender, **kwargs):
+    print "This is only called when MyModel does a pre_save"
+    
+# connect signal, dispatch_uid is used to make sure no duplicate signals
+request_finished.connect(my_callback, dispatch_uid="my_unique_identifier")
+</code></pre>
+
+<h4 id="a-idsignalssendsending-signalsa"><a id="signalssend">Sending Signals</a></h4>
+
+<p>You can send signals using two ways (<code>Signal.send(sender, **kwargs)</code> or <code>Signal.send_robust(sender, **kwargs)</code>) where <code>sender</code> is a Class.  THe difference between these two methods is that <code>send()</code> does not catch any exceptions raised by receivers while <code>send_robust()</code> catches errors and receives are notified.  These return a list of tuple pairs (<code>[(receiver, response), ...]</code>).  For example:</p>
+
+<pre><code>import django.dispatch
+
+class PizzaStore(object):
+
+    def send_pizza(self, toppings, size):
+         pizza_done.send(sender=self.__class__, toppings=toppings, size=size)
+
+# creates a pizza_done signal that provide receivers with arguments for 'toppings' and 'size'
+pizza_done = django.dispatch.Signal(providing_args=["toppings", "size"])
+</code></pre>
+
+<h2 id="a-idadminadmina"><a id="admin">Admin</a></h2>
+
+<p>Django has an Admin that allows other users (admins) to quickly do CRUD operations.  We use a ModelAdmin class that represents the model in the admin interface.</p>
+
+<h4 id="a-idadminsetupadmin-setupa"><a id="adminsetup">Admin Setup</a></h4>
+
+<p>In your app, create an <strong>admin.py</strong> file and register your models with their respective ModelAdmin.</p>
+
+<pre><code>from django.contrib import admin
+
+from .models import MyModel, OtherModel
+
+class MyCustomFilter(admin.SimpleListFilter):
+    title = _('has pants?')
+    parameter_name = 'pants'  # parameter that appears on the URL
+
+    def lookups(self, request, model_admin):
+        """ 
+        returns list of tuples: first element is value that
+        appears in the URL; second element is human readable value
+        that appears in admin sidebar
+        """
+        return (
+            ('yes_pants', _('pant titles only')),
+            ('no_pants', _('no pant titles'))
+        )
+
+    def queryset(self, request, queryset):
+        """
+        returns filtered queryset based on value provided in the
+        query string and retrievable via 'self.value()'.
+        """
+        if self.value() == 'yes_pants':
+            return queryset.filter(title__icontains='pant')
+        if self.value() == 'no_pants':
+            return queryset.exclude(title__icontains='pant')
+
+class OtherModelTabularInline(admin.TabularInline):
+    model = OtherMOdel
+    readonly_fields = ('y_field', 'x_field')
+
+def get_extra(self, request, obj=None, **kwargs):
+    """ Only show 1 extra place """
+    extra = 1
+    return extra
+
+class OtherModelStackedInline(admin.StackedInline):
+    model = OtherModel
+
+class MyModelAdmin(admin.ModelAdmin):
+    inlines = [OtherModelTabularInline, ]
+    fields = ('myfield', 'anotherfield')  # display fields in detail
+    list_display = ('myfield', 'somefield')  # display fields in object overview
+    list_filter = ('user', MyCustomFilter)
+
+class OtherModelAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(MyModel, MyModelAdmin)
+admin.site.register(OtherModel, OtherModelAdmin)
+</code></pre>
+
+<h4 id="a-idadmincustomadmin-customizationsa"><a id="admincustom">Admin Customizations</a></h4>
+
+<p>By default, the ModelAdmin just lists all fields.  We can specify what fields to include, what fields should be joined together (e.g. <code>(('first_name', 'last_name'))</code>, what fields are grouped together (using <strong>fieldsets</strong>), what models should be displayed together (<strong>admin.TabularInline, admin.StackedInline</strong>), any custom filters for the admin (e.g. <strong>admin.SimpleListFilter</strong>, or if there’s any extra formatting we should apply (e.g. css classes using <strong>classes</strong>)</p>
+
+<h2 id="a-idcustommngcmdcustom-management-commandsa"><a id="custommngcmd">Custom Management Commands</a></h2>
+
+<p>In Django, you can create your own <code>manage.py customcommand</code> just like syncdb or migrate, but probably not that complex.  These are good for running standalone scripts.  For example, if you want to update a field that is the average ratings for each Blog Post, you would write a script for this.</p>
+
+<h4 id="a-idcustommngcmdsetupcustom-management-commands-setupa"><a id="custommngcmdsetup">Custom Management Commands Setup</a></h4>
+
+<p>In your Django app, create a directory <strong>management/commands/</strong> and make sure to put your <strong>init.py</strong> files (if Python 2).  The file that you create (say you name it <code>update_post_ratings.py</code>) will be your command that you use to execute (e.g. <code>python manage.py update_post_ratings</code>)</p>
+
+<h4 id="a-idcustommngcmdcodecustom-management-commands-codea"><a id="custommngcmdcode">Custom Management Commands Code</a></h4>
+
+<p>We define a Command that can take in arguments (none, required, or optional) and then runs a handler.  </p>
+
+<pre><code>from django.core.exceptions import FieldError
+from django.core.management.base import BaseCommand, CommandError
+
+from accounts.models import User
+from blog.models import Post
+
+
+class Command(BaseCommand):
+    args = "&lt;username&gt;"
+    help = "Calculates the Average Blog Likes for that User"
+
+    def add_arguments(self, parser):
+        parser.add_argument('username', nargs='+', type=str)
+
+    def handle(self, *args, **options):
+
+        if args:
+            try:
+                user = User.objects.get(username=args[0])
+                result = Post.objects.filter(user=user)
+                result = result.aggregate(Avg('likes'))
+                if result.get('likes__avg') is not None:  # handles empty
+                    print result
+            except FieldError:
+                raise CommandError('Could not find a user by that name')
+        else:
+            raise CommandError('Please enter a username')
+</code></pre>
+
+<h2 id="a-idsessionssessionsa"><a id="sessions">Sessions</a></h2>
+
+<p>Django has a built-in sessions framework, which is Django’s tool for keeping a persistent state of data for users on the server through the use of <strong>cookies</strong>.  This can be set by including the right middleware and by default session data will be stored in a Django Model under the database, though there’s other options like storing session info into Cookies, etc.  With this enabled, every <strong>HttpRequest</strong> has a <strong>request.session</strong> dictionary-like object attached that holds specific information.</p>
+
+<h4 id="a-idsessionsrequestaccessing-session-data-in-a-view-with-requestsessiona"><a id="sessionsrequest">Accessing Session data in a View with <code>request.session</code></a></h4>
+
+<p>In every HttpRequest, we get a <strong>request.session</strong> that has a dictionary where we can access and write to.  Additionally there are specific functions for setting cookies, testing cookies, deleting cookies, etc.</p>
+
+<pre><code>&gt;&gt;&gt; print(request.session.keys())
+&gt;&gt;&gt; print(request.session.items())
+# [(u'_auth_user_hash', u'fdlajfklasfjklasfjlasfjl'), (u'_auth_user_id', 1), (u'_auth_user_backend', u'django.contrib.auth.backends.ModelBackend')]
+&gt;&gt;&gt; print()
+&gt;&gt;&gt; request.session.set_test_cookie()
+</code></pre>
+
+<p>To set and access session data in a view, we just use a single session attribute for querying and modifying the session:</p>
+
+<pre><code>def test_session(request):
+    request.session['stuff'] = 10
+    print request.session['stuff']
+</code></pre>
+
+<p>The important thing is that when a user sees the actual HTTP traffic, the cookie does not have the hidden variable ‘stuff’ and instead only shows the <strong>sessionid</strong>.  In Google Chrome, you can find this under: <code>chrome://settings/cookies</code></p>
+
+<pre><code>Set-Cookie:sessionid=a92d67e44a9b92d7dafca67e507985c0;
+       expires=Thu, 07-Jul-2011 04:16:28 GMT;
+       Max-Age=1209600;
+       Path=/
+</code></pre>
+
+<h4 id="a-idsessiondatastoragehow-django-stores-sessionsa"><a id="sessiondatastorage">How Django stores Sessions</a></h4>
+
+<p>By default, Django’s session module stores sessions in the main DB’s <strong>django_session</strong>.  The <strong>session_key</strong> is the ID in the cookie.  The <strong>session_data</strong> contains the actual session data.</p>
+
+<pre><code>from django.contrib.sessions.models import Session
+
+mysession = Session.objects.get(pk='a92d67e44a9b92d7dafca67e507985c0')
+print mysession.session_data  # ZmEyNDVhNTBhMTk2ZmRjNzVlYzQ4NTFjZDk2Y2UwODc3YmVjNWVjZjqAAn1xAVUFY291bnRxAksGcy4=
+print mysession.get_decoded()  # {'stuff': 10}
+</code></pre>
+
+<p>Be aware that Session data does not get cleaned automatically.  When a person visits the site, they create a session.  If they log out, the </p>
+
+<h4 id="a-idsessionsoutsideviewsaccessing-session-data-out-of-a-view-with-sessionstorea"><a id="sessionsoutsideviews">Accessing Session data out of a View with SessionStore</a></h4>
+
+<p>You can access Session data outside of a View with <strong>SessionStore</strong>.  <strong>request.session</strong> is a SessionStore object.</p>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+      <li><span>02 Oct 2015</span> <a href="/2015/10/02/tmux.html">Tmux</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

@@ -34,7 +34,616 @@
     <div id="post">
 <h2 id="statistical-analysis">Statistical Analysis</h2>
 
-<p>When I was younger, I wish someone told me to learn calculus if I wanted to be a rocket scientist, otherwise go learn statistics.</p>
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#statsoverview">Statistics High Level Overview</a>
+    <ul>
+      <li><a href="#describeinfer">How are we using the data?  Descirbe or Infer</a></li>
+      <li><a href="#categoricalcontinuous">What are the data types?  Categorical or Continuous</a></li>
+      <li><a href="#numbervariables">Number of Independent and Dependent Variables</a></li>
+    </ul>
+  </li>
+  <li><a href="#modelcs">Model Cheatsheet</a></li>
+  <li><a href="#scipystats">SciPy Stats</a>
+    <ul>
+      <li><a href="#onesamplettest">Example: One Sample T-Test</a></li>
+      <li><a href="#fishersexact">Example: Fisher’s Exact Test</a></li>
+    </ul>
+  </li>
+  <li><a href="#tools">Statistician Tools</a>
+    <ul>
+      <li><a href="#simulation">Example: Simulation with Coin Tosses</a></li>
+      <li><a href="#shuffling">TODO Example: Shuffling with Two Groups</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<p>When I was younger, I wish someone told me to learn calculus if I wanted to be a rocket scientist, otherwise go learn statistics.  Even with that advice, I found it difficult to learn statistics because there seems to be a lot of different naming conventions.  Here is my take on the first principles of statistics where we try to break down statistical analysis into its smallest pieces; the idea is that we want to find useful patterns for learning statistics.  Statistics is simply <code>outcome = model + error</code></p>
+
+<h2 id="a-idstatsoverviewstatistics-high-level-overviewa"><a id="statsoverview">Statistics High Level Overview</a></h2>
+
+<p>I think data analysis can be broken down into three key parts.  This is a very high level overview so it is probably oversimplifying a lot of complex topics, but should give you a sense of what data is.</p>
+
+<ol>
+  <li>How are we using the data?  Do we want to <strong>describe</strong> or make <strong>inferences</strong> about the dataset?
+    <ul>
+      <li>If we want to just <strong>describe</strong> the dataset, we look at things like the mean, median, etc.  We want to be careful to make sure that our measurements are good in the sense that they are <strong>reliable</strong> and <strong>valid</strong>, etc.</li>
+      <li>If we want to make some type of <strong>inference</strong>, we have additional criteria to consider and can look at it a few different ways.
+        <ul>
+          <li>What are we interested in checking, <strong>correlation</strong> or <strong>causality</strong> (cause and effect)?  Correlation does not directly infer whereas Causality says a variable effects another.</li>
+          <li>How are we measuring?  Are we looking at <strong>independent measures</strong> (aka <strong>cross-sectional study</strong>, a single point in time snapshot) or <strong>repeated measures</strong> (aka <strong>longitudinal study</strong>, measure variables at different points in time).</li>
+          <li>There’s additional considerations like if we have an adequate <strong>sample size</strong>, what should we consider <strong>statistically significant (p-value)</strong>, <strong>one-tailed</strong> or <strong>two-tailed</strong> test, etc.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>What are the data types?  Are the variables <strong>categorical</strong> (dichotomous, nominal, ordinal) or <strong>continuous</strong>?
+    <ul>
+      <li>If the variables are continuous, we can use <strong>parametric</strong> tests (that assume a normal distribution) and if the variables are categorical, we use <strong>non-parametric</strong> tests, which make less assumptions</li>
+    </ul>
+  </li>
+  <li>Number of <strong>independent variables</strong> and <strong>dependent variables</strong>
+    <ul>
+      <li>The number of variables affect the test we can use.  I made a quick guide below with some examples.</li>
+    </ul>
+  </li>
+</ol>
+
+<h4 id="a-iddescribeinferhow-are-we-using-the-dataa"><a id="describeinfer">How are we using the data?</a></h4>
+
+<p><strong>Descriptive Statistics</strong> describes the dataset and is pretty straightforward.  For example, what is the mode, median, mean?  For more details, look up the Stats Primer post.</p>
+
+<p><strong>Inferential Statistics</strong> predicts values of an outcome variable based on some kind of model.  This usually means we are looking to see if the independent variable(s) cause some kind of change in the dependent variable(s) or if there is a strong relationship between a set of variables.  All inferential statistics can be described with:</p>
+
+<pre><code>outcome = model + error
+</code></pre>
+
+<p>Personal Note: A lot of data analyst jobs out there are just making graphs of descriptive statistics.  It’s a great intro to data and is useful, but being able to make inferences from the dataset is a natural (and more difficult) next step.</p>
+
+<h4 id="a-idcategoricalcontinuouswhat-are-the-data-typesa"><a id="categoricalcontinuous">What are the data types?</a></h4>
+
+<p>Data can be broken down into different <strong>levels of measurement</strong> that help determine what statistical tests we can do.  Ideally we want more specific (continuous) instead of braoder (categorical-binary).  Here they are from weakest to strongest in terms of statistical power (so you can find the right effect).</p>
+
+<ul>
+  <li><strong>Categorical</strong> (aka Qualitative)
+    <ul>
+      <li><strong>Binary</strong> (aka Dichotomous) has only two distinct possibilities (e.g. either alive or dead, pregnant or not)</li>
+      <li><strong>Nominal</strong> has two or more possibilities (e.g. human, cat, dog)</li>
+      <li><strong>Ordinal</strong> has two or more possibilities and there is a logical order (e.g. first, second, third place in a race); you know which is larger and smaller, but not by how much</li>
+    </ul>
+  </li>
+  <li><strong>Continuous</strong> (aka Quantitative)
+    <ul>
+      <li><strong>Numerical</strong> data that are numbers (e.g. 1,000 cookies)</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idnumbervariablesnumber-of-independent-and-dependent-variablesa"><a id="numbervariables">Number of Independent and Dependent Variables</a></h4>
+
+<p>See chart below on what statistical test to use based on the number (and type) of variables we have.</p>
+
+<h2 id="a-idmodelcsmodel-cheat-sheeta"><a id="modelcs">Model Cheat Sheet</a></h2>
+
+<p>We simply switch out the model, which is made up of <strong>variables</strong> and <strong>parameters</strong>.  Like all cheat sheets, this is a large oversimplification of statistics, but could be useful as a high level starting point.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>test_name_aka</strong></th>
+      <th style="text-align: left"><strong>about_model_description</strong></th>
+      <th style="text-align: left"><strong>example_use_of_the_model</strong></th>
+      <th style="text-align: center">dist</th>
+      <th style="text-align: center"><strong>#dep</strong></th>
+      <th style="text-align: center">type_dep</th>
+      <th style="text-align: center"><strong>#ind</strong></th>
+      <th style="text-align: center">type_ind</th>
+      <th style="text-align: center">pop</th>
+      <th style="text-align: center"><strong>the_really_long_notes_section</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><strong>one sample t-test</strong> and <strong>one sample z-test</strong></td>
+      <td style="text-align: left">Compare one group to a ‘known truth’ looking at their <strong>means</strong>; &lt;30 sample is t-test, &gt;30 sample is z-test</td>
+      <td style="text-align: left">Does the average NY student spend more time studying than the national average of 2hrs/day</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1 ind</td>
+      <td style="text-align: center">Calculations based on Central Limit Theorem</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>one sample sign</strong> (aka one sample median) and <strong>one sample Wilcoxon</strong></td>
+      <td style="text-align: left">Compare one group to a ‘known truth’ looking at their <strong>medians</strong>; use one sample sign for unknown or asymmetric distribution, use one sample Wilcoxon for symmetric distribution</td>
+      <td style="text-align: left">We want to know the median time it takes for a new user to add a friend to their buddy list.  We want to know if the median time for a newly developed drug to relieve pain is 12 minutes.</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (ordinal) or continuous</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1 ind</td>
+      <td style="text-align: center"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>one sample test of proportions</strong> (<strong>binomial sign test</strong> and <strong>Chi-square goodness-of-fit</strong>)</td>
+      <td style="text-align: left">Compare one group to a ‘known truth’ looking at their <strong>proportions</strong>;use binomial sign test if categories are dichotomous, use Chi-square for more than 2 categories</td>
+      <td style="text-align: left">A company prints out baseball cards claiming 30% are rookies, 60% are veterans, 10% all-stars.  We gather a random sample and use Chi-square goodness of fit to see if our sample distribution is statistically greater than what the company claimed</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">N/A</td>
+      <td style="text-align: center">1 ind</td>
+      <td style="text-align: center">Population should be at least 10 times as large as the samples; this method is good for really large samples, but not suited for small samples (go get more samples if necessary)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>unpaired t-test</strong> (aka <strong>two independent samples t-test</strong>, <strong>Student’s t-test</strong>, <strong>Welch’s t-test</strong>) and <strong>unpaired z-test</strong> (aka two independent samples z-test)</td>
+      <td style="text-align: left">Compare two continuous variables by looking at their <strong>means</strong> using unpaired t-test (n&lt;30 or unknown standard deviation) and unpaired z-test (n&gt;30).  Student’s t-test for equal variances, Welch’s t-test for unequal variances</td>
+      <td style="text-align: left">We want to know if two categorical groups (say women and men) have different average heights</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (only dichotomous)</td>
+      <td style="text-align: center">2 ind</td>
+      <td style="text-align: center">Do not do multiple t-tests because of <strong>familywise</strong> (aka experimentwise error rate)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Wilcoxon Rank-Sum</strong> (aka Wilcoxon-Mann-Whitney, Mann-Whitney, Wilcoxon two sample)</td>
+      <td style="text-align: left">Compares two categoricals (looking at their medians) using the <strong>independent measures</strong> design.  Note: For repeated-measures design, use Wilcoxon signed rank test.</td>
+      <td style="text-align: left">We want to know the differences in depression levels between two groups of people (one takes alcohol, other ecstasy).  We want to decide at a .05 significance level if the gas mileage data of manual and automatic cars have identical distributions.</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (ordinal) or continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (only dichotomous)</td>
+      <td style="text-align: center">2 ind</td>
+      <td style="text-align: center"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Chi square test of homogeneity</strong> (aka Chi-square test) and <strong>Fisher’s exact test</strong></td>
+      <td style="text-align: left">Compare two categoricals (looking at their <strong>proportions</strong>).  Create crosstab and if each cell has a minimum frequency of 5 use Chi-square test of homogeneity.  If a cell does not have the minimum frequency of 5, use Fisher’s exact test.</td>
+      <td style="text-align: left">We want to know if there is a relationship between a person’s gender (Male, Female) and the type of school (Public, Private).  Is there any statistically significant relationship between school attended and gender?</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (only dichotomous)</td>
+      <td style="text-align: center">2 ind</td>
+      <td style="text-align: center"> </td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>One-way Independent ANOVA</strong> (Analysis of Variance)</td>
+      <td style="text-align: left">Compares several groups (three or more) by looking at their <strong>means</strong> using <strong>independent measures</strong>.  ANOVA is an <strong>omnibus test</strong>, meaning it tests for an overall effect between all groups.  Check <strong>homogeneity of variance</strong> (i.e. variances of groups should be equal) with <strong>Levene’s test</strong>.</td>
+      <td style="text-align: left">We want to see if costumes of flying superheroes (Superman, Spiderman) injure themselves (scale 0 to 100) more than non-flying superheroes (Hulk, Ninja Turtles).  Does the mean score differ significantly among the levels of each group/superhero?</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">3+ ind</td>
+      <td style="text-align: center">Test statistic is the <strong>F-ratio</strong> (aka F-statistic, F-test) and tells us if the means of the 3+ groups are different (as a whole).  Do <strong>planned contrasts</strong> or <strong>post-hoc comparisons</strong> to determine which specific group is different</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Kruskal Wallis One-way ANOVA</strong> (aka Kruskal Wallis)</td>
+      <td style="text-align: left">Compares several groups (three or more) by looking at their medians. Idea is to rank all data from all groups together (ordering scores from lowest to highest), assign tied ranks the average of the ranks had they not been tied.  Once ranked, collect the scores back into their groups and add up ranks for each group.</td>
+      <td style="text-align: left">We want to see if coca cola affects sperm count.  We have four groups (no soda, 1 soda, 4 sodas, 7 sodas a day) and check sperm count every day.</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (ordinal) or continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">3+ ind</td>
+      <td style="text-align: center">Visualize with <strong>boxplot</strong>.  Use <strong>Jonckheere-Terpstra test</strong> if you think there is some type of trend between the group’s medians.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Chi square test of homogeneity</strong> (aka Chi-square test) and <strong>Fisher’s exact test</strong></td>
+      <td style="text-align: left">Compare two categoricals (looking at their <strong>proportions</strong>).  Create crosstab and if each cell has a minimum frequency of 5 use Chi-square test of homogeneity.  If a cell does not have the minimum frequency of 5, use Fisher’s exact test.</td>
+      <td style="text-align: left">Compare relationship between a person’s gender (Male, Female) and the tv shows they prefer (Simpsons, Breaking Bad, Game of Thrones).  Do men have a significantly different preference for tv shows than women?</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">3+ ind</td>
+      <td style="text-align: center"><strong>Contingency Table</strong> (aka Cross Tab) shows <strong>Populations</strong> * <strong>Category Levels</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>paired t-test</strong> (aka two dependent samples t-test, paired two sample t-test, dependent t-test for paired samples, paired two samples t-test, repeated-measures t-test)</td>
+      <td style="text-align: left">Checks for statistically significant difference by looking at the <strong>means</strong> of two dependent samples using <strong>repeated-measures</strong>.</td>
+      <td style="text-align: left">We want to know if a test preparation course helps students with their test scores.  We do a before-course exam and an after-course exam, then compare to see if there was any significant difference.</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (ordinal) or continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">2 dep</td>
+      <td style="text-align: center">Note: There’s two types of t-test, unpaired (aka independent samples) that compares between-groups (unrelated groups).  This is paired (aka dependent samples) t-test, compares repeated-measures (i.e. before and after, same group)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Wilcoxon signed Rank Test</strong></td>
+      <td style="text-align: left">Checks if statistically significant difference by looking at <strong>median</strong> differences using <strong>repeated-measures</strong>.  We rank all items from lowest to highest score, then do analysis on the rank itself instead of the actual data.  Once ranked, collect the scores back into their groups and add up ranks for each group.</td>
+      <td style="text-align: left">We survey people about an area before gentrification and after.  Responses were on a categorical from (really love it to really hate it).  We add up the positive and negative responses.  We compare to see if there is any significant difference</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (ordinal) or continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (ordinal) or continuous</td>
+      <td style="text-align: center">2 dep</td>
+      <td style="text-align: center">Similar to paired t-test but non-parametric version so we assume difference is ordinal.  Main thing is there’s a sign (positive or negative) assigned to the rank.  If sample size too small, use Fisher’s exact test, likelihood ratio, or Yate’s continuity correction to avoid Type I errors.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>McNemar’s test</strong> (aka McNemar’s Z-test)</td>
+      <td style="text-align: left">Checks if statistically significant difference by looking at the <strong>proportion</strong> using <strong>repeated-measures</strong>.</td>
+      <td style="text-align: left">We want to see if a drug has an effect on a particular disease.  Counts of individuals are given with the diagnosis between treatment (present or absent) in the rows and diagnosis after treatment (present or absent) in the columns.</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (dichotomous)</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (dichotomous)</td>
+      <td style="text-align: center">2 dep</td>
+      <td style="text-align: center">We’re testing difference between paired proportions; is there a significant difference before-after? We want the marginal frequencies (i.e. proportion) of two binary outcomes.  To plot, use a 2*2 <strong>contingency table</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>One-way Repeated-Measures ANOVA (analysis of variance)</strong></td>
+      <td style="text-align: left">Check if statistically significant differences between several groups (three or more) by looking at their <strong>means</strong> with <strong>repeated-measures</strong>.</td>
+      <td style="text-align: left">We want to see if there is a difference in alcohol consumption (our dependent variable) after rehab (e.g. with three measurement points: immediately before, 1 month after, 6 months after; ‘time’ is our independent variable).</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">3+ dep</td>
+      <td style="text-align: center">Our values are likely related because they’re from the same population (due to repeated-measures design) so we can’t use <strong>F-ratio</strong> because it lacks accuracy and instead we use the <strong>assumption of sphericity</strong> (aka circularity), which is an assumption about the structure of the covariance matrix (i.e. checks if variances of the differences between conditions are about equal)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Friedman’s test</strong> (aka Friedman’s two-way ANOVA for ranks)</td>
+      <td style="text-align: left">Check if statistically significant differences between several groups (three or more) looking at their <strong>medians</strong> with <strong>repeated-measures</strong>.  Theory is we rank all items from lowest to highest score, then do analysis on the rank itself (ordinal) instead of the actual data.  Once ranked, collect the scores back into their groups and add up ranks for each group.</td>
+      <td style="text-align: left">We survey multiple subjects (say 20 people) about three soft drinks (Pepsi, Coke, 7-up) and they rate on a scale of 1-10 on taste of each drink (given in random order) using the same participants.  Is there a significant difference in taste?</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (ordinal) or continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">3+ dep</td>
+      <td style="text-align: center">Visualize with a <strong>boxplot</strong>.  Use the <strong>Jonckheere-Terpstra test</strong> when you hypothesize that there’s some type of trend between the group’s medians.  Group sizes should be about equal.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Wald Chi-Square Test</strong> and <strong>Repeated Measures Logistic Regression</strong> (aka Wald log-linear chi-square test)</td>
+      <td style="text-align: left">Check if statistically significant difference between two categoricals by looking at their <strong>proportions</strong> using <strong>repeated measures</strong> in a two-way table.  Wald chi-square is the difference between observed and expected weight cell frequencies  (e.g. probability of becoming pregnant divided by probability of not becoming pregnant).  Wald log-linear chi-square test is based on the log odds ratios (e.g. odds of becoming pregnant when condom is used, odds of becoming pregnant when condom not used, then calculate the proportionate change in odds between the two)</td>
+      <td style="text-align: left">We do multiple tests (did person have a high pulse) on multiple subjects (say 30 people) that are assigned to different diets (meat, no meat) and different exercises (biking, swimming, tap dancing).  Predict the probability of getting a high pulse with meat diet.</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">2 dep</td>
+      <td style="text-align: center">We can’t have <strong>complete separation</strong>, which is where the outcome variable can be perfectly predicted by one variable or a combination of variables; this causes issues in that there’s no data in the middle (where we’re not very sure of probability); to fix this, collect more data or use a simpler model (less features).</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Factorial ANOVA</strong> (aka 2+ way independent Factorial ANOVA, independent Factorial ANOVA)</td>
+      <td style="text-align: left">Compares the differences between groups with two or more independent variables using <strong>independent measures</strong>.  Note that when effects of 2+ variables are considered together, this is a <strong>factor</strong>.  The calculation for SSm (variance explained by the experiment) is calculated as SSa (variance of A), SSb (variance of B), SSa*b (<strong>interaction effect</strong>, variance of interaction of A and B).</td>
+      <td style="text-align: left">Hypothesis is that after alcohol is consumed (1st independent variable), subjective perceptions of attractiveness are more inaccurate.  We’re also interested if effect is different for men and women (2nd independent variable)</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">2+</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">2+ ind</td>
+      <td style="text-align: center"><strong>Levene’s test</strong> to check for significant differences between group variances (homogeneity of variance).  <strong>Simple effects analysis</strong> to look at <strong>interaction effects</strong>.   <strong>interaction graphs</strong> help interpret and visualize significant interaction effects.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Ordinal Logistic Regression</strong> (aka ordered logit, Ordered Logistic Regression, Multinomial Logistic Regression)</td>
+      <td style="text-align: left">Compares several groups (with the dependent variable as an ordinal categorical and at least two independent categoricals) by looking at their <strong>medians</strong> using <strong>independent measures</strong>.  Predict categorical (ordinal) dependent variable using independent variables with calculations using <strong>log-likelihood</strong>, which sums the probabilities associated with the predicted and actual outcomes (i.e. how much left unexplained after the entire model has been fitted).</td>
+      <td style="text-align: left">Predict if ‘tax is too high’ (this is your ordinal dependent variable measured on a 4 point Likert item from ‘Strong Disagree’ to ‘Strongly Agree’) based on two independent variables (Age, Income).  Can also determine whether a number of independent variables (Age, Gender, Level of Physical Activity) predict the ordinal dependent variable of obesity (values of normal, overweight, obese)</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (ordinal) or continuous</td>
+      <td style="text-align: center">2+</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">2+ ind</td>
+      <td style="text-align: center">For partial fit, use <strong>maximum-likelihood estimation (MLE)</strong> or <strong>deviance</strong> (aka -2LL) because it has a chi-square distribution.  Check for <strong>multicollinearity (ind variables are too highly correlated), __tolerance statistic</strong> and <strong>VIF statistics</strong>.  Also can’t have <strong>complete separation</strong>.  Can penalize models for having more variables using <strong>Akaike Information Criterion (AIC)</strong> or <strong>Bayes Information Criterion (BIC)</strong></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Factorial Logistic Regression</strong></td>
+      <td style="text-align: left">Compares several groups where there are two or more categorical independent variables with a dichotomous dependent variable using <strong>independent measures</strong>.</td>
+      <td style="text-align: left">We’re interested in the relationship between the independent variables of school type (tier1, tier2, tier3), program (art, science, history) and the dependent variable (gender).  Can we determine probabilities of independent variables affecting the dependent?</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (dichotomous)</td>
+      <td style="text-align: center">2+</td>
+      <td style="text-align: center">categorical</td>
+      <td style="text-align: center">2+ ind</td>
+      <td style="text-align: center">Check for <strong>multicollinearity</strong> (where independent variables are too highly correlated), <strong>tolerance statistic</strong>, <strong>VIF statistics</strong>.  Also can’t have <strong>complete separation</strong> (outcome is perfectly predicted by independent variables) since we need data in the middle / not 100% of the probability.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Correlation</strong></td>
+      <td style="text-align: left">Compares the relationship between two or more continuous variables using <strong>Pearson’s correlation coefficient</strong>.  <strong>coefficient of correlation</strong> is <strong>r^2</strong>; the higher the value the better the fit.</td>
+      <td style="text-align: left">We want to see if there’s any relationship between the ‘number of ice cream getting sold’ (continuous variable) and the temperature (continuous variable)</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">1 ind</td>
+      <td style="text-align: center">A <strong>negative correlation</strong> means there is an <strong>inverse relationship</strong> (when one decreases, the other increases).  A <strong>positive correlation</strong> means relationship is <strong>directly related</strong> (when one increases, the other also increases).  <strong>r</strong> ranges from 0 (no effect) to 1 (perfect effect).  r=.1 means small effect, r=.3 means medium effect, r=.5 means large effect.  Note that r=.6 does not mean it is twice the effect of r=.3</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Simple Linear Regression</strong></td>
+      <td style="text-align: left">Looks at linear relationship between a continuous dependent variable and a continuous dependent variable using <strong>independent measure</strong>.  Mathmatical concept is <strong>model sum of squares</strong> where we fit a line that minimizes error; simple linear regression the line is straight, in multiple linear regression the line is more complex.  Measure with <strong>Pearson’s correlation coefficient</strong> and <strong>coefficient of correlation</strong> is <strong>r^2</strong>.</td>
+      <td style="text-align: left">How much does advertisting cost (continuous independent variable) affect album sales (continuous dependent variable)?</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">1 ind</td>
+      <td style="text-align: center">If we graph the <strong>standardized residuals</strong> against the <strong>predicted values</strong>, it should look like a random array of dots.  If we get a ‘funnel’ type shape, it means violation of <strong>homogeneity of variance</strong> (which means we cannot generalize findings beyond this sample); can try correcting (with resisuals try transforming data, with violation of linearity assumption try logistic regression, otherwise try robust regression with bootstrapping).  Order of putting in predictor variables matter, recommend using <strong>backward direction</strong> to prevent <strong>suppressor effects</strong> or checking <strong>all-subsets</strong> with <strong>Mallow’s Cp</strong> if you want to increase accuracy at cost of exponentially more calculations.  <strong>Cross-validate</strong> with train/test at random 80/20 split.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Non-Parametric Correlation using <strong>Spearman’s rho</strong> (aka Spearman’s Rank-Order correlation) and <strong>Kendall’s Tau</strong> coefficient</td>
+      <td style="text-align: left">Compares the relationship between one or more categorical (ordinal) variables using <strong>correlation</strong>, which means <strong>Spearman’s rho</strong> or <strong>Kendall’s Tau</strong> coefficient.  Idea is that values are converted to ranks and then the ranks are correlated.</td>
+      <td style="text-align: left">We want to see if there’s any relationship between when people finish a race (first place, second place, third place - the categorical ordinal) and their time spent training (1 month, 2 months, 3 months - continuous variable)</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">at least one categorical (nominal) in dep or ind</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">at least one categorical (nominal) in dep or ind</td>
+      <td style="text-align: center">1 ind</td>
+      <td style="text-align: center"><strong>r</strong> can be <strong>Spearman’s rho</strong> (non-parametric data and at least ordinal data for both variables), <strong>Kendall’s tau</strong> (non-parametric data, but use when small number of samples and there’s a lot of tied ranks; e.g. lots of ‘liked’ in ordinal ranks of ‘dislike’, ‘neutral’, ‘like’).  Correlation is not causation.  <strong>Confounding variables</strong> (aka teritum quid) are extraneous factors (e.g. there’s a correlation between breast implants and suicide; breast implants don’t cause suicide, but a third factor like low self-esteem might cause both).</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Simple Logistic Regression</strong> (aka Binary Logistic Regression)</td>
+      <td style="text-align: left">Test that assumes the dependent variable is dichotomous using <strong>independent measures</strong>.</td>
+      <td style="text-align: left">Predict the likelihood that a tumor is cancerous or benign (dichotomous dependent variable)</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">categorical (dichotomous)</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">1 ind</td>
+      <td style="text-align: center">We assess the model with <strong>log-likelihood</strong>, the smaller value the better the fit.  This basically sums the probabilities associated with the predicted and actual outcomes (i.e. how much unexplained there is after the entire model has been fitted); larger values mean poorer fit.  For a partial fit, use <strong>maximum-likelihood estimation (MLE)</strong> or <strong>deviance (aka -2LL)</strong> because it has a chi-square distribution.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Multiple Linear Regression</strong></td>
+      <td style="text-align: left">Looks at the linear relationship between two or more independent continuous variables and its effect on a continuous dependent variable using <strong>independent measures</strong>.</td>
+      <td style="text-align: left">How much does advertising cost (first independent continuous variable) and airtime on radio (second independent continuous variable) affect album sales (continuous dependent variable)?</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">2+</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">2+ ind</td>
+      <td style="text-align: center">We calculate <strong>Pearson’s correlation</strong> and <strong>coefficient of correlation (r^2)</strong>.  This is similar to a Simple Linear Regression, except in a Multiple Linear Regression we have more than one independent variable.  The mathmatical concept is still the same, we use model sum of squares where we try to fit a line that minimizes error.  Here the line is more complex than a straight line.</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Analysis of Covariance</strong></td>
+      <td style="text-align: left">Looks at the linear relationship between independent variables (where there’s both continuous and categorical) and a dependent continuous variable by comparing several <strong>means</strong>.</td>
+      <td style="text-align: left">We have viagra doses (placebo, low, high dose as categoricals) and we measure a participant’s libido (continuous dependent variable) with the partner’s libido (independent continuous variable as the <strong>covariate</strong>)</td>
+      <td style="text-align: center">P</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">2+</td>
+      <td style="text-align: center">at least 1 continuous and/or at least 1 categorical</td>
+      <td style="text-align: center">2+ ind</td>
+      <td style="text-align: center"><strong>Partial eta squared</strong> (aka <strong>partial n^2</strong>) is an effect size measure for ANCOVA; this is like <strong>eta squared</strong> (n^2) in ANOVA or r^2.  ANCOVA is like ANOVA except you include <strong>covariates</strong>, which are one or more continuous variables that are not part of the main experimental manipulation, but have an influence on the dependent variable.  You add these to 1.) <strong>reduce within-group error variance</strong> and 2.) <strong>elimination of confounds</strong> (those variables other than the experimental manipulation that affect the dependent variable)</td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><strong>Multiple Logistic Regression</strong></td>
+      <td style="text-align: left">Test that assumes one categorical (nominal) dependent variable and two or more continuous independent variables using <strong>independent measures</strong>.</td>
+      <td style="text-align: left">High school graduates make career choices (nothing, work, college as the dependent variable) and we model this off of their social economic status (low, middle, high income as their first independent variable) and their SAT scores (as their second independent variable).</td>
+      <td style="text-align: center">NP</td>
+      <td style="text-align: center">1</td>
+      <td style="text-align: center">continuous</td>
+      <td style="text-align: center">2+</td>
+      <td style="text-align: center">at least 1 continuous and/or at least 1 categorical</td>
+      <td style="text-align: center">2+ ind</td>
+      <td style="text-align: center">We’re interested in the effect that the independent variables have on the probability of obtaining a particular value of the dependent variable</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="a-idscipystatsscipy-statsa"><a id="scipystats">SciPy Stats</a></h2>
+
+<p>In Python, there’s an open-source library called SciPy that handles a lot of standard mathematics, science, and engineering calculations.  There’s many subpackages, including linear algebra (<code>scipy.linalg</code>), spatial data structures and algorithms to compute triangulations and Voronoi diagrams (<code>scipy.spatial</code>), but for this article we want to look at the statistics side (<code>scipy.stats</code>).  FYI there are other libraries like <code>statsmodel</code> that do this and more.</p>
+
+<h4 id="a-idonesamplettestexample-one-sample-t-testa"><a id="onesamplettest">Example: One Sample T-Test</a></h4>
+
+<p><strong>Problem</strong></p>
+
+<p>We want to compare a sample mean to a known population mean of the average American height (177cm).  Does this data represent the population mean?</p>
+
+<p><strong>Code</strong></p>
+
+<pre><code>"""
+  Definitons:
+    Assume statistical significance level (alpha) = .05
+    Assume Two tailed
+    Degrees of Freedom (dof) = For a simple t-test: number of samples - 1
+
+  Example:
+    If we look up degrees of freedom, say for 29 samples, assume a statistical
+    significance .05, two-tailed test, we look up a 'critical value' table
+    and get a critical value of 2.045; this means if we get a t-statistic of
+    less than -2.045 or greater than 2.045, we reject the null hypothesis
+"""
+
+from scipy import stats
+import numpy as np
+
+data_a = [177, 177, 178, 179, 172, 173, 178, 177, 174, 175, 178, 179,
+             178, 179, 178, 177, 173, 177, 175]
+data_b = [180, 198, 200, 178, 199, 210, 270, 210, 430, 240, 260,
+             180, 190, 188, 300, 210]
+
+print "Running Data A; we accept the null hypothesis" \
+      "(i.e. no relationship/difference between measured groups)"
+print "Data A has a mean of:", np.mean(data_a)  # avg height: 176.526
+dof = len(data_a)-1  # for a t-test, degrees of freedom = number samples-1
+print "Data A has a length of:", len(data_a), " and " \
+    " degrees of freedom:", len(data_a)-1
+result = stats.ttest_1samp(data_a, 177)
+print "t-statistic is {} and p-value is {}".format(result[0], result[1])
+# t-statistic is -0.940589569294 and p-value is 0.359367763116
+critical_value = stats.t.isf(0.05/2, dof)  # critical value for two sided test
+print "critical value is:", critical_value  # 2.100
+
+print "\nRunning Data B; we reject the null hypothesis" \
+      "(i.e. there is a relationship/difference between measured groups)"
+print "Data B has a mean of:", np.mean(data_b)  # avg height: 227.687
+dof = len(data_b)-1  # for a t-test, degrees of freedom = number samples-1
+print "Data B has a length of:", len(data_b), " and " \
+    " degrees of freedom:", len(data_b)-1
+result = stats.ttest_1samp(data_b, 177)
+print "t-statistic is {} and p-value is {}".format(result[0], result[1])
+# t-statistic is 3.13929630004 and p-value is 0.00675255864071
+critical_value = stats.t.isf(0.05/2, dof)  # critical value for two sided test
+print "critical value is:", critical_value  # 2.131
+</code></pre>
+
+<p><strong>Explaination of Results</strong></p>
+
+<p>We did a <strong>t-test</strong> for the mean of ONE group of scores.  We created two examples, one dataset that accepts the null hypothesis and the other that rejects the null hypothesis.  As a quick overview:</p>
+
+<ul>
+  <li><strong>Null hypothesis</strong> is just a way of saying there is no relationship/difference among these variables.  We either accept or reject the null hypothesis.  If we accept the null hypothesis, this means there is no relationship/difference between variables.  If we reject the null hypothesis, this means there is a relationship/difference between the groups.</li>
+  <li>The <strong>statistical signifiance level</strong> (aka <strong>alpha</strong>) is a number we pick at the beginning of our experiment (usually <code>.05</code> or <code>.01</code>) and use this as a threshold to determine if we reject the null hypothesis.</li>
+  <li>The <strong>p-value</strong> can be seen as the probability of obtaining the observed sample results.  If the <em>p-value</em> is equal or smaller than the <em>statistical signifiance level</em>, then the <em>null hypothesis</em> must be rejected.  However, this does not automatically mean that the alternative hypothesis is true.</li>
+  <li>The <strong>t-statistic</strong> used in this <strong>t-test</strong> assesses whether the size of the difference is significant.  The greater this value, the greater the evidence against the null hypothesis.  Check this with the <em>critical value</em>.</li>
+  <li>The <strong>critical value</strong> is what we use to compare to the t-statistic to see if we reject the null hypothesis or not.</li>
+</ul>
+
+<p><strong>Example 1 - Similar Data</strong></p>
+
+<p>In <code>data_a</code> we had an average height of <code>176.526</code>.  Just by eyeballing, our <code>data_a</code> is near the mean of 177 that we passed in.  For a t-test, we calculate the <em>degrees of freedom</em> as the number of samples-1, which comes out to be <code>19-1=18</code>.  We get a <em>t-statistic</em> that is <code>-0.940</code> and a <em>two tailed p-value</em> of <code>0.359</code>.  We calculate the <em>critical value</em> to be <code>2.100</code>.  We compare the <em>t-statistic</em> with the <em>critical value</em> and find that the <em>t-statistic</em> value (<code>-0.940</code>) is within the <em>critical value</em> ranges (of <code>-2.1</code> to <code>2.1</code>) so we have to accept the null hypothesis (i.e. there is no relationship/difference between these two sets of numbers).  With a <em>p-value</em> of <code>.359</code>, this is another indicator that we must reject the null hypothesis since it is greater than our signifiance level of <code>.05</code>.</p>
+
+<p><strong>Example 2 - Different Data</strong></p>
+
+<p>In <code>data_b</code> we had an average height of <code>227.687</code>.  Just by eyeballing, our <code>data_b</code> is not near the mean of 177 that we passed in.  For a t-test, we calculate the <em>degrees of freedom</em> as the number of samples-1, which comes out to be <code>16-1=15</code>.  We get a <em>t-statistic</em> that is <code>3.139</code> and a <em>two tailed p-value</em> of <code>0.006</code>.  We calculate the <em>critical value</em> to be <code>2.131</code>.  We compare the <em>t-statistic</em> with the <em>critical value</em> and find that the <em>t-statistic</em> value (<code>3.139</code>) is within the <em>critical value</em> ranges (of <code>-2.131</code> to <code>2.131</code>) so we reject the null hypothesis (not necessarily have to accept the alternative hypothesis).  With a <em>p-value</em> of <code>.006</code>, we can then accept the alternative hypothesis since it is less than our signifiance level of <code>.05</code> (i.e. there is a relationship/difference between these two sets of numbers).</p>
+
+<h4 id="a-idfishersexactexample-fishers-exact-testa"><a id="fishersexact">Example: Fisher’s Exact Test</a></h4>
+
+<p><strong>Code</strong></p>
+
+<pre><code>import pandas as pd
+import scipy.stats as stats
+
+
+if __name__ == '__main__':
+
+    raw_data = {'gender': ['Male', 'Female', 'Male', 'Male', 'Female', 'Male',
+                           'Female', 'Male', 'Male', 'Female', 'Female',
+                           'Female', 'Female', 'Female', 'Male', 'Female',
+                           'Male', 'Female', 'Male', 'Male', 'Female',
+                           'Female', 'Female', 'Male', 'Male'],
+                'diet': ['Yes', 'No', 'No', 'Yes', 'No', 'Yes', 'Yes', 'No',
+                         'Yes', 'No', 'No', 'Yes', 'Yes', 'No', 'No', 'Yes',
+                         'No', 'Yes', 'Yes', 'No', 'Yes', 'Yes', 'Yes',
+                         'No', 'No']}
+    df = pd.DataFrame(raw_data, columns=['gender', 'diet'])
+    print df
+    #     gender diet
+    # 0     Male  Yes
+    # 1   Female   No
+    # 2     Male   No
+    # 3     Male  Yes
+    # 4   Female   No
+    # 5     Male  Yes
+    # 6   Female  Yes
+    # 7     Male   No
+    # 8     Male  Yes
+    # 9   Female   No
+    # 10  Female   No
+    # 11  Female  Yes
+    # 12  Female  Yes
+    # 13  Female   No
+    # 14    Male   No
+    # 15  Female  Yes
+    # 16    Male   No
+    # 17  Female  Yes
+    # 18    Male  Yes
+    # 19    Male   No
+    # 20  Female  Yes
+    # 21  Female  Yes
+    # 22  Female  Yes
+    # 23    Male   No
+    # 24    Male   No
+    
+    # See crosstab of counts
+    a = df['gender']
+    b = df['diet']
+    
+    ct = pd.crosstab(index=a, columns=b)
+    ct = ct[['Yes', 'No']]  # Reorder columns
+    print ct
+    # diet    Yes  No
+    # gender
+    # Female    8   5
+    # Male      5   7
+    
+    row_1 = list(ct.ix['Female'])
+    row_2 = list(ct.ix['Male'])
+    
+    fvalue, pvalue = stats.fisher_exact([row_1, row_2])
+    print "fvalue is {f}, pvalue is {p}".format(f=fvalue, p=pvalue)
+    # fvalue is 2.24, pvalue is 0.433752668115
+</code></pre>
+
+<h2 id="a-idstatisticiantoolsstatisticians-toolsa"><a id="statisticiantools">Statistician’s Tools</a></h2>
+
+<p>With a computer, we can do a lot of computations that can help verify our math (or save us from doing a lot of math).  We can:</p>
+
+<ul>
+  <li>Simulate Results</li>
+  <li>Shuffle Data</li>
+  <li>Bootstrap Data</li>
+  <li>Cross Validate Models</li>
+</ul>
+
+<h4 id="a-idsimulationsimulation-with-coin-tossesa"><a id="simulation">Simulation with Coin Tosses</a></h4>
+
+<p>Say you toss a coin 30 times and see 22 heads.  Is it a fair coin?  Using a <strong>probabilistic model</strong> (i.e. we know it will be 50/50 chance for heads or tails), we can <strong>simulate</strong> the results.</p>
+
+<p><strong>Code</strong></p>
+
+<pre><code>"""
+    From: Statistics for Hackers by Jake VanderPlas
+
+    Instead of calculating the probability behind a sampling distribution,
+    we simply simulate the sampling distribution of say a coin flipping
+    using a for-loop.  We count the number of occurrences something happens
+    and can check the probability that it occurs.
+
+    Sample Problem: You toss a coin 30 times and you see 22 heads.  Is the
+    coin fair?  Assuming that the coin is not fair, we test the Null Hypothesis
+    We reject the fair coin hypothesis at p &lt; 0.05
+"""
+
+
+import numpy
+
+
+if __name__ == '__main__':
+    numpy.random.seed(1)
+    M = 0
+    for i in xrange(10000):  # do 10,000 trials
+        trials = numpy.random.randint(2, size=30)  # each trial, flip 30 times
+        if (trials.sum() &gt;= 22):
+            M += 1
+    p = M/10000.0
+
+    print 'Probability is: {0:.5f}'.format(p)  #p=0.00830, reject fair coin hypothesis
+</code></pre>
+
 
 </div>
 
@@ -42,11 +651,11 @@
   <h3>Related Posts</h3>
   <ul class="posts">
     
-      <li><span>05 Apr 2015</span> <a href="/2015/04/05/pandas.html">Pandas</a></li>
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
     
-      <li><span>04 Apr 2015</span> <a href="/2015/04/04/numpy.html">NumPy</a></li>
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
     
-      <li><span>02 Apr 2015</span> <a href="/2015/04/02/python-basics.html">Python Basics</a></li>
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
     
   </ul>
 </div>

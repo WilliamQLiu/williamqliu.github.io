@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>SQL</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="sql">SQL</h2>
+
+<hr />
+
+<p><strong>Summary</strong></p>
+
+<p><em>SQL (Structured Query Language)</em> is the standard language for communicating with relational database management systems.  There’s a few variations including Microsoft’s SQL Server, MySQL, PostgreSQL, SQLite.  Below instructions are with MySQL.  We’ll setup a MySQL server, then use a client to connect to the server and query for data.</p>
+
+<h2 id="installation">Installation</h2>
+<p>On a mac, use homebrew to install mysql using <code>$brew install mysql</code> to install the MySQL as a server.  For a GUI client, you can download MySQL Workbench, which will allow you to visually see the data with a GUI (as opposed to only command line).</p>
+
+<h2 id="bash-commands">Bash Commands</h2>
+
+<h3 id="useful-mysql-commands-start-stop-server">Useful MySQL commands (Start, Stop Server)</h3>
+<pre><code>$mysql.server start  # start the server
+$mysql.server stop  # stop the server
+$mysql.server status  # check if server is running
+$mysql.server help  # get help commands
+</code></pre>
+
+<h3 id="run-a-text-file-containing-sql-scripts-from-command-line">Run a text file (containing sql scripts) from command line</h3>
+<pre><code>$mysql &lt; myscript.sql
+</code></pre>
+
+<h3 id="switching-from-bash-to-shell">Switching from bash to shell</h3>
+<pre><code>$mysql  # enters into the shell from bash
+$mysql -u root -p  # enters into the shell as root user
+mysql&gt;  # This is what you'll see when in shell
+</code></pre>
+
+<h2 id="shell-commands">Shell Commands</h2>
+
+<h3 id="create-drop-and-use-a-database">Create, Drop, and Use a Database</h3>
+<pre><code>mysql&gt; DROP DATABASE IF EXISTS my_database_name;
+mysql&gt; CREATE DATABASE my_database_name;
+mysql&gt; USE my_database_name;
+</code></pre>
+
+<h2 id="loading-data">Loading Data</h2>
+
+<p>Say we want to load the iris dataset.  We do a curl to get the dataset, then run the below sql query.</p>
+
+<pre><code>curl http://mlr.cs.umass.edu/ml/machine-learning-databases/iris/iris.data &gt; iris.csv
+</code></pre>
+
+<table>
+  <thead>
+    <tr>
+      <th>sepallength</th>
+      <th>sepalwidth</th>
+      <th>petallength</th>
+      <th>petalwidth</th>
+      <th>class</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>5.1</td>
+      <td>3.5</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>Iris-setosa</td>
+    </tr>
+    <tr>
+      <td>4.9</td>
+      <td>3</td>
+      <td>1.4</td>
+      <td>0.2</td>
+      <td>Iris-setosa</td>
+    </tr>
+    <tr>
+      <td>4.7</td>
+      <td>3.2</td>
+      <td>1.3</td>
+      <td>0.2</td>
+      <td>Iris-setosa</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre><code>LOAD DATA LOCAL 
+
+#EDIT THIS PATH:
+INFILE "/Users/williamliu/Desktop/iris.csv"   
+
+INTO TABLE sampdb.iris  #db sampdb, table iris
+
+FIELDS
+    TERMINATED BY ',' 
+    #ENCLOSED BY '"' 
+
+LINES
+   TERMINATED BY '\n'
+#IGNORE 1 LINES;
+</code></pre>
+
+<h2 id="create-table">Create Table</h2>
+
+<pre><code>create table iris(
+sepallength float,
+sepalwidth float,
+petallength float,
+petalwidth float,
+class nvarchar(30)
+);
+</code></pre>
+
+<h2 id="queries">Queries</h2>
+
+<h3 id="basic-format-of-sql-queries">Basic Format of SQL Queries</h3>
+
+<p>Assuming data (say mytable from mydatabase) looks like:</p>
+
+<pre><code># last_name, first_name, suffix, city, state, birth, death
+Adams, John, , Braintree, MA, 1735-10-30, 1826-07-04
+Adams, John Quincy, , Braintree, MA, 1767-07-11, 1848-02-23
+Arthur, Chester A., , Fairfield, VT, 1829-10-05, 1886-11-18
+Buchanan, James, , Mercersburg, PA, 1791-04-23, 1868-06-01
+Bush, George H.W., , Milton, MA, 1924-06-12, 
+</code></pre>
+
+<p>We can do the following query:</p>
+
+<pre><code>SELECT last_name, first_name, state
+FROM mydatabase.mytable;
+</code></pre>
+
+<ul>
+  <li>a database holds a lot of tables</li>
+  <li>a table holds lots of rows and columns of data</li>
+  <li>a record is a particular instance of a row and column</li>
+</ul>
+
+<h3 id="row-number">ROW NUMBER</h3>
+
+<p>To get a returning count of what the row number is, do this.  Note that you can set variables and return them in the results.</p>
+
+<pre><code>SET @n=0;
+SELECT @n := @n+1 AS 'row_num', sepallength FROM sampdb.iris;
+</code></pre>
+
+<h3 id="count">COUNT</h3>
+
+<pre><code>SELECT COUNT(*) FROM sampdb.president
+SELECT COUNT(first_name), COUNT(death) FROM sampdb.president  # Returns 42 and 38
+SELECT COUNT(DISTINCT state, first_name) FROM sampdb.president
+</code></pre>
+
+<ul>
+  <li>Counts the not NULL values passed into it</li>
+  <li>This is an ‘aggregating’ function - takes a set of records or values and performs calculations on that set</li>
+  <li>For <code>Distinct</code>, we get 42 instead of 43 total presidents, means one duplicate state and first_name combo</li>
+  <li>Can also Subset and Count the data</li>
+</ul>
+
+<h3 id="other-functions-avg-sum-min-max">Other Functions (AVG, SUM, MIN, MAX)</h3>
+
+<pre><code>SELECT AVG(death) FROM sampdb.president
+SELECT SUM(age) FROM sampdb.president
+SELECT MIN(age) FROM sampdb.president
+SELECT MAX(age) FROM sampdb.president
+</code></pre>
+
+<h3 id="functions-as-datediff-concat-etc">Functions (AS, DATEDIFF, CONCAT, etc.)</h3>
+
+<pre><code>SELECT ... score * 2 AS doubled_score
+SELECT ... DATEDIFF(death, birth)
+SELECT ... CONCAT(first_name, ' ', last_name)
+SELECT ... UNIQUE(last_name, middle_name, first_name)
+</code></pre>
+
+<ul>
+  <li>Can create an alias with <code>AS</code> (required for subqueries)</li>
+  <li>Can run functions (e.g. <code>CONCAT</code> combines strings into one, <code>DATEDIFF</code> gets difference in days)</li>
+  <li>Can get unique values using <code>UNIQUE</code></li>
+</ul>
+
+<h3 id="null-values-and-functions">NULL Values and Functions</h3>
+
+<ul>
+  <li><strong>NULL</strong> values represent missing or unknown data (not the same as the value 0).</li>
+  <li>To test for <em>NULL</em>, do <strong>IS NULL</strong> or <strong>IS NOT NULL</strong>.
+    <ul>
+      <li><strong>IS NULL</strong> checks if the value is null.  For example, <code>SELECT LastName, FirstName FROM Persons WHERE LastName IS NULL</code></li>
+      <li><strong>IS NOT NULL</strong> checks if the value is not null.  For example, <code>SELECT LastName, FirstName FROM Persons WHERE LastName IS NOT NULL</code></li>
+    </ul>
+  </li>
+  <li>There are functions <strong>ISNULL(), NVL(), IFNULL(), and COALESCE()</strong> that specify how we want to treat a <em>NULL</em> value
+    <ul>
+      <li>For MySQL, <em>IFNULL()</em> tells us how to treat a <em>NULL</em> value (in this case, replacing it with 0): <code>SELECT UnitPrice*(UnitsInStock+IFNULL(UnitsOnOrder,0)) FROM Products</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="where">WHERE</h3>
+
+<pre><code>SELECT COUNT(first_name) FROM sampdb.president WHERE last_name="Adams" 
+</code></pre>
+
+<ul>
+  <li>Filters (before <code>GROUP BY</code>)</li>
+  <li>Can pass in lists (using <code>IN</code>) or tuples
+    <ul>
+      <li>Filter by list: … <code>WHERE state IN ('MA', 'VA')</code></li>
+      <li>Filter by tuple: … <code>WHERE (last_name, state) IN ('Adams', 'MA')</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="group-by">GROUP BY</h3>
+
+<pre><code>SELECT state, COUNT(*) FROM sampdb.president GROUP BY state ORDER BY state
+</code></pre>
+
+<ul>
+  <li>GROUP BY is a subset; divides records by unique tuples</li>
+</ul>
+
+<h3 id="group-by-using-where-and-having">GROUP BY using WHERE and HAVING</h3>
+
+<pre><code>SELECT state, COUNT(*) FROM sampdb.president
+   WHERE birth &lt;= '1900-01-01'
+   GROUP BY state
+   HAVING COUNT(*) &gt;=2
+   ORDER BY COUNT(*);
+</code></pre>
+
+<p>Sample Output:</p>
+
+<pre><code>state, count(*)
+   MA, 2
+   VT, 2
+   NC, 2
+   NY, 4
+   OH, 7
+   VA, 8
+</code></pre>
+
+<ul>
+  <li>WHERE filters before the GROUP BY</li>
+  <li>HAVING filters after the GROUP BY</li>
+</ul>
+
+<h3 id="subqueries">Subqueries</h3>
+<ul>
+  <li>Subqueries is a query inside another query</li>
+  <li>Usually this means an <strong>outer query</strong> and an <strong>inner query</strong>
+<code>SELECT name FROM city WHERE pincode IN (SELECT pincode FROM pin WHERE zone = 'west')</code>
+    <ul>
+      <li><strong>outer query</strong> is <code>SELECT name FROM city WHERE pincode IN ...</code></li>
+      <li><strong>inner query</strong> is <code>SELECT pincode FROM pin WHERE zone = 'west'</code></li>
+    </ul>
+  </li>
+  <li>Returned table has to have the fields and row expected of it by the calling query</li>
+  <li>Alias (<code>AS</code>) is required for subqueries</li>
+  <li>
+    <p>Two varieties of subqueries (<strong>correlated</strong> and <strong>non-correlated</strong>)</p>
+
+    <ul>
+      <li>
+        <p><strong>Non-correlated subquery</strong> means that the <em>inner query</em> doesn’t depend on the <em>outer query</em> and can run as a stand alone query</p>
+      </li>
+      <li>
+        <p><code>SELECT company FROM stock WHERE listed_on_exchange = (SELECT ric FROM market WHERE country='japan')</code>
+     - The <em>inner query</em> executes first, then the <em>outer query</em>.
+     - <em>non-correlated subqueries</em> usually use <code>IN</code> or <code>NOT IN</code></p>
+      </li>
+      <li>
+        <p><strong>Correlated subquery</strong> means that the <em>inner query</em> depends on the <em>outer query</em></p>
+      </li>
+      <li>
+        <p><code>SELECT student_id, score FROM sampdb.score AS scr WHERE event_id = 3 AND score &gt; ( SELECT AVG(score) FROM sampdb.score WHERE event_id = scr.event_id GROUP BY event_id) )</code>
+     - Requires use of alias (<code>AS</code>)
+     - The <em>outer query</em> executes first, then the <em>inner query</em>; this is because the <em>inner query</em> depends on the output of the <em>outer query</em>
+     - These queries are slower than <em>non-correlated queries</em> (think about doing a <em>join</em> instead)
+     - <em>correlated subqueries</em> usually use <code>EXISTS</code> or <code>NOT EXISTS</code></p>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="exists">EXISTS</h3>
+
+<ul>
+  <li>The <strong>EXISTS</strong> and <strong>NOT EXISTS</strong> conditions are used with a subquery (usually the <em>correlated subquery</em>).  Condition is met if the subquery returns at least one row.  It can be used with <em>SELECT, INSERT, UPDATE, or DELETE</em> statements.</li>
+  <li><code>SELECT * FROM mysuppliers WHERE NOT EXISTS (SELECT * FROM myorders WHERE mysuppliers.supplier_id = myorders.order_id);</code></li>
+  <li>Note that these are very inefficient since the sub-query is re-run for every single row so use only if no other solution</li>
+</ul>
+
+<h3 id="joins">JOINS</h3>
+<p>Used to combine rows from two or more tables.  Types of joins include:</p>
+
+<ul>
+  <li><strong>INNER JOIN</strong> selects all rows from both tables that have a match
+    <ul>
+      <li><code>SELECT column_name(s) FROM table1 INNER JOIN table2 ON table1.column_name=table2.column_name;</code></li>
+    </ul>
+  </li>
+  <li><strong>LEFT JOIN</strong> selects all rows from the left table (table1) and matching rows on the right table (table2)
+    <ul>
+      <li><code>SELECT column_name(s) FROM table1 LEFT JOIN table2 ON table1.column_name=table2.column_name;</code></li>
+    </ul>
+  </li>
+  <li><strong>RIGHT JOIN</strong> selects all rows from the right table (table2) and matching rows on the left table (table1)
+    <ul>
+      <li><code>SELECT column_name(s) FROM table1 RIGHT JOIN table2 ON table1.column_name=table2.column_name;</code></li>
+    </ul>
+  </li>
+  <li><strong>FULL JOIN</strong> selects all rows from the left table (table1) and all rows on the right table (table2)
+    <ul>
+      <li><code>SELECT column_name(s) FROM table1 FULL OUTER JOIN table2 ON table1.column_name=table2.column_name;</code></li>
+    </ul>
+  </li>
+  <li><strong>UNION and UNION ALL</strong> combines the result of two or more SELECT statements (with each statement having the same number of columns, data types, and order).  <em>UNION</em> selects distinct values only.  <em>UNION ALL</em> allows duplicates.
+    <ul>
+      <li><code>SELECT column_name(s) FROM table1 UNION SELECT column_name(s) FROM table2</code></li>
+      <li><code>SELECT column_name(s) FROM table1 UNION ALL SELECT column_name(s) FROM table2</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="primary-key-pk-and-foreign-key-fk">Primary Key (PK) and Foreign Key (FK)</h3>
+<ul>
+  <li>A <strong>primary key</strong> constraint uniquiely identifies each record in a database table.  These values must be unique, cannot contain NULL values, and each table can only have one primary key.  Note that you can have multiple column values that make up the primary key (e.g. P_ID, LastName, SSN).
+    <ul>
+      <li>Add a <em>primary key</em> to a table with a single column (e.g. P_ID) as the constraint: <code>ALTER TABLE MyTable ADD PRIMARY KEY (P_ID)</code></li>
+      <li>Add a <em>primary key</em> to a table with multiple columns (e.g. P_ID, LastName) as the constraint: <code>ALTER TABLE MyTable ADD PRIMARY KEY(P_ID, LastName)</code></li>
+      <li>Remove a <em>primary key</em>: <code>ALTER TABLE MyTable DROP PRIMARY KEY</code></li>
+    </ul>
+  </li>
+  <li>A <strong>foreign key</strong> constraint in one table is just a <em>primary key</em> in another table.
+    <ul>
+      <li>Add a <em>foreign key</em> on a single column as the constraint: <code>ALTER TABLE MyTable ADD FOREIGN KEY (P_ID) REFERENCES OtherTable(P_ID)</code></li>
+      <li>Add a <em>foreign key</em> on multiple columns (e.g. P_ID) as the constraint: <code>ALTER TABLE MyTable ADD CONSTRAINT my_fk FOREIGN KEY (P_ID) REFERENCES OtherTable(P_ID)</code></li>
+      <li>Remove a <em>foreign key</em> with: <code>ALTER TABLE MyTable DROP FOREIGN KEY my_fk</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="drop-and-truncate">DROP and TRUNCATE</h3>
+<ul>
+  <li>To delete an entire database, be extra sure you want to and can spell correctly, then do: <code>DROP DATABASE MyDatabase</code>.  This deletes everything in the database.</li>
+  <li>To delete an entire table (including the table itself), be extra sure you want to and can spell correctly, then do: <code>DROP TABLE MyTable</code></li>
+  <li>To delete the data inside an entire table, do: <code>TRUNCATE TABLE MyTable</code></li>
+</ul>
+
+<h3 id="alter">ALTER</h3>
+<ul>
+  <li>To add, delete, or modify columns in an existing table, use <strong>ALTER</strong>.</li>
+  <li>To add a column in a table, use: <code>ALTER TABLE MyTable MODIFY COLUMN MyColumn &lt;datatype&gt;</code></li>
+  <li>To delete a column in a table, use: <code>ALTER TABLE MyTable DROP COLUMN MyColumn</code></li>
+  <li>To modify a column in a table, use: <code>ALTER TABLE MyTable MODIFY COLUMN MyColumn &lt;datatype&gt;</code></li>
+</ul>
+
+<h3 id="insert">INSERT</h3>
+<ul>
+  <li>To insert data by field: <code>INSERT INTO MyDatabase.MyTable SET ThisField = ThisData</code></li>
+  <li>To insert data by row: <code>INSERT INTO MyDatabase.MyTable VALUES ('field1', 'field2', 'field3'</code></li>
+</ul>
+
+<h3 id="update">UPDATE</h3>
+<pre><code>UPDATE MyDatabase.MyTable SET ThisField = ThisData
+</code></pre>
+
+<h3 id="delete">DELETE</h3>
+<pre><code>DELETE FROM MyDatabase.MyTable  # Careful, no criteria deletes the entire database!
+</code></pre>
+
+<h3 id="if">IF</h3>
+<pre><code>IF(2&gt;1, 'OK', 'NOT)
+</code></pre>
+
+<h3 id="case">CASE</h3>
+<pre><code>CASE
+    WHEN 2 &gt; 1
+        THEN 'OK'
+    WHEN 1==1
+        THEN 'YEP'
+    ELSE
+        'NOT OK'
+END
+</code></pre>
+
+<p>You can combine all of the above into something like this (Note: From SQL Server):</p>
+
+<pre><code>SELECT IVRName, 
+SUM(CASE WHEN Disconnection in ('Answer') THEN 1 END) AS Answered, 
+SUM(CASE WHEN Disconnection in ('Abandon') THEN 1 END) AS Abandoned
+FROM LifeNetDW.dbo.QueueMetrics
+WHERE CallTime &gt; '2015-1-31' AND IVRName IS NOT NULL
+GROUP BY IVRName
+</code></pre>
+
+<h2 id="other">Other</h2>
+
+<h3 id="schemas">Schemas</h3>
+<ul>
+  <li>Command: SHOW DATABASES;
+    <ul>
+      <li>Shows all databases available on the server</li>
+    </ul>
+  </li>
+  <li>Command: SHOW TABLES IN books;
+    <ul>
+      <li>Shows all tables available in a particular database</li>
+    </ul>
+  </li>
+  <li>Command: DESCRIBE books.authors;
+    <ul>
+      <li>Shows columns, data types, keys, in a particular table</li>
+    </ul>
+  </li>
+  <li>Command: SHOW CREATE TABLE books.authors\G;
+    <ul>
+      <li>Shows the command for creating a table</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="indexing">Indexing</h3>
+<ul>
+  <li>Makes processing things much faster</li>
+  <li>An index is a pre-ordered sort of a particular field</li>
+  <li>Done and stored by the database server</li>
+  <li>Indexing has storage and performance costs</li>
+  <li>For every index on a table, the database must reorder the index for a new entry</li>
+  <li>Each index takes up space in storage and memory</li>
+  <li>Do ‘profiling’ to see where things are slow</li>
+  <li>To create an index, do: <code>CREATE INDEX MyIndex on MyTable (colToIndex)</code></li>
+  <li>To create an index on a combination of volumns, do: <code>CREATE INDEX MyIndex on MyTable(colToIndex1, colToIndex2, colToIndex3)</code></li>
+  <li>To drop an index, do: <code>ALTER TABLE MyTable DROP INDEX MyIndex</code></li>
+</ul>
+
+<h3 id="normalization-nth-normal-form">Normalization (Nth normal form)</h3>
+<ul>
+  <li>Principles of Modeling Data ‘norms’</li>
+  <li>Rules for making sure data is where we expect it and that it isn’t duplicated</li>
+  <li><strong>First Normal Form (1NF)</strong>
+    <ul>
+      <li>Data should be atomic (i.e. values should not be combined)</li>
+      <li>E.g. George Washington shouldn’t be a value (because it combines first and last name)</li>
+      <li>No repeating columns</li>
+      <li>E.g. Columns like Author1, Author2, Author3</li>
+    </ul>
+  </li>
+  <li><strong>Second Normal Form (2NF)</strong>
+    <ul>
+      <li>No ‘partial dependencies’</li>
+      <li>Cannot determine a nonkey column value with only a portion of the primary key</li>
+      <li>Basically, unnecessary duplication</li>
+    </ul>
+  </li>
+  <li><strong>Third Normal Form (3NF)</strong>
+    <ul>
+      <li>Second Normal Form plus no nonkey column depends on the value of another nonkey column</li>
+      <li>Values are driven by the primary key fields; these values should be removed to a table of their own</li>
+    </ul>
+  </li>
+</ul>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

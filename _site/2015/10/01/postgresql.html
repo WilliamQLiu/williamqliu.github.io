@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>PostgreSQL</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="postgresql">PostgreSQL</h2>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#basiccommands">Basic Commands</a>
+    <ul>
+      <li><a href="#login">Login</a></li>
+      <li><a href="#listdb">List Databases</a></li>
+      <li><a href="#createdb">Create Database</a></li>
+      <li><a href="#accessdb">Access Database</a></li>
+      <li><a href="#listdbinside">List Databases (inside psql)</a></li>
+      <li><a href="#seeroles">See Roles)</a></li>
+      <li><a href="#changepw">Change Database Password</a></li>
+      <li><a href="#conninfo">View Current Connection Info</a></li>
+      <li><a href="#dt">View Database Tables</a></li>
+      <li><a href="#viewall">View Tables, Views, and Sequences</a></li>
+      <li><a href="#queries">Queries</a></li>
+      <li><a href="#exit">Exit</a></li>
+      <li><a href="#sqlhelp">SQL Help</a></li>
+      <li><a href="#psqlhelp">PSQL Help</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<p><strong>PostgreSQL</strong> is an open source relational database.  </p>
+
+<h2 id="a-idbasiccommandsbasic-commandsa"><a id="basiccommands">Basic Commands</a></h2>
+
+<h4 id="a-idloginlogina"><a id="login">Login</a></h4>
+
+<p>In the command line, just enter <code>psql</code> to see your options</p>
+
+<pre><code>$psql --help
+</code></pre>
+
+<h4 id="a-idlistdblist-databasesa"><a id="listdb">List Databases</a></h4>
+
+<p>In the command line, to see what databases are available for access, do:</p>
+
+<pre><code>$psql --list
+</code></pre>
+
+<h4 id="a-idcreatedbcreate-databasea"><a id="createdb">Create Database</a></h4>
+
+<p>Create a database called <code>mydb</code></p>
+
+<pre><code>createdb mydb
+</code></pre>
+
+<h4 id="a-idaccessdbaccess-databasea"><a id="accessdb">Access Database</a></h4>
+
+<p>Connect to a database (e.g. db is named mydb)</p>
+
+<pre><code>psql mydb [optional user name]
+</code></pre>
+
+<h4 id="a-idlistdbinsidelists-all-databasesa"><a id="listdbinside">Lists all Databases</a></h4>
+
+<p>Now that you’re in psql, you can also list all databases</p>
+
+<pre><code> \list
+</code></pre>
+
+<h4 id="a-idseerolessee-rolesa"><a id="seeroles">See Roles</a></h4>
+
+<p>Prints out a list of roles and attributes (e.g. name, superuser, member of)</p>
+
+<pre><code> \du
+</code></pre>
+
+<h4 id="a-idchangepwchange-database-passworda"><a id="changepw">Change Database Password</a></h4>
+
+<p>Change the password of a database</p>
+
+<pre><code>\password mydb
+</code></pre>
+
+<h4 id="a-idconninfoview-current-connection-infoa"><a id="conninfo">View current connection info</a></h4>
+
+<p>View current connection information</p>
+
+<pre><code>\conninfo
+</code></pre>
+
+<h4 id="a-iddtview-database-tablesa"><a id="dt">View Database Tables</a></h4>
+
+<p>View database tables and their owners</p>
+
+<pre><code>\dt
+</code></pre>
+
+<h4 id="a-idviewallview-tables-views-and-sequencesa"><a id="viewall">View Tables, Views, and Sequences</a></h4>
+
+<p>View all of the tables, views, and sequences</p>
+
+<pre><code>\z
+</code></pre>
+
+<h4 id="a-idqueriesqueriesa"><a id="queries">Queries</a></h4>
+
+<p>While in the interactive session, remember to terminate queries with a <strong>;</strong></p>
+
+<pre><code>mydb=# SELECT * FROM mytable;
+</code></pre>
+
+<h4 id="a-idexitexita"><a id="exit">Exit</a></h4>
+
+<p>Exits out of the PostgreSQL command prompt</p>
+
+<pre><code>\q
+</code></pre>
+
+<h4 id="a-idsqlhelpsql-helpa"><a id="sqlhelp">SQL Help</a></h4>
+
+<p>To get help for SQL Commands</p>
+
+<pre><code>\h
+</code></pre>
+
+<h4 id="a-idpsqlhelppsql-helpa"><a id="psqlhelp">PSQL Help</a></h4>
+
+<p>To get help for psql commands</p>
+
+<pre><code>\?
+</code></pre>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

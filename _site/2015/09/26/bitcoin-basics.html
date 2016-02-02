@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Bitcoin Basics</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="bitcoin-basics">Bitcoin Basics</h2>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#iter1">Iteration 1</a></li>
+  <li><a href="#iter2">Iteration 2</a></li>
+  <li><a href="#iter3">Iteration 3</a></li>
+  <li><a href="#iter4">Iteration 4</a>
+    <ul>
+      <li><a href="#pow">Proof of Work</a></li>
+      <li><a href="#mining">Mining</a></li>
+    </ul>
+  </li>
+  <li><a href="#bitcoin">Bitcoin</a>
+    <ul>
+      <li><a href="#bitcoinexchange">Bitcoin Exchanges</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<p>Bitcoin is an online peer-to-peer currency.  Alice wants to give another person, Bob, an infocoin.  Let’s walkthrough how we could implement this/what the Bitcoin Protocol is.</p>
+
+<h2 id="a-iditer1iteration-1a"><a id="iter1">Iteration 1</a></h2>
+
+<p>Alice uses a string of bits as a primitive form of money.  She writes “I, Alice, am giving Bob one infocoin”.  She then signs with a private cryptographic key and announces this to the world.</p>
+
+<ul>
+  <li>Pros: Anyone in the world (including Bob) can use Alice’s public key to verify Alice was the one who signed the message; i.e. we can verify that Alice’s intent to give Bob an infocoin</li>
+  <li>Issues: Duplication of coins</li>
+</ul>
+
+<h2 id="a-iditer2iteration-2a"><a id="iter2">Iteration 2</a></h2>
+
+<p>Sign with a serial number to fix duplication.  Alice writes “I, Alice, am giving Bob an infocoin with serial number 1111123”</p>
+
+<ul>
+  <li>Needs a trusted source to produce and track these serial numbers, i.e. a bank</li>
+  <li>Bob accepts the infocoin, but also needs to verify the serial number belongs to Alice and she hasn’t spent it yet.  If this is correct, the transfer is complete.</li>
+</ul>
+
+<h2 id="a-iditer3iteration-3a"><a id="iter3">Iteration 3</a></h2>
+
+<p>Eliminate the bank, make everyone the bank.  Everyone keeps a <strong>block chain</strong> that is a public ledger of transactions.</p>
+
+<ul>
+  <li>Cons: Alice can send two transactions, one to Bob and one to Charlie.  If they happen to verify at the same time (before the block chain is updated), you can double send.</li>
+  <li>Possible Solution: Bob shouldn’t verify the transaction alone, it should broadcast to the entire network of users to ask them to help determine if the transaction is legitimate.</li>
+  <li>Issues with the possible solution are:
+    <ul>
+      <li>What is ‘once enough people verify’; what is enough?  It can’t be everyone since we don’t know who is on the entire network.</li>
+      <li>Alice can have puppet identities that swamp the network and verify both transactions</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-iditer4iteration-4a"><a id="iter4">Iteration 4</a></h2>
+
+<p>This last iteration is closer to what Bitcoin is.  It’s made up of:</p>
+
+<ol>
+  <li><strong>proof-of-work</strong> is a hard computational puzzle that artifically makes it computationally costly for network users to validate transactions</li>
+  <li>users <strong>mine</strong> (get rewards) users for trying to help validate transactions</li>
+</ol>
+
+<p>This makes it so that a cheater would need enormous computational resources to cheat (thus impractical).  We no longer rely on the number of people on the network, but focuses on the total computational power they bring.</p>
+
+<p>Users need to solve the proof-of-work puzzle or else the network won’t accept it as a valid transaction.</p>
+
+<h4 id="a-idpowproof-of-worka"><a id="pow">Proof of Work</a></h4>
+
+<p>Bitcoin uses a <strong>SHA-256</strong> hash function.  An example <strong>proof-of-work</strong> may be adding say a <strong>nonce</strong> (e.g. 0) to the end of the actual text (e.g. “hello world”):</p>
+
+<pre><code>h("hello world0") = fjdskal43242jkfdldajkll34jlksfdl
+</code></pre>
+
+<p>We would keep incrementing the nonce (e.g. 1, 2, 3) until we find a result that has say 4 starting zeroes</p>
+
+<pre><code>h("hello world4323") = 0000fjlaj24jlkdssfajl4j3jllfj
+</code></pre>
+
+<p>The actual Bitcoin network is a little more sophisticated and can adjust how difficult the <strong>target</strong> (e.g. the number of zeroes needed) is so that it averages about 10 minutes to validate.  We can also require multiple puzzles to be solved.</p>
+
+<h4 id="a-idminingmininga"><a id="mining">Mining</a></h4>
+
+<p>The validation process is called <strong>mining</strong>.  For every block of transactions validated, the user gets a bitcoin reward.  A 10^-8 bitcoin is the minimial unit of Bitcoin and is called a <strong>satoshi</strong>.  As another reward besides mining, there can also be a minimal <strong>transaction fee</strong> that goes to the people helping validate.</p>
+
+<h4 id="a-idorderordera"><a id="order">Order</a></h4>
+
+<p>We want an <strong>order</strong> to see which transactions have occurred first.  Without an order, we won’t know who owns what infocoins.  New blocks always include a pointer to the last block validated in the chain (in addition to the list of transactions in the block).</p>
+
+<p>Sometimes there’s a <strong>fork</strong> in the block chain, which means two miners validated and broadcasted to the entire network at the same time.  To resolve this, new miners are assigned the longest fork.  A valid fork needs at <strong>least 5 blocks</strong> following.</p>
+
+<h4 id="a-idissuesissuesa"><a id="issues">Issues</a></h4>
+
+<p>Alice can still <strong>double spend</strong> by paying herself and Charlie in an inprobable scenario; say Charlie accepts the infocoin (which happens after the transaction has been confirmed 6 times in the longest chain), and somehow Alice has so much computing power to overpower the network so that her fork is the longest.  Again this is unlikely, but possible.</p>
+
+<h2 id="a-idbitcoinbitcoina"><a id="bitcoin">Bitcoin</a></h2>
+
+<p>To use bitcoin, you install a <strong>wallet</strong> program (e.g. Multbit).  This shows you how many bitcoins you have.  If you’re a merchant that allows people to pay using Bitcoin, you tell your wallet program to generate a <strong>Bitcoin address</strong>; this creates a public/private key pair where the public key is a result of hashing your public key.  E.g. Address: 17jfdkaljklfdasjlfsajl</p>
+
+<ol>
+  <li>You send your Bitcoin address to the person who wants to buy from you.</li>
+  <li>The person who wants to pay you generates a <strong>transaction</strong>
+    <ul>
+      <li>This includes an identifier for the transaction</li>
+      <li>Version number of Bitcoin</li>
+      <li>Number of inputs and outputs</li>
+      <li>Any lock_time (when can the transaction be finalized); usually 0 (i.e. immediately)</li>
+      <li>Input of the transaction (e.g. signature of person sending the money, corresponding public key)</li>
+      <li>Note: there is nothing explicitly specifying how many bitcoins should be spent in this transaction (like trying to buy bread with 20 dollars and can’t break that down)</li>
+      <li>Output of the transaction (i.e. how many bitcoins are we spending?)</li>
+    </ul>
+  </li>
+</ol>
+
+<p>Instead of creating a serial number from a central area, users self-generate a transaction id by hashing the transaction.</p>
+
+<h4 id="a-idbitcoinexchangebitcoin-exchangea"><a id="bitcoinexchange">Bitcoin Exchange</a></h4>
+
+<p>A Bitcoin exchange is like a bank where you deposit money and can buy or sell bitcoins when it reaches a certain amount.</p>
+
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

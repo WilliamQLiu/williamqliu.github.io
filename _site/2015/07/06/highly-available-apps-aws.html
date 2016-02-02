@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Architecting Highly Available Apps on AWS</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="architecting-highly-available-apps-on-aws">Architecting Highly Available Apps on AWS</h2>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a></li>
+  <li><a href="#haft">Highly Available vs Fault Tolerant</a>
+    <ul>
+      <li><a href="#highlyavailable">Highly Available</a></li>
+      <li><a href="#numberofnines">Number of Nines</a></li>
+      <li><a href="#faulttolerance">Fault Tolerance</a></li>
+    </ul>
+  </li>
+  <li><a href="#awsarchitecture">AWS Architecture</a>
+    <ul>
+      <li><a href="#chaosmonkey">Chaos Monkey</a></li>
+      <li><a href="#s3">AWS S3</a></li>
+      <li><a href="#cloudfront">AWS CloudFront</a></li>
+      <li><a href="route53">AWS Route 53</a></li>
+    </ul>
+  </li>
+  <li><a href="#lab1">AWS Lab 1</a>
+    <ul>
+      <li><a href="#lab1a">How to manually fix a bad instance</a></li>
+      <li><a href="#lab1b">How to automatically fix bad instances</a></li>
+    </ul>
+  </li>
+  <li><a href="#hacost">High Availability Cost</a>
+    <ul>
+      <li><a href="#autoscalecomponents">Auto Scaling Components</a></li>
+    </ul>
+  </li>
+  <li><a href="#lab2">AWS Lab 2 - Create High Availability on Web Tier</a>
+    <ul>
+      <li><a href="#lab2a">Load Balancers</a></li>
+      <li><a href="#lab2b">Auto Scaling Part 1</a></li>
+      <li><a href="#lab2c">Auto Scaling Part 2</a></li>
+      <li><a href="#lab2d">Summary: High Availability on Web Tier</a></li>
+    </ul>
+  </li>
+  <li><a href="#storage">AWS Storage Options</a>
+    <ul>
+      <li><a href="#ebs">AWS Elastic Block Store (EBS)</a></li>
+      <li><a href="#instancestorage">AWS EC2 Instance Storage</a></li>
+      <li><a href="#s3storage">AWS S3 Storage</a></li>
+      <li><a href="#storagesummary">AWS Storage Options Summary</a></li>
+    </ul>
+  </li>
+  <li><a href="#dbarchitecture">AWS Database Options</a>
+    <ul>
+      <li><a href="#diyrdbms">Do It Yourself RDBMS</a></li>
+      <li><a href="#dbstorageconsiderations">Database Storage Considerations</a></li>
+      <li><a href="#caching">Caching</a></li>
+      <li><a href="#dbgenericreplication">Database Generic Replication</a></li>
+      <li><a href="#sharding">Database Sharding</a></li>
+      <li><a href="#dbnosql">NoSQL Databases</a></li>
+      <li><a href="#rds">AWS RDS</a></li>
+      <li><a href="#dynamodb">AWS DynamoDB</a></li>
+      <li><a href="#dbsummary">DB Summary</a></li>
+    </ul>
+  </li>
+  <li><a href="#lab3">AWS Lab 3 - Create High Availability on Database Tier</a>
+    <ul>
+      <li><a href="#lab3a">AWS RDS to create highly available relational database</a></li>
+      <li><a href="#lab3b">AWS DynamoDB (NoSQL) to store session state</a></li>
+      <li><a href="#lab3c">Lab Summary: Use AWS RDS or DynamoDB</a></li>
+    </ul>
+  </li>
+  <li><a href="#hadesignpatterns">High Availability Design Patterns</a>
+    <ul>
+      <li><a href="#commondesignpatterns">Common Design Patterns</a></li>
+      <li><a href="#vpndirectconnect">VPN and AWS Direct Connect</a></li>
+      <li><a href="#looselycoupled">Building Loosely Coupled Systems</a></li>
+    </ul>
+  </li>
+  <li><a href="#lab4">AWS Lab 4 - Making outbound traffic highly available using NAT instances</a></li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<p>These are notes from attending the NYC AWS Training and Certification for Highly Available Applications using Amazon Web Services.</p>
+
+<h2 id="a-idhafthighly-available-vs-fault-toleranta"><a id="haft">Highly Available vs Fault Tolerant</a></h2>
+
+<h4 id="a-idhighlyavailablehighly-availablea"><a id="highlyavailable">Highly Available</a></h4>
+
+<p><strong>Highly Available</strong> means removing single points of failure (because “Everything fails all the time”)</p>
+
+<ul>
+  <li>Assume everything fails and work backwards</li>
+  <li>Avoid single points of failure (e.g. if database fails, can still write)</li>
+  <li>Implement elasticity (e.g. even if not failing, might be really slow, can add to speed up)</li>
+  <li>Design loosely coupled architectures</li>
+  <li>Goal is to have no downtime, always available</li>
+  <li><em>Availability</em> defined as percentage of time an application operates during its work cycle</li>
+  <li>Loss of availability is known as an outage or downtime (e.g. app is offline, app is slow, either planned or unplanned)</li>
+</ul>
+
+<h4 id="a-idnumberninesnumber-of-nines-in-levels-of-availabilitya"><a id="numbernines">Number of Nines in Levels of Availability</a></h4>
+
+<p><strong>Number of Nines</strong> in Levels of Availability</p>
+
+<ul>
+  <li>1 Nine = 90% uptime, downtime per year = 36.5 days</li>
+  <li>2 Nines = 99%, downtime per year = 3.65 days</li>
+  <li>3 Nines = 99.9%, downtime per year = 8.76 hrs (probably the standard, we have two load balancers, two web servers, two application servers, two databases, etc.)</li>
+  <li>4 Nines = 99.99%, downtime per year = 52.6 min (at this point, to go from 3 Nines to 4 Nines, you need to put servers in another building / some distance, but this adds in some latency issues)</li>
+  <li>5 Nines, etc… (things like S3 has 9 Nines)</li>
+</ul>
+
+<h4 id="a-idfaulttolerancefault-tolerancea"><a id="faulttolerance">Fault Tolerance</a></h4>
+
+<p><strong>Fault Tolerance</strong> means built-in redundancy so apps can continue functioning when components fail</p>
+
+<ul>
+  <li>Ability of an application to accommodate growth without changing design</li>
+  <li>Be able to recover from failure</li>
+</ul>
+
+<h2 id="a-idawsarchitectureaws-architecturea"><a id="awsarchitecture">AWS Architecture</a></h2>
+
+<p>AWS encourages everything in the cloud as ‘off-site’ and ‘multi-site’.</p>
+
+<ul>
+  <li>Lots of great diagrams showing big picture of architecture <a href="http://aws.amazon.com/architecture/" title="Diagrams of AWS Architecture">here</a></li>
+  <li>Single or Multi-Regions?  Depends on how much money you have/want to spend and what your app does without say a key component like a database.  Recommend to a single default region + multiple Availability Zones</li>
+  <li>AWS is literally a programmable data center, automation is one of its key uses.  Everything is API driven.  Automate and test your highly available implementation.</li>
+</ul>
+
+<h4 id="a-idchaosmonkeychaos-monkeya"><a id="chaosmonkey">Chaos Monkey</a></h4>
+
+<p>What is Chaos Monkey?  Netflix created Chaos Monkey to terminates random instances on a live server to see if an application is fault tolerant.  Not recommended to do on a live production server.</p>
+
+<h4 id="a-ids3aws-s3a"><a id="s3">AWS S3</a></h4>
+
+<p>S3 is perfect for hosting your <strong>static</strong> digital assets (e.g. css, company logo, javascript files).  S3 is very efficient.</p>
+
+<p>You can also use Amazon S3’s website feature when only client-side processing is required.  There’s no infrastructure to configure/launch.</p>
+
+<h4 id="a-idcloudfrontaws-cloudfronta"><a id="cloudfront">AWS CloudFront</a></h4>
+
+<p><strong>CloudFront</strong> is a world-wide <strong>content distribution network</strong> (CDN).  This distributes content to end users closest to the user so its low latency, high data transfer speeds (and makes use of edge locations).  Availability SLA is </p>
+
+<p>Without CloudFront, your content is being loaded from EC2 webservers directly.  With no CDN, the response time is longer and server load is higher.</p>
+
+<p>You can use CloudFront for even Dynamic Resources (not just static).  This is perfect for intelligently pushing back small packets of data back to the origin server as long as it does NOT require a real time response (e.g. a voting application).  You can:</p>
+
+<ul>
+  <li>TCP/IP optimizations for the network path</li>
+  <li>Keep-Alive Connections to reduce RTT</li>
+  <li>Collapsed forwarding</li>
+  <li>SSL Termination close to viewers</li>
+  <li>POST/PUT upload optimizations</li>
+</ul>
+
+<h4 id="a-idroute53aws-route-53a"><a id="route53">AWS Route 53</a></h4>
+
+<p>AWS <strong>Route 53</strong> is a highly available and scalable DNS (Fun note: 53 is the common port for DNS).  Route 53 manages DNS Failover to route around region and AZ level issues.  Route 53 also has domain name registration and renewals.  Route 53 should point to a <strong>Load Balancer</strong>.</p>
+
+<p><strong>DNS Failover</strong> means that if you have a DNS pointing to a primary server and the health check fails, you can automatically reroute to a different server (even if its just a static site that says there are issues).  For example, that setup would look like this:</p>
+
+<p><strong>Record Sets</strong></p>
+
+<ul>
+  <li>CNAME www is pointing to the elastic_load_balancer</li>
+  <li>Routing Policy = Failover</li>
+  <li>Record Type = Primary</li>
+</ul>
+
+<p><strong>Amazon S3 website</strong></p>
+
+<ul>
+  <li>Routing Policy = Failover</li>
+  <li>Record Type = Secondary</li>
+</ul>
+
+<h2 id="a-idlab1lab-1-exercisea"><a id="lab1">Lab 1 Exercise</a></h2>
+
+<p>We will transform a fragile two-tier web application into a resilient, scalable application using <strong>AWS CloudFront</strong>.  Currently it is a web server that relies on a database server.  If either instance fails, the site is down.  If there is a surge in traffic, performance would degrade.  If we scale up, we would need to stop the instances (affecting availability).  It would also be difficult to scale horizontally by adding more web servers.</p>
+
+<h2 id="a-idlab1ahow-to-manually-fix-a-bad-instancea"><a id="lab1a">How to manually fix a bad instance</a></h2>
+
+<p>In <strong>EC2</strong>, you can see that there is an Elastic IP address (<strong>Elastic IPs</strong>) attached to the web server (e.g. 54.175.6.128).  This enables the instance (e.g. <code>i-038815d0 (cloudwiki-lab1-www)</code>) to be reached via a static address.  A <code>DNS A</code> record is typically mapped to the Elastic IP so that you can access the server using a friendly host name like www.jobwaffle.com.</p>
+
+<p>In our <strong>EC2</strong>, we can create <strong>Images</strong> under <strong>Instances</strong> &gt; Actions &gt; Image &gt; Create Image.  This is done so we can launch a replacement instance in the same exact state as the current running instance (in case something goes wrong).  You can see these images under the <strong>Images</strong> &gt; <strong>AMI</strong>.</p>
+
+<p>We will simulate a faulty instance by deleting the web server under instances.  We now replace the web server by going to AMIs, selecing the AMI we just created, and clicking ‘Launch’.  We then specify the size and security groups (select the www-server security group), and the keypair.  </p>
+
+<h2 id="a-idlab1bhow-to-automatically-fix-bad-instancesa"><a id="lab1b">How to automatically fix bad instances</a></h2>
+
+<p>AWS lets you failover to a backup website if your primary website is unavailable.  We will do this by configuring a simple backup website on Amazon S3 and use Amazon Route 53 DNS Failover to automatically route traffic when the primary site is unavailable.</p>
+
+<p><strong>Setup Hosted Zone, Health Check, and set Failover Routing Policy</strong></p>
+
+<p>In our <strong>Route 53</strong>, we will look at <strong>Hosted Zones</strong>, which is a hosted zone for your domain name (usually modifying these settings takes hours to take into effect).  Under ‘Hosted Zones’ &gt; ‘Go to Record Sets’.  You will see 3 records with these types:</p>
+
+<ul>
+  <li>A - this A record points to the Elastic IP Address of your web server.</li>
+  <li>NS</li>
+  <li>SOA</li>
+</ul>
+
+<p>We want to create a DNS Failover, which first involves setting up <strong>Health Checks</strong>.  We add a Health Check name, IP Address (from our ‘Hosted Zones’ &gt; Record Set - A record), host name, port, path, request interval, and failure threshold (10 seconds).  When you go to the Record Set, you’ll see a few settings.</p>
+
+<ul>
+  <li><strong>TTL (Seconds)</strong> is by default set to 60 seconds.  This limits the amount of time this DNS record will be cached within the Internet’s DNS system, which means there will be a shorter delay between the time failover occurs and the time that end users begin to be routed to your backup site.</li>
+  <li>Change the <strong>Routing Policy</strong> to <strong>Failover</strong>.</li>
+  <li>For <strong>Failover Record Type</strong>, click ‘Primary’.</li>
+  <li>You can <strong>Associate with Health Check</strong> by clicking ‘Yes’ and selecting the Health Check we created earlier.</li>
+</ul>
+
+<p>What this does is that we now automatically check the health of the homepage and verifies that it returns a successful response every 10 seconds.  If this check fails, we want to route our traffic to a backup site on AWS S3.</p>
+
+<p><em>Setup S3 bucket to contain a static version of the site</em></p>
+
+<p>Go to <strong>S3</strong> and let’s assume there’s a bucket that has a static version of your website.  There’s an option under ‘Properties’ that allows for <strong>Static Website Hosting</strong>.  Get the link for this endpoint (e.g. i-038815d0.highlyavailable.org.s3-website-us-east-1.amazonaws.com).</p>
+
+<p>Go to <strong>Route 53</strong> and under <strong>Hosted Zones</strong>, we want to ‘Create Record Set’.  Under ‘Alias’ we select our S3 endpoint that we created right above.  We specify that the <strong>Routing Policy</strong> is set to <strong>Failover</strong> and the Policy is ‘Secondary’.</p>
+
+<p>You can now terminate the webserver and you’ll see that there is a static failover (not all the links will work).  What happens is that <strong>Route 53</strong> has detected the failure of the primary and is now sending traffic to the backup site.  Remember that the failover does not have to be a static site; the failover can also be directed to another active site.</p>
+
+<h2 id="a-idhacosthigh-availability-costa"><a id="hacost">High Availability Cost</a></h2>
+
+<p>Hosting a high availability website can be complex.  You want to balance between not paying more than you need to with users having a good responsive experience.  We will go over the following Web Tier Core Concepts:</p>
+
+<ul>
+  <li>Use Fault Tolerant AWS Services:  Amazon CloudFront, Amazon Route 53, Elastic Load Balancing (ELB)</li>
+  <li>Allow auto scaling for elastic capacity (e.g. be able to handle fast growth, on/off, variable peak, predictable peaks) using ‘Just In Time’ provisioning</li>
+  <li>The Web Tier Foundation Components are: Elastic Load Balancer, Amazon CloudWatch, and Auto Scaling
+    <ul>
+      <li>Elastic Load Balancer has traffic come in and determines where to route traffic</li>
+      <li>CloudWatch provides monitoring for AWS cloud resources; CloudWatch is a metrics repository that gets metrics like CPU utilization, latency, etc. from Elastic Load Balancer.  You can setup metric thresholds that has an action (e.g. auto-scale a new server, alert you of high latency).</li>
+      <li>Auto Scaling changes configuration settings (e.g. create a new web server)</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idcloudwatchaws-cloudwatcha"><a id="cloudwatch">AWS CloudWatch</a></h4>
+
+<p>Cloudwatch allows you to monitor AWS cloud resources.  Alarms can be setup.  You can setup metric thresholds that has an action (e.g. auto-scale a new server, alert you of high latency).  It can tell you CPU utilization, but not things like memory use (because it is an instance that thinks all memory is used).</p>
+
+<h4 id="a-idelbaws-elastic-load-balancera"><a id="elb">AWS Elastic Load Balancer</a></h4>
+
+<p>Elastic Load Balancer (ELB) is a load balancer that is highly available and helps with auto-scaling, does health checks, etc.  ELB spans across multiple AZs.  ELB scales smoothly based on traffic.  Scaling can take from 1-7 minutes based on traffic profile.</p>
+
+<p>IP Address will change over time (so don’t use IP Address).</p>
+
+<ul>
+  <li>Use ‘CNAME’ records in DNS</li>
+  <li>DNS TTL of 60 seconds</li>
+</ul>
+
+<p>For spiky/flash traffic, pre-warm ELB by submitting a request to AWS Support.  You can also DIY by slowling simulating more users.</p>
+
+<p>There are two types of ELBs: <strong>public ELB</strong> (only ELB is public facing, Web/app instances can use private IP Adddresses in private subnets) and <strong>internal ELBs</strong> (ideal for balancing request between multiple internal tiers).  </p>
+
+<h4 id="a-idautoscaleaws-auto-scalinga"><a id="autoscale">AWS Auto Scaling</a></h4>
+
+<p>With auto scaling, we want to scale up and down or rebalance servers across AZs.  We have the following types of scaling (manual, by schedule, by policy in response to real-time alerts, auto-rebalance across AZs).</p>
+
+<p>For example, scale up by 10% if CPU utilization is greater than 60% for 5 minutes or scale down by 10% if CPU utilization is less than 30% for 20 minutes.  We always scale up more since it takes longer than scaling down.</p>
+
+<h4 id="a-idautoscalecomponentsauto-scaling-componentsa"><a id="autoscalecomponents">Auto Scaling Components</a></h4>
+
+<p>We have the following components:</p>
+
+<ul>
+  <li>Launch Configuration - describes what auto scaling will create when adding instances</li>
+  <li>Auto-Scaling Group - auto scaling managed grouping of EC2 instances</li>
+  <li>Auto-Scaling Policy - parameters for performing an auto scaling action</li>
+</ul>
+
+<p>We can use the <strong>AWS CLI</strong> for auto-scaling by calling commands like an API (or you can see this under <strong>EC2</strong> auto-scaling:</p>
+
+<p>E.g. <code>aws autoscaling create-launch-configuration --launch-configuration-name LC1 \ --image-id ami-570f603ee --instance-type m3.medium</code></p>
+
+<p><code>aws autoscaling create-auto-scaling-group --auto-scaling-group-name ASG1 \ --launch-configuration-name LC1 --min-size 2 --max-size 8 \ --desired-capacity 4 --availability-zones us-east-1a us-east-1c --load-balancer-names ELB1</code></p>
+
+<h4 id="a-idbootstrapbootstrappinga"><a id="bootstrap">Bootstrapping</a></h4>
+
+<p>Configuration (like with Chef) of setting up a server when it first starts.</p>
+
+<h2 id="a-idlab2lab-2-exercise---create-high-availability-on-web-tiera"><a id="lab2">Lab 2 Exercise - Create High Availability on Web Tier</a></h2>
+
+<h4 id="a-idlab2aload-balancersa"><a id="lab2a">Load Balancers</a></h4>
+
+<p>We will continue our previous web application and remove the single point of failure at the web app by adding a <strong>load balancer</strong> and implementing <strong>auto scaling</strong>.  We will start with the ‘Deployment &amp; Management’ &gt; CloudFormation &gt; Output; notice that this URL resolves to a Elastic Load Balancer.  Under <strong>EC2</strong>, look at the <strong>Load Balancers</strong> section.  Under the ‘Instances’ tab, you can see that there are two Availability Zones (AZs); e.g. we have us-east-1c and us-east-1d.</p>
+
+<h4 id="a-idlab2bauto-scaling-part-1a"><a id="lab2b">Auto Scaling Part 1</a></h4>
+
+<p>So what happens if an instance in an AZ fails?  The other instances have to carry the load.  We can implement <strong>auto scaling</strong> to help correct for this.  We simulate an instance stopping by stopping a web server instance.  The instance will fail an ELB health check and ELB will remove this instance from rotation.  </p>
+
+<p>After a few minutes, Auto Scaling will find the unavailable instance, terminate it, and launch a replacement instance, then register it with ELB.  You can see this in action in <strong>EC2</strong> under <strong>Auto Scaling Groups</strong> and look at the ‘Activity History’ to see that an instance was terminated, then a new EC2 instance is automatically launching.  </p>
+
+<h4 id="a-idlab2cauto-scaling-part-2a"><a id="lab2c">Auto Scaling Part 2</a></h4>
+
+<p>We can generate load on our web servers to trigger Auto Scaling grow the number of servers to handle the load.  To see how a group scales, in <strong>EC2</strong> look under ‘Details’ to see the ‘desired’, ‘min’, and ‘max’ servers.  To see the policies, look under ‘Scaling Policies’ to see the rules (e.g. remove 1 instance when CPU utilization &lt; 40 for 180 consecutive periods of 60 seconds).</p>
+
+<p>We run a custom program (bees with machine guns) that spins up EC2 servers that generate load on our web servers.  You can see the load in real time in <strong>EC2</strong> &gt; Instances &gt; select a web server &gt; Monitoring.  To see a list of events, look under ‘Auto Scaling Groups’ &gt; ‘Activity History’ to see the web servers increase and decrease in usage.</p>
+
+<h4 id="a-idlab2dsummary-high-availability-on-web-tiera"><a id="lab2d">Summary: High Availability on Web Tier</a></h4>
+
+<p>Summary: The current architecture improves availability and solves the single point of failure at the web tier (via Elastic Load Balancer), using auto scaling to provide fault tolerance and scalability within the web server fleet.
+*  However, the database is still not fault tolerant.  A database failure will cause an application outage.
+*  Session state is held in each of the web tiers so while the application can survive the loss of web servers, the state on the lost web servers won’t be recoverable, which could result in a poor customer experience.</p>
+
+<h2 id="a-idstorageaws-storage-optionsa"><a id="storage">AWS Storage Options</a></h2>
+
+<p>AWS has a few storage options including scalable storage, inexpensive archive storage, persistent direct attached storage, turn-key gateway solutions.  You want to pick the right one for the job.  Each has a unique combination of performance, durability, cost and interface.</p>
+
+<ul>
+  <li>AWS EC2
+    <ul>
+      <li>EC2 Local Instance Storage (Ephemeral volumes)
+        <ul>
+          <li>Magnetic</li>
+          <li>SSD</li>
+        </ul>
+      </li>
+      <li>EBS (Elastic BLock Storage)
+        <ul>
+          <li>Magnet, General Purpose (SSD) or PIOPS (SSD)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Cloud Storage
+    <ul>
+      <li>S3 (Simple Storage Service)</li>
+      <li>Glacier (Archival/Cold Storage)</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idebsaws-elastic-block-store-ebsa"><a id="ebs">AWS Elastic Block Store (EBS)</a></h4>
+
+<p>High performance block storage device, can mount as drives to instances.  However, can’t map to multiple instances.  This is essentially a network attached hard drive.  These are 1 GB to 16 TB in size, are private to your instances, and are replicated within an Availability Zone.  Backups can be snapshotted for point-in-time restore.  Detailed metrics can be captured with CloudWatch.</p>
+
+<p><strong>EBS Availability</strong></p>
+
+<p>A volume is replicated, but only within a <strong>single Availability Zone</strong>.  Snapshots are stored in S3.  You can increase availability by replicating your volumes to another AZ or Snapshot regularly.</p>
+
+<p><strong>EBS Performance</strong></p>
+
+<p>There are two types of EBS, Magnetic and SSD.  Recommend not using Magnetic.</p>
+
+<ul>
+  <li>3 IOPS/GB sustained/baseline
+    <ul>
+      <li>100GB = 300 IOPS, 1000GB = 3000 IOPS sustained</li>
+    </ul>
+  </li>
+  <li>Each volume gets an IO credit of 5.4 million IOPS</li>
+  <li>Burstable up to 3000 IOPS for 30 minutes
+    <ul>
+      <li>30 * 60 * 3000 = 5,400,000 IOPS</li>
+      <li>Once IOPS are depleted, it’s replenished at the baseline rate</li>
+    </ul>
+  </li>
+  <li>Sustained performance until IOPS are depleted</li>
+</ul>
+
+<p>Use PIOPS for consistent IO performance</p>
+
+<ul>
+  <li>Up to 4000 16KB IOPS/volume</li>
+  <li>Stripe multiple volumes for &gt;4000 IOPS</li>
+  <li>Use with EBS Optimized Instances (be aware of max IOPS and bandwidth based on your EC2 instance size, e.g. c1.xlarge = 1,000 dedicated EBS throughput)</li>
+</ul>
+
+<h4 id="a-idinstancestorageaws-ec2-instance-storagea"><a id="instancestorage">AWS EC2 Instance Storage</a></h4>
+
+<p>‘Instance Storage’ is a storage local to your AWS EC2 instance.  These are basically hard drives that you can’t take with you (i.e. you lose this when your server shuts down) with the following properties:</p>
+
+<ul>
+  <li>Temporary, volatile block storage</li>
+  <li>Not all instances have instance storage (e.g. T2)</li>
+  <li>Must be configured at launch of instance, cannot be reconfigured later</li>
+  <li>Good for sequential I/O whereas EBS is better for random I/O</li>
+  <li>Ranges from 4GB to 48 TB of storage (based on instance type)</li>
+  <li>Can be used for transient or replicated data</li>
+  <li>Good for swap, caches, temp tables, intermediate data, data you can afford to lose</li>
+  <li>SSD Instance storage ideal for high performance workloads
+    <ul>
+      <li>Up to 365,000 4KB random read IOPS and up to 315,000 4KB random first write IOPS</li>
+    </ul>
+  </li>
+  <li>Neither highly available nor Fault Tolerant</li>
+  <li>There is a first access penalty
+    <ul>
+      <li>First time you access a block of storage, it must be either wiped clean (for new volumes)</li>
+      <li>Or instantiated from its snapshot, before you can access the block (for restored volumes)</li>
+    </ul>
+  </li>
+  <li>Recommended use is for high performance workloads</li>
+</ul>
+
+<h4 id="a-ids3storageaws-s3-storagea"><a id="s3storage">AWS S3 Storage</a></h4>
+
+<p>Very very high durability of objects.  Unlimited storage of objects of any type.</p>
+
+<ul>
+  <li>Buckets act like hard drives</li>
+  <li>Up to 5TB per object</li>
+  <li>Can have object versioning</li>
+  <li>Can do server side encryption</li>
+  <li>Can do browser upload to S3</li>
+  <li>S3 is a key-value store; key is the file name and value is the object.
+    <ul>
+      <li>E.g. <code>&lt;my_bucket&gt;/521335461-2013_11_13.jpg</code></li>
+      <li>E.g. <code>&lt;my_bucket&gt;/465330151-2013_11_13.jpg</code></li>
+      <li>You want the first few numbers to be random, that way it’ll hit different shards.  The WORST thing you can do is make these numbers increment by one.  Note: Only for really high volumes like 1TB+.</li>
+    </ul>
+  </li>
+  <li>Add additional prefixes to help sorting, that way one application will not degrade another application’s performance
+    <ul>
+      <li>E.g. <code>&lt;my_bucket&gt;/images/5213213-2013_11_13.jpg</code></li>
+      <li>E.g. <code>&lt;my_bucket&gt;/images/9686894-2013_11_13.jpg</code></li>
+      <li>E.g. <code>&lt;my_bucket&gt;/movies/4324678-2013_11_13.jpg</code></li>
+      <li>E.g. <code>&lt;my_bucket&gt;/movies/9066548-2013_11_13.jpg</code></li>
+    </ul>
+  </li>
+  <li>Lookup image for AWS Storage Options Chart</li>
+</ul>
+
+<h4 id="a-idstoragesummaryaws-storage-options-summarya"><a id="storagesummary">AWS Storage Options Summary</a></h4>
+
+<ul>
+  <li>AWS storage options are different from traditional storage options</li>
+  <li>EBS is fault tolerant to a single AZ, important to snapshot regularly and/or replicate critical data</li>
+  <li>Use EBS with Provisional IOPS for higher performance file systems</li>
+  <li>Use Amazon S3 for Fault Tolerant object storage with high durability
+    <ul>
+      <li>Object Storage, no infrastructure to think about</li>
+      <li>Unlimited space, high scale</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-iddbarchitecturedatabase-optionsa"><a id="dbarchitecture">Database Options</a></h2>
+
+<p>AWS supports a variety of database deployment options.  </p>
+
+<ul>
+  <li>AWS can support traditional database high availability options by mirroring and replication.</li>
+  <li>AWS also offers managed databases with high availability support using <strong>Amazon RDS Multi-AZ</strong> and <strong>Amazon DynamoDB</strong>.</li>
+</ul>
+
+<h4 id="a-iddiyrdbmsdiy-rdbms-optionsa"><a id="diyrdbms">DIY RDBMS options</a></h4>
+
+<p>Each option solves different DB problems so choose based on experience, features, and cost.</p>
+
+<p>Self managed on EC2</p>
+
+<ul>
+  <li>Oracle, SQL Server, DB2</li>
+  <li>MySQL, PostgreSQL</li>
+  <li>Basically any type of database</li>
+</ul>
+
+<p>AWS Managed (RDS)</p>
+
+<ul>
+  <li>RDS MySQL</li>
+  <li>RDS Oracle</li>
+  <li>RDS SQL Server</li>
+  <li>RDS PostgreSQL</li>
+</ul>
+
+<h4 id="a-iddbstorageconsiderationsdatabase-storage-considerationsa"><a id="dbstorageconsiderations">Database Storage Considerations</a></h4>
+
+<ul>
+  <li>Use EBS GP2 volumes for low/medium workloads</li>
+  <li>EBS PIOPS provides up to 4000 IOPS/volume for high performance workloads</li>
+  <li>Instance storage for temporary data</li>
+  <li>SSD Ephemeral disk amy be useful for NoSQL databases or replicated RDBMS</li>
+  <li>For DR purposes, important to snapshot EBS volumes regularly</li>
+  <li>For best practices, read whitepapers.</li>
+</ul>
+
+<h4 id="a-idcachingcachinga"><a id="caching">Caching</a></h4>
+
+<p>You can always cache to reduce the number of reads to your database.</p>
+
+<h4 id="a-iddbgenericreplicationdatabase-relational-database-replicationa"><a id="dbgenericreplication">Database Relational Database Replication</a></h4>
+
+<p>You can have a typical master-slave setup.  You might have database mirroring.  This allows for reporting to hit a slave database instead of the master.</p>
+
+<h4 id="a-idshardingdatabase-shardinga"><a id="sharding">Database Sharding</a></h4>
+
+<p>You can shard your databases where you split large partitionable tables across multiple, smaller database servers.  You need to setup application so it is shard-ware and shards may require periodic rebalancing.  This also brings additional challenges like multi-server querying.</p>
+
+<h4 id="a-iddbnosqlnosql-databasesa"><a id="dbnosql">NoSQL Databases</a></h4>
+
+<p>If you don’t need these important features (e.g. transaction support, ACID compliance, joins, SQL) you can then switch to key-value store using NoSQL (very fast, no need to worry about same sharding issues as a relational database).</p>
+
+<h4 id="a-idrdsaws-rdsa"><a id="rds">AWS RDS</a></h4>
+
+<p>AWS has a relational database called <strong>RDS</strong> that has an option to one-click high availability.  This creates a replicated database to another availability zone.</p>
+
+<h4 id="a-iddynamodbaws-dynamodba"><a id="dynamodb">AWS DynamoDB</a></h4>
+
+<p>AWS <strong>DynamoDB</strong> is a fully managed NoSQL database service that provides extremely fast and predictable performance with seamless scalability.  There is minimal administration, low latency SSDs, and unlimited potential storage and throughput.  There is no need for tuning, is highly durabile, and one of the few services that is fault tolerant (only other is Route 53).</p>
+
+<ul>
+  <li>Provisioned the throughput needed for each table; set at table creation (e.g. my table needs 1,000 writes/second and 5,000 reads/seconds of capacity)</li>
+  <li>Increase / decrease any time via API call</li>
+  <li>Pay for throughput and storage</li>
+  <li>Good uses cases include low latency and/or high throughput are required</li>
+  <li>Digital advertising: cookie/pixel tracking</li>
+  <li>Any workload where high availability and performance are important</li>
+  <li>Most operations should be lookup in a table (key-value), not for relational data</li>
+  <li>No dependencies (e.g. foreign keys)</li>
+</ul>
+
+<h4 id="a-iddbsummaryaws-database-summarya"><a id="dbsummary">AWS Database Summary</a></h4>
+
+<ul>
+  <li>AWS supports a wide variety of database and high availability options</li>
+  <li>Consider whether you want to manage your database infrastructure or let AWS do it</li>
+  <li>RDS provides a high availability relational database</li>
+  <li>DynamoDB provides a high availability and fault tolerant NoSQL database </li>
+</ul>
+
+<h2 id="a-idlab3lab-3-exercise---create-high-availability-on-database-tiera"><a id="lab3">Lab 3 Exercise - Create High Availability on Database Tier</a></h2>
+
+<h4 id="a-idlab3aaws-rds-to-create-highly-available-relational-databasea"><a id="lab3a">AWS RDS to create highly available relational database</a></h4>
+
+<p>Our goal is to create a highly available database tier.  We will use AWS <strong>RDS</strong>, where Amazon will run the database instance in multi-AZs.  When looking at the database, if <strong>Multi-AZ</strong> option is ‘Yes’, you will see the ‘Availability Zone’ and the ‘Secondary Availability Zone’.</p>
+
+<p>Failover will automatically occur when various events (like rebooting the server) happen.  Normally a reboot would cause downtime, but with a Multi-AZ instance, RDS can failover to the standby instance while the primary is rebooting (When you reboot, there will be an option to select ‘Reboot with Failover’, which you should check).  You can verify what happens by checking the ‘Events’ log.  There are also options to create <strong>Read Replicas</strong> and <strong>Automatic Database Backups</strong>.  It is as simple as clicking on ‘Instance Actions’ &gt; ‘Create Read Replica’</p>
+
+<h4 id="a-idlab3baws-dynamodb-nosql-to-store-session-statea"><a id="lab3b">AWS DynamoDB (NoSQL) to store session state</a></h4>
+
+<p>We lose session state in case of web server failure.  This is also an issue when using Auto Scaling because auto scaled instances should be stateless.  There are many possible solutions to store our session state information including putting this outside of web servers in a database, in an in-memory cache (like memcached or AWS ElasticCache), or a high performance durable storage.</p>
+
+<p>For this example, we will store our sessions state using AWS <strong>DynamoDB</strong> since it is inherently fault tolerant, we do not need to worry about replication, failover or any other issues with high availability.  We enter in some data into our application (e.g. create a login, password, etc).  We go back to ‘DynamoDB’ and look at the table to see the id and data.  By default, there is a provisioned throughput of 10 read and writes per second, which you can change depending on your needs.</p>
+
+<h4 id="a-idlab3clab-summary-use-aws-rds-or-dynamodba"><a id="lab3c">Lab Summary: Use AWS RDS or DynamoDB</a></h4>
+
+<p>In summary, it is easy to create high availability of databases if you use AWS RDS or DynamoDB.  You have the option to create your own custom databases and manually setting master-slaves, but that is a lot more difficult.</p>
+
+<h2 id="a-idhadesignpatternshigh-availability-design-patternsa"><a id="hadesignpatterns">High Availability Design Patterns</a></h2>
+
+<p>When it comes to High Availability, we have the following patterns:</p>
+
+<ul>
+  <li>Basic patterns</li>
+  <li>Advanced patterns</li>
+  <li>Amazon Virtual Private Cloud (VPC) patterns</li>
+</ul>
+
+<h4 id="a-idcommondesignpatternscommon-design-patternsa"><a id="commondesignpatterns">Common Design Patterns</a></h4>
+
+<p><strong>Multi-Server Pattern</strong></p>
+
+<ul>
+  <li>Problem: Need to increase availability at the instance layer such that if an instance dies there is a resilient solution.</li>
+  <li>Solution: Distribute load between instances using Elastic Load Balancing</li>
+</ul>
+
+<p><strong>Multi-Datacenter Pattern</strong></p>
+
+<ul>
+  <li>Problem:  Increase availability of my application if there is a power outage or a natural disaster in the area causing a data center outage</li>
+  <li>Solution: Distribute load between instances using an Elastic Load Balancing across multiple AZs.</li>
+</ul>
+
+<p><strong>High Availability Database Pattern</strong></p>
+
+<ul>
+  <li>Problem:  Need to have high availability solution that will withstand an outage of the DB master and can sustain high volume of reads</li>
+  <li>Solution:  Deploy RDS with a master and slave configuration.  In addition, deploy a read replica in each availability zone for my reads.</li>
+</ul>
+
+<p><strong>Floating IP Pattern</strong></p>
+
+<ul>
+  <li>Problem:  If my instance fails or I need to upgrade it, I need to push traffic to another instance with the same public IP Address.</li>
+  <li>Solution:  Use an IP address which allows portability of a given IP Address between EC2 instances without updating DNS</li>
+</ul>
+
+<p><strong>Floating Interface Pattern</strong></p>
+
+<ul>
+  <li>Problem:  If my instance fails or I need to upgrade it, I need to push traffic to another instance with the same public and private IP addresses and same network interface</li>
+  <li>Solution:  Deploy your application in VPC and use an elastic network interface (ENI) on eth1 that can be moved between instances and retain same MAC, public, and private IP addresses.</li>
+</ul>
+
+<p><strong>State Sharing</strong></p>
+
+<ul>
+  <li>Problem: State is stored on my server so scaling horizontally does not work that well.  I want my application to be stateless.</li>
+  <li>Solution:  In order to scale horizontally and not have a user locked into a single server, we need to move state off of my server into a KVS.</li>
+</ul>
+
+<p><strong>Web Storage Pattern</strong></p>
+
+<ul>
+  <li>Problem:  Delivery of large files from a web server can become a problem in terms of network load</li>
+  <li>Solution:  User generated content needs to be distributed across all my web servers.</li>
+</ul>
+
+<p><strong>Scheduled Scale Out</strong></p>
+
+<ul>
+  <li>Problem:  Traffic does not scale organically, but has huge jumps at specific periods of the day or for an event (e.g. Shazam commercial to use app for Super Bowl)</li>
+  <li>Solution:  Use Scaling by Schedule or Scaling by Policy to handle running an Auto Scaling policy at a specific point in time.</li>
+</ul>
+
+<p><strong>Job Observer Pattern</strong></p>
+
+<ul>
+  <li>Problem:  I want to manage resources against the depth of my work queue</li>
+  <li>Solution:  Create Auto Scaling group to scale compute resources based upon queue depth</li>
+</ul>
+
+<p><strong>Bootstrap Instance</strong></p>
+
+<ul>
+  <li>Problem:  Code releases happen often and creating a new AMI every time you have a release and managing these AMIs across multiple regions is difficult</li>
+  <li>Solution:  Develop a base AMI, and then bootstrap the instance during the boot process to install software, get updates, and install source code so that your AMI rarely or never changes.</li>
+</ul>
+
+<p><strong>High Availability (HA) NAT</strong></p>
+
+<ul>
+  <li>Problem:  NAT inside of VPC is confined to a single instance, which could fail</li>
+  <li>Solution:
+    <ul>
+      <li>Run NAT in independent ASGs per AZ</li>
+      <li>If NAT instance goes down, Auto Scaling will launch new NAT instance</li>
+      <li>As part of launch config, assign a public IP and call VPC APIs to update routes</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>HA NAT - Squid Proxy</strong></p>
+
+<ul>
+  <li>Problem:  Standard NAT inside of VPC is confined to a single instance, which could fail</li>
+  <li>Solution:
+    <ul>
+      <li>Run Squid in proxy configuration in an ASG</li>
+      <li>On boot, configure instance to point to proxy for all HTTP(S) requests</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="a-idvpndirectconnectvpn-and-aws-direct-connecta"><a id="vpndirectconnect">VPN and AWS Direct Connect</a></h4>
+
+<p><strong>VPN Connectivity</strong> allows connecting dual redundant tunnels between your on-premises equipment and AWS</p>
+
+<p><strong>AWS Direct Connect</strong> establishes a private network connection between your network and one of the AWS Regions.  AWS Direct Connect is an alternative to using the Internet to access AWS cloud services.  This reduces bandwith costs, creates consistent network performance, is a private connection to your Amazon VPC.</p>
+
+<h4 id="a-idlab4lab-4-exercise---making-outbound-traffic-highly-available-using-nat-instancesa"><a id="lab4">Lab 4 Exercise - Making outbound traffic highly available using NAT instances</a></h4>
+
+<p>In previous labs we created redundant services across availability zones (AZs) within a region and distributing inbound traffic across those services at various application tiers (web, database).  Now we want to look at how to make outbound traffic highly originating from application tiers in VPC highly available, using NAT instances that span multiple AZs.</p>
+
+<p>This looks tough, time to call an Amazon representative if you run into this issue.</p>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>

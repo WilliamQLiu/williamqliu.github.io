@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>Hadoop</title>
+   <meta name="William Liu" content="William Liu" />
+
+   <!-- syntax highlighting CSS -->
+   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+
+   <!-- Homepage CSS -->
+   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+
+   <!-- LaTeX support -->
+   <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+     MathJax.Hub.Config({
+     extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js"],
+     jax: ["input/TeX", "output/HTML-CSS"],
+     tex2jax: {
+         inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+         displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+     },
+     "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+   </script>
+
+</head>
+
+<body>
+  <div class="site">
+    <div class="title">
+      <a href="/">William Liu</a>
+    </div>
+
+    <div id="post">
+<h2 id="hadoop">Hadoop</h2>
+
+<hr />
+
+<h2 id="table-of-contents">Table of Contents</h2>
+
+<ul>
+  <li><a href="#summary">Summary</a>
+    <ul>
+      <li><a href="#whyhadoop">Why Hadoop</a></li>
+    </ul>
+  </li>
+  <li><a href="#howworks">How does Hadoop work?</a>
+    <ul>
+      <li><a href="#mapreduce">MapReduce</a></li>
+      <li><a href="#hdfs">HDFS</a></li>
+    </ul>
+  </li>
+  <li><a href="#diffhadoopversions">Hadoop v2 Ecosystem (Pig, Hive, Spark)</a>
+    <ul>
+      <li><a href="#overviewlayers">Overview of Layers</a></li>
+      <li><a href="#hive">Hive</a></li>
+      <li><a href="#pig">Pig</a></li>
+      <li><a href="#spark">Spark</a></li>
+      <li><a href="#hue">Hadoop User Interface (HUE)</a></li>
+    </ul>
+  </li>
+  <li><a href="#hellohadoop">Hello Hadoop Code</a></li>
+  <li><a href="#emr">Amazon Elastic Map Reduce</a>
+    <ul>
+      <li><a href="#datalayers">Data Layers</a></li>
+      <li><a href="#datasetups">Data Architectures</a></li>
+      <li><a href="#emrexecutework">How to execute work with EMR</a></li>
+      <li><a href="#emrsecurity">EMR setup security</a></li>
+    </ul>
+  </li>
+  <li><a href="#awsdatapipeline">Amazon Data Pipeline for ETL</a>
+    <ul>
+      <li><a href="#pipelinebasiccmds">General Pipeline Commands</a></li>
+      <li><a href="#pipelineusecase">Use Case: Clickstreams</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="a-idsummarysummarya"><a id="summary">Summary</a></h2>
+
+<p>Apache’s <strong>Hadoop</strong> is an open source software framework for big and/or unstructured data that is programmed in Java.  This means that if you’re working with very large data sets (e.g. 100 Terabytes), then you’ll need Hadoop.  It’s important to note that if you don’t work with very large data sets or unstructured data, then you probably do NOT need Hadoop.  You’re probably better off with using a standard relational SQL database.</p>
+
+<h4 id="a-idwhyhadoopwhy-hadoopa"><a id="whyhadoop">Why Hadoop</a></h4>
+
+<p>So why Hadoop?  Instead of running on a single powerful server, Hadoop can run on a large cluster of commodity hardware.  This means that a network of personal computers (nodes) can coordinate their processing power and storage (see HDFS below).  Hadoop allows systems to build <strong>horizontally</strong> (i.e. more computers) instead of just <strong>vertically</strong> (i.e. a faster computer).</p>
+
+<p>Hadoop is the right system for ‘Big Data’.  Choose Hadoop if a lot of this applies:</p>
+
+<ul>
+  <li>Data lacks structure</li>
+  <li>Analyzing streams of information</li>
+  <li>Processing large datasets</li>
+  <li>Warehousing large datasets</li>
+  <li>Flexibility for ad hoc analysis</li>
+  <li>Speed of queries on large data sets</li>
+</ul>
+
+<p>Hadoop is good for:</p>
+
+<ul>
+  <li>Massively parallel</li>
+  <li>Scalable and fault tolerant</li>
+  <li>Flixibility for multiple languages and data formats</li>
+  <li>Open Source</li>
+  <li>Ecosystem of tools</li>
+  <li>Batch and real-time analytics</li>
+</ul>
+
+<h2 id="a-idhowworkshow-does-hadoop-worka"><a id="howworks">How does Hadoop work?</a></h2>
+
+<p>Hadoop’s architecture is built from Google’s <strong>MapReduce</strong> and the <strong>Google File System</strong> white papers so it is no surprise that Hadoop consists of <strong>MapReduce</strong> and the <strong>Hadoop File System (HDFS)</strong>.</p>
+
+<h4 id="a-idmapreducemapreducea"><a id="mapreduce">MapReduce</a></h4>
+
+<p>MapReduce is broken down into two pieces, <strong>mappers</strong> and <strong>reducers</strong>:</p>
+
+<ul>
+  <li>mappers load data from the HDFS and filters, transforms, parses, and outputs (key, value) pairs</li>
+  <li>reducers automatically groups by the mapper’s output key and summarizes (say aggregates, count) the HDFS</li>
+</ul>
+
+<p>The general steps look like this:</p>
+
+<ol>
+  <li>split</li>
+  <li>map</li>
+  <li>sort/shuffle (this is done automatically)</li>
+  <li>reduce</li>
+</ol>
+
+<p>Note: There are specific MapReduce programs that allow higher level querying like Pig (that allow GROUP BY, FOREACH statements), Hive (similar to SQL, but less powerful), and Mahout (a Machine Learning language library that sometimes uses Hadoop for recommending, clustering, classification).</p>
+
+<h4 id="a-idhdfshdfsa"><a id="hdfs">HDFS</a></h4>
+
+<p>The <strong>Hadoop File System (HDFS)</strong> provides <strong>redundancy</strong> and <strong>fault-tolerant</strong> storage by breaking data into chunks of about 64MB - 2GB, then it creates 3 instances of the same data, and spreads it across a network of computers. Say that one of the networked computers has a piece of data you need and it goes down; there are still two other copies of the data on the network that is readily available. This is much different than many enterprise systems where if a major server goes down, it would take anywhere from minutes to hours or days to fully restore.</p>
+
+<p>Note: There are specific HDFS data systems like HBase and Accumulo that allow you to fetch keys quickly, which are good for transactional systems.</p>
+
+<h2 id="a-iddiffhadoopversionshadoop-v2-ecosystema"><a id="diffhadoopversions">Hadoop v2 ecosystem</a></h2>
+
+<p>There were a few changes from Hadoop v1 to Hadoop v2, mainly the addition of YARN and a lot more data processing applications like Pig, Hive, etc.</p>
+
+<p><strong>Hadoop 1</strong></p>
+
+<p>Main pieces of Hadoop 1.0 were MapReduce sitting on top of the HDFS.</p>
+
+<p><strong>Hadoop 2</strong></p>
+
+<p>With Hadoop 2.0, we still have MapReduce and HDFS, but now also have an additional layer <strong>YARN</strong> that acts as a resource manager for distributed applications; YARN sits between the MapReduce and HDFS layers.  Client submits job to YARN Resource Manager, which then automatically distributes and manages the job.  Along with MapReduce, we have a few other data processing like Hive, Pig, Spark, etc.</p>
+
+<h4 id="a-idoverviewlayersoverview-of-hadoop-2-layersa"><a id="overviewlayers">Overview of Hadoop 2 Layers</a></h4>
+
+<ol>
+  <li>Applications with Pig, Hive, Cascading, Mahout, Giraph, Presto</li>
+  <li>Batch jobs with MapReduce; Interactive with Tez; In memory with Spark</li>
+  <li>YARN for Cluster Resource Management</li>
+  <li>Storage with S3, HDFS</li>
+</ol>
+
+<h4 id="a-idhivehivea"><a id="hive">Hive</a></h4>
+
+<p>Use Hive to interact with your data in HDFS and Amazon S3</p>
+
+<ul>
+  <li>Batch or ad-hoc workloads</li>
+  <li>SQL-like query language (HiveQL) to allow users with knowledge of SQL to leverage Hadoop</li>
+  <li>Schema-on-read to query data without needing pre-processing using the Hive metastore.  You basically create your table however you want and say here’s how Hive should see the table using the <em>metastore</em>.</li>
+</ul>
+
+<h4 id="a-idpigpiga"><a id="pig">Pig</a></h4>
+
+<ul>
+  <li>Uses high level ‘Pig latin’ language to easily script data transformations in Hadoop</li>
+  <li>Strong optimizer for workloads</li>
+</ul>
+
+<h4 id="a-idsparksparka"><a id="spark">Spark</a></h4>
+
+<p>An alternative to MapReduce.  Spark uses a <strong>Directed Acyclic Graph</strong> instead of Hadoop’s Map-Reduce.  Has very high performance, but is in memory.</p>
+
+<ul>
+  <li>In-memory for fast queries</li>
+  <li>Great for machine learning (MLlib) or other iterative queries</li>
+  <li>Use Spark SQL to create a low-latency data warehouse</li>
+  <li>Spark Streaming library for real-time, stream processing workloads</li>
+  <li>Runs on YARN (and other cluster managemers too)</li>
+</ul>
+
+<h4 id="a-idhuehadoop-user-experience-hue-gui-for-hive-and-piga"><a id="hue">Hadoop User Experience (HUE) GUI for Hive and Pig</a></h4>
+
+<p>Can interact in an ad-hoc way with the HUE GUI.</p>
+
+<h4 id="a-idhellohadoophello-world-of-hadoopa"><a id="hellohadoop">Hello World of Hadoop</a></h4>
+
+<p><strong>Notes</strong></p>
+
+<p>Books: Hadoop the Definitive Guide
+Streaming with Python just use <code>stdin</code> and <code>stdout</code>
+*  Login to server through ssh.  E.g. <code>ssh username@216.230.228.88</code>, then enter your password for the ssh.
+*  Directory ‘streaming-examples’ has code for stock prices, wordcount, and word frequencies.  In each directory, enter this in the command line to run your hadoop code: <code>source run-hadoop.sh</code>
+*  Output gets stored in output/part-000000 should match file expected-output.</p>
+
+<p><strong>run-hadoop.sh</strong></p>
+
+<p>Run hadoop using: <code>source run-hadoop.sh</code></p>
+
+<pre><code>hadoop jar $HADOOP_HOME/share/hadoop/tools/lib/hadoop-streaming-*.jar \
+  -input ./input.txt \
+  -output ./output \
+  -mapper map.py \
+  -reducer reduce.py
+</code></pre>
+
+<p><strong>input.txt</strong></p>
+
+<pre><code>Goog, 230, 240
+Apple, 100, 98
+MS, 300, 250
+MS, 250, 260
+MS, 270, 280
+Goog, 220, 215
+Goog, 300, 350
+IBM, 80, 90
+IBM, 90, 85
+</code></pre>
+
+<p><strong>map.py</strong></p>
+
+<pre><code>#!/usr/bin/env python
+import sys
+import string
+
+for line in sys.stdin:
+    record = line.split(",")
+    opening = int(record[1])
+    closing = int(record[2])
+    if (closing &gt; opening):
+        change = float(closing - opening) / opening
+        print '%s\t%s' % (record[0], change)
+</code></pre>
+
+<p><strong>reduce.py</strong></p>
+
+<pre><code>#!/usr/bin/env python
+import sys
+import string
+
+stock = None
+max_increase = 0
+for line in sys.stdin:
+   next_stock, increase = line.split('\t')
+   increase = float(increase)
+   if next_stock == stock:     # another line for the same stock
+       if increase &gt; max_increase:
+           max_increase = increase
+   else:  # new stock; output result for previous stock
+       if stock != None:  # only false on the very first line of input
+           print( "%s\t%f" % (stock, max_increase) )
+       stock = next_stock
+       max_increase = increase
+# print the last
+print( "%s\t%f" % (stock, max_increase) )    
+</code></pre>
+
+<p><strong>expected-output</strong></p>
+
+<pre><code>Goog    0.166667
+IBM     0.125000
+MS      0.040000
+</code></pre>
+
+<p><strong>output/part-00000</strong></p>
+
+<p>This is created after running the <code>source run-hadoop.sh</code></p>
+
+<pre><code>Goog    0.166667
+IBM     0.125000
+MS      0.040000
+</code></pre>
+
+<h2 id="a-idemramazon-elastic-map-reducea"><a id="emr">Amazon Elastic Map Reduce</a></h2>
+
+<ul>
+  <li>Launch a cluster in minutes</li>
+  <li>Low cost with hourly rate</li>
+  <li>Elastic, easily add or remove capacity</li>
+  <li>EMR automatically rebalances tasks if servers drop</li>
+  <li>Can easily resize clusters</li>
+  <li>Can also have EMR push logs to S3 easily</li>
+  <li>Can launch in AWS Management Console, AWS Command Line Interface, or Amazon EMR API.</li>
+  <li>Security taken care of by AWS Identity and Access Management (IAM)</li>
+</ul>
+
+<p>In multiple EMR instance groups, we have:</p>
+
+<ul>
+  <li>Master Node (submit jobs to this)</li>
+  <li>Slave Group - Core (runs data managers like YARN)</li>
+  <li>Slave Group - Task (just runs node manager, does tasks; this is what you want your spot instances to be running in case it shuts down if you lose bid for server)</li>
+</ul>
+
+<h4 id="a-iddatalayerss3-and-hdfs-as-your-data-layersa"><a id="datalayers">S3 and HDFS as your data layers</a></h4>
+
+<ul>
+  <li>EMR File System (EMRFS) to access objects in S3</li>
+  <li>Decouple your storage layer from your cluster</li>
+  <li>Leverage S3’s durability</li>
+  <li>Good performance for sequential reads (which is common in analytics workloads)</li>
+  <li>Hadoop Distributed File System (HDFS)</li>
+  <li>3x replication for durability</li>
+  <li>Uses the local disk from your EC2 instances in your cluster</li>
+</ul>
+
+<h4 id="a-iddatasetupsdata-architecturesa"><a id="datasetups">Data Architectures</a></h4>
+
+<p>You can architect your data a few different ways.  Here are a few examples:</p>
+
+<ol>
+  <li>Data (e.g. GB of logs) are pushed to S3
+2a. You can either push out a small amount of data to a local server
+2b. If you don’t want to save data in the local server, you can just use S3 instead of HDFS for your data layer to decouple your compute capacity and storage.</li>
+</ol>
+
+<p><strong>Long-running cluster</strong></p>
+
+<ul>
+  <li>Daily EMR cluster ETL data into database with Pig</li>
+  <li>24/7 EMR cluster running HBase</li>
+</ul>
+
+<p><strong>Interactive query</strong></p>
+
+<ul>
+  <li>Hive metastore on Amazon EMR, then use business intelligence tools for ad-hoc investigation like cloudera impala, spark, presto, tez, and hive</li>
+</ul>
+
+<p><strong>EMR for ETL and query engine for investigations</strong></p>
+
+<p>This takes the S3 data and splits it two ways:</p>
+
+<ol>
+  <li>Spark for transient EMR cluster for ad-hoc analysis of entire log set</li>
+  <li>Hourly EMR cluster using Spark for ETL, then load subset into Redshift Data Warehouse</li>
+</ol>
+
+<p>Other interesting ETL setups include:</p>
+
+<ul>
+  <li>Nasdaq Data Lake Architecture</li>
+  <li>Washington Post and Spark on EMR</li>
+</ul>
+
+<p><strong>Streaming Data Processing</strong></p>
+
+<p>Logs stored in Amazon Kinesis, then it splits out to:</p>
+
+<ul>
+  <li>Amazon Kinesis Client Library</li>
+  <li>AWS Lambda</li>
+  <li>Spark Streaming</li>
+  <li>Amazon EMR with Hive, Pig, Cascading</li>
+  <li>Amazon EC2 and Storm</li>
+</ul>
+
+<h4 id="a-idemrexecuteworkhow-to-use-execute-work-on-emra"><a id="emrexecutework">How to use execute work on EMR</a></h4>
+
+<p>You can either:</p>
+
+<ul>
+  <li>via EMR Step API</li>
+  <li>Connect to Master Node and then work directly in shell to submit work or connect to HUE.</li>
+</ul>
+
+<p>You can have a variety of data stores including:</p>
+
+<ul>
+  <li>AWS S3</li>
+  <li>HDFS</li>
+  <li>AWS DynamoDB</li>
+  <li>AWS Redshift</li>
+  <li>AWS Glacier</li>
+  <li>AWS RDS</li>
+</ul>
+
+<h4 id="a-idemrsecurityhow-to-set-security-for-emra"><a id="emrsecurity">How to set security for EMR</a></h4>
+
+<p>EMR uses two IAM roles for security:</p>
+
+<ul>
+  <li>EMR service role is for the EMR control panel</li>
+  <li>EC2 instance profile is for the actual instances in the Amazon EMR cluster</li>
+</ul>
+
+<p>EMR by default creates two security groups:</p>
+
+<ul>
+  <li>Master Security Group - has port 22 access for SSHing into your cluster</li>
+  <li>Slave Security Group - is a single default master and default slave security group across all of your clusters</li>
+  <li>You can add additional security groups to the master and slave groups on a cluster to separate them further</li>
+</ul>
+
+<p>Bootstrap Actions configures your applications (e.g. setup <code>core-site.xml</code>, <code>hdfs-site.xml</code>, <code>mapreduce.xml</code>, <code>yarn.xml</code>)</p>
+
+<p>You should consider using client-side encrypted objects in S3.  Also should compress your data files.  S3 can be used as Landing Zone and/or as Data Lake.</p>
+
+<p>EMR is also HIPAA-eligible.</p>
+
+<h2 id="a-idawsdatapipelineaws-data-pipeline-for-etla"><a id="awsdatapipeline">AWS Data Pipeline for ETL</a></h2>
+
+<p>AWS Data Pipeline, can access through the console, command line interface, APIs</p>
+
+<ul>
+  <li>Manages your workflow data orchestration based on activities you define</li>
+  <li>Manages dependencies and automated scheduling for you</li>
+  <li>Provides notifications/alerts using Amazon SNS on job failure/success</li>
+  <li>Provide ability to run backfills on your data</li>
+</ul>
+
+<h4 id="a-idpipelinebasiccmdsgeneral-data-pipeline-commandsa"><a id="pipelinebasiccmds">General Data Pipeline Commands</a></h4>
+
+<ul>
+  <li><em>Define</em> by defining the name of the data pipeline</li>
+  <li><em>Import</em> import in the data</li>
+  <li><em>Activate</em> to activate your pipeline</li>
+</ul>
+
+<h4 id="a-idpipelineusecasepipeline-use-case-for-clickstreamsa"><a id="pipelineusecase">Pipeline Use Case for Clickstreams</a></h4>
+
+<ol>
+  <li>S3 as Data Lake / Landing Zone</li>
+  <li>Amazon EMR as ETL grid (hive, pig)</li>
+  <li>Data Warehouse with Amazon Redshift</li>
+</ol>
+
+<p>On a Data Pipeline, the activities looks like:</p>
+
+<ol>
+  <li>weblogs-bucket</li>
+  <li>logsProcess-ExtractTransform</li>
+  <li>goes to staging</li>
+  <li>goes to redshift</li>
+  <li>reports connect to redshift</li>
+</ol>
+
+<p>For example, a PigActivity can do:</p>
+
+<ul>
+  <li>Can setup a schedule (e.g. every day, every 15 min)</li>
+  <li>Retry</li>
+  <li>On Fail/On Success</li>
+  <li>Define Input</li>
+  <li>Define Output</li>
+  <li>Runs on</li>
+</ul>
+
+</div>
+
+<div id="related">
+  <h3>Related Posts</h3>
+  <ul class="posts">
+    
+      <li><span>17 Oct 2015</span> <a href="/2015/10/17/django.html">Django Web Framework</a></li>
+    
+      <li><span>04 Oct 2015</span> <a href="/2015/10/04/testing.html">Testing</a></li>
+    
+      <li><span>03 Oct 2015</span> <a href="/2015/10/03/django-rest-framework.html">Django REST Framework (DRF)</a></li>
+    
+  </ul>
+</div>
+
+    <div class="footer">
+      <div class="contact">
+        <p>
+          William Liu<br/>
+        </p>
+      </div>
+      <div class="contact">
+        <p>
+          <a href="http://github.com/williamqliu/">github.com/williamqliu</a><br/>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <a href="http://github.com/williamqliu"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
+  -->
+
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-36019998-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- Google Analytics end -->
+</body>
+
+</html>
