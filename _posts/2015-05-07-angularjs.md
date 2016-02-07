@@ -64,6 +64,8 @@ Here's a quick summary of how to get up and running with AngularJS.
 *  Make folder
 *  `yo angular <appname>`
     -  No to Gulp, No to SASS, Yes to Bootstrap
+    -  e.g. `yo angular:app myAppName`
+    -  If this installs in the wrong folder location, then check your `.yo-rc.json` file (delete it), then recreate in the right folder location
 *  `bower install --save <some js library (e.g. firebase)>`
 *  `grunt serve` and then `grunt build`
 
