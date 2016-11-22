@@ -1,6 +1,5 @@
 markdown: kramdown
-higherlighter: pygments
-pygments: true
+higherlighter: rouge
 
 author:
     name: William Liu
