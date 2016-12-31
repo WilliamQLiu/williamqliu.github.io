@@ -128,4 +128,40 @@ We don't have to animate every keyframe because we have **interpolation**, **smo
 * **Animation Parameters** specify when one state can go to another state (e.g. can't have a dead player transitioning to jumping animation)
 * We use **scripts** to trigger animations; in Unity you can drag and drop scripts to objects like the clock
 
+##Cameras
+
+Every scene needs at least a **main camera**.
+
+* **Clear Flags** property is what the camera sees if there is no 3D object (think of it as the background scene); don't ever use **Don't Clear**, which uses the last frame's scene (no use for VR)
+* A **Layer** is like a folder for how we organize putting in game objects; by default, there is a 'Default' layer. First 8 Layers are for the Unity Engine.
+*  **Culling Mask** property tells the camera what layers of the scene should be rendered
+
+###Depth
+
+There are two ways for cameras to capture a 3D space and represent it onto a 2D screen. Unity uses two types of depths: **Perspective** and **Orthographic**.
+
+* **Perspective** is like a pinhole camera, where we take into account that some objects are closer to the camera and should appear larger (like in real life)
+* **Orthographic** renders objects based on their size and not based on how close they are
+
+For VR, we want to use Perspective.
+
+###Field of View
+
+The **Field of View** is what your camera can capture; this is normally dependent on your VR headseat.
+Depending on what you can view, we're interested in only rendering what we can see (for efficency) with **Clipping Planes** that specify rendering anything from **Near** to **Far**
+With Clipping, it helps with optimization using a technique called **Frustrum Culling**
+
+###Camera for VR
+
+The neat thing about VR is that we're using two cameras, one for each eye.
+We measure the distance between the two lenses on our VR system (e.g. Cardboard, Vive); usually done through API
+VR allows you to track your head rotation; we do this with scripts
+
+###Scripting Basics
+
+MonoDevelop is the default program for scripts
+Scripts by default are in C#
+By default there are two methods: **Start** (initialization) and **Update** (called every frame)
+A **Quaternion** is the name for stored gyro data
+Google SDKs use more than just camera distance from each eye, it also uses the Gyro, Compass, and Accelerometer to combine this data into a **sensor fusion**; i.e. use the API for head tracking
 
