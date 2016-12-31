@@ -86,23 +86,25 @@ You can create code directly or use a game engine platform.
 * Native Development could be in OpenGL, Microsoft DirectX
 * Results are much more flexibility, but much longer development times
 
-#Creating Scenes and Objects
+#Creating Scenes
 
-We learn how to create a scene by creating an apartment by creating objects, making objects animate, and view scenes with cameras and lights.
+We learn that a scene of an apartment is made up of objects, animations, cameras and lights.
 
-##Meshes
+##Objects
+
+###Meshes
 
 Everything in VR is made of points and those points are connected together using triangles.
 Triangles joined together form **meshes**, which is the underlying foundation for your scenes.
 Triangles are used for 3d objects based on their speed, simplicity, and also on convention.
 
-##Primitives
+###Primitives
 
 Cubes, cones, planes are called **primitives**.
 Simple models can be created under 'GameObjects' > '3D Object' > e.g. Cube, Sphere, Capsule, Cylinder, Plane, Quad
 If you want a complex model (e.g. a rat, a person, a tree), then you need a program like **Blender** or **Maya**
 
-##Transforms
+###Transforms
 
 You can **transform** primitives by **position**, **scale**, and **rotation**.
 Transforms can be nested, think like a robot arm with multiple joints (Unity calculates using **matricies**)
@@ -113,5 +115,17 @@ These transforms use a **left handed co-ordinate system**, meaning with your lef
 * Z means forward or backwards (depth)
 
 Transforms are accessible in Unity in a 'Transform' window.
+
+##Animations
+
+###Keyframes
+
+We don't have to animate every keyframe because we have **interpolation**, **smoothing**, and **averaging**. This means we can specify the first and last keyframe, then pick an **Animation Curve**.
+
+* **Interpolation** uses an **Animation Curve**, meaning that a property changes over time
+* Cheat Sheet for Easing Functions: http://easings.net/
+* Unity has an **Animator** system that allows you to specify states through a **Macanim State Machine** (e.g. player is alive, resting, dead)
+* **Animation Parameters** specify when one state can go to another state (e.g. can't have a dead player transitioning to jumping animation)
+* We use **scripts** to trigger animations; in Unity you can drag and drop scripts to objects like the clock
 
 
