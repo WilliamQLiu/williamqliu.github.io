@@ -86,4 +86,32 @@ You can create code directly or use a game engine platform.
 * Native Development could be in OpenGL, Microsoft DirectX
 * Results are much more flexibility, but much longer development times
 
+#Creating Scenes and Objects
+
+We learn how to create a scene by creating an apartment by creating objects, making objects animate, and view scenes with cameras and lights.
+
+##Meshes
+
+Everything in VR is made of points and those points are connected together using triangles.
+Triangles joined together form **meshes**, which is the underlying foundation for your scenes.
+Triangles are used for 3d objects based on their speed, simplicity, and also on convention.
+
+##Primitives
+
+Cubes, cones, planes are called **primitives**.
+Simple models can be created under 'GameObjects' > '3D Object' > e.g. Cube, Sphere, Capsule, Cylinder, Plane, Quad
+If you want a complex model (e.g. a rat, a person, a tree), then you need a program like **Blender** or **Maya**
+
+##Transforms
+
+You can **transform** primitives by **position**, **scale**, and **rotation**.
+Transforms can be nested, think like a robot arm with multiple joints (Unity calculates using **matricies**)
+These transforms use a **left handed co-ordinate system**, meaning with your left hand, point up with your index finger and 90 degrees point right with your thumb.
+
+* Y means up and down
+* X means right and left
+* Z means forward or backwards (depth)
+
+Transforms are accessible in Unity in a 'Transform' window.
+
 
