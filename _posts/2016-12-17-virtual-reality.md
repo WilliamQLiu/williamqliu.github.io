@@ -165,3 +165,34 @@ By default there are two methods: **Start** (initialization) and **Update** (cal
 A **Quaternion** is the name for stored gyro data
 Google SDKs use more than just camera distance from each eye, it also uses the Gyro, Compass, and Accelerometer to combine this data into a **sensor fusion**; i.e. use the API for head tracking
 
+##Lights
+
+There are four types of lights in Unity:
+
+* **Directional** is well, a strong source of light coming from a direction at a distance, like the sun.
+* **Point** light emits a sphere of light from its current position, like a lightbulb.
+* **Spot** light shoots out a cone of light, like a lighthouse or a flashlight.
+* **Area** light have to be **baked**, meaning it needs to do some computation; think of it like a flood light in a stadium.
+
+###Generic Light Properties
+
+Generic light properties include:
+
+* color
+* intensity (0) for no effect, (8) for max
+* shadows are fairly computationally expensive, especially on mobile. There are 3 types: none, hard (not realistic, but computationally easier), and soft (computationally intensive)
+* render mode means should we always render these lights, which you normally leave Auto (basically choice of making people sick from dropped FPS or less realistic)
+* culling mode says what layer should this light interact with
+
+###Baking
+
+We can 'cheat' by rendering static light sources ahead of type using **baking**, a way to compute advanced lighting effects like indirect light bounces and realistic shadows.
+Remember that Unity requires a light to be **static** in order to use baking; this is just a property. You can have items be static for different things (lights, navigation, etc)
+Click 'Bake' and it'll build (takes a few minutes)
+
+###Light Panel
+
+Access Lighting through 'Window' > 'Lighting'. You can then filter by Objects, Scene, and Lightmaps
+
+###Global Illumination (GI)
+
