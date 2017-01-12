@@ -104,6 +104,20 @@ Cubes, cones, planes are called **primitives**.
 Simple models can be created under 'GameObjects' > '3D Object' > e.g. Cube, Sphere, Capsule, Cylinder, Plane, Quad
 If you want a complex model (e.g. a rat, a person, a tree), then you need a program like **Blender** or **Maya**
 
+###Materials
+
+Materials describe the surface appearance of a 3D object. Without Materials, we can't even see our objects.
+
+The 'Albedo' parameter is the color when light gets reflected; for now think of it as the material's main color.
+
+###Textures
+
+Textures are images that get stretched around meshes.
+
+###Shaders
+
+You want a good balance between frame rate and realism; use diffuse for faster frames, PBR for realism.
+
 ###Transforms
 
 You can **transform** primitives by **position**, **scale**, and **rotation**.
@@ -118,13 +132,23 @@ Transforms are accessible in Unity in a 'Transform' window.
 
 ##Animations
 
+Open up 'Window' > 'Animation' to see the tab for creating Animations. Just add a property (e.g. Rotation).
+
 ###Keyframes
+
+Keyframes are points in your animation.
 
 We don't have to animate every keyframe because we have **interpolation**, **smoothing**, and **averaging**. This means we can specify the first and last keyframe, then pick an **Animation Curve**.
 
 * **Interpolation** uses an **Animation Curve**, meaning that a property changes over time
 * Cheat Sheet for Easing Functions: http://easings.net/
-* Unity has an **Animator** system that allows you to specify states through a **Macanim State Machine** (e.g. player is alive, resting, dead)
+* You can change the easing in Animation under 'Curves' and 'Dopesheet'
+
+###Animator
+
+Unity has an **Animator** system that allows you to specify states through a **Macanim State Machine** (e.g. player is alive, resting, dead)
+
+* The state machine connects together all of our animation states
 * **Animation Parameters** specify when one state can go to another state (e.g. can't have a dead player transitioning to jumping animation)
 * We use **scripts** to trigger animations; in Unity you can drag and drop scripts to objects like the clock
 
