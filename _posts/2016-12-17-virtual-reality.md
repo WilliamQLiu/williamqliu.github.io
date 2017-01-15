@@ -220,3 +220,88 @@ Access Lighting through 'Window' > 'Lighting'. You can then filter by Objects, S
 
 ###Global Illumination (GI)
 
+**Global Illumination** is a system for how lights bounce off of surfaces onto other surfaces (indirect light) instead of just the light hitting a surface directly from a light source (direct light).
+
+##Quality
+
+You can change a few settings that can have a large impact on performance:
+
+* Edit > Project > Quality Settings
+* Edit > Project > Player Settings
+
+#Scripting
+
+Programming in Unity is done through C# or a variation of JavaScript. 
+
+##Behaviors
+
+Scripts describe behaviors that get attached to game objects. For example, a behavior might be:
+
+* A dog object might have a 'bark' behavior
+* A dog object might have a 'walk around' behavior
+
+##Start and Update
+
+Scripts have built in methods for handling calls at certain keyframes:
+
+* `Start()` method is called only on initialization
+* `Update()` method is called once per frame
+
+###Time.deltaTime
+
+An example call with [Time.deltaTime](docs.unity3d.com/ScriptReference/Time-deltaTime.html
+) to make an object fall at 2.5 meters per second looks like this:
+
+    void Update() {
+        transform.Translate(0, -2.5f * Time.deltaTime, 0, Space.World);
+    }
+
+What's going on is that Update() is called every frame, but different hardware runs at different frames per second (e.g. 60, 90, 120).
+
+We need Time.deltaTime to smooth out the animation so the animation can be **framerate-independent** (and change every frame, independent of hardware).
+
+##Unity Documentation
+
+Unity organizes the documentation into two sections, **Manual** and the **[Scripting]**(https://docs.unity3d.com/ScriptReference/).
+
+###Scripting API
+
+The **scripting API** uses C# and the game engine is divided into **namespaces** (a way to group classes togethers). Other namespaces outside of Unity are .NET's **System** namespace, used in commands like `System.Console.WriteLine("Hello World");` to call a class **Console**. The Unity API breaks down into:
+
+* **UnityEngine** to access every object.
+* **UnityEditor** to extend the Unity Editor.
+
+####Unity Engine
+
+Namespaces in the Unity Engine include things like:
+
+* UnityEngine.VR has specific namespaces
+* **Classes** is where most of your objects will be
+
+You can click on the question mark icon in Unity to directly jump to the documentation. Make use of Search on the docs.
+
+##Creating Objects
+
+**Instantiating** is when we create a new instance of an object. One way to tell what object to create is by starting an empty script, then drag and drop to the editor. You can then control an object by **reference**.
+
+Code example to make an object appear at specific coordinates (Vector3) with no rotation (the Quaternion part):
+
+    using UnityEngine;
+    using System.Collections;
+
+    public class ObjectMaker : MonoBehaviour {
+        public GameObject objectToCreate;
+    
+        void Start() {
+            // Make an object
+            Object.Instantiate(objectToCreate, new Vector3(2, 4, 6), Quaternion.identity);
+        }
+    } 
+
+More links:
+
+* [Object Instantiation](https://docs.unity3d.com/ScriptReference/Object.Instantiate.html)
+* [Vector3 is how you specify an object in 3D space (x, y, z)](https://docs.unity3d.com/ScriptReference/Vector3-ctor.html)
+* [Quaternions are how to rotate an object in 3D, better than Euler Angles](http://blog.preoccupiedgames.com/quaternions-not-satan/)
+
+
