@@ -410,4 +410,45 @@ Some custom code for events in C#.
         isPressed = true;
     }
 
+###Physics and Audio
+
+###Colliders
+
+Any time we want an object to interact with physics, we need a **Collider**, which comes in one of these main types:
+
+* Box collider
+* Capsule collider
+* Mesh collider
+* Sphere collider
+
+####Rigidbody
+
+A **Rigidbody** is a component that enables a GameObject to interface with the Unity physics simulation. This gives you control over:
+
+* Mass
+* Drag
+* Use Gravity
+* Is Kinematic
+
+An example would be a ball that has a rigidbody automatically have physics applied to it (e.g. drop from the air, hits the ground)
+
+###Raycasting
+
+You can use **Raycasting** to see what an object is looking at. For VR, this is useful to see what a user is directly looking towards.
+
+####Audio
+
+Create an **Audio Source** component. Some effects include:
+
+* Volume
+* Pitch
+* Loop
+* Bypass
+
+For VR, this is important to get the user's attention (e.g. to make them turn around).
+
+* Background music are 2D spatial blends.
+* Something that comes from a specific location (e.g. animal chirp) should be a 3D spatial blend.
+* All audio is from an **Audio Listener**, which you can only have one (usually on the camera)
+
 
