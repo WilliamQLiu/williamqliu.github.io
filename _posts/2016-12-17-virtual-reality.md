@@ -295,6 +295,13 @@ Code example to make an object appear at specific coordinates (Vector3) with no 
         void Start() {
             // Make an object
             Object.Instantiate(objectToCreate, new Vector3(2, 4, 6), Quaternion.identity);
+            
+            // Do a lot of stuff
+            for (int i =0; i < 50; i++) {
+                GameObject newSeagull = (GameObject)Object.Instantiate(objectToCreate, new Vector3(i, 0, 0), Quaternion.identity);
+                Renderer objectRenderer = newSeagull.GetComponentInChildren<Renderer> ();
+                objectRenderer.material.color = Color.white * Random.value; 
+            }
         }
     } 
 
@@ -303,5 +310,104 @@ More links:
 * [Object Instantiation](https://docs.unity3d.com/ScriptReference/Object.Instantiate.html)
 * [Vector3 is how you specify an object in 3D space (x, y, z)](https://docs.unity3d.com/ScriptReference/Vector3-ctor.html)
 * [Quaternions are how to rotate an object in 3D, better than Euler Angles](http://blog.preoccupiedgames.com/quaternions-not-satan/)
+
+###Prefabs
+
+**Prefabs** allow you to store a **GameObject** and all of its components and settings as a file on your hard drive. Prefabs allow easy reuse. Prefabs appear as a blue cube.
+
+##VR Interaction
+
+In 'Hierarchy', right click for 'UI', then click 'Text'.
+
+* Make sure to position to center
+* Scale default canvas size down.
+* To change sharpness in text, change 'Dynamic Pixels Per Unit'.
+
+###Event System
+
+In 'Hierarchy', right click for 'UI', then click 'Event System'. Sometimes this is created when you add UI components.
+
+* 'Add Component', then 'Gaze Input Module' (for VR); way to gaze and click
+* The event system will need to interact with a **Collider** (e.g. a Box Collider)
+* We will need an 'Event Trigger' and then 'Add New Event Type' (these are all mouse oriented, e.g. Pointer Click)
+
+###Methods and Debug Logs
+
+You can create a script and define Methods that are called from **Event Triggers**.
+
+    using UnityEngine;
+    using System.Collections;
+
+    public class ChangeScene : MonoBehaviour {
+        public void GoToScene() {
+            Debug.Log ("Method was called");        
+        }
+    }
+
+###Change Scenes
+
+In Build Settings, you can add in multiple scenes (first one is loaded by default).
+
+* Make sure to add in the `using UnityEngine.SceneManagement;` library.
+* You can Load Scenes by name, e.g. `SceneManager.LoadScene ("00-FallingCoconut");`
+* You can Load Scenes as an index
+* You can Load Scenes as a parameter
+
+Sample Code:
+
+    using UnityEngine;
+    using System.Collections;
+    using UnityEngine.SceneManagement;
+    
+    public class ChangeScene : MonoBehaviour {
+        public void GoToScene(string sceneName) {
+            SceneManager.LoadScene (sceneName);
+        }
+    }
+
+###Programming Animations
+
+####LERP and SLERP
+
+**LERP** stands for Linear interpolation.
+**SLERP** stands for spherical linear interpolation.
+
+SLERP calls require a rotation (Quaternions) and Time. An example would be rotating the sun over time.
+
+    public GameObject directionalLight;
+
+    void Update() {
+        Quaternion startRotation = Quaternion.Euler(50f, 30f, 0f);
+        Quaternion endRotation = startRotation * Quaternion.Euler (0f, 180f, 0f);
+    }
+
+####Custom Events with Code
+
+Some custom code for events in C#.
+
+    public class RotateLight : MonoBehaviour {
+
+        public.GameObject directionalLight;
+
+        float startTime = 0f;
+        bool isPressed = false;
+
+        void Start() {
+            GvrViewer.Instance.OnTrigger += ActivateRotation;
+        }
+
+        void Update() {
+            Quaternion startRotation = Quaternion.Euler(50f, 30f, 0f);
+            Quaternion endRotation = startRotation * Quaternion.Euler (0f, 180f, 0f);
+            if (isPressed == true) {
+                directionalLight.transform.rotation = Quaternion.Slerp (startRotation, endRotation, startTime / 10f);
+                startTime += Time.deltaTime;
+            }
+        }
+    }
+    
+    public void ActivateRotation() {
+        isPressed = true;
+    }
 
 
