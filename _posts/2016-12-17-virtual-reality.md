@@ -451,4 +451,85 @@ For VR, this is important to get the user's attention (e.g. to make them turn ar
 * Something that comes from a specific location (e.g. animal chirp) should be a 3D spatial blend.
 * All audio is from an **Audio Listener**, which you can only have one (usually on the camera)
 
+###Advanced Scripting
+
+We'll work with other people's code. Udacity provides:
+
+* **Waypoints** - You can navigate around environments with waypoints.
+* **Shaders** (e.g. animation of ocean) are done in code and are pretty complex.
+* **Flocking Algorithm** - each individual object behaves on its own and avoid one another as a group.
+
+###VR Design
+
+How to design for VR, whether its GUI, the UX, modifying for movement sickness, audio considerations, and documentation.
+
+####Good design
+
+Looking at Udacity's VR experience:
+
+* Onboarding Screens
+* Allow switch between mono and VR
+* Menu to switch between areas
+* Particles to indicate click here
+* Fade between scenes
+* Not too many popups to start off
+
+####Design Process
+
+Go through many iterations. Will let us make design decisions based off actual information. 
+
+* Too many things that can go wrong (e.g. got scale wrong on an object) so do iterative work (small improvements).
+* The User is not me. You're creating content for others, needs user testing (especially with VR and sickness)
+* Make sure to document your work (will show your decision making)
+* For User testing, make sure to setup Goals (e.g. does scale feel appropriate, is experience comfortable, is mood well established)
+* UX research shows that after just 5 users, you get diminishing returns
+* Take notes on what user is doing and saying
+* Let user know that if they feel motion sickness, just to stop and take headseat off
+
+####Set the Scene
+
+* Get **Scale** correct (will things appear larger or smaller); can use real life objects as reference
+* 1 unity unit is about 1 meter in real life 
+* Set one reference object to begin with (e.g. a door)
+* Lighting is good for drawing attention (e.g. light in dark room)
+
+####User Interfaces
+
+You want to **Sketch** all of your designs up ahead before taking it digitally.
+
+* Start with a frame
+* Do numerous sketches
+
+To setup a user interface in Unity:
+
+* Start off with a **Canvas** (will default huge, make sure to select **World Space** and scale to say .001, .001, .001)
+* Add a background color
+* Add in Text; avoid thin type faces
+
+####Movement
+
+**Simulator Sickness** varies across people, usually developers build up tolerance. A few ways to avoid it is:
+
+* Use constant linear acceleration
+* User should move forward (e.g. not backwards)
+* Remain stationary when possible
+* If possible, give users control of movement (that way they can anticipate when it will happen)
+* Keep movement time short
+* Keep a high frame rate
+* Make sure to keep line of sight when teleporting or dashing towards objects
+
+A few movement systems include:
+
+* **Ground Ray Casting**, you point at the ground and it moves there, can freely move through space
+* **Waypoints** to teleport to specific areas
+* **On rails** is to follow a specific route (but still might cause sickness when looking at side to side)
+
+Download a library called **iTween** to use for movement.
+
+###Audio
+
+We'll use **GVR**, which has **Spatial Audio** built into its SDK. This means that sounds will get quieter as you move further away, louder closer you get.
+
+* Edit > Project Settings > Audio and under **Spatializer Plugin**, add in **GVR Audio Spatializer**
+* In Main Camera, add in **GVR Audio Listener**
 
