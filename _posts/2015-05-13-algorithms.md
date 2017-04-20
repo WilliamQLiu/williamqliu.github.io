@@ -102,7 +102,7 @@ There are different algorithms to solve the same problem and they are often dras
 
 ##<a id="bigo">Big O</a>
 
-We use __Big O notation__ to give an estimated running time based on the input size (as it tends toward infinity).  Big O is basically a math formula that counts how many steps of computations get executed given a specified input size; the more computational steps the slower it is.  We characterize these functions according to their __rate of growth__ (aka __growth rate__), which is represented using the __O Notation__.
+We use __Big O notation__ to give an estimated running time based on the input size (as it tends toward infinity).  Big O is basically a math formula that counts how many steps of computations get executed given a specified input size; the more computational steps the slower it is.  We characterize these functions according to their __rate of growth__ (aka __growth rate__), which is represented using the __O Notation__. We also care about space (so see Space Complexity below).
 
 ####<a id="bigoexample">Big O Example</a>
 
@@ -206,7 +206,7 @@ A __hash table__ (aka __hash map__) is a collection of items that are stored in 
 
 ####<a id="hashfunction">Hash Function</a>
 
-A __hash function__ is the function that distributes key/value pairs across an array of slots.  A sample function would look like `index = f(key, array_size` and `hash = hashfunc(key)`.  The goal of the hash function is to:
+A __hash function__ is the function that distributes key/value pairs across an array of slots.  A sample function would look like `index = f(key, array_size)` and `hash = hashfunc(key)`.  The goal of the hash function is to:
 
 *  Be deterministic - i.e. equal keys produce the same hash value all the time
 *  Be efficient - Computing the hash should be quick
@@ -294,7 +294,7 @@ There are many probe sequences, which has different takes on trying to minimize 
 
 ####<a id="hashlinearprobe">Resolving Hash Collision with Open Addressing and Linear Probing</a>
 
-When we visit each bucket one at a time, we are using a technique called __linear probing__.  With the given example above, if we added `71`, we would have a _hash collion_ since `93` is already in position `5` (`71%11=5` and `93%11=5`).  We call this __rehashing__ when we try to make `71` into a new hash.
+When we visit each bucket one at a time, we are using a technique called __linear probing__.  With the given example above, if we added `71`, we would have a _hash collision_ since `93` is already in position `5` (`71%11=5` and `93%11=5`).  We call this __rehashing__ when we try to make `71` into a new hash.
 
     slots       0    1    2    3    4    5    6    7    8    9    10
     values      None None None None 26   93   None 73   None None 54
@@ -311,8 +311,18 @@ When we search for an item, we use the hash function to generate the slot where 
 
 ##<a id="linkedlists">Linked Lists</a>
 
-####<a id="singelinkedlist">Singly Linked List</a>
+So remember that a __list__ is a mutable data structure that can hold different data types in the same list (e.g. int, then a str)
+And remember that an __array__ is a mutable data structure that can only hold the same data types in the same array (e.g. only strings)
+So with an array, memory allocation is done for all of its elements as one block of memory (easier since its all the same data types).
+A linked list instead does memory allocation so that each element (aka __linked list element__, __node__), gets its own memory block.
+The linked list gets its overall structure by using pointers to connect all its nodes together.
 
+###<a id="createlinkedlist">Creating a Linked List</a>
+
+Each node contains two fields:
+
+* a 'data' field to store the actual value.
+* a 'next' field, which is a pointer used to link the node to the next node
 
 ##<a id="algorithmdesign">Designing Algorithms</a>
 
@@ -564,7 +574,7 @@ Given an array _A_ that represents a heap, we can look at the two attributes (_l
 *  `A.heap-size` gives us how many elements in the heap are stored within array _A_.
 *  The heap would then be calculated as `A[1 ... A.heap-size]` where `0 <= A.heap-size <= A.length`
 
-####<<a id="binaryheap">(Binary) Heap</a>
+####<a id="binaryheap">(Binary) Heap</a>
 
 A __(binary) heap__ data structure is an array object that we can view as a binary tree.  Think of this algorithm as two parts:
 
