@@ -24,7 +24,19 @@ title: Algorithms
     -  [Space Complexity](#bigospace)
 *  [Arrays and Strings](#arraysandstrings)
     -  [Hashing](#hashing)
-    -  [Hash Tables](#hashtables)
+        +  [Hash Table](#hashtable)
+        +  [Hash Function](#hashfunction)
+        +  [Hash Function Example](#hashexample)
+    -  [Hash Collision](#hashcollision)
+        +  [Minimizing Hash Collisions](#hashminimizecollision)
+        +  [Hash Folding](#hashfolding)
+        +  [Hash Mid Square Method](#hashmidsquare)
+        +  [Minimize Hashing Collisions with Characters](#hashchars)
+    -  [Hash Collision Resolution](#hashcollisionresolution)
+        +  [Hash Collision Resolution with Open Addressing](#hashopenaddressing)
+        +  [Hash Collision Resolution with Open Addressing and Linear Probing](#hashlinearprobe)
+        +  [Hash Collision Resolution with Open Addressing and Quadriatic Probing](#hashquadriaticprobe)
+        +  [Hash Collision Resolution with Separate Chaining](#hashseparatechaining)
     -  [Array Resizing](#arrayresize)
 *  [Linked Lists](#linkedlists)
     -  [Create a linked list](#)
@@ -204,6 +216,8 @@ If we know where every item should be, then our search can do a single compariso
 
 A __hash table__ (aka __hash map__) is a collection of items that are stored in a way where we can find the items very quickly.  Each position in the hash table is called a __slot__ (sometimes the entire slot is refered to as a __bucket__) and can hold an item.
 
+What is a real life example of this? Say a teacher sorts their student's papers in categories of A-Z based on their first names (or specific buckets like W-Z if there are not a lot of names with those characters, as long as we get about an even distribution). If there are multiple people with the same first letter (e.g. Laura, Lisa), we have a hash collision that can be fixed with 'chaining' (multiple names are added to the same category).
+
 ####<a id="hashfunction">Hash Function</a>
 
 A __hash function__ is the function that distributes key/value pairs across an array of slots.  A sample function would look like `index = f(key, array_size)` and `hash = hashfunc(key)`.  The goal of the hash function is to:
@@ -282,7 +296,7 @@ If we do a hash function that just simply adds up all the characters and gets th
 
 __Collision resolution__ is the method for resolving _hash collision_, which means what do we do when two or more items are hashed to the same slot in the _hash table_.  There are many ways of attempting to address this including __open addressing__ and __separate chaining__. 
 
-####<a id="hashopenaddress">Resolving Hash Collision with Open Addressing</a>
+####<a id="hashopenaddressing">Resolving Hash Collision with Open Addressing</a>
 
 __Open Addressing__ (aka __closed hashing__) is a method to resolve _hash collisions_ by trying to find the next open slot in the _hash table_ through some __probe sequence__, which systematically visits each slot until an open slot is found.  The name comes from the fact that the location ('address') of the item is not determined by its 'hash value'.  The downside of _open addressing_ is that the number of stored entries cannot exceed the number of slots.
 
@@ -303,11 +317,257 @@ When we visit each bucket one at a time, we are using a technique called __linea
 
 Instead of making the skip a constant value (e.g. 1, 2), we can use a rehash function that increments the hash value by 1, 3, 5, 7, etc.  This means that if the first hash value is `h`, the successive hash values are `h+1`, `h+4`, `h+9`, `h+16`, `h+25` etc.  This 'skip' value is successive perfect squares.
 
-####<a id="hashquadraticprobe">Resolving Hash Collision with Separate Chaining</a>
+####<a id="hashseparatechaining">Resolving Hash Collision with Separate Chaining</a>
 
 __Separate chaining__ (aka __chaining__) allows many items to exist at the same location in the hash table.  When a hash collision happens, the item does not do probing and instead is placed in the proper slot.
 
-When we search for an item, we use the hash function to generate the slot where it should be.  Each slot has a collection so we use a searching technique to decide if the item is present.  The advantage is that on average, there are likely to be very few items in each slot so the search should be more efficient.
+When we search for an item, we use the hash function to generate the slot where it should be.  Each slot has a collection so we use a searching technique to decide if the item is present.  The advantage is that on average, there are likely to be very few items in each slot so the search should be more efficient. If there are many items in each slot, we have a few ways to handle this:
+
+* Separate Chaining with Linked Lists
+* Separate Chaining with List Head Cells
+* Separate Chaining with other data structures, like a self-balancing search tree (which adds complexity and may cause even worse performance for smaller hash tables due to time spent inserting and balancing the tree)
+* There is an 'array hash table' that uses a dynamic array that resizes to the size it needs (or say doubling the array size). 
+
+Here is some sample code for a hash table implementation:
+
+
+    """
+    Implement a hashmap (with amortized constant time look-ups) without using a hashmap primitive.
+    Includes an executable testing framework for the data structure
+    """
+
+
+    import unittest
+    from nose.tools import assert_equal, assert_not_equal, assert_true, \
+                           assert_false
+
+
+    class TestUnitHashTable(unittest.TestCase):
+        """ Unit Tests - Test each piece in isolation """
+
+        def setUp(self):
+            self.ht = HashTable(11)
+            self.a = SlotItem('hello', 1112223333)  # char, int scenario
+            self.b = SlotItem(1, 1)  # int, int scenario
+            self.c = SlotItem('f', 'morestuff')  # char, char scenario
+            self.ht.table = [[self.a], [self.b], [], [self.c], [], [], [], [],
+                             [], [], []]
+
+        def test_keys_can_be_integers(self):
+            try:
+                self.ht.set(11, 100)
+            except TypeError:
+                self.fail("UT: Hashing func cannot handle key with ints")
+
+        def test_keys_can_be_characters(self):
+            try:
+                # hello = 104*1 + 101*2 + 108*3 + 108*4 + 111*5 = 1617 => %11=0
+                self.ht.set('hello', 'world')  # pos: 'hello'(0), value: 'world'
+            except TypeError:
+                self.fail("UT: Hashing func cannot handle key with chars")
+
+        def test_keys_can_be_spaces(self):
+            try:
+                self.ht.set('  ', 'somevalue')
+            except TypeError:
+                self.fail("UT: Hashing func cannot handle key with spaces")
+
+        def test_keys_can_be_mix_chararacters_and_integers(self):
+            try:
+                self.ht.set('a1b3e', 'somevalue')
+            except TypeError:
+                self.fail("UT: Hashing func cannot handle key with ints & chars")
+
+        def test_hashes_anagram_keys_to_different_buckets(self):
+            """ Ensure hashing of keys with anagrams turns out unique """
+            self.ht.set('elvis', 'samestuff')  # 1666 => %11=5
+            self.ht.set('lives', 'samestuff')  # 1651 => %11=1
+
+            bucket5 = self.ht.table[5]  # elvis bucket goes to slot 5
+            bucket1 = self.ht.table[1]  # lives bucket goes to slot 1
+
+            for _ in bucket5:
+                if _.key == 'elvis':
+                    value5 = _.value
+
+            for _ in bucket1:
+                if _.key == 'lives':
+                    value1 = _.value
+
+            assert_equal(value5, value1)
+
+        def test_identify_empty_hash_table_index(self):
+            bucket2 = self.ht.table[2]
+            assert_false(bucket2)  # Check if list in this bucket is empty
+
+        def test_identify_filled_hash_table_index(self):
+            bucket1 = self.ht.table[1]
+            assert_true(bucket1)  # Check if list in this bucket is empty
+
+        def test_get_existing_hash_table_item(self):
+            value = self.ht.get('hello')
+            assert_equal(value, 1112223333)
+
+        def test_get_nonexisting_hash_table_item(self):
+            value = self.ht.get('nothere')
+            assert_equal(value, None)
+
+        def test_set_data_on_empty_hash_table_slot(self):
+            assert_equal(self.ht.get(16), None)
+            self.ht.set(16, 'abc')
+            assert_equal(self.ht.get(16), 'abc')
+
+        def test_set_data_on_existing_hash_table_slot(self):
+            assert_equal(self.ht.get('f'), 'morestuff')
+            self.ht.set('f', 'differentstuff')
+            assert_equal(self.ht.get('f'), 'differentstuff')
+
+        def test_remove_data_on_existing_key_with_value(self):
+            assert_equal(self.ht.get('hello'), 1112223333)
+            self.ht.remove('hello')
+            assert_equal(self.ht.get('hello'), None)
+
+        def test_remove_data_on_nonexisting_key(self):
+            try:
+                self.ht.remove('notthere')
+            except:
+                print "Issue with trying to remove a nonexisting key"
+                raise
+
+        def test_set_load_factor_high(self):
+            assert_equal(self.ht.size, 11)
+            self.ht.table = [[self.a], [self.b], [self.a], [self.c], [self.a],
+                             [self.c], [], [self.a], [self.a], [self.b], []]
+            self.ht.set(10, 'here')  
+            # TODO: if more time, trigger auto resize
+            #assert_equal(self.ht.size, 22)
+            #assert_equal(self.ht.get(10), 'here')  # check value here after resize
+
+        # TODO: check hash value not too high
+        # TODO: check uniform distribution of values
+
+    class TestFunHashTable(object):
+        """ Functional Tests - Test all pieces together from end to end """
+
+        def test_end_to_end(self):
+            hash_table = HashTable(11)
+            print "FT: Created Hash Table of size, ", hash_table.size
+
+            print "FT: Default value type at slot 0 is None"
+            assert_equal(hash_table.get(0), None)
+
+            print "FT: Setting value in slot 13 (i.e. 13%11=2) with value dee"
+            hash_table.set(13, 'dee')
+            assert_equal(hash_table.get(13), 'dee')
+
+            print "FT: Adding value in slot 3 with value dee"
+            hash_table.set(3, 'dee')
+            assert_equal(hash_table.get(3), 'dee')
+
+            print "FT: Checking that two values are the same"
+            assert_equal(hash_table.get(13), hash_table.get(3))
+
+            print "FT: Deleting value in slot 2"
+            hash_table.remove(2)
+            assert_equal(hash_table.get(2), None)
+
+
+    class SlotItem(object):
+        """ An items in the same hash table slot """
+        def __init__(self, key, value):
+            self.key = key
+            self.value = value
+
+        def __str__(self):
+            return self.key
+
+    class HashTable(object):
+        """
+            Implementation of a hash table using chaining instead of
+            open addressing.  Each slot has a list of items that are appended
+            when there is a hash collision.
+        """
+
+        def __init__(self, size):
+            self.size = size
+            self.table = [[]] * self.size
+
+        def hash_function(self, key):
+            """
+                Return modulus (i.e. remainder) and handles two scenarios:
+                1 - numbers only (int or long); just take modulus
+                2 - characters involved; create hash from position and ordinal
+                    value of character (position added to handle anagrams)
+            """
+
+            if type(key) is int or type(key) is long:  # numbers only
+                return key % self.size
+            else:
+                total = 0  # characters involved
+                for position in xrange(len(key)):
+                    total = total + (ord(key[position]) * (position+1))
+                return total % self.size
+
+        def set(self, key, value):
+            """
+                Finds slot with hash_function, then saves key-value pair.  If
+                there is an existing key, we overwrite that value.
+            """
+            index = self.hash_function(key)  # find correct slot
+
+            for slot in self.table[index]:  # look inside slot for key
+                if slot.key == key:  # key found, replace current value
+                    slot.value = value
+                    return
+            self.table[index].append(SlotItem(key, value))  # key not found, add
+
+            self.check_load_factor(upper_limit=.8, resize=2)
+
+        def get(self, key):
+            """ Finds slot with hash_function, returns slot value or else None """
+            index = self.hash_function(key)
+
+            for slot in self.table[index]:  # look inside slot for key
+                if slot.key == key:  # key found, return current value
+                    return slot.value
+            return None  # no key found
+
+        def remove(self, key):
+            """ Given a key, remove the key-value pair """
+            index = self.hash_function(key)
+            for i, slot in enumerate(self.table[index]):
+                if slot.key == key:  # key found, return current value
+                    del self.table[index][i]
+
+        def check_load_factor(self, upper_limit=.8, resize=2):
+            """
+                Check load factor, if limit reached, warn to resize larger table
+            """
+            load = 0
+            for i in xrange(self.size):
+                for slot in self.table[i]:
+                    if slot:
+                        load += 1
+
+            load_factor = float(load)/float(self.size)
+            #print "Load factor is ", load_factor
+
+            if load_factor > upper_limit:  # need to resize for larger hash table
+                print "Load Factor is past upper limit, you should resize"
+                # TODO: Create deepcopy, dynamically resize for high and low limit
+
+            else:
+                pass  # load_factor is in acceptable limits
+
+
+    if __name__ == '__main__':
+
+        # run unit tests
+        suite = unittest.TestLoader().loadTestsFromTestCase(TestUnitHashTable)
+        unittest.TextTestRunner(verbosity=2).run(suite)
+
+        A = TestFunHashTable()
+        A.test_end_to_end()
 
 ##<a id="linkedlists">Linked Lists</a>
 
@@ -430,6 +690,11 @@ Example Code:
         insertionSort(mylist)
         print "Insertion Sorted: ", mylist
 
+So why would you want one of the O(n^2) algorithms when there are O(n log n) algorithms? Well, insertion sort is good when:
+
+* The data is nearly sorted (because it is adaptive) so the sort becomes O(n)
+* When the list is small (low overhead compared to others)
+* Other algorithms like quicksort make a big assumption that the data is already in memory. If the data source you're reading from is really slow, you might want to "sort as you go" instead.
 
 ####<a id="bubblesort">Incremental: bubble sort</a>
 
@@ -441,7 +706,7 @@ __Bubble sort__  (aka __sinking sort__, __ripple sort__) is a simple but ineffic
 4. Compare the next block in line with the first and repeat step 3
 5. Begin step 1 again with the second block
 
-The name bubble sort is because elements tend to move up into the correct order like bubbles rising to the surface and you see a rippling effect for the ones that are not in the correct order.  After each pass of the bubble sort, one item is definitely sorted; a total of `n-1` passes to sort `n` items.  Big Oh Runtime is `O(n^2)`.
+The name bubble sort is because elements tend to move up into the correct order like bubbles rising to the surface and you see a rippling effect for the ones that are not in the correct order.  After each pass of the bubble sort, one item is definitely sorted; a total of `n-1` passes to sort `n` items.  Big O Runtime is `O(n^2)`.
 
 Example Code
 
@@ -463,9 +728,10 @@ Example Code
 
 __Selection sort__  improves on _bubble sort_ by making only one exchange for every pass through the list.  The selection sort finds the largest value as it makes its pass and after completing the pass, places it in the correct location/order.  What happens is that there is a 'swap' (where we put the largest value into the largest index; the item that was previously in the largest index is swapped over to where the previous largest value was).
 
-Similar to bubble sort, after the initial pass, the largest item appears in place.  The final item is in place after `n-1` passes to sort `n` items.  This is slightly faster than bubble sort since we don't have to do as many exchanges.  Big Oh Runtime is still `O(n^2)`.
+Similar to bubble sort, after the initial pass, the largest item appears in place.  The final item is in place after `n-1` passes to sort `n` items.  This is slightly faster than bubble sort since we don't have to do as many exchanges.  Big O Runtime is still `O(n^2)`.
 
-    """ Selection Sort """
+
+    """ Selection Sort from largest to smallest """
     
     def selectionSort(mylist):
         for fillslot in range(len(mylist)-1, 0, -1):
@@ -485,6 +751,13 @@ Similar to bubble sort, after the initial pass, the largest item appears in plac
         print "Original: ", mylist
         selectionSort(mylist)
         print "Selection Sorted: ", mylist
+
+
+The algorithm can be changed to swap out for the smallest item instead of the largest item (depending on how you want to sort by). If so, the idea is the same; we select the smallest unsorted item (instead of largest) and then swap it with the item in the next position to be filled.
+
+We look through the entire array for the smallest element, once you find it you swap it (smallest element with the first element of the array). Then you look for the smallest element in the remaining array (the array without the first element) and swap with the second element, etc.
+
+Realistically, you wouldn't need selection sort because it is O(n^2) and so is not an optimal solution for large lists.
 
 ####<a id="mergesort">Divide and Conquer: merge sort</a>
 
@@ -581,7 +854,7 @@ A __(binary) heap__ data structure is an array object that we can view as a bina
 1. We have some data (e.g. a list of `[6, 5, 3, 1, 8, 7, 2, 4]`) that we use to create the _heap_, a data structure that looks like a binary tree.  As we're building this binary tree, the heap swaps elements depending on the type (e.g. min or max) of the binary heap (e.g. sorting smallest to largest, larger nodes don't stay below smaller node parents and end up swapping; `8` can't be below `5` on the heap).  Once the binary tree is built, we have a tree where each array index represents a node and also has the index of the node's parent, left child branch, or right child branch.
 2. We then create a _sorted array_ by repeatedly removing the largest element from the root of the heap and inserting it into the array.  The heap is updated after each removal to maintain the heap.  The heap incrementally gets smaller until all objects have been removed from the heap, resulting in only a sorted array left.
 
-####<<a id="priorityqueue">Priority Queue</a>
+####<a id="priorityqueue">Priority Queue</a>
 
 As mentioned earlier, __heap sort__ is great for creating __priority queues__, which is a data structure for maintaining a set _S_ of elements, each with an associated value called a __key__.  There's __max-priority queue__ (e.g. used to schedule jobs on a server and set their relative priorities) and a __min-priority queue__ (e.g. used for _discrete event-driven simulation_ models like determining how many patients can be served from changing 8 hours to 9 hours of operation when avg surguery takes say 4 hours).
 
@@ -613,7 +886,7 @@ __Probabilistic analysis__ is the use of probability in the analysis of problems
 
 For this example, we want to hire an office assistant.  We interview candidates and determine if they are better than the current assistant (if so, replace the current assistant right then and there).  There is a cost to hiring and firing someone.  We want to find the expected cost after interviewing everyone (which is a fixed n candidates).
 
-Say we have a list and rank them into an ordered list of best possible candidate using: `[rank1, rank2, rank3, rankn]`.  Saying that applicants come in a random order is equivalent to saying there is _n!__ permutations of the numbers 1 through n.  We call this __uniform random permutation__, which means that each of the possible n! permutations appears with equal probability.
+Say we have a list and rank them into an ordered list of best possible candidate using: `[rank1, rank2, rank3, rankn]`.  Saying that applicants come in a random order is equivalent to saying there is __n!__ permutations of the numbers 1 through n.  We call this __uniform random permutation__, which means that each of the possible n! permutations appears with equal probability.
 
 We first assume (or make sure we randomly select) candidates for hire.  We can check probabilities and expectations using an __indicator random variable__.  For example, if we flip a coin, we count the number of times it actually comes up heads (saying using a __random number generator__) to what we expect.
 
@@ -627,7 +900,7 @@ How many people must there be in a room before there is a 50% chance that two of
 
 ####<a id="ballsbins">Balls and Bins</a>
 
-If we randomly toss identical balls into _b_ bins (1 through _b_) and assuming the tosses are independent with an equal chance of ending up in any bin, we have the probability that a tossed ball lands in any given bin as `1/b` of success (where success is falling into the given bin).  The ball tossing can be seen as a sequence of __Bernoulli trials__ (i.e. a binomial trial, a random experiment where there are exactly two possible outcomes; success and failure).  This answers questions like:
+If we randomly toss identical balls into 'b' bins (1 through 'b') and assuming the tosses are independent with an equal chance of ending up in any bin, we have the probability that a tossed ball lands in any given bin as `1/b` of success (where success is falling into the given bin).  The ball tossing can be seen as a sequence of __Bernoulli trials__ (i.e. a binomial trial, a random experiment where there are exactly two possible outcomes; success and failure).  This answers questions like:
 
 *  How many balls fall in a given bin?
 *  How many balls must we toss, on average, until a given bin contains a ball?
@@ -635,7 +908,7 @@ If we randomly toss identical balls into _b_ bins (1 through _b_) and assuming t
 
 ####<a id="streaks">Streaks</a>
 
-If you flip a fair coin _n_ times, what is the longest streak of consecutive heads that you expect to see?
+If you flip a fair coin 'n' times, what is the longest streak of consecutive heads that you expect to see?
 
 ##<a id="graphtheory">Graph Theory</a>
 
@@ -765,7 +1038,7 @@ This is how to setup a graph abstract data type (ADT) that we can build off of:
 
 You can store graphs as an __adjacency list__ (most common way) or as an __adjacency matrices__.  When two verticies are connected by an edge, they are __adjacent__, thus the name of list and matrix.  There are advantages and disadvantages to both.
 
-*  an __adjacency matrix__ is a two-dimensional matrix, more precisely a N*N boolean matrix (where N is the number of nodes).  A value at `matrix[v][w]` means row `v` and column `w`, which indicates an edge from node v to node w.
+*  an __adjacency matrix__ is a two-dimensional matrix, more precisely a `N*N` boolean matrix (where N is the number of nodes).  A value at `matrix[v][w]` means row `v` and column `w`, which indicates an edge from node v to node w.
     -  Advantages: The adjacency matrix is simple, especially for small graphs where you can see which nodes are connected to other nodes.
     -  Disadvantages: Usually searches on an adjacency matrix are less efficient than an adjacency list since you have to search through all the nodes to identify a node's neighbors.  Since most of the cells are usually empty (i.e. a __sparse matrix__), this is not an efficient way to store data.  It is rare to see a real world problem where most vertexes connect to most other vertexes.
 
