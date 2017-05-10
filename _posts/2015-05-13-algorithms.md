@@ -14,6 +14,7 @@ title: Algorithms
     - [What is an Algorithm](#whatisalgorithm)
     - [Is the algorithm correct?](#algorithmcorrect)
     - [Is the algorithm efficient?](#algorithmefficient)
+    - [Is a sorting algorithm stable?](#algorithmstable)
 *  [Big O](#bigo)
     -  [Big O Example](#bigoexample)
     -  [Evaluating Runtimes](#bigotime)
@@ -111,6 +112,14 @@ There are different algorithms to solve the same problem and they are often dras
 
 1. the __size of input__ normally means looking at the _number of items in the input_; for other problems like multiplying integers, we look at the _total number of bits_ used.
 2. the __running time__ is the number of 'steps' (i.e. the number of times something is executed).
+
+####<a id="algorithmstable">Is a sorting algorithm stable?</a>
+
+For sorting algorithms, you might hear that one type is 'stable' while others are 'unstable'.
+
+* A stable sorting algorithm keeps the original order of the input set, which only matters when two elements are equal (say sorting cards by value, but we have two 5's, one of hearts and one of diamond).
+* An unstable sorting algorithm does not keep the original order of the input set, so if you sorted the same cards from above, the order might not be preserved (e.g. 5 of diamonds comes before 5 of hearts)
+* Things end up being a tradeoff, with stable sorting usually being less efficient, but sometimes you need the original order preserved.
 
 ##<a id="bigo">Big O</a>
 
@@ -577,6 +586,12 @@ So with an array, memory allocation is done for all of its elements as one block
 A linked list instead does memory allocation so that each element (aka __linked list element__, __node__), gets its own memory block.
 The linked list gets its overall structure by using pointers to connect all its nodes together.
 
+So what are some examples of linked lists?
+
+* Singly Linked List - a scavenger hunt where one clue points to the place of the next clue (but that clue has no reference to the previous clue)
+* Doubly Linked List - a train car that has a previous and next train car connected to it
+* Circular Linked List - Whose turn is it on a multiplayer game (keeps going around), same with resource pooling on a shared resource (e.g. round robin scheduling) 
+
 ###<a id="createlinkedlist">Creating a Linked List</a>
 
 Each node contains two fields:
@@ -655,14 +670,31 @@ Other examples of recursive problems include:
 
 ##<a id="comparisonsortalgorithms">Sorting Algorithms with Comparison Sorts</a>
 
-A basic computational problem is the __sorting problem__, where you sort a sequence of _n_ numbers (aka __keys__).  We apply the above general approaches (_insertion_, _divide and conquer_) using different types of algorithms.  The following algorithms (_insertion sort_, _bubble sort_, _selection sort_, _merge sort_, _heapsort_, and _quicksort_) are all __comparison sorts__ (i.e. they determine the order of an input array by comparing elements).
+A basic computational problem is the __sorting problem__, where you sort a sequence of _n_ numbers (aka __keys__).
+We apply the above general approaches (_insertion_, _divide and conquer_) using different types of algorithms.
+The following algorithms (_insertion sort_, _bubble sort_, _selection sort_, _merge sort_, _heapsort_, and _quicksort_) are all __comparison sorts__ (i.e. they determine the order of an input array by comparing elements).
 
 ####<a id="insertionsort">Incremental: insertion sort</a>
 
-__Insertion sort__ is a simple sorting algorithm based on the incremental approach and is efficient at sorting a small number of elements in place.  The idea is to always maintain a sorted sublist in the lower portions of the list. Each new item is then 'inserted' back into the previous sublist so that the sorted sublist is one item larger.  For example, if we want to sort a hand of playing cards:
+__Insertion sort__ is a simple sorting algorithm based on the incremental approach and is efficient at sorting a small number of elements in place and is useful when items are mostly sorted already.
+The idea is to always maintain a sorted sublist in the lower portions of the list; what this means is we will have a 'sorted' and an 'unsorted' group. See example steps:
+
+     sorted|unsorted
+          0|5,3,-1
+        0,5|3,-1
+      0,3,5|-1
+    -1,0,3,5|  
+
+So what are we doing?
+We move the items from our 'unsorted group' to the 'sorted group' (this is where the new item is then 'inserted') into the sorted group.
+  Notice we have a base case where the first item is sorted (because it is the only item in the sorted group)
+When we move from unsorted to sorted one item at a time, it simply does a comparison of the next unsorted item with the next sorted item(if it is larger, then insert item after your comparison item).
+Basically, we move this invisible line that divides the "sorted" vs the "unsorted" groups one item at a time.
+
+For example, if we want to sort a hand of playing cards:
 
 1. Start with an empty left hand and all cards face down on the table
-2. We remove one card from the table and insert it into the correct position on the left hand
+2. We remove one card from the table and insert it into the correct position on the left hand (first card is the base case, its already sorted then)
 3. To find the correct position, we compare it with each of the cards already in the left hand (from right to left); this way left hand cards are always sorted
 
 Example Code: 
@@ -696,9 +728,31 @@ So why would you want one of the O(n^2) algorithms when there are O(n log n) alg
 * When the list is small (low overhead compared to others)
 * Other algorithms like quicksort make a big assumption that the data is already in memory. If the data source you're reading from is really slow, you might want to "sort as you go" instead.
 
+
 ####<a id="bubblesort">Incremental: bubble sort</a>
 
-__Bubble sort__  (aka __sinking sort__, __ripple sort__) is a simple but inefficient sorting algorithm that repeatedly goes through the list to be sorted, compares each pair of adjacent items, and swaps them if they are in the wrong order.  For example, say we were sorting scrabble tiles into alphabetical order.
+__Bubble sort__  (aka __sinking sort__, __ripple sort__) is a simple but inefficient sorting algorithm that repeatedly goes through the list to be sorted, compares each pair of adjacent items, and swaps them if they are in the wrong order.
+
+Here is a sample run:
+
+    # first pass 
+    5 1 4 2 8  # original
+    1 5 4 2 8  # swap the first pair (5, 1)
+    1 4 5 2 8  # check to swap the next pair (4, 5), but no swap needed (4 < 5)
+    1 4 2 5 8  # swap 5 and 2
+    1 4 2 5 8  # check to swap the next pair (5, 8), but no swap needed (5 < 8) 
+
+    # second pass
+    1 4 2 5 8
+    1 2 4 5 8  # swap 2 and 4
+    1 2 4 5 8  # check to swap the next pair (4, 5), but no swap needed (4 < 5)
+    1 2 4 5 8  # check to swap the next pair (5, 8), but no swap needed (5 < 8)
+
+    # third pass
+    checks through each pair, but no swaps needed since its sorted 
+
+
+For example, say we were sorting scrabble tiles into alphabetical order.
 
 1. Place letters on tile holder and look at the first block.
 2. Look at the block to the right of it.
@@ -706,7 +760,8 @@ __Bubble sort__  (aka __sinking sort__, __ripple sort__) is a simple but ineffic
 4. Compare the next block in line with the first and repeat step 3
 5. Begin step 1 again with the second block
 
-The name bubble sort is because elements tend to move up into the correct order like bubbles rising to the surface and you see a rippling effect for the ones that are not in the correct order.  After each pass of the bubble sort, one item is definitely sorted; a total of `n-1` passes to sort `n` items.  Big O Runtime is `O(n^2)`.
+The name bubble sort is because elements tend to move up into the correct order like bubbles rising to the surface and you see a rippling effect for the ones that are not in the correct order.
+After each pass of the bubble sort, one item is definitely sorted; a total of `n-1` passes to sort `n` items.  Big O Runtime is `O(n^2)`.
 
 Example Code
 
@@ -726,9 +781,24 @@ Example Code
 
 ####<a id="selectionsort">Incremental: selection sort</a>
 
-__Selection sort__  improves on _bubble sort_ by making only one exchange for every pass through the list.  The selection sort finds the largest value as it makes its pass and after completing the pass, places it in the correct location/order.  What happens is that there is a 'swap' (where we put the largest value into the largest index; the item that was previously in the largest index is swapped over to where the previous largest value was).
+__Selection sort__  improves on _bubble sort_ by making only one exchange for every pass through the list.
+The selection sort finds the largest value as it makes its pass and after completing the pass, places it in the correct location/order.
+What happens is that there is a 'swap' (where we put the largest value into the largest index; the item that was previously in the largest index is swapped over to where the previous largest value was).
 
-Similar to bubble sort, after the initial pass, the largest item appears in place.  The final item is in place after `n-1` passes to sort `n` items.  This is slightly faster than bubble sort since we don't have to do as many exchanges.  Big O Runtime is still `O(n^2)`.
+Here is an example run:
+
+    #sorted | unsorted
+    64 25 12 22 11  # initial state
+    11|25 12 22 64  # find smallest value (11) and swap with first element (64)
+    11 12|25 22 64  # find next smallest value from unsorted (12) and compare with second element (25), do swap (12 < 25)
+    11 12 22|25 64  # find next smallest value from unsorted (22) and compare with third element (25), do swap (22 < 25)
+    11 12 22 25|64  # find next smallest value from unsorted (25) and compare with fourth element (25), no need to swap (25 < 64)
+    11 12 22 25 64| # all sorted
+
+Similar to bubble sort, after the initial pass, the largest item appears in place.
+The final item is in place after `n-1` passes to sort `n` items.
+This is slightly faster than bubble sort since we don't have to do as many exchanges.
+Big O Runtime is still `O(n^2)`.
 
 
     """ Selection Sort from largest to smallest """
@@ -757,11 +827,31 @@ The algorithm can be changed to swap out for the smallest item instead of the la
 
 We look through the entire array for the smallest element, once you find it you swap it (smallest element with the first element of the array). Then you look for the smallest element in the remaining array (the array without the first element) and swap with the second element, etc.
 
-Realistically, you wouldn't need selection sort because it is O(n^2) and so is not an optimal solution for large lists.
+Realistically, you wouldn't normally need selection sort because it is O(n^2) and so is not an optimal solution for large lists.
 
 ####<a id="mergesort">Divide and Conquer: merge sort</a>
 
-__Merge sort__ is a recursive algorithm that uses the divide-and-conquer approach to keep splitting a list in half until there are individual items.  We then go in reverse (instead of splitting), we combine the items back together using a __merge__.
+__Merge sort__ is a recursive algorithm that uses the divide-and-conquer approach to keep splitting a list in half until there are pairs of individual items.
+Don't worry if the list is an odd number, just add the last item anywhere.
+We then go in reverse (instead of splitting), we combine the items back together using a __merge__.
+This merge compares the pairs and determines which is smaller/larger, which then sorts the smaller list.
+The trick is that since all of our lists are already sorted, when we combine pairs of lists, we only need to look at the first element of each list.
+
+Here is an example run:
+
+    k     i       j
+    0 1 2 3 4 5 6 7  # position
+    9 7 3 8 4 5 6 2  # original values in list
+    
+    # start splitting up (divide by two)
+    9 7 3 8 | 4 5 6 2  # divide into two lists 
+    9 7 | 3 8 | 4 5 | 6 2  # divide by two again into four lists
+    9 | 7 | 3 | 8 | 4 | 5 | 6 | 2  # divide until all items are separated 
+    
+    # now merge back with the merged pairs sorted
+    7 9 | 3 8 | 4 5 | 2 6  # merge from single items to pairs that are sorted
+    3 7 8 9 | 2 4 5 6  # merge again, key is that we only compare first item from each list (since they are sorted)
+    2 3 4 5 6 7 8 9 # combine again, get final sorted list
 
 For example, if we want to sort a hand of playing cards:
 
@@ -823,7 +913,19 @@ Example Code:
 
 ####<a id="quicksort">Divide and Conquer: quick sort</a>
 
-__Quick sort__ is an efficient algorithm that does a sort 'in place' by splitting the array into two smaller arrays, one with low elements and one with high elements based off a 'pivot' element.  It's similar to _merge sort_ in that it does the divide and conquer approach.  The advantage is that you do not need as much storage over _merge sort_, but the performance could possibly be diminished (depending on if the __pivot value__ selected is near the middle).
+__Quick sort__ is an efficient algorithm that does a sort 'in place' by splitting the array into two smaller arrays, one with lower value elements and one with higher value elements based off a 'pivot' element.
+
+Example Run:
+
+     6 5 1 3 8 4 6 9 5  # initial list
+   
+    # we pick a pivot (say for this example it is the last element of the list, which is 2; can also be any item, e.g. the first item of the list, median)
+    |6 5 1 3 8 4 6 9 5 # we setup the pivot wall (separated by `|`), items to the left should be smaller, items to the right of the wall are larger
+    |6 5 1 3 8 4 6 9 5 # we compare the pivot element 5 with the first element to the right of the wall (6); 5 < 6 so no swap needed
+    |6 5 1 3 8 4 6 9 5 # we compare the pivot element 5 with the next element to the right of the wall (5); 5 == 5 so no swap needed
+     1|5 6 3 8 4 6 9 5 # our current element 1 is smaller than the pivot element 5 so we switch the current element (1) with the lowest index item on the right side of the wall (6)
+
+It's similar to _merge sort_ in that it does the divide and conquer approach. The advantage is that you do not need as much storage over _merge sort_, but the performance could possibly be diminished (depending on if the __pivot value__ selected is near the middle).
 
 1. Pick an element from the array; this element is called a __pivot__
 2. We now want to do a __partition__ operation; this means we want to reorder the array so that all elements with values less than the pivot are on one side while all elements with values greater than the pivot are on the other side (equal values can go either way).  After this paritioning, the pivot element is in its final position.
