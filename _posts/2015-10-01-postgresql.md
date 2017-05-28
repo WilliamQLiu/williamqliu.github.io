@@ -21,6 +21,7 @@ title: PostgreSQL
     -  [View Current Connection Info](#conninfo)
     -  [View Database Tables](#dt)
     -  [View Tables, Views, and Sequences](#viewall)
+    -  [Switch Databases](#switchdb)
     -  [Queries](#queries)
     -  [Exit](#exit)
     -  [SQL Help](#sqlhelp)
@@ -93,6 +94,12 @@ View database tables and their owners
 View all of the tables, views, and sequences
 
     \z
+
+####<a id="switchdb">Switch Databases</a>
+
+To connect to another database (e.g. db 'jobwaffle_prod')
+
+    \connect jobwaffle_prod
 
 ####<a id="queries">Queries</a>
 
