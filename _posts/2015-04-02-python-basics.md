@@ -37,6 +37,9 @@ __ADVANCED__
     -  [globals()](#globals)
     -  [type()](#type)
     -  [id()](#id)
+    -  [__repr__](#repr)
+*  [Mutable and Immutable](#mutableimmutable)
+	-  [](#)
 *  [Functions, Classes, Methods](#functionmethodclass)
     -  [variable scope](#variablescope)
     -  [bound and unbound methods](#boundunbound)
@@ -253,7 +256,11 @@ Examples:
 
 ###<a id="tuples">Tuples</a>
 
-**Tuples** are like read-only lists because they are immutable (instead of mutable) and are enclosed with parentheses (instead of brackets).  Tuples do care about order.
+**Tuples** are like read-only lists because they are immutable (instead of mutable) and are enclosed with parentheses (instead of brackets).  Tuples do care about the order of when items were inserted. Tuples can also be sliced just like lists.
+
+So what's the big deal about tuples? Tuples are a fixed size so they don't have append or extend
+methods like lists. However, since Tuples are immutable, tuples are great for 
+dictionary keys (since dict keys have to be immutable). 
 
     temp = ('abcd', 786, 2.23, 'john', 70.2 )
     print temp  # ('abcd', 785, 2.23, 'john', 70.2)
@@ -269,6 +276,27 @@ So why use a tuple over a list?
 
 *  Certain tuples (if they contain values like strings, numbers, other tuples) can be used as dictionary _keys_.  Lists cannot be used as dictionary keys (because lists are not immutable).  Dictionary _keys_ require an immutable data type, although the _value_ can be mutable or immutable).
 *  Tuples are faster than lists.
+
+Here is a code example of a tuple holding structure:
+
+    my_book_location = ("Lord of te Rings", 41, 11)  # book, page number, line number
+    my_book_location[0]  # "Lord of the Rings"
+
+    clicked_here = (10, 100)  # clicked on x, y
+
+    # Use with hash tables
+    clicked_table = {}
+    clicked_table[clicked_here] = "clicked on monkey" 
+    clicked_table[clicked_here] = "clicked on monkey"
+
+Notes about tuples:
+
+* To write a tuple with a single value, you need to include a comma, e.g.: `tup1 = (50, )`
+* You cannot update a tuple, you can only delete the entire tuple
+* Tuples allow different data types (e.g. str, int) together
+* Tuples allow slicing just like lists
+* Tuples can be used as a dictionary key as long as all elements are immutable
+  (e.g. no list in there like `my_tuple = ("hey", [1, 2])`
 
 ####<a id="sequencemethods">Sequence Methods</a>
 Assuming `s` and `t` are sequences and `n`, `i`, `j` are integers.
@@ -579,6 +607,158 @@ These functions are nice for debugging your code.
 ####<a id="id">id(object)</a>
 
 `id()` returns the identity of the object as an integer or long integer; this represents the address of the object in memory.  This is useful to see if copies are being referenced or if the same object is.
+
+####<a id="repr">__repr__</a>
+
+Similar to looking at the id() of an object, you can also use `__repr__` to see the representation of an object.
+With the `__repr__` command, you can see if an object is immutable or not.
+
+A way to see if an object is immutable (e.g. a string) is by seeing memory locations change when the object changes.
+
+    >>mystr = "hey there"
+    >>mystr.__repr__
+    <method-wrapper '__repr__' of str object at 0x7f74135cb5f0>
+	# See the memory location where our object mystr is stored
+	
+	>>mystr = "hey I changed!"
+	>>mystr.__repr__
+    <method-wrapper '__repr__' of str object at 0x7f74135cb5f0>
+	# See that the object is now stored in a different memory location 
+
+	>>mystr_2 = mystr
+	>>mystr_2
+	"hey I changed"
+	>>mystr_2.__repr__
+    <method-wrapper '__repr__' of str object at 0x7f74135cb5f0>
+	# Notice that when we assign a new variable, it is pointing at the same memory location as the other variable
+
+	>>mystr_2 = "Another new value"
+	>>mystr_2.__repr__
+	<method-wrapper '__repr__' of str object at 0x7f7413541cd8>
+	# Only when we change the value of our new variable does it point to a new memory location
+
+A way to see if an object is mutable (e.g. a list) is by seeing memory locations stay the same even when the object changes:
+	
+	>>mylist = [1, "hey", "there", None]
+	>>mylist.__repr__
+	<method-wrapper '__repr__' of list object at 0x7f7413546248>
+	# Note the memory location where our object mylist is stored
+
+	>>mylist.append("another item")
+	>>mylist.__repr__
+	<method-wrapper '__repr__' of list object at 0x7f7413546248>
+	# Using built-in append does not change the memory location
+
+	>>mylist[2]
+	"there"
+	>>mylist[2] = "boo"
+	>>mylist
+	[1, "hey", "boo", None, "another item"]
+	>>mylist.__repr__
+	<method-wrapper '__repr__' of list object at 0x7f7413546248>
+	# Mutability means when parts of the list are changed, does not need to recreate, still same memory location
+
+	>>anotherlist = mylist
+	>>anotherlist
+	[1, "hey", "boo", None, "another item"]
+	>>mylist
+	[1, "hey", "boo", None, "another item"]
+	>>anotherlist.__repr__
+	<method-wrapper '__repr__' of list object at 0x7f7413546248>
+	# Notice that both lists are in the same memory location
+	
+	>>anotherlist[2] = "foo"
+	>>anotherlist
+	[1, "hey", "foo", None, "another item"]
+	>>mylist
+	[1, "hey", "foo", None, "another item"]
+	# Notice that both lists have now changed, even though we only modified anotherlist
+	
+	>>anotherlist.__repr__
+	<method-wrapper '__repr__' of list object at 0x7f7413546248>
+	>>mylist.__repr__
+	<method-wrapper '__repr__' of list object at 0x7f7413546248>
+
+
+## <a id="mutableimmutable">Mutable and Immutable</a>
+
+So what does this all mean by mutable and immutable? This concept helps you know if an object is being updated or if you are returning a new object. In order to write a working and efficient program, you need to know the difference. Also, only immutables are hashable (therefore members of **sets** or keys in **dicts**, and since hash tables are the quickest lookup, its very important).
+
+### <a id="mutableimmutablegeneral">General Rule</a>
+
+Usually if the type is primitive (e.g. string), the object is immutable and if the type is
+a container (e.g. a list), the object is mutable. We have:
+
+Immutable Objects:
+
+* int
+* float
+* decimal
+* complex
+* bool
+* string
+* tuple
+* range
+* frozenset
+* bytes
+
+Mutable objects (usually containers, user-defined types):
+
+* list
+* dict
+* set
+* bytearray (used if you want in-place modification of a string)
+* user-defined classes (unless specifically made immutable)
+
+The exceptions are a __tuple__, which is an immutable container and
+a __frozenset__, which is an immutable version of set. 
+
+### <a id="mutableimmutableerror">Common Error</a>
+
+So you want to avoid putting a mutable object as the default value of
+a function parameter (immutable types are perfectly safe).
+
+    def my_function_wrong(param=[]):
+        param.append("thing")
+        return param
+
+    my_function_wrong()  # returns ["thing"]
+    my_function_wrong()  # returns ["thing", "thing"]
+    # what actually happens is that since we passed a mutable object, we are
+    using the same list (Python only evaluates functions once)
+
+    # Instead what you want to do is this:
+    def my_function_correct(param=None):
+        if param is None:
+            param = []
+        param.append("thing")
+        return param
+
+
+### <a id="mutableimmutableefficiency">Efficiency</a>
+
+You can concatenate two strings together like this:
+
+	string_build = ""
+	for data in container:
+		string_build += str(data)
+
+Because strings are immutable, concatenating two strings together creates a third string, which is the combination of two strings.
+
+Instead, you want to do something that takes advantage of the mutability of a single list object to gather data together and then allocate a single result string to put your data in:
+
+	builder_list = []
+	for data in container:
+		builder_list.append(str(data))
+	"".join(builder_list)
+
+	### Another way is to use a list comprehension
+	"".join([str(data) for data in container])
+	
+	### Or use a map function
+	"".join(map(str, container))
+
+
 
 - - - -
 
@@ -933,7 +1113,7 @@ __abstractmethod__ requires that the class has a `__metaclass__ = ABCMeta`.
 __Reflection__ (aka __introspection__) means finding out about the type, class, attributes and methods of an object.  Some reflection-enabling functions include:
 
 *  `type()`
-*  `isinstance()` - check if this is an instance of a class; checks attribute `class.__instancecheck__(self, instance)`.  E.g. `isinstance(instance, class)`
+*  `isinstance()` - check if this is an instance of a class; checks attribute `class.__instancecheck__(self, instance)`.  E.g. `isinstance(instance, class)`. A good use is `isinstance(mystring, str)`
 *  `issubclass()` - check if this is a subclass of a class; checks attribute `class.__subclasscheck__(self, subclass)`.  E.g. `issubclass(subclass, class)`
 *  `callable()` - check if this instance of your class can be called as if it were a function.
 *  `dir()`
