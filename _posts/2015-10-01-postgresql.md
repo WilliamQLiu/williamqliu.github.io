@@ -41,6 +41,8 @@ title: PostgreSQL
     -  [Select with Max and Min](#selectmaxmin)
     -  [Select with a basic Subquery](#selectsubquery)
 *  [SQL Joins and Subqueries](#joinsubquery)
+    -  [From](#from)
+    -  [Inner Join](#innerjoin)
 
 
 ## <a id="summary">Summary</a>
@@ -184,17 +186,17 @@ Retrieve everything from a table (all columns, all rows):
     facid	name	        membercost	guestcost	initialoutlay	monthlymaintenance
     0	    Tennis Court 1	5	        25	        10000	        200
     1	    Tennis Court 2	5	        25	        8000	        200
-    2	    Badminton Court	0	        15.5	    4000	        50
-    3	    Table Tennis	0	        5	        320	            10
+    2	    Badminton Court	0	        15.5        4000            50
+    3	    Table Tennis	0	        5           320             10
     4	    Massage Room 1	35	        80	        4000	        3000
     5	    Massage Room 2	35	        80	        4000	        3000
-    6	    Squash Court	3.5	        17.5	    5000	        80
+    6	    Squash Court	3.5	        17.5        5000            80
     7	    Snooker Table	0	        5	        450	            15
-    8	    Pool Table	    0	        5	        400	            15
+    8	    Pool Table      0           5           400             15
 
 #### <a id="selectcolumns">Select Specific Columns</a>
 
-To select specific columns from a table:
+To select specific **columns** from a table, we use **SELECT**.
 
     SELECT name, membercost
     FROM cd.facilities;
@@ -212,7 +214,7 @@ To select specific columns from a table:
 
 #### <a id="selectrows">Select Specific Rows</a>
 
-To select specific rows from a table:
+To select specific **rows** from a table, we use SQL's **WHERE**:
 
     SELECT facid, name, membercost, monthlymaintenance
     FROM cd.facilities
@@ -234,7 +236,7 @@ You can filter strings in tables (e.g. list all facilities with the word
     acid	name	            membercost	guestcost	initialoutlay	monthlymaintenance
     0	    Tennis Court 1	    5	        25	        10000	        200
     1	    Tennis Court 2	    5	        25	        8000	        200
-    3	    Table Tennis	    0	        5	        320	            10
+    3	    Table Tennis	    0	        5	        320             10
 
 #### <a id="selectfilterin">Filter In List</a>
 
@@ -397,18 +399,105 @@ two people joined at the exact same time.
 
 Relational databases are relational because of joins.
 
+#### <a id="from">From</a>
+
+Remember that the output of a **FROM** is another table. That's why you can do this:
+
+    SELECT _bookings.starttime
+    FROM cd.bookings _bookings,
+         cd.members _members
+    WHERE
+         _members.firstname = 'David'
+         AND _members.surname = 'Farrell'
+         AND _members.memid = _bookings.memid;
+
 #### <a id="innerjoin">Inner Join</a>
 
 Say we want a list of the start times for bookings by members named 'David
 Farrell'.
 
 Use an **INNER JOIN** to combine two tables with matching values on both
-tables.
+tables. You can do this a couple different styles:
 
+    # Style 1
     SELECT _bookings.starttime
     FROM cd.bookings _bookings
     INNER JOIN cd.members _members
                ON _members.memid = _bookings.memid
     WHERE _members.firstname = 'David'
           AND _members.surname = 'Farrell';
+
+    # Style 2
+    SELECT _bookings.starttime
+    FROM cd.bookings _bookings,
+         cd.members _members
+    WHERE
+         _members.firstname = 'David'
+         AND _members.surname = 'Farrell'
+         AND _members.memid = _bookings.memid;
+
+    starttime
+    2012-09-18 09:00:00
+    2012-09-18 17:30:00
+    2012-09-18 13:30:00
+    2012-09-18 20:00:00
+    2012-09-19 09:30:00
+    2012-09-19 15:00:00
+    2012-09-19 12:00:00
+    2012-09-20 15:30:00
+    2012-09-20 11:30:00
+    2012-09-20 14:00:00
+    2012-09-21 10:30:00
+    2012-09-21 14:00:00
+    2012-09-22 08:30:00
+    2012-09-22 17:00:00
+    2012-09-23 08:30:00
+    2012-09-23 17:30:00
+    2012-09-23 19:00:00
+    2012-09-24 08:00:00
+    2012-09-24 16:30:00
+    2012-09-24 12:30:00
+    2012-09-25 15:30:00
+    2012-09-25 17:00:00
+    2012-09-26 13:00:00
+    2012-09-26 17:00:00
+    2012-09-27 08:00:00
+    2012-09-28 11:30:00
+    2012-09-28 09:30:00
+    2012-09-28 13:00:00
+    2012-09-29 16:00:00
+    2012-09-29 10:30:00
+    2012-09-29 13:30:00
+    2012-09-29 14:30:00
+    2012-09-29 17:30:00
+    2012-09-30 14:30:00
+
+Another example is to produce a list of the start times for bookings for tennis
+courts for the date '2012-09-21' and return the start time and facility name
+pairings, ordered by the time.
+
+    SELECT books.starttime AS start,
+       facil.name AS name
+    FROM cd.bookings books
+    INNER JOIN cd.facilities facil
+        ON books.facid = facil.facid
+    WHERE
+	    DATE(books.starttime) = '2012-09-21'
+	    AND facil.name LIKE '%Tennis Court%'
+    ORDER BY
+	    books.starttime;
+
+    start	            name
+    2012-09-21 08:00:00	Tennis Court 1
+    2012-09-21 08:00:00	Tennis Court 2
+    2012-09-21 09:30:00	Tennis Court 1
+    2012-09-21 10:00:00	Tennis Court 2
+    2012-09-21 11:30:00	Tennis Court 2
+    2012-09-21 12:00:00	Tennis Court 1
+    2012-09-21 13:30:00	Tennis Court 1
+    2012-09-21 14:00:00	Tennis Court 2
+    2012-09-21 15:30:00	Tennis Court 1
+    2012-09-21 16:00:00	Tennis Court 2
+
+
 
