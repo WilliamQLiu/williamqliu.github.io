@@ -24,4 +24,4 @@ The code is freely available and can be downloaded at [Github here](https://gith
 
 ## Screenshots
 
-![Flu Aware](https://github.com/WilliamQLiu/williamqliu.github.io/tree/master/images/flu_aware.png)
+![Flu Aware](https://raw.githubusercontent.com/WilliamQLiu/williamqliu.github.io/master/images/flu_aware.png)
