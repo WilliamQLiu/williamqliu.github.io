@@ -1,11 +1,11 @@
 ---
 layout: post
-title: First Post
+title: Default Post
 ---
 
-###{{ page.title }}
+### {{ page.title }}
 
-This is contents of a first post.  This is for testing out neat features.
+This is contents of a default post. Copy as a starting point.
 
 Testing out inline Math Equations $a^2 + b^2 = c^2$ and \\( sin(x^2) \\)
 
