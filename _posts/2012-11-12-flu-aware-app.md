@@ -5,6 +5,7 @@ title: Flu Aware, an Android App
 
 # {{ page.title }}
 
+
 ## Summary
 
 Back in 2011 I created an Android app (my first mobile app) for a programming competition hosted by the [Centers for Disease Control and Prevention (CDC)](https://www.cdc.gov). The goal was to raise awareness about the flu. My submission explains the flu, steps to fight the flu, streams the CDC's flu podcasts, finds a nearby flu vaccine clinic based on your location, and allows you to (un)subscribe to their text messages easily.
@@ -23,8 +24,4 @@ The code is freely available and can be downloaded at [Github here](https://gith
 
 ## Screenshots
 
-Here's a few of the early screen shots when it was still in development:
-
-![Flu
-Aware](https://github.com/WilliamQLiu/android-java-examples/blob/master/docs/flu_aware.png)
-
+![Flu Aware](https://github.com/WilliamQLiu/williamqliu.github.io/tree/master/images/flu_aware.png)
