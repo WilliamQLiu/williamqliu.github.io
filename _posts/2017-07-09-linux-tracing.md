@@ -160,6 +160,8 @@ The command: `strace -c ls -l` output looks like:
 
 * `strace -e access ls -l` to filter by system call, e.g. look at the `access` call (can be other calls like `open`, `read`, etc.) when we run the command `ls -l`. For this example, we want to look at access because we see 11 errors in our previous system call.
 
+An example of filtering output looks like:
+
     will@xps ~ $ strace -e access ls -l
     access("/etc/ld.so.nohwcap", F_OK)      = -1 ENOENT (No such file or directory)
     access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
