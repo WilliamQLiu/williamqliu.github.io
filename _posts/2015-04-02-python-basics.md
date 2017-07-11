@@ -74,7 +74,7 @@ Python can do simple calculations like addition, subtraction, division, multiplc
      2 + 2**3  # Addition with 2 to the power of 2
      #10
 
-####Floor Division
+#### Floor Division
 
 Integers (e.g. `2`, `4`, `20`) have type **int** and the fractional parts (e.g. `5.0`, `1.6`) have type **float**.  When doing division with a numerator and denominator of type int, then there is an automatic **floor division** (i.e. rounds down to the nearest integer, e.g. `11/4 = 2` even though result should be `2.75`).  To avoid floor division, make one of the operands a float (e.g. `11/4.0` and your result will be `2.75`).  You can also force a floor division (regardless of data types) using `//` operator
 
@@ -89,9 +89,9 @@ Integers (e.g. `2`, `4`, `20`) have type **int** and the fractional parts (e.g. 
 
 - - - -
 
-##<a id="sequencetypes">SEQUENCE TYPES</a>
+## <a id="sequencetypes">SEQUENCE TYPES</a>
 
-###<a id="strings">Strings</a>
+### <a id="strings">Strings</a>
 
 Python can also manipulate strings using single quotes (`'...'`) and double quotes (`"..."`) with `\` as an escape character.  Strings are **immutable** (i.e. object can't be altered, a new object has to be created if a different value has to be stored)
 
@@ -105,7 +105,7 @@ Python can also manipulate strings using single quotes (`'...'`) and double quot
     print temp  # doesn't
     print type(temp)  # <type 'str>'
 
-####Raw Strings
+#### Raw Strings
 
 If you don\'t want characters prefaced by `\` to be interpreted as a special character (e.g. `\n` used in next line), then use `r` before the string
 
@@ -116,7 +116,7 @@ If you don\'t want characters prefaced by `\` to be interpreted as a special cha
     print r"C:\some\name"  # here it reads the raw string
     #C:\some\name
 
-####Joining and Slicing Strings
+#### Joining and Slicing Strings
 
 If you want to join strings together use `+`.  If you want to slice strings, use `[]`.
 
@@ -130,7 +130,7 @@ If you want to join strings together use `+`.  If you want to slice strings, use
     print word[2:4]  # Slice characters
     #th
 
-####String Methods
+#### String Methods
 
 *  `str.count()` returns the number of occurrences of substring
 *  `str.decode()` returns a decoded version of the string
@@ -145,7 +145,7 @@ If you want to join strings together use `+`.  If you want to slice strings, use
 
 - - - -
 
-###<a id="lists">Lists</a>
+### <a id="lists">Lists</a>
 
 Lists are a way to hold items in order.  The items can be different data types or the same type (if it's the same type and you need speed, look up arrays, in particular numpy arrays).  Lists can also be sliced and concatenated (i.e. sequence type).  Lists are also **mutable** (i.e. there are methods to modify the object)
 
@@ -160,7 +160,7 @@ Lists are a way to hold items in order.  The items can be different data types o
     #[9, 16]
     print type(squares)  # <type 'list'>
 
-####List Slicing
+#### List Slicing
 
 Just like you can index and slice strings, you can do the same for Python's lists.
 
@@ -173,7 +173,7 @@ Just like you can index and slice strings, you can do the same for Python's list
     squares[::2] # [1, 9, 25]  # skip every other
     squares[::-1]  # [25, 16, 9, 4, 1] reverse order
 
-####Nesting Lists
+#### Nesting Lists
 
 You can nest lists (create lists that contain other lists).
 
@@ -185,7 +185,7 @@ You can nest lists (create lists that contain other lists).
     print x[0][1]  # b
 
 
-####List Methods
+#### List Methods
 
 *  `list.append(x)` adds an item `x` to the end of the list
 *  `list.extend(L)` extends the list by specific items
@@ -197,10 +197,10 @@ You can nest lists (create lists that contain other lists).
 *  `list.sort()` sorts the items of the list in place
 *  `list.pop([i])` removes the `i` item or last item if not specified
 
-####Stacks
+#### Stacks
 A **stack** is using a list with first-in, last-out functionality.  The main methods for stacks are `append()` and `pop()`.  Note that with append, the items you add can be other lists (i.e. you can have a list with lists inside as individual items)
 
-####Queues
+#### Queues
 A **queue** is a specific list built for efficient first-in, first-out functionality.  For more specialized containers, look up `collections`.
 
     from collections import deque
@@ -212,7 +212,7 @@ A **queue** is a specific list built for efficient first-in, first-out functiona
     queue  # deque(['Michael', 'Terry', 'Graham'])
     print type(queue)  # <type 'collections.deque'>
 
-####List comprehensions
+#### List comprehensions
 
 List comprehensions are a concise way of making lists based on an operation or if the item satisifes a certain condition.  This is a compact for-loop that builds lists.  Here are different ways of doing a regular loop along with the list comprehension equivalent:
 
@@ -225,7 +225,7 @@ List comprehensions are a concise way of making lists based on an operation or i
     squares = map(lambda x: x**2, range(10))  # same, using map
     squares = [x**2 for x in range(10)]  # same, using list comprehension
 
-####So what makes up a list comprehension?
+#### So what makes up a list comprehension?
 
 The basic structure is:
 
@@ -254,7 +254,7 @@ Examples:
 
 - - - -
 
-###<a id="tuples">Tuples</a>
+### <a id="tuples">Tuples</a>
 
 **Tuples** are like read-only lists because they are immutable (instead of mutable) and are enclosed with parentheses (instead of brackets).  Tuples do care about the order of when items were inserted. Tuples can also be sliced just like lists.
 
@@ -298,7 +298,7 @@ Notes about tuples:
 * Tuples can be used as a dictionary key as long as all elements are immutable
   (e.g. no list in there like `my_tuple = ("hey", [1, 2])`
 
-####<a id="sequencemethods">Sequence Methods</a>
+#### <a id="sequencemethods">Sequence Methods</a>
 Assuming `s` and `t` are sequences and `n`, `i`, `j` are integers.
 
 *  `x in s`  # True if an item of s is equal to x, else False
@@ -314,7 +314,7 @@ Assuming `s` and `t` are sequences and `n`, `i`, `j` are integers.
 *  `s.index(x)`  # index of the first occurence of x in s
 *  `s.count(x)`  # total number of occurences of x in s
 
-####Enumerate
+#### Enumerate
 
 A useful built-in function for sequences is Enumerate.  Enumerate means you return a tuple containing a count and the value from iterating over the sequence.  By default this starts counting from start 0, unless you specify the `start=` parameter.
 
@@ -333,7 +333,7 @@ A useful built-in function for sequences is Enumerate.  Enumerate means you retu
     #Position  2  has value  Fall
     #Position  3  has value  Winter
 
-####<a id="sequencesort">Sorting Sequences</a>
+#### <a id="sequencesort">Sorting Sequences</a>
 
 Python has a `sort` method that modifies a list in-place and a `sorted` method that builds a new sorted list from an iterable.  NumPy also has a `sort` method, but it does not modify the list in-place.
 
@@ -354,7 +354,7 @@ Python has a `sort` method that modifies a list in-place and a `sorted` method t
     sorted([5, 2, 3, 1, 4], reverse=False)
     [1, 2, 3, 4, 5]
 
-####keys
+#### keys
 
 There is a `key` parameter in Python\'s `sort` and `sorted` methods that allows you to specify a function to be called on each list element prior to making comparisons.  Note this is not available in the Numpy version of `sort`.
 
@@ -371,13 +371,13 @@ A common pattern is to sort objects using the object indices as a key.  For exam
     sorted(student_tuple, key=lambda student: student[2])  # sort by age
     #[('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]
 
-####operator (itemgetter, attrgetter, methodcaller)
+#### operator (itemgetter, attrgetter, methodcaller)
 
 Python has a few built in functions to help you get get items with `itemgetter` and `attrgetter` to get attributes
 
     from operator import itemgetter, attrgetter
 
-####itemgetter
+#### itemgetter
 
 Get an item from an object using **itemgetter**.  This basically looks up an index on a sequence, then returns that value.
 
@@ -393,7 +393,7 @@ Get an item from an object using **itemgetter**.  This basically looks up an ind
     #Tuple
     itemgetter(2)(student_tuple)  # ('dave', 'B', 10)
 
-####attrgetter
+#### attrgetter
 
 Get attributes from an object using **attrgetter**.  This basically looks up an attribute on an object.
 
@@ -414,11 +414,11 @@ Get attributes from an object using **attrgetter**.  This basically looks up an 
 
 - - - -
 
-##<a id="hashtables">HASH TABLES</a>
+## <a id="hashtables">HASH TABLES</a>
 
 A hash table (aka hash map) is a way to map keys to values (i.e. a key-value pair).  A hash function computes an index into an array of buckets or slots, from which the correct value can be found.
 
-###<a id="dict">Dictionary (dict)</a>
+### <a id="dict">Dictionary (dict)</a>
 
 A **dictionary** is a key-value pair.  The key can be almost any type, but usually are numbers or strings.  Value can be any Python object.  Dictionaries are enclosed with `{}` and accessed with brackets `[]`.  The idea is also called **associative arrays**, **map**, **symbol table**.  The ideas behind operations are:
 
@@ -455,7 +455,7 @@ Example:
 
 - - - -
 
-###<a id="set">Set</a>
+### <a id="set">Set</a>
 
 A **set** is an unordered collection of distinct hashable elements.  Note that items have to be hashable and can't hold duplicates. Sets do not have indexing, ordering, or slicing. Sets have all these restrictions, but are really fast. They're also good for set methods.
 
@@ -478,7 +478,7 @@ A **set** is an unordered collection of distinct hashable elements.  Note that i
 
 - - - -
 
-##<a id="controlflow">Control Flow</a>
+## <a id="controlflow">Control Flow</a>
 
 Python has the usual control flow statements.  These include:
 
@@ -489,7 +489,7 @@ Python has the usual control flow statements.  These include:
 *  `lambda` expression is a small anonymous function, which means lambda: a if some_condition() else b
 *  `map()` function applys a function to every item of iterable and returns a list
 
-###<a id="ifelse">if, elif, else statement</a>
+### <a id="ifelse">if, elif, else statement</a>
 
     # if statement
     if x < 0:
@@ -499,14 +499,14 @@ Python has the usual control flow statements.  These include:
     else:
         print "x is positive"
 
-###<a id="for">for statement</a>
+### <a id="for">for statement</a>
 
     # for statement
     words = ['cat', 'window', 'defense']
     for w in words:
        print w,  # cat window defense
 
-###<a id="range">range(), xrange()</a>
+### <a id="range">range(), xrange()</a>
 
     # range() function
     for i in range(5):
@@ -520,7 +520,7 @@ Python has the usual control flow statements.  These include:
     for i in xrange(2, 10):
         print i,  # 2 3 4 5 6 7 8 9
 
-###<a id="lambda">lambda expression</a>
+### <a id="lambda">lambda expression</a>
 
 Lambda is a way to create small anonymous functions (i.e. a function without a name).  These are often used in combination with `filter()`, `map()`, and `reduce()`
 
@@ -528,7 +528,7 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
     lambda x: 'big' if x > 100 else 'small'
     lambda x: x**2
 
-####<a id="filter">filter()</a>
+#### <a id="filter">filter()</a>
 
 `filter(function, sequence)` is a function that filters out all the elements of a sequence where the function returns `True`.  The first argument is the function that returns a Boolean and this is applied to every element of the list.  A sequence is returned where the values are only where the function returns `True`.
 
@@ -551,7 +551,7 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
     # [item for item in iterable if function(item)]  # if function not None
     # [item for item in iterable if item]  # if function is None
 
-####<a id="map">map</a>
+#### <a id="map">map</a>
 
 `map(function, sequence)` is a function with two arguments.  The first argument is the name of a function and the second is a _sequence data type_ (e.g. a list).  Map applies the function to all the elements of the sequence and returns this as a new list.
 
@@ -566,7 +566,7 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
     Fahrenheit = map(lambda x: (float(9)/5)*x + 32, Celsius)
     print Fahrenehit  # [97.7, 98.60000000000001, 99.5, 102.2]
 
-####<a id="reduce">reduce</a>
+#### <a id="reduce">reduce</a>
 
 `reduce(function, sequence)` applies a function to a sequence and returns a single value (instead of a list like the above).  The idea is that the first two items are reduced to a single value, then that single value and the third value is reduced into a new single value.  This repeats until no more items are in the list.
 
@@ -574,7 +574,7 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
     result = reduce(lambda x,y: x+y, [47, 11, 42, 13])
     print result  # 113
 
-####<a id="zip">zip</a>
+#### <a id="zip">zip</a>
 
 `zip(sequence1, sequence2)` returns a list of tuples, where each tuple contains the ith element from each of the sequences.  The returned list is truncated to the length of the shortest argument sequence.
 
@@ -584,31 +584,31 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
 
 - - - -
 
-##<a id="debug">DEBUGGING FUNCTIONS</a>
+## <a id="debug">DEBUGGING FUNCTIONS</a>
 
 These functions are nice for debugging your code.
 
-####<a id="help">help(object)</a>
+#### <a id="help">help(object)</a>
 
 `help()` uses the built-in help system to tell you more about the function, class, method, keyword, etc.  Exit help with `:q`.
 
-####<a id="dir">dir()</a>
+#### <a id="dir">dir()</a>
 
 `dir()` gives you the list of names in the current local scope.  If you input an object as an argument, it tells you its attributes.
 
-####<a id="globals">globals()</a>
+#### <a id="globals">globals()</a>
 
 `globals()` returns a dictionary of the current objects.
 
-####<a id="type">type(object)</a>
+#### <a id="type">type(object)</a>
 
 `type()` returns the type of an object (e.g. str, list)
 
-####<a id="id">id(object)</a>
+#### <a id="id">id(object)</a>
 
 `id()` returns the identity of the object as an integer or long integer; this represents the address of the object in memory.  This is useful to see if copies are being referenced or if the same object is.
 
-####<a id="repr">__repr__</a>
+#### <a id="repr">__repr__</a>
 
 Similar to looking at the id() of an object, you can also use `__repr__` to see the representation of an object.
 With the `__repr__` command, you can see if an object is immutable or not.
