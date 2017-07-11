@@ -7,7 +7,7 @@ title: Statistical Analysis
 
 - - - -
 
-##Table of Contents
+## Table of Contents
 
 *  [Summary](#summary)
 *  [Statistics High Level Overview](#statsoverview)
@@ -22,11 +22,11 @@ title: Statistical Analysis
     -  [Example: Simulation with Coin Tosses](#simulation)
     -  [TODO Example: Shuffling with Two Groups](#shuffling)
 
-##<a id="summary">Summary</a>
+## <a id="summary">Summary</a>
 
 When I was younger, I wish someone told me to learn calculus if I wanted to be a rocket scientist, otherwise go learn statistics.  Even with that advice, I found it difficult to learn statistics because there seems to be a lot of different naming conventions.  Here is my take on the first principles of statistics where we try to break down statistical analysis into its smallest pieces; the idea is that we want to find useful patterns for learning statistics.  Statistics is simply `outcome = model + error`
 
-##<a id="statsoverview">Statistics High Level Overview</a>
+## <a id="statsoverview">Statistics High Level Overview</a>
 
 I think data analysis can be broken down into three key parts.  This is a very high level overview so it is probably oversimplifying a lot of complex topics, but should give you a sense of what data is.
 
@@ -41,7 +41,7 @@ I think data analysis can be broken down into three key parts.  This is a very h
 3.  Number of __independent variables__ and __dependent variables__
       - The number of variables affect the test we can use.  I made a quick guide below with some examples.
 
-####<a id="describeinfer">How are we using the data?</a>
+#### <a id="describeinfer">How are we using the data?</a>
 
 __Descriptive Statistics__ describes the dataset and is pretty straightforward.  For example, what is the mode, median, mean?  For more details, look up the Stats Primer post.
 
@@ -51,7 +51,7 @@ __Inferential Statistics__ predicts values of an outcome variable based on some 
 
 Personal Note: A lot of data analyst jobs out there are just making graphs of descriptive statistics.  It's a great intro to data and is useful, but being able to make inferences from the dataset is a natural (and more difficult) next step.
 
-####<a id="categoricalcontinuous">What are the data types?</a>
+#### <a id="categoricalcontinuous">What are the data types?</a>
 
 Data can be broken down into different __levels of measurement__ that help determine what statistical tests we can do.  Ideally we want more specific (continuous) instead of braoder (categorical-binary).  Here they are from weakest to strongest in terms of statistical power (so you can find the right effect).
 
@@ -63,11 +63,11 @@ Data can be broken down into different __levels of measurement__ that help deter
     -  __Numerical__ data that are numbers (e.g. 1,000 cookies)
 
 
-####<a id="numbervariables">Number of Independent and Dependent Variables</a>
+#### <a id="numbervariables">Number of Independent and Dependent Variables</a>
 
 See chart below on what statistical test to use based on the number (and type) of variables we have.
 
-##<a id="modelcs">Model Cheat Sheet</a>
+## <a id="modelcs">Model Cheat Sheet</a>
 
 We simply switch out the model, which is made up of __variables__ and __parameters__.  Like all cheat sheets, this is a large oversimplification of statistics, but could be useful as a high level starting point.
 
@@ -99,11 +99,11 @@ We simply switch out the model, which is made up of __variables__ and __paramete
 |__Analysis of Covariance__|Looks at the linear relationship between independent variables (where there's both continuous and categorical) and a dependent continuous variable by comparing several __means__.|We have viagra doses (placebo, low, high dose as categoricals) and we measure a participant's libido (continuous dependent variable) with the partner's libido (independent continuous variable as the __covariate__)|P|1|continuous|2+|at least 1 continuous and/or at least 1 categorical|2+ ind|__Partial eta squared__ (aka __partial n^2__) is an effect size measure for ANCOVA; this is like __eta squared__ (n^2) in ANOVA or r^2.  ANCOVA is like ANOVA except you include __covariates__, which are one or more continuous variables that are not part of the main experimental manipulation, but have an influence on the dependent variable.  You add these to 1.) __reduce within-group error variance__ and 2.) __elimination of confounds__ (those variables other than the experimental manipulation that affect the dependent variable)|
 |__Multiple Logistic Regression__|Test that assumes one categorical (nominal) dependent variable and two or more continuous independent variables using __independent measures__.|High school graduates make career choices (nothing, work, college as the dependent variable) and we model this off of their social economic status (low, middle, high income as their first independent variable) and their SAT scores (as their second independent variable).|NP|1|continuous|2+|at least 1 continuous and/or at least 1 categorical|2+ ind|We're interested in the effect that the independent variables have on the probability of obtaining a particular value of the dependent variable|
 
-##<a id="scipystats">SciPy Stats</a>
+## <a id="scipystats">SciPy Stats</a>
 
 In Python, there's an open-source library called SciPy that handles a lot of standard mathematics, science, and engineering calculations.  There's many subpackages, including linear algebra (`scipy.linalg`), spatial data structures and algorithms to compute triangulations and Voronoi diagrams (`scipy.spatial`), but for this article we want to look at the statistics side (`scipy.stats`).  FYI there are other libraries like `statsmodel` that do this and more.
    
-####<a id="onesamplettest">Example: One Sample T-Test</a>
+#### <a id="onesamplettest">Example: One Sample T-Test</a>
 
 __Problem__
 
@@ -175,7 +175,7 @@ __Example 2 - Different Data__
 
 In `data_b` we had an average height of `227.687`.  Just by eyeballing, our `data_b` is not near the mean of 177 that we passed in.  For a t-test, we calculate the _degrees of freedom_ as the number of samples-1, which comes out to be `16-1=15`.  We get a _t-statistic_ that is `3.139` and a _two tailed p-value_ of `0.006`.  We calculate the _critical value_ to be `2.131`.  We compare the _t-statistic_ with the _critical value_ and find that the _t-statistic_ value (`3.139`) is within the _critical value_ ranges (of `-2.131` to `2.131`) so we reject the null hypothesis (not necessarily have to accept the alternative hypothesis).  With a _p-value_ of `.006`, we can then accept the alternative hypothesis since it is less than our signifiance level of `.05` (i.e. there is a relationship/difference between these two sets of numbers).
 
-####<a id="fishersexact">Example: Fisher's Exact Test</a>
+#### <a id="fishersexact">Example: Fisher's Exact Test</a>
 
 __Code__
 
@@ -243,7 +243,7 @@ __Code__
         # fvalue is 2.24, pvalue is 0.433752668115
 
 
-##<a id="statisticiantools">Statistician's Tools</a>
+## <a id="statisticiantools">Statistician's Tools</a>
 
 With a computer, we can do a lot of computations that can help verify our math (or save us from doing a lot of math).  We can:
 
@@ -252,7 +252,7 @@ With a computer, we can do a lot of computations that can help verify our math (
 *  Bootstrap Data
 *  Cross Validate Models
 
-####<a id="simulation">Simulation with Coin Tosses</a>
+#### <a id="simulation">Simulation with Coin Tosses</a>
 
 Say you toss a coin 30 times and see 22 heads.  Is it a fair coin?  Using a __probabilistic model__ (i.e. we know it will be 50/50 chance for heads or tails), we can __simulate__ the results.
 
