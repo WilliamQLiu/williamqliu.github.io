@@ -48,10 +48,10 @@ designed to efficiently return data for an entire row.
 
 A row-oriented table might serialize each row of data like this:
 
-  1:10,Smith,Joe,25000
-  2:12,Jones,Mary,40000
-  3:11,Johnson,Cathy,55000
-  4:20,Jones,Bob,30000
+    1:10,Smith,Joe,25000
+    2:12,Jones,Mary,40000
+    3:11,Johnson,Cathy,55000
+    4:20,Jones,Bob,30000
 
 Row-base systems are not efficient at performing set-wide operations on the
 whole table (as opposed to a small number of specific records). For example, if
@@ -65,10 +65,10 @@ between x and y), relational databases use **database indexes** to store all
 the values from a set of columns along with rowid pointers back to the original
 table. An index on salary might look like:
 
-  1:25000
-  2:40000
-  3:55000
-  4:30000
+    1:25000
+    2:40000
+    3:55000
+    4:30000
 
 Indexes help with lookups, but maintaining indexes adds overhead to the system
 (like when new data is written to the database, then any attached indexes also
@@ -79,10 +79,10 @@ have to be updated).
 A column-oriented database serializes the values of a column together. For
 example:
 
-  10:1,12:2,11:3,20:4
-  Smith:1,Jones:2,Johnson:3,Jones:4
-  Joe:1,Mary:2,Cathy:3,Bob:4
-  25000:1,40000:2,55000:3,30000:4
+    10:1,12:2,11:3,20:4
+    Smith:1,Jones:2,Johnson:3,Jones:4
+    Joe:1,Mary:2,Cathy:3,Bob:4
+    25000:1,40000:2,55000:3,30000:4
 
 One big difference between the systems is that with the row-based system, the primary 
 key is the rowid field. In the column-based system, the primary key is the
@@ -90,7 +90,7 @@ data. So what does that mean? If we look in detail on the column-based system,
 we see that for duplicate data (e.g. 'Jones'), we're able to store the same
 value only once, like in this serialized version:
 
-  ;Smith:1,Jones:2,4;Johnson3;
+    ;Smith:1,Jones:2,4;Johnson3;
 
 ### So which one is better (row or column)?
 
