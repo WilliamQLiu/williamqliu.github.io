@@ -93,4 +93,38 @@ Ready to use virtual machine configurations for common use deployments (e.g. Red
 
 Relational SQL Database, basically MySQL. Good for relatively small data.
 
+## Dataproc
+
+* Google managed Hadoop, Pig, Hive, Spark.
+* Instead of storing data on HDFS, use Google Cloud Storage.
+* Think as a 'job' that you would spin up clusters for compute
+
+## Cloud Datastore
+
+### Object Oriented Programming and Relational Databases
+
+If you use a relational database to persist an object hierarchy, you get into
+an __object relational impedance mismatch__; so objects (instances) reference 
+one another, forming a graph (in the mathematical sense, a network including
+loops and cycles), which are in contrast to relational schemas (tabular and
+based on relational algebra) that groups data fields into a 'row' with
+different types for each field.
+
+For example, if you have a hierarchical data structure for Players, you have 
+some players that are footballers, some that are baseball players, some that
+are bowlers, and so forth. We need the players data to persist so we store our
+data in a relational database. We now have football players with batting averages.
+We put a null batting average for a football player, but this doesn't make sense.
+Converting linked tabular rows to graph structures is hard (this
+Object/relational mapping is sometimes called the 'The Vietnam of Computer
+Science').
+
+What we can do is store objects directly with **Cloud Datastore** (scales up to
+terabytes of data). What you're storing is like a persistent __Hashmap__
+(there's a key/id to the object and the entire actual object). When you write,
+you write an entire object. When you read, you're searching for the key or
+a property of the object (e.g. baseball players with batting average greater
+than 10 runs a game).
+
+For example, we create an Author, add Properties, then save the entity.
 
