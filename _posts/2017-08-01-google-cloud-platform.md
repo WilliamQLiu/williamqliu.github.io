@@ -89,11 +89,53 @@ Sample Scenario:
 
 Ready to use virtual machine configurations for common use deployments (e.g. Redis). Similar to DockerHub.
 
+# Storage based on Access Pattern
+
+You want to choose storaged based on access pattern
+
+* Cloud Storage
+    Capacity: Petabytes+
+    Access: Like files in a file system
+    Read: Have to copy to local disk
+    Write: One file
+    Update granularity: An object (a 'file')
+    Usage: Store blobs
+* Cloud SQL
+    Capacity: Gigabytes
+    Access: Relational Database
+    Read: SELECT rows
+    Write: INSERT row
+    Update granularity: Field
+    Usage: No-ops SQL database on the cloud
+* Datastore
+    Capacity: Terabytes
+    Access: Persistent Hashmap
+    Read: filter objects on property
+    Write: put object
+    Update granularity: Attribute
+    Usage: Structured data from AppEngine apps
+* Bigtable
+    Capacity: Petabytes
+    Access: Key-value(s), HBase API
+    Read: scan rows
+    Write: put row
+    Update granularity: Row (write new row instead)
+    Usage: No-ops, high throughput, scalable, flattened data
+* BigQuery
+    Capacity: Petabytes
+    Access: Relational
+    Read: SELECT rows
+    Write: Batch/stream
+    Update granularity: Field
+    Usage: Interactive SQL querying fully managed warehouse
+
 ## Cloud SQL
 
 Relational SQL Database, basically MySQL. Good for relatively small data.
 
 ## Dataproc
+
+Data Processing.
 
 * Google managed Hadoop, Pig, Hive, Spark.
 * Instead of storing data on HDFS, use Google Cloud Storage.
@@ -126,5 +168,44 @@ you write an entire object. When you read, you're searching for the key or
 a property of the object (e.g. baseball players with batting average greater
 than 10 runs a game).
 
-For example, we create an Author, add Properties, then save the entity.
+For example, we create a Player, add Properties, then save the entity. The Properties can all be different (e.g. if person is a baseball player, will have batting average, if a football player, will have yards ran). 
+### Why use (or don't use) Cloud Datastore?
+
+### Disadvantages
+
+Note that when you use Datastore, you're locked in to Google's platform because
+you're then writing custom code for transactions (unlike say Cloud SQL).
+Queries are a bit more restrictive due to using previously built indexes; you
+won't have join operations, inequality filtering on multiple properties,
+or filtering on data based on results of a subquery.
+
+### Advantages
+
+Datastore supports transactions allowing you to read and write structured data. 
+Datastore is a good option if you still need to do transactions like a SQL
+database and need to scale to very large data sets. Cloud Datastore is good for
+highly available structured data at scale. 
+
+## Bigtable
+
+Bigtable is a NoSQL database made for low latency, high throughput workflows at
+a very large scale. Good use cases include IoT, user analytics, and financial
+data analysis.
+
+# Data Processing Architectures
+
+## Asynchronous Processing
+
+Asynchronous processing is a way for absorbing shock and change.
+Say you have an application built for 100 users, then there is a sudden influx
+of 4,000 users. Your application can just crash or queue things up so responses
+are sent, but delayed.
+
+Asynchronous processing is able to help by separating the receiving code and
+the processing code with a message system. When a new request comes in, they go
+to a message queue, then you have consumers of this message queue do the actual
+processing of the request. An example would be RabbitMQ. This will make sure
+that your application is Available, so any request sent will be sooner or later
+be processed. You can also balance load across multiple workers so this can help with throughput.
+
 
