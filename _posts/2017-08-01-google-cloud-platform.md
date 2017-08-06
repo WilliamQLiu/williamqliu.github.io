@@ -190,9 +190,24 @@ highly available structured data at scale.
 
 Bigtable is a NoSQL database made for low latency, high throughput workflows at
 a very large scale. Good use cases include IoT, user analytics, and financial
-data analysis.
+data analysis. You can write very wide columns of data with high throughput at
+the cost of sometimes duplicating data.
+
+## BigQuery
+
+Used for data warehousing, can still use SQL for querying.
 
 # Data Processing Architectures
+
+For data processing architectures, we have:
+
+* Message-Oriented Architectures (i.e. Asynchronous Processing with Pub/Sub)
+* Serverless Data Pipelines
+
+As an example, here's a real-time data analysi of Twitter data using a pipeline
+built on Google Compute Engine, Kubernetes, Google Cloud Pub/Sub, and BigQuery.
+
+https://cloud.google.com/solutions/real-time/kubernetes-pubsub-bigquery
 
 ## Asynchronous Processing
 
@@ -208,4 +223,34 @@ processing of the request. An example would be RabbitMQ. This will make sure
 that your application is Available, so any request sent will be sooner or later
 be processed. You can also balance load across multiple workers so this can help with throughput.
 
+## Cloud Pub/Sub
 
+Google's **Cloud Pub/Sub** is a good way to handle asynchronous processing;
+Pub/Sub offers reliable, real-time messaging that is accessible through HTTP.
+You have __decoupled sources__ (e.g. an HR System, a Vendor Office), __publishers__ that send independent events (HR has a New Hire Event, Vendor Office has a New Contractor Event) that goes to a Pub/Sub __Topic__ (e.g. HR). We have __decoupled workers__ that are subscribed to this Topic and __consume__ these messages.
+
+## Serverless Data Pipelines
+
+__Dataflow__ is the execution framework for __Apache Beam__ pipelines. Apache
+Beam is an open-source API that lets you define a data pipeline. Apache Beam
+can be executed on Flink, Spark, etc. Dataflow does the data ingestion,
+transformation, and loading. You can process batch and stream data the same
+way.
+
+* Job is submitted to Cloud, its executed
+* No need to spin up extra servers
+* `ParDo` is a Parallel Do
+* Instead of being able to just read from a text file, can do `SlidingWindows`
+  (e.g. every minute, every 60 minutes) to get real time data (from say
+  Pub/Sub)
+
+
+## Data Analysis with Cloud Datalab
+
+Basically ipython/jupyter on the cloud.
+
+## Useful Machine Learning APIs
+
+* Translate API - Language translation
+* Vision API - Image recognition
+* Speech API - Speech to Text
