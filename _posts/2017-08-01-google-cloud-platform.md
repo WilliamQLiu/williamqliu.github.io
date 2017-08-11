@@ -6,8 +6,9 @@ title: Google Cloud Platform (GCP)
 
 # {{ page.title }}
 
+## Intro to Google Cloud Platform
 
-## History of data technologies from Google
+### History of data technologies from Google
 
 * **Google File System (GFS)** (2002, w/ newer version of **Colossus** in 2010) is the basis for **HDFS** and **MapReduce** (2004) is the basis for **Hadoop**; these allow a distributed file and compute system using large clusters of commodity hardware. No longer really used due to coupling of storage and compute.
     Advantages: Can scale compute and storage 
@@ -17,7 +18,7 @@ title: Google Cloud Platform (GCP)
   data storage and processing systems of choice.
 
 
-## GCP Products
+### GCP Products
 
 Foundational Level
 
@@ -43,7 +44,7 @@ Data-handling Frameworks for moving data from one place to another
 * __Cloud Dataflow__
 * __Cloud Dataproc__
 
-## Interfaces
+### Interfaces
 
 You can access any of the Google resources a few different ways including:
 
@@ -76,7 +77,7 @@ We want Google Cloud Storage for:
   Cloud Storage supports multi-threaded uploads, multi-part uploads, resumable
   uploads)
 
-### Data handling in Cloud Storage
+#### Data handling in Cloud Storage
 
 Sample Scenario:
 
@@ -85,11 +86,11 @@ Sample Scenario:
 * Store the transformed data on Cloud Storage
 * Publish Cloud Storage data on the web
 
-## Google Cloud Launcher
+### Google Cloud Launcher
 
 Ready to use virtual machine configurations for common use deployments (e.g. Redis). Similar to DockerHub.
 
-# Storage based on Access Pattern
+## Storage based on Access Pattern
 
 You want to choose storaged based on access pattern
 
@@ -197,7 +198,7 @@ the cost of sometimes duplicating data.
 
 Used for data warehousing, can still use SQL for querying.
 
-# Data Processing Architectures
+## Data Processing Architectures
 
 For data processing architectures, we have:
 
@@ -209,7 +210,7 @@ built on Google Compute Engine, Kubernetes, Google Cloud Pub/Sub, and BigQuery.
 
 https://cloud.google.com/solutions/real-time/kubernetes-pubsub-bigquery
 
-## Asynchronous Processing
+### Asynchronous Processing
 
 Asynchronous processing is a way for absorbing shock and change.
 Say you have an application built for 100 users, then there is a sudden influx
@@ -254,3 +255,57 @@ Basically ipython/jupyter on the cloud.
 * Translate API - Language translation
 * Vision API - Image recognition
 * Speech API - Speech to Text
+
+# Cloud Dataproc
+
+## On-premise applications for Big Data
+
+* Spark - general purpose cluster computing
+* Hadoop - Hadoop and Hadoop File System
+* Pig - for data transformations on Hadoop HDFS
+* Hive - querying on Hadoop HDFS
+
+## bdutil
+
+bdutil is a free OSS Toolkit, (a command-line script) used to manage Apache Hadoop and Apache
+Spark instances on GCE.
+
+## Setup Dataproc Cluster
+
+### Location
+
+Setting up Compute and Storage by location (__Zones__ and __Regions__) is very important; this affects transfer speed.
+
+Match your data location with your compute location (put in same region and
+zone ideally).
+
+* Same region and zone means petabit scale bandwidth
+* Between zones in the same regions means different buildings or different
+  segments of buildings, so fast, but not petabit scale
+* Between regions means fiber optic connections across the globe.
+
+### Cluster Configurations
+
+There are three cluster modes.
+
+* Single Node - use for experimentation
+* Standard - 1 master only; if something happens on master and not stored in
+  cluster, its lost
+* High Availability - 3 masters
+
+
+For storage, do not use HDFS (its available, just don't use it). The reason is
+that it will allow you to separate compute from storage. If you use storage on
+the Compute Engine, you can't spin down these machines.
+
+Consider using 'Preemptible' nodes for cheaper worker nodes. These are cheaper,
+but can be taken away at any minute. Good for compute.
+
+You can also setup additional configs like firewalls and what image versions
+you want (e.g. Spark, Hadoop, Pig, Hive).
+
+## gcloud SDK
+
+You can use the Cloud SDK to do many of the same operations as the GUI.
+
+
