@@ -260,6 +260,9 @@ Basically ipython/jupyter on the cloud.
 
 ## On-premise applications for Big Data
 
+Dataproc is a managed service for creating clusters of computers that can be
+used to run Hadoop and Spark applications.
+
 * Spark - general purpose cluster computing
 * Hadoop - Hadoop and Hadoop File System
 * Pig - for data transformations on Hadoop HDFS
@@ -308,4 +311,19 @@ you want (e.g. Spark, Hadoop, Pig, Hive).
 
 You can use the Cloud SDK to do many of the same operations as the GUI.
 
+### Firewall Configuration
+
+We want to make sure that our clusters allow our IP Address, Protocols, and
+Ports. You might want to open:
+
+* IP Address (find from http://ip4.me) and add '/32' (e.g. 174.51.93.17/32)
+* tcp:8088  # Hadoop uses this
+* tcp:50070  #  HDFS uses this
+* tcp:8080  #  Datalab uses this
+
+You can then access the web GUIs at your master node's IP Address, then
+followed by the port. E.g. say we have an master node of 104.154.142.41
+
+* http://104.154.142.41:8088  # shows Hadoop GUI (what jobs are submitted)
+* http://104.154.142.41:50070  # shows HDFS GUI
 
