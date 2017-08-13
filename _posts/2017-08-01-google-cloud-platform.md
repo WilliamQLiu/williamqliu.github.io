@@ -307,7 +307,7 @@ but can be taken away at any minute. Good for compute.
 You can also setup additional configs like firewalls and what image versions
 you want (e.g. Spark, Hadoop, Pig, Hive).
 
-## gcloud SDK
+### gcloud SDK
 
 You can use the Cloud SDK to do many of the same operations as the GUI.
 
@@ -326,4 +326,76 @@ followed by the port. E.g. say we have an master node of 104.154.142.41
 
 * http://104.154.142.41:8088  # shows Hadoop GUI (what jobs are submitted)
 * http://104.154.142.41:50070  # shows HDFS GUI
+
+## SSH into cluster
+
+You can ssh into master nodes to run jobs to do quick experimentation. You can
+start the pyspark interpreter.
+
+## Installing Software on Dataproc
+
+### Apache Bigtop
+
+__Apache Bigtop__ is a good baseline place to get started with installing comprehensive
+big data components (like Hadoop, HBase and Spark).
+
+### Installing Custom Software
+
+You can also install additional software on a Dataproc cluster by:
+
+* Write an executable program (bash, python, etc)
+* Upload it to Cloud Storage
+* Specify GCS location in Dataproc creation command
+
+Make sure to write the program so that it runs as root. E.g.
+
+* **Shebang** (#!) to speciy what language interpreter to invoke (e.g.
+  `#!/bin/bash`)
+* Make sure to include `-y` when running something like `apt-get install -y
+  python-numpy python-scipy python-matplotlib python-panads`
+
+### Installing Custom Software (specify if only on Master Node, Worker Nodes)
+
+By default, Dataproc installs on both masters and workers. If we only want an
+install on master or worker only, we can look at the metadata to determine
+where installs go.
+
+    #!/bin/bash
+    apt-get update || true
+
+    ROLE=$(/usr/share/google/get_metadata_value attributes/dataproc-role)
+    if [[ "${ROLE}" == 'Master' ]]; then
+        apt-get install -y vim
+    else
+        # something that goes only on worker
+    Fi
+
+    # things that go on both
+    apt-get install -y python-num python-scipy
+
+### Pre-made initialization scripts
+
+If you want to use some pre-built initialization scripts, check this out:
+
+https://github.com/GoogleCloudPlatform/dataproc-initialization-actions
+
+There's also a read-only storage bucket here:
+
+    # Bucket
+    gs://dataproc-initialization-actions
+
+    # Command line to see bucket
+    gsutil ls gs://datproc-initialization-actions
+
+    # Command line to create dataproc cluster using initialization-actions
+    gcloud dataproc clusters create mycluster \
+        --initialization-actions gs://mybucket/init-actions/my_init.sh \
+        --initialization-action-timeout 3m
+
+### Cluster Properties
+
+If you want to modify configuration properties, you can do:
+`file_prefix:property=value` in the gcloud SDK
+
+
 
