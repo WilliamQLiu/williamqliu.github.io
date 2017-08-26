@@ -704,14 +704,14 @@ to the cluster
     #!/usr/bin/env python
     from pyspark import SparkContext
     sc = SparkContext("local")
-    
+
     file = sc.textFile("gs://williamqliu/unstructured/lab2-input.txt")
     dataLines = file.map(lambda s: s.split(",")).map(lambda x : (x[0], [x[1]]))
     print dataLines.take(100)
-    
+
     databyKey = dataLines.reduceByKey(lambda a, b: a + b)
     print databyKey.take(100)
-    
+
     countByKey = databyKey.map(lambda (k,v): (k, len(v)))
     print countByKey.take(100)
 
@@ -747,4 +747,232 @@ If we want to submit the job using only the command line, we can run:
     gcloud dataproc jobs submit pyspark \
       --cluster my-cluster gs://williamqliu/unstructured/lab2.py
 
+## Datalab
+
+Create a Dataproc cluster, install Datalab, then you basically have a Jupyter
+Notebook that can utilize the Dataproc cluster. You're able to get data from
+Google Cloud Storage, run BigQuery to query data, and also run PySpark jobs to
+do parallel jobs.
+
+We made use of the initialization scripts that told the cluster what to install
+and setup. We also opened an IP Address and port on the firewall so that our IP
+Address is able to access the cluster IP Addresses.
+
+
+## BigQuery w/ Hadoop and Spark
+
+BigQuery integrates with Spark Clusters so you don't have to do something like
+Spark SQL. You can use Spark SQL for SQL statements, but if you want to run
+a Spark machine learning program, BigQuery might be good.
+
+Say we're on a Jupyter Notebook and we submit a query over to BigQuery.
+
+## Machine Learning APIs
+
+Google has a few APIs available for Machine Learning, including:
+
+* Vision API - Use Vision API to search for something in photos
+* Natural Language API - Run sentiment analysis (e.g. look at Hacker News
+  stories, gives numeric rating per story, if positive or negative)
+* Speech API
+* Translation API - Take a file (e.g. Alice in Wonderland, then translate to
+  Spanish)
+
+## Google Big Data Stack 2.0
+
+In Big Data v1, if we had to process very large datasets, we couldn't do them
+on one machine. You'd have to MapReduce, so that computations are doing with
+a map operation and data is sharded across many machines. The more machines you
+have, the more you can store, but also the more machines you have to search to
+find your data. This doesn't scale very well because we tied in storage and
+compute.
+
+Big Data v2 is looking at products like PubSub and BigQuery where its
+completely serverless, autoscaled ways of doing data analysis.
+
+## What is BigQuery
+
+BigQuery lets you run large queries (petabyte scale) from a cold start. There's
+no need to create indexes, provision clusters, etc. You can have data in
+regular tables or in denormalized form (with the denormalized form being much
+more efficient).
+
+You can access BigQuery console at https://bigquery.cloud.google.com
+
+* Data Storage is inexpensive. You are billed based off of the amount of data processed.
+* No-ops
+* Near real time (not milliseconds, but seconds)
+* Immutable audit logs
+* Durable (replicated) inexpensive storage
+* Can give anyone the data you have access to
+
+### How BigQuery fits in an xample Architecture for Data Analytics
+
+Here's how BigQuery fits into a Data Analytics Architecture
+
+1. Real-time Events (someone clicked this, etc.)
+2. Game Server Authentication
+3. Cloud Pub/Sub - Asynchronous messaging
+4. Cloud Dataflow - Paralle Data Processing (writes aggregates to BigQuery)
+5. BigQuery Analytics Engine.
+
+If you did not want to stream data, then you can batch load to Cloud Storage
+After BigQuery, you can do data exploration with DataLab
+
+### Project Terminology for BigQuery
+
+A Project is what sets billing (who sends the bill to). In a project, there
+are:
+
+* Users - people who belong to a project
+* Dataset - collection of tables and views (use views to limit access, like
+  read only)
+* Table - data with schema
+* Job - query, import, export, copies, some job that interacts with the dataset
+
+### BigQuery Tables and Jobs
+
+So BigQuery is a columnar database; because of this, tables are a collection of
+columns.
+
+A typical datbase is a relational database, with record-oriented storage that
+supports transactional updates.
+
+For BigQuery Storage, each column is in a separate, compressed, encrypted file
+that is replicated 3+ times. There are no indexes, keys or partitions required.
+BigQuery is a great use for immutable, massive datasets.
+
+### Querying BigQuery
+
+Run the web console to query BigQuery. Basic commands are:
+
+* Run - Run the Query
+* Save Query - Saves the Query
+* Validate - Shows how much data will be processed (gives an idea of cost)
+* Explanation - Analyze Query Performance
+* Export - Allows exports to CSV, JSON, Table, Google Sheets
+
+### BigQuery SQL Syntax
+
+Here's an example of the query syntax, basically SQL 2011 + extensions.
+
+Sample Query:
+
+    SELECT
+      airline,
+      SUM(IF(arrival_delay > 0, 1, 0)) AS num_delayed,
+      COUNT(arrival_delay) AS total_flights
+    FROM
+      `bigquery-samples.airline_ontime_data.flights`
+    WHERE
+      arrival_airport='OKC'
+      AND departure_airport='DFW'
+    GROUP BY
+      airline
+
+Query Results
+
+    Row     airline     num_delayed     total_flights
+    1       AA          10312           23060
+    2       OO          198             552
+    3       EV          756             1912
+    4       MQ          3884            7903
+
+SQL Syntax is pretty typical:
+
+    SELECT
+      <BUILT-IN FUNCTIONS: SUM, IF, COUNT>
+    FROM
+      <PROJECT>.<DATASET>.<TABLE>
+    WHERE
+      <CLAUSE, BOOLEAN OPERATIONS>
+    GROUP BY
+      <FIELDS>
+
+#### BigQuery SQL using Subqueries
+
+You can also do standard SQL subqueries in BigQuery.
+
+Original Data
+
+    Row     airline     departure_airport   num_delayed     total_flights
+    1       OH          MCO                 33              76
+    2       XE          SAN                 317             759
+    3       XE          EWR                 1985            3698
+    4       WN          DAL                 9117            19555
+    5       NW          MSP                 17              35
+
+SQL Query with Subquery
+
+    SELECT
+      airline, departure_airport, num_delayed, total_flights,
+      num_delayed/total_flights AS delayed_frac
+    FROM
+        # SubQuery Begins
+        (SELECT
+           airline, departure_airport,
+           SUM(IF(arrival_delay > 0, 1, 0)) AS num_delayed,
+           COUNT(arrival_delay) AS total_flights
+         FROM
+           `bigquery-samples.airline_ontime_data.flights`
+         WHERE
+           arrival_airport='OKC'
+         GROUP BY
+           airline, departure_airport)
+    WHERE total_flights > 5
+    ORDER by delayed_frac
+    DESC LIMIT 5
+
+Results
+
+    Row airline departure_airport   num_delayed total_flights   delayed_frac
+    1   OO      ATL                 260         360             0.72222222
+    2   OH      ATL                 251         373             0.67282222
+    3   EV      EWR                 191         303             0.63036303
+
+#### BigQuery query multiple tables
+
+You can also do SQL queries across multiple tables in BigQuery.
+
+An example of a UNION ALL. Notice that we have a Wildcard `_` to match the same
+sete of tables as the `FROM`
+
+    SELECT
+      FORMAT_UTC_USEC(event.timestamp_in_usec) AS time, request_url
+    FROM
+      [myproject-1234:applogs.events_20120501],
+      [myproject-1234:applogs.events_20120502],
+      [myproject-1234:applogs.events_20120503],
+    WHERE
+      event.username = 'root' AND
+      NOT event.source_ip.is_internal;
+    FROM
+      TABLE_DATE_RANGE(myproject-1234:applogs.events_,
+                       TIMESTAMP('2012-05-01'),
+                       TIMESTAMP('2012-05-03'))
+
+#### BigQuery JOIN ON fields across Tables
+
+You can JOIN ON fields across Tables like standard SQL. Here the Inner Select
+returns the days it rained at a station
+
+
+    SELECT
+      f.airline,
+      SUM(IF(f.arrival_delay > 0, 1, 0)) AS num_delayed,
+      COUNT(f.arrival_delay) AS total_flights
+    FROM
+      `bigquery-samples.airline_ontime_data.flights` AS f
+    JOIN (
+      SELECT
+        CONCAT( CAST(year AS STRING), '-', LPAD(CAST(month AS STRING),2,'0'), '-', LPAD(CAST(day as STRING),2,'0')) AS rainyday
+      FROM
+        `bigquery-samples.weather_geo.gsod`
+      WHERE
+        station_number = 725030
+        AND total_precipitation > 0) AS w
+    ON
+      w.rainyday = f.date
+    WHERE f.arrival_airport = 'LGA'
+    GROUP BY f.airline
 
