@@ -976,3 +976,63 @@ returns the days it rained at a station
     WHERE f.arrival_airport = 'LGA'
     GROUP BY f.airline
 
+### How does BigQuery fit in?
+
+BigQuery acts as storage and as a data warehouse. Its important to see that we
+have the following roles:
+
+* Ingest/Capture with
+  - Google App Engine
+  - Google Cloud Logging
+  - Google Cloud Pub/Sub
+* Porcess with
+  - Cloud DataFlow (Batch or Stream)
+  - Cloud Dataproc
+* Store with
+  - BigQuery Storage (tables)
+  - Cloud Storage (objects)
+* Analyze
+  - BigQuery Analytics (SQL)
+* Visualize
+  - 3rd Party Tools (Tableau, etc.)
+  - Cloud DataLab
+
+### Loading data with BigQuery
+
+You can load data into BigQuery using a few different ways, including:
+
+* `gsutil` tool in command line
+* web interface
+* python API
+* `bq` command-line tool to load data
+
+#### Using bq command-line
+
+Load data using the `bq` (BigQuery) command. This looks at a Google Cloud
+Storage, grabs all json type files, then loads them to BigQuery.
+
+    bq load --source_format=NEWLINE_DELIMITED_JSON $DEVSHELL_PROJECT_ID:cpb101_flight_data.flights_2014 gs://cloud-training/CPB200/BQ/lab4/domestic_2014_flights_*.json ./schema_flight_performance.json
+
+Verify with:
+
+    bq ls $DEVSHELL_PROJECT_ID:cpb101_flight_data
+
+You can export tables using the command line as well. Export formats include
+CSV, JSON, and AVRO:
+
+    bq extract cpb101_flight_data.AIRPORTS gs://williamqliu/bq/airports2.csv
+
+### BigQuery Data Types
+
+BigQuery supports all of the standard SQL types.
+
+    Data Type,  Possible Value
+    STRING      Variable-length character (Unicode) data
+    INT64       64-bit integer
+    FLOAT64     Double-precision (approximate) decimal values
+    BOOL        True or False (case insensitive)
+    ARRAY       Ordered list of zero or more elements of any non-ARRAY type
+    STRUCT      Container of ordered fields each with a type (required) and
+    field name (optional)
+    TIMESTAMP   Absolute point in time with precision up to microseconds
+
