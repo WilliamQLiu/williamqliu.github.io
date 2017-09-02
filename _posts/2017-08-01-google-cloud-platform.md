@@ -1036,3 +1036,163 @@ BigQuery supports all of the standard SQL types.
     field name (optional)
     TIMESTAMP   Absolute point in time with precision up to microseconds
 
+### Advanced BigQuery
+
+An example use of advanced SQL is here https://medium.com/@hoffa/the-top-weekend-languages-according-to-githubs-code-6022ea2e33e8
+
+* `WITH` clause in SQL
+* `ARRAY`
+* `STRUCT`
+
+## Dataflow
+
+**Dataflow** is a way to execute Apache Beam data pipelines on the Google Cloud
+Platform. We use dataflow to write data pipleines, carry out MapReduce
+programs, deal with side inputs, and streaming.
+
+An example would be a pipeline that reads from BigQuery and writes to Cloud
+Storage. Dataflow runs through **steps** (aka **transforms**) that can be
+executed in parallel.
+
+### Apache Beam
+
+**Apache Beam** (Batch + strEAM) is an open source model and set of APIs for
+doing both batch and stream data processing. You can use Apache Beam for
+Dataflow, as well as Apache Flink and Spark (so its pretty agnostic about the
+execution engine, similar to how SQL is a unified language for databases).
+
+#### How does it work?
+
+The general idea is that we create our Pipeine, then do a series of applies.
+
+    Pipeline p = Pipeline.create();
+    p.apply(...)
+     .apply(...)
+     .apply(...)
+    p.run()
+
+#### Batch and Streams
+
+So Apache Beam allows you to write code that processes both historical batch
+data (data that is complete - bounded sources and syncs) to data that is
+unbounded in nature.
+
+If you are working with unbounded data (i.e. streaming), you apply a sliding
+window still of say 60 minutes (so if you want an average, the calculation is
+a moving average).
+
+The idea is that it doesn't matter if you work with batch data (complete data)
+or streaming data (sliding windows of data), you apply the same code to both.
+
+#### Pipeline Terminology
+
+* A **Pipeline** is a set of steps
+* A **Transform** is a single step
+* A **PCollection** (aka Parallel **Collection**) is a list of items that get the apply
+  function run across the items from a Transform. Each transform creates a new PCollection.
+* A **Runner** is an execution framework (e.g. Dataflow, Flink, Spark) that
+  runs your pipeline
+    - A **Direct Runner** executes locally on your laptop
+    - A **Dataflow Runner** executes on the cloud
+* A **Source** is where data comes from (e.g. from BigQuery, the sink, to Cloud
+  Storage)
+* A **Sink** is where data goes to
+
+#### Python API
+
+We read from a Source, apply our Transforms, then data goes to the Sink. In
+Apache Beam, the pipe operator means apply. We first create the graph, then we
+run it.
+
+    import apache_beam as beam
+
+    if __name__ == '__main__':
+        # create a pipeline parameterized by commandline flags
+        p = beam.Pipeline(argv=sys.argv)
+
+        (p
+            | beam.io.ReadFromText('gs://...') # read input
+            | beam.FlatMap(lambda line: count_words(line)) # do something
+            | beam.io.WriteToText('gs://...') # write output
+        )
+
+        p.run()  # run the pipeline
+
+#### Applying Transform to PCollection
+
+The data in a pipeline is represented by a Parallel Collection. Every transform
+is applied to a Parallel Collection. A parallel collection does not have to be
+in-memory, it can be unbounded / streaming data. Remember that P stands for
+parallel processing.
+
+Apply Transform to PCollection, then return PCollection. Here we give the
+PCollection the name 'Length'.
+
+    lines = p | ...
+    sizes = lines | 'Length' >> beam.Map(lambda line: len(line))
+
+You can replace a running pipeline. This is important so you don't lose any
+data.
+
+#### Read data into a Pipeline and Write data out of a Pipeline
+
+##### Reading data into a Pipeline
+
+To get data into a pipeline, we need to read data. We can read data from text,
+from BigTable, BigQuery, Pub/Sub or a variety of different sources. E.g. You can
+read from multiple files, that then make up your PCollection.
+
+##### Writing data out of a Pipeline
+
+To write data out of a pipeline, you can use TextIO.Write.to/data/output with
+a suffix. Most writes are meant to be across multiple machines/files (to handle larger
+data), but you can force a single machine only (beware much slower) by
+specifying `withoutSharding`. 
+
+#### Running a Pipeline
+
+To run locally, run `main()` to run the pipeline locally
+
+    python ./mypipe.py
+
+To run on the cloud, specify the cloud parameters.
+
+    python ./mypipe.py --project=$PROJECT --job_name=myjob
+    --staging_location=gs://$BUCKET/staging/
+    --temp_location=gs://$BUCKET/staging --runner=DataflowRunner
+
+Notice you need a Job Name; these names should be unique (datetime might be good to be included)
+
+### MapReduce in Dataflow
+
+A common problem with larger data is taking a map reduce approach. You break up
+the data set into pieces so that each compute node processes data that is local
+to it. The map operations happen in parallel on chunks of the original input
+data. The result of these maps are sent to one or more reduce nodes.
+
+#### ParDo for parallel processing
+
+**ParDo** stands for Parallel Do. Say you have 20 instances processing your map
+operations. You do the processing on one item at a time, then emit the data
+out.
+
+##### ParDo in Python - Map vs FlatMap
+
+Let's say our example eis to lambda a word, get the input and then return the
+length of the word.
+
+Use **Map** for a 1:1 relationship between input and output.
+
+    'WordLengths' >> beam.Map( lambda word: (word, len(word))
+
+Use **FlatMap** for non 1:1 relationships, usually with a generator. A good example
+is a filtering operation. We choose whether we return a value or not. If it
+matches, we yield, otherwise we don't return anything.
+
+    def my_grep(line, term):
+        if term in line:
+            yield line
+
+    'Grep' >> beam.FlatMap(lambda line: my_grep(line, searchTerm))
+
+
