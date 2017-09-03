@@ -1195,4 +1195,67 @@ matches, we yield, otherwise we don't return anything.
 
     'Grep' >> beam.FlatMap(lambda line: my_grep(line, searchTerm))
 
+##### GroupBy
+
+In Dataflow, shuffle explicitly with a GroupByKey.
+
+* Create a Key-Value pair in a ParDo
+* Then group by key
+
+For example, say we have the following:
+
+    Input:
+    New York ... 10001
+    New York ... 10003
+    Seattle ... 98003
+    New York ... 10005
+
+    Steps:
+    Machine 1
+    Key-value: New York 10001
+    Key-value: New York 10003
+    ...
+    Machine 2
+    Key-value: Seattle 98003
+    Key-value: Seattle ...
+
+    What we want GroupByKey is:
+    New York: 10001, 10003, 10005
+    Seattle: 98003
+
+##### Combine
+
+If you want to do an aggregate, say the total sales, you can use Combine
+globally.
+If you want to find say sales per person, you can Combine per Key (with key being
+say the person).
+
+##### GroupBy and Combine examples in Python
+
+Python syntax:
+
+    cityAdnZipcodes = p | beam.Map(lambda fields: (fields[0]: fields[3]))
+    grouped = cityAndZipCodes | beam.GroupByKey()
+    totalAmount = salesAmounts | Combine.globally().sum()
+    totalSalesPerPerson = salesRecords | Combine.perKey(sum)
+
+##### Prefer Combine over GroupByKey
+
+Whatever you can do with a combine you could also do with a group by key
+explicitly. The GroupByKey method is much slower. Only if your combine
+operation is something special (e.g. not a Sum, Min, Max) then use the
+GroupByKey.
+
+### Side Inputs
+
+In the real world, you often run into the scenario where you have to process
+more than one PCollection. It isn't as simple as reading one PCollection from
+a source, processing it, and writing it to a sink.
+
+Say the data you need to process involves multiple external objects as well.
+You can take that other source (usually smaller) and convert the object into a View.
+The View can either be a list or a map (key-value pairs); this object can then
+be converted into a **side input**. You would then do
+something like ParDo.withSideInputs(map).
+
 
