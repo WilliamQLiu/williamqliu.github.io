@@ -1258,4 +1258,28 @@ The View can either be a list or a map (key-value pairs); this object can then
 be converted into a **side input**. You would then do
 something like ParDo.withSideInputs(map).
 
+### Streaming
+
+Automatic timestamp when reading from PubSub - this timestamp is the time that
+the message was published to topic
+
+For batch inputs, explicitly assign timestamp when emitting at some step in
+your pipeline.
+
+Now that there is a timestamp associated with the message (whether by batch or
+a real time pipeline), we can then do our transformations in Windows. 
+
+Say we have a sliding window of 2 minutes where we want to get an average. We
+have the sliding window run every 30 seconds. That way any time we do a group
+by key, whether the transform is a sum or average, they're carried out in the
+context of the window.
+
+You want to deal with real-time data the same as your historical data. Its
+important especially for machine learning use cases.
+
+#### Sample Serverless Workflow
+
+We can handle real-time data streaming by streaming data into Pub/Sub. You then
+handle the data processing code with DataFlow. DataFlow then streams that into
+BigQuery where you can run your SQL.
 
