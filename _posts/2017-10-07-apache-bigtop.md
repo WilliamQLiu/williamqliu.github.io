@@ -32,10 +32,37 @@ https://hortonworks.com/downloads/
 
 ## Setup
 
+### Sandbox
+
+For a sandbox environment, head over to here:
+
+https://github.com/apache/bigtop/tree/master/docker/sandbox
+
+You can then build sandbox images using ubuntu and w/ components like hdfs,
+yarn, and spark:
+
+    ./build.sh -a bigtop -o ubuntu-16.04 -c "hdfs, yarn, spark"
+
+Run your sandbox with:
+
+    docker run -d -p 50070:50070 -p 8088:8088 -p 8080:8080
+    bigtop/sandbox:ubuntu-16.04_hdfs_yarn_spark
+
+### Provisioner
+
 Head over to the provisioner section and select your setup (e.g. Docker,
-Vagrant).  
+Vagrant). Here you can create your clusters.
 
 https://github.com/apache/bigtop/tree/master/provisioner/docker
+
+You can create and destroy clusters or run commands on individual containers.
+
+* Create a Bigtop Hadoop cluster (w/ three nodes): `./docker-hadoop.sh --create
+  3`
+* Destroy a Bigtop Hadoop cluster: `./docker-hadoop.sh --destroy`
+* Login to first container: `./docker-hadoop.sh --exec 1 bash`
+* Execute a command on the second container: `./docker-hadoop.sh --exec
+  2 hadoop fs -ls /`
 
 ## Example Project
 
@@ -45,4 +72,17 @@ chain of petstores.
 
 https://github.com/apache/bigtop/tree/master/bigtop-bigpetstore
 
+The general idea is that this Spark application:
+
+* Generates raw (dirty) data on the file system (a csv file w/ a few fields
+  that can cover from Store ID, Store location, Customer ID, Customer name,
+  Transaction ID, Transaction datetime, Transaction Product (e.g. category=dry
+  cat food;brand=Feisty Feline;flavor=Chicken)
+* Runs ETL component as a spark job to read the data, parse the data times and
+  products, normalizes the data, and writes out the RDD for each type of 
+  class (Store, Customer, Location, Product, Transaction) from the data model
+  above.
+* We can then run analytics on the data and use this to write out custom
+  results (e.g. JSON results of the number of Total Transactions, Transaction
+  Count by Month, Product, and Location)
 
