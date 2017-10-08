@@ -24,6 +24,12 @@ Bigtop can include components like:
 * Hive
 * Mahout
 
+### Other Sandboxes
+
+Bigtop is similar to other sandboxes like Hortonworks' data platform:
+
+https://hortonworks.com/downloads/
+
 ## Setup
 
 Head over to the provisioner section and select your setup (e.g. Docker,
@@ -38,4 +44,5 @@ BigPetStore generates and analyzes synthetic transaction data for a fictional
 chain of petstores.
 
 https://github.com/apache/bigtop/tree/master/bigtop-bigpetstore
+
 
