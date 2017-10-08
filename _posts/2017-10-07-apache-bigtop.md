@@ -11,7 +11,7 @@ title: Apache Bigtop
 Apache Bigtop is a way for developers to try out the Apache Hadoop ecosystem
 quickly. 
 
-https://github.com/apache/bigtop
+[Apache Bigtop](https://github.com/apache/bigtop)
 
 Bigtop can include components like:
 
@@ -28,7 +28,7 @@ Bigtop can include components like:
 
 Bigtop is similar to other sandboxes like Hortonworks' data platform:
 
-https://hortonworks.com/downloads/
+[Hortonworks Sandboxes](https://hortonworks.com/downloads/)
 
 ## Setup
 
@@ -36,10 +36,10 @@ https://hortonworks.com/downloads/
 
 For a sandbox environment, head over to here:
 
-https://github.com/apache/bigtop/tree/master/docker/sandbox
+[Bigtop Sandboxes](https://github.com/apache/bigtop/tree/master/docker/sandbox)
 
-You can then build sandbox images using ubuntu and w/ components like hdfs,
-yarn, and spark:
+You can then build sandbox images using different os (e.g. ubuntu) and 
+w/ components like hdfs, yarn, and spark:
 
     ./build.sh -a bigtop -o ubuntu-16.04 -c "hdfs, yarn, spark"
 
@@ -53,7 +53,7 @@ Run your sandbox with:
 Head over to the provisioner section and select your setup (e.g. Docker,
 Vagrant). Here you can create your clusters.
 
-https://github.com/apache/bigtop/tree/master/provisioner/docker
+[Bigtop Provisioners](https://github.com/apache/bigtop/tree/master/provisioner/docker)
 
 You can create and destroy clusters or run commands on individual containers.
 
@@ -70,7 +70,7 @@ The BigPetStore is an example application for the Hadoop/Spark ecosystems.
 BigPetStore generates and analyzes synthetic transaction data for a fictional
 chain of petstores.
 
-https://github.com/apache/bigtop/tree/master/bigtop-bigpetstore
+[Bigtop BigPetStore](https://github.com/apache/bigtop/tree/master/bigtop-bigpetstore)
 
 The general idea is that this Spark application:
 
