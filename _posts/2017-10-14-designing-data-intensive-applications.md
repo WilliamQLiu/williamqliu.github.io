@@ -22,11 +22,30 @@ While these are the basic tasks, there's a lot of different types of databases
 with different characteristics. In order to determine the right types of
 systems, we need to look at the fundamentals of what it means to be:
 
-* __reliable__ 
-* __scalable__ 
-* __maintainable__
+* __reliable__ - system should continue to work correctly (performing the
+  correct function at the desired level of performance) even in the face of
+  adversity (hardware or software faults)
+* __scalable__ - as the system grows (in data volume, traffic volume,
+  complexity), there should be reasonable ways of dealing with growth
+* __maintainable__ - Over time, many people will work on the system and they
+  should all be able to work on it productively
 
-### Data Systems
+### Types of Data Systems
 
-Traditionally we've seen relational databases.
+Traditionally data systems have been relational databases and message queues.
+They both store data for some time, but they're different due to their very
+different __access patterns__, meaning broadly that we'll have much different
+performance characteristics and implementations.
+
+With newer tools like Redis (a datastore that can also be a message queue) and
+Apache Kafka (message-queue with database-like durability guarantees), the
+traditional categories have been blurred.
+
+### Reliability
+
+### Scalability
+
+### Maintainability
+
+
 
