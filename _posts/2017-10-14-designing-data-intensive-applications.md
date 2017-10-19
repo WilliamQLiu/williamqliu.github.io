@@ -177,13 +177,121 @@ percentile since they're higher influencers. In the end, Twitter is using
 a hybrid approach depending on whether you have a large number of followers or
 not.
 
-#### Performance
+#### Describing Performance
 
-Let's look at what happens when load increases.
+Let's look at what happens when load increases in a system through two ways:
 
-* When you increase a load parameter and keep the system resources (CPU,
-  memory, bandwidth)
+1. When you increase a load parameter and keep the same system resources 
+   (CPU, memory, bandwidth), how is the performance of the system affected?
+2. When you increase a load parameter, how much do you need to increase the
+   resources if you want to keep performance unchanged?
+
+#### Latency and Response Time
+
+__Response Time__ is what the client sees: besides the actual time to process
+the request (the __service time__), it includes network delays and queueing
+delays.
+
+__Latency__ is the duration that a request is waiting to be handled, during
+which it is __latent__, awaiting service.
+
+In reality when clients make requests over and over, we'll get slightly
+different response times each time. That means we can't measure response times
+as a single number, but a distribution of values that you can measure.
+Sometimes you'll see the average response time, but this is not a very good
+metric since it hides the delays of your outliers.
+
+Instead, we want to use __percentiles__ to see say the 50th, 95th, 99th, 
+and 99.9th percentiles. You want to pay special attention to response times
+in the 99.9th percentile (__tail latencies__) because the customers with 
+the slowest requests are usually the ones with the most data in their 
+accounts (and thus most valuable customers). Percentiles are used in 
+__service level objectives (SLOs)__ and __service level agreements (SLAs)__ 
+that define the expected performance and availability of a service.
+
+Since a server can only process a small number of things in parallel (e.g.
+limited by number of CPU cores), it only takes a small number of slow requests
+to hold up the processing of subsequent requests (aka __head-of-line
+blocking__).
+
+If you have a microservice architecture where a single end-user request hits
+multiple backend calls, the end-user needs to wait for the slowest of the
+calls to complete. Even if a small percentage of this is slow, you can end with
+very high wait times due to __tail latency amplification__.
+
+You can check response times for all requests within a time window and sort
+that list every minute or you can get approximations of percentiles with
+algorithms like __forward decay__, __t-digest__, or __HdrHistogram__.
+
+#### Coping with Load
+
+Now that we can describe and measure load, we can try to architect for an
+appropriate level of load. This means that if we architect for say 2 or 3 times
+the load, it might not be the same as architecting for 10 times that load.
+
+When coping with load, you can __scale up__ (aka __vertical scaling__) by
+making a machine more powerful or __scale out__ (aka __horizontal scaling__,
+__shared-nothing__ architecture) by spreading the load across multiple 
+smaller machines. A single machine can often be simpler, but very costly.
+
+Some systems are __elastic__, meaning automatic computing resources are added
+when they detect a load increase while other systems require manual
+intervention for adding resources.
+
+Moving from a single machine into a distributed stateless service across
+multiple machines can introduce a lot of additional complexity. You should
+consider the problems you are trying to solve before rearchitecting your
+system; the problem(s) might be the volume of reads, the volume of writes, the
+volume of data to store, the complexity of the data, the response time
+requirements, the access patterns, or some mix.
+
+For example, a system designed to handle 100k requests per second, each 1kb in
+nsize, looks very different from a system that is designed for 3 requests per
+minute, each 2GB in size, even though the two systems have the same data
+__throughput__ (the number of records we can process per second, or the total
+time it takes to run a job on a dataset of a certain size).
 
 ### Maintainability
 
+The majority of the cost of software isn't on the initial development, but in
+its ongoing maintenance like fixing bugs, investigating failures, modifying
+the existing system for new use cases, and adding new features. We should
+design software meant to minimize pain during maintenance by looking at three
+design principles in particular:
+
+* __Operability__ - make it easy for operations teams to keep the system
+  running smoothly
+* __Simplicity__ - make it easy for new engineers to understand the system 
+* __Evolvability__ (aka __extensibility__, __modifiability__, __plasticity__) - 
+  make it easy for engineers to make changes to the system in the future
+
+#### Operability
+
+"Good operations can often work around the limitations of bad or incomplete
+software, but good software cannot run reliably with bad operations". A good
+operations team keeps a software system running by:
+
+* Monitoring the health of a system
+* Tracks down causes of problems such as system failures or poor performance
+* Keeps software up to date
+* Keeps tabs on how different systems affect each other
+* Capacity Planning
+* Establish good practices and tools for deployment, configuration management
+* Avoid dependency on individual machines
+
+#### Simplicity
+
+Small projects have simple code, but as projects get larger, they become
+complex and difficult to understand. Complexity slows down everyone who needs
+to work on the system and increases the cost of maintenance and increases the
+number of bugs when changes happen. We want to remove __accidental
+complexity__, which is defined as: complexity is accidental if it is not inherent
+in the problem that the software solves (as seen by the users) but arises only
+from the implementation. We can usually use __abstraction__ to help with complexity
+by hiding the implementation details behind a clean, simple to understand facade.
+
+#### Evolvability
+
+Make changes easy. Your system requirements probably change frequently from new
+business requiremnets or new cases emerge.
 
