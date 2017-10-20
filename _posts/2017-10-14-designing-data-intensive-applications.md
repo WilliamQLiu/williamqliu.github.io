@@ -541,9 +541,73 @@ by Neo4J, Titan, and InfiniteGraph) and the __triple-store__ model (e.g. used
 by Datomic, AllegroGraph)
 
 I don't have much experience with Graph databases, but I think the idea is that
-they are the opposite of document databases. In graph databases, anything is
+they are the _opposite_ of document databases. In graph databases, anything is
 potentially related to everything. In document databases, the target use case
 is that data is self-contained documents and relationships between one document
 and another are rare.
 
+## Chapter 3: Storage and Retrieval
+
+A database stores data and when you ask for it later, it returns data. How the
+storage engine works internally will help you know what type of engine to
+pick, with the reason being that there is a big difference between storage
+engines that are optimized for __transactional__ workloads versus those
+optimized for __analytics__. Since we talked about relational databases and 
+NoSQL databases, we'll look at __log-structured__ and __page-oriented__ storage 
+engines.
+
+### First Principles Database
+
+Let's look at the simplest database created using two bash functions to create
+a key-value store. `db_set key value` will store key and value in the database.
+`db_get key` will get the most recent value with that key. The idea is we have
+a text file where each line is a key-value pair separated by a comma (ignoring
+escape issues). When a new `db_set` is done, the old value is not overwritten,
+we just look at the last occurrence of the key with `tail -n 1` in `db_get`.
+
+    #!/bin/bash
+
+    db_set () {
+        echo "$1,$2" >> database 
+    }
+
+    db_get () {
+        grep "^$1," database | sed -e "s/^$1,//" | tail -n 1
+    }
+
+Example Usage
+
+    db_set 42 '{"name": "San Francisco", "attractions": ["Golden Gate
+    Bridge"]}'
+
+    db_get 42
+    '{"name": "San Francisco", "attractions": ["Golden Gate
+    Bridge"]}'
+ 
+Performance
+
+The `db_set` performance is good because appending to a file is very 
+efficient. Many databases do something similar internally using a __log__, 
+an append-only sequence of records.
+
+The `db_get` performance is bad with a large number of records because we have
+`O(n)` lookup costs; if we double our records, we double our search times.
+
+#### Index
+
+If we want to efficiently find the value for a specific key in a database, we
+need an additional data structure called an __index__, with the general idea of
+keeping additional metadata on the side, acting as a signpost to help you
+locate the data you want. If you want to search data in different ways, you can
+have different indexes on different parts of the data.
+
+The benefit of indexes is that it helps with the performance of some read queries
+at the cost of adding overhead on writes, with every write also needing to write 
+to the indexes.
+
+There are various types of indexes, including:
+
+* __hash indexes__ 
+* __sstables__ and __lsm-trees__
+* __b-trees__
 
