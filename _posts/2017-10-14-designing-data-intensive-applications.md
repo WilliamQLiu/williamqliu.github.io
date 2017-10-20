@@ -295,3 +295,53 @@ by hiding the implementation details behind a clean, simple to understand facade
 Make changes easy. Your system requirements probably change frequently from new
 business requiremnets or new cases emerge.
 
+## Chapter 2: Data Models and Query Languages
+
+Data models are the one of the most important pieces of developing software
+because it is not only how the software is written, but also how we think about
+the problem that we are solving. We usually layer one data model on top of
+another, with each layer thinking "how is it represented in terms of the
+next-lower layer"?
+
+1. As an application developer, you look at the real world (e.g. people,
+   organizations, actions) and model it in terms of objects or data structures
+   with APIs that manipulate those data structures.
+2. When you want to store those data structures, we express them in
+   general-purpose data models like JSON or XML documents, tables in
+   a relational databases or a graph model.
+3. The engineers who built the database software decided on representing the
+   JSON/XML/relational/graph data in terms of bytes in memory, on disk, or on
+   a network. The representation allows the data to be queried, searched,
+   manipulated, processed in different ways.
+4. On lower levels, hardware engineers represent bytes in terms of electrical
+   currents, pulses of light, etc.
+
+The idea is that each layer hides complexity of the layers below it by
+providing a clean data model.
+
+### Relational Model vs Document Model
+
+The best known relational model is __SQL__; data is organized into
+__relations__ (aka __tables__ in SQL), where each relation is an unordered
+collection of __tuples__ (aka __rows__ in SQL).
+
+#### NoSQL
+
+__NoSQL__ isn't a particular technology, it just stands for Not Only SQL. NoSQL
+stands to do:
+
+* Scale better than relational databases, with more focus on very large
+  datasets and very high write throughput
+* Specialized query operations that are not suppported by the relational model
+* More dynamic data models than those of the relational schemas
+
+Since SQL and NoSQL solve different problems, these two technologies can be
+used together (aka __polygot persistence__).
+
+#### Object-Relational Mismatch
+
+Most application development is done using object-oriented programming
+languages, but data is stored using the SQL data model in relational tables.
+There is this awkward mismatch between transitioning objects to tables/rows/columns
+called __impedance mismatch__.
+
