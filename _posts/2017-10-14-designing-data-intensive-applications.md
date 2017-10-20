@@ -345,3 +345,205 @@ languages, but data is stored using the SQL data model in relational tables.
 There is this awkward mismatch between transitioning objects to tables/rows/columns
 called __impedance mismatch__.
 
+#### Resume Example
+
+Let's look at how a resume might be expressed in a relational schema.
+
+##### One-to-One Relationships 
+
+For a resume, we have one-to-one fields like a user and their name.
+
+* We have a unique identifier `user_id`
+* We have fields `first_name` and `last_name` appear only once per user, so we
+  create these columns in a `users` table
+
+##### One-to-Many Relationships 
+
+For a resume, we have one-to-many relationships. People have more than one job 
+in their career and more than one periods of education or contact information 
+(__one-to-many__ relationship). We can express this a few ways:
+
+* one-to-many can be separate tables (e.g. education, contact, jobs)
+* we can add support for structured datatypes like JSON or XML data so that 
+  multi-valued data is stored in a single row (allowing the db to query and 
+  index these documents)
+* we can encode education, jobs, contact info as a JSON or XML document,
+  store it in a text column in the database, and let the application interpret
+  its structure and contents (usually unable to have the db query for values
+  inside the encoded column)
+
+If we go the JSON or XML representation, we have better __locality__ than the
+multi-table schema, meaning when we access the data, we do not need to perform
+multiple queries and joins between all the tables; instead we only have one
+query with all the information in one place.
+
+##### Many-to-One and Many-to-Many Relationships
+
+In a resume, if there are free-text fields, it makes sense to store that as
+plain text strings. However, for fields like `region_id` and `industry_id`, we
+want to use an id instead of plain text like `Greater Seattle Area` and
+`Technology`. Users can then choose from a drop down list to help with:
+
+* Consistent style and spelling
+* Avoid ambiguity (e.g. several cities with the same name)
+* Ease of Updating (e.g. city changes name)
+* Localization support
+* Better Search (e.g. search for in state of WA can have Seattle listed as in WA)
+
+You can technically store the text, but using an ID helps because it has no
+meaning to humans so it never needs to change. Anything meaningful to humans
+might need to be changed. Removing duplicated information is the idea of 
+__normalization__ in databases.
+
+With __many-to-one__ relationships (many people live in one region, many people
+work in one industry), it won't fit nicely in a document model (unlike
+a relational database where it's normal to refer to rows in other tables by
+ID). In document databases, we don't need joins for one-to-many tree structures
+(e.g. education, jobs). So what do we do? We can shift the joins from the
+database to the application code (w/ multiple queries, then doing a join), but
+then that really doesn't have the database solve the issue.
+
+The same issue that document databases encounter for one-to-many relationships
+is the same issue as for __many-to-many__ relationships. If there are many of 
+these types of joins, then a relational model is better. However, if we want
+more schema flexibility and better performance due to locality with one-to-many
+relationships, the document database might work better.
+
+In a relational model you can take a document-like structure (i.e. a tree of
+one-to-many relationships) and split this document into multiple tables 
+(aka technique of __shredding__), but can lead to cumbersome schemas and
+unnecessarily complicated application code.
+
+If data is very highly interconnected, the document model is not the way to go,
+the relational model is okay, and __graph models__ are the most natural.
+
+##### Relationship Summary
+
+The main idea is that you want to have simple application code and in order to
+accomplish this, we pick the right database depending on the types of
+relationships that exist between data items. Usually:
+
+* mostly one-to-many relationships with nested records, use document database
+* mostly many-to-one and a few many-to-many relationships, use relational database
+* highly interconnected data (i.e. lots of many-to-many relationships), use graph models
+
+#### Schemas
+
+Relational and Document databases handle schemas a bit differently.
+Most document databases and relational databases that support JSON do not
+enforce any schema on the data in documents. XML support in relational
+databases usually have an optional schema validation.
+
+* Document databases are sometimes called __schemaless__, but it really means
+  that its __schema-on-read__, where the structure of the data is implicit and
+  only interpreted when the data is read.
+* Relational databases have __schemas__ and are __schema-on-write__, where the
+  schema is explicit and the database ensures all written data conforms to it
+
+##### schema-on-read vs schema-on-write
+
+So to an application developer, this idea of schema-on-read vs schema-on-write
+is comparable to type checking in programming languages.
+
+* schema-on-read is like dynamic (runtime) type checking like python
+* schema-on-write is like static (compile-time) type checking like java
+
+So how does this affect things?
+
+* On a document database (schema-on-read), if we have the name field and want 
+  to store this into two separate fields of first name and last name, we write 
+  the application code to create a new field.
+* On a relational database (schema-on-write), we need to perform a database
+  migration like (`ALTER TABLE users ADD COLUMN first_name text; ...`)
+
+Schema changes are usually pretty quick (except for MySQL, which copies the
+entire table, meaning minutes or even hours of downtime for larger tables).
+
+So when is it good to have a schema?
+
+* schema-on-read is good when items in the collection don't all have the same
+  structure for some reason (i.e. data is heterogeneous). The structure of the
+  data might be determined by external systems and may change at any time.
+* schema-on-write is good when all records are expected to have the same
+  structure so we can document and enforce that structure
+
+### Imperative vs Declarative Languages
+
+We have __imperative languages__ (most programming languages, like Python) that
+tells the computer to perform certain operations in a certain order. We can
+step through the code line by line.
+
+On the opposite end, we have __declarative languages__ (like SQL, CSS, or relational
+algebra), where you specify the pattern of the data you want, but not HOW to
+achieve that goal. This type of language is more concise and easier to work
+with and hides the implementation details of something like the database engine. 
+This allows for automatic optimizations and usually allows parallel execution.
+
+#### MapReduce
+
+__MapReduce__ is kinda in the middle between an imperative and declarative
+language. You run snippets of code repeatedly by a processing framework. This
+code does a __map__ (aka __collect__) and __reduce__ (aka __fold__,
+__inject__). An example of this might be to map how many sharks you saw per month.
+
+In a relational database like Postgres, this might look like:
+
+    SELECT date_trunc('month', observeration_timestamp) AS observation_month,
+    SUM(num_animals) AS total_animals
+    FROM observations
+    WHERE family = 'Sharks'
+    GROUP BY observation_month;
+
+In a MapReduce like MongoDB, we have:
+
+    db.observations.mapReduce(
+        function map() {
+            var year = this.observationTimestamp.getFullYear();
+            var month = this.observationTimestamp.getMonth() + 1;
+            emit(year + "-" + month, this.numAnimals);
+        },
+        function reduce(key, values) {
+            return Array.sum(values);
+        },
+        {
+            query: { family: "Sharks" },
+            out: "monthlySharkReport"
+        }
+    );
+
+We group by a key (in this case, the year and month combined as a key like
+'2017-10') and emit the value (number of animals in that observation).
+  
+The __map__ and __reduce__ functions must be __pure functions__, meaning they
+ONLY use the data passed to them as input and cannot do additional database
+queries or have any side effects. This allows the database to run the functions
+anywhere, in any order, and rerun them on failure in a distributed execution
+environment on a cluster of machines.
+
+### Graph Databases
+
+If many-to-many relationships are very common in your data, then consider
+a __graph database__. A graph has two kinds of objects: __verticies__ (aka
+__nodes__, __entities__) and __edges__ (aka __relationships__, __arcs__).
+Examples are:
+
+* Social Graphs - vertices are people and edges are how people know each other
+* Web Graphs - vertices are web pages and edges are links to other pages 
+* Road or Rail Networks - vertices are junctions and edges are roads/highway
+  lines
+
+Graphs are not limited to __homogeneous data__ (same types of data, e.g. web
+page link to other web pages). We can have a single graph link people to
+locations, events, checkins, comments, etc.
+
+We can structure and query data using the __property graph__ model (e.g. used
+by Neo4J, Titan, and InfiniteGraph) and the __triple-store__ model (e.g. used 
+by Datomic, AllegroGraph)
+
+I don't have much experience with Graph databases, but I think the idea is that
+they are the opposite of document databases. In graph databases, anything is
+potentially related to everything. In document databases, the target use case
+is that data is self-contained documents and relationships between one document
+and another are rare.
+
+
