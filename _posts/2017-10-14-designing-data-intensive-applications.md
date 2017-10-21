@@ -611,3 +611,52 @@ There are various types of indexes, including:
 * __sstables__ and __lsm-trees__
 * __b-trees__
 
+##### Hash Indexes
+
+Hash indexes are for key-value data. Key-value stores are basically like the
+dictionary data type in programming languages and are implemented as a hash 
+map/hash table.
+
+The idea is that you have an in-memory hash map where every key is mapped to
+a byte offset in a data file (location where the value can be found).
+
+An example storage engine with hash indexes is __Bitcask__ (default storage 
+engine in __Riak__). Bitcask has high performance reads and writes, but the 
+requirement is that all keys fit in RAM since the hash map is kept in memory.
+
+When to use? If you have a situation where the value for each key is updated
+very frequently and can fit in memory, then this storage engine would be a 
+good fit. A key might be a URL of a link and the value is the number of times
+it has been accessed (incremented each time there is a visit). There are a lot
+of writes, but not too many distinct keys.
+
+With our example we are only appending to a file, which would lead to running
+out of disk space. We can break the log into segments when a segment reaches
+a certain size, then make writes to a new segment. This allows __compaction__
+on the segments, meaning we throw away duplicate keys in the log and keeping
+only the most recent value for each key.
+
+##### SSTables and LSM-Trees
+
+__Sorted String Table__ (aka __SSTable__) is where the sequence of key-value
+pairs are sorted by key. There's some advantages over a regular hash index:
+
+* merging segments is simple and efficient, even if files are larger than memory
+* to find a specific key, you don't have to keep an index of all the keys in
+  memory
+
+We can create __Log-Structured Merge-Tree__ (aka __LSM-Trees__) out of
+SSTables.
+
+##### B-Trees
+
+__B-Trees__ is maintaining a sorted structure on disk (opposed to memory),
+where the database is broken down into fixed-size __blocks__ (aka __pages__) of
+about 4KB in size and read or write one page at a time.
+
+B-Trees need to maintain a write ahead log.
+
+##### Comparing B-Trees and LSM-Trees
+
+Usually LSM-Trees are typically faster for writes and B-Trees are faster for reads.
+
