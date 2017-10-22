@@ -1283,3 +1283,89 @@ We can handle real-time data streaming by streaming data into Pub/Sub. You then
 handle the data processing code with DataFlow. DataFlow then streams that into
 BigQuery where you can run your SQL.
 
+## Building Resilient Streaming Systems
+
+The idea of data __streaming__ means data processing for an __unbounded__ data 
+set (a data set that is never complete when considering time). This is the
+opposite of __bounded__ data sets, which is a finite data set that is complete 
+regardless of time.
+
+When people talk about stream processing, we think about the execution engine, 
+meaning we look at the system, the service, the runner, and what we are
+using to process the unbounded data.
+
+Examples of stream processing systems might be something like physical sensors 
+collecting data or credit card transactions. Usually we need to take action on
+that data immediately, like checking if a transaction is fradulent (by comparing
+against data we've collected in the past).
+
+### Streaming Challenges
+
+Our challenges w/ stream processing:
+
+* Volume of data is large (need to scale, even if higher volume during
+  holidays)
+* Variety of data (that includes unstructured data)
+* Velocity of data (need realtime or near-realtime) to do things like moving
+  avgs, but have to deal w/ out of order data, late data
+
+### Handling Variable Data Volumes
+
+So if we want to ingest variable volumes of streaming events, we need to be
+able to handle spiky/bursty data (highly available) and be durable (what we
+save is saved).
+
+We should not tightly couple senders and receivers. If we directly couple
+sender and receiver, we'll have durability and/or availability problems.
+
+* __Fan-in__ scenario would be multiple senders creating messages to a single
+  receiver and the receiver crashes. If one of the senders has a problem (say
+  its sending a lot or bad messages), then the receiver crashes.
+* __Fan-out__ scenario would be a single sender creating messages to multiple
+  receivers. If the sender can't send a message to a bad receiver and it 
+  keeps trying, the sender and receiver would crash (e.g. too many messages
+  built up)
+
+Solution
+
+The solution is to create a __message bus__ to keep our systems loosely-coupled.
+The message bus' job is to create a buffer for these messages. If a subscriber
+goes away, then the message bus holds onto those messages until that subscriber
+is back. If a publisher goes away, it's not a problem because once that
+publisher is back, it'll continue sending messages.
+
+### Deal with unordered/late data
+
+You will get some late data. Even for something like sensors, smaller packets 
+usually arrive faster than larger packets due to __latency__ (or any other
+number of reasons). This latency could happen during transmit (e.g. network
+delays, ingest delays, write latencies, ingest failures), during ingest or
+during processing.
+
+Solution
+
+We want to be able to answer these four questions (we'll use Beam/Dataflow
+model as an example):
+
+* What results are calculated? Answered via transformations
+* Where in event time are results calculated? Answered via event-time windowing
+* When in processing time are results materialized? Answered via watermarks,
+  triggers, and allowed lateness
+* How do refinements of results relate? Answered via accumulation modes
+
+We get low-latency speculation (make best guess based on current data) and 
+ability to refine the results after the fact (e.g. new data comes in 3 hours 
+late, refine or ignore).
+
+### Deal with real-time insights
+
+You shouldn't have to store the data before being able to do analytics on that
+data. Storage adds latency. You should be able to do analytics on that stream
+as its happening.
+
+If you want to do something like fraud detection, you want to look at live data
+and historical data. What we need is a unifed language when querying both sets
+of data. If we use two types of systems for this type of analysis, it becomes
+much harder.
+
+
