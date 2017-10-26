@@ -127,5 +127,126 @@ You can create a PCollection from an external source including reading text
 from a file.
 
     lines = p | 'ReadMyFile' >> beam.io.ReadFromText('gs://some/inputData.txt')
- 
 
+You can also create a PCollection from in-memory data, like using `beam.Create`
+to make a `list`.
+
+    with beam.Pipeline(options=pipeline_options) as p:
+        
+        lines = (p
+                 | beam.Create([
+                    'To be, or not to be: that is the question: ',
+                    'Whether \'tis nobler in the mind to suffer',
+                    'The slings and arrows of outrageous fortune']))
+
+#### PCollection Characteristics
+
+A PCollection is owned by a Pipeline object; multiple pipelines cannot share
+a PCollection.
+
+* Element type must be the same type - each individual element is encoded as
+  a byte string
+* Immutable - once created, you cannot add, remove, or change individual
+  elements. A Beam Transform does not consume or modify the original input
+  collection
+* A PCollection is a large, immutable "bag" of elements; there is no upper
+  limit on the number of elements.
+* A PCollection can be either __bounded__ or __unbounded__ in size. The size is
+  determined whether the PCollection is reading from a streaming or
+  continuously-updating data source (e.g. Pub/Sub or Kafka creates an unbounded
+  PCollection)
+* If the PCollection is __unbounded__, there is __windowing__ to divide
+  a continuously updating data set into logical windows of finite size. Beam
+  processes each window as a bundle. These windows are determined by some
+  characteristic associated with a data element, like a __timestamp__.
+* Each element in a PCollection has an associated intrinsic timestamp; the
+  timestamp for each element is initially assigned by the __Source__ that
+  creates the PCollection. These timestamps are useful for a PCollection that
+  has an inherent notion of time, like reading a stream of events where each
+  event was posted at the element timestamp. You can manually assign these
+  timestamps.
+
+## Transforms
+
+A __Transform__ is the operations in your pipeline. You provide processing
+logic as a function (aka __user code__) and this user code is applied to each
+element of the input PCollection (or more than one PCollection). Depending on
+the pipeline runner, different workers across a cluster can execute instances
+of your user code in parallel. The output of the workers is added to
+a separate, final output PCollection. Core transforms include __ParDo__ and
+__Combine__, and __Composite Transforms__.
+
+### Core Beam Transforms
+
+The core transforms include:
+
+* `ParDo`
+* `GroupByKey`
+* `CoGroupByKey`
+* `Combine`
+* `Flatten`
+* `Partition`
+
+### ParDo
+
+A __ParDo__ is a transform for generic parallel processing similar to a __Map__
+in the Map/Shuffle/Reduce-style. A ParDo applies your user code on each element
+in the input PCollection and emits zero, one, or more elements to an ouptut
+PCollection. Example usage cases include:
+
+* Filtering a data set - either output the element to a new PCollection or
+  discard it
+* Format or type-convert each elemnt in a data set - if elements in your
+  PCollection are a different type, do a conversion and output the result to
+  a new PCollection 
+* Extract parts of each element in a data set - if you have a PCollection of
+  records with multiple fields, use the ParDo to parse out the fields you want
+* Computations on each element - perform computations on every element or
+  certain elements of a PCollection to a new PCollection
+
+#### DoFn w/ ParDo
+
+User Code is in the form of a __DoFn__ object, which is the processing logic
+that gets applied to each element in the input collection. Make sure this
+implementation does NOT depend on the number of invocations (it may be called
+multiple times in case of failure or retries).
+
+    # the input PCollection of Strings
+    words = ... 
+
+    # Using DoFn that performs on each element in the input PCollection
+    class ComputeWordLengthFn(beam.DoFn):
+        def process(self, element):
+            return [len(element)]
+
+    # Apply a ParDo to the PCollection 'words' to compute lengths for each word
+    word_lengths = words | beam.ParDo(ComputeWordLengthFn())
+
+Here we assume an input PCollection of String values. We apply a ParDo
+transform that specifies a function ComputeWordLengthFn to compute the length
+of each string and outputs the result to a new PCollection of Integer values.
+
+#### FlatMap w/ lambda
+
+If you have a simple DoFn, you can just use a __FlatMap__ with a lambda
+function. 
+
+    # the input PCollection of Strings
+    words = ...
+
+    # Apply a lambda function to the PCollection 'words'
+    word_lengths = words | beam.FlatMap(lambda word: [len(word)])
+
+
+#### Map
+
+If you have a ParDo that has a one-to-one mapping of input elemnts to output
+elments, you can use the __Map__ transform.
+
+    # the input PCollection of Strings
+    words = ...
+
+    # Apply a Map with a lambda function to the PCollection 'words'
+    word_lengths = words | beam.Map(len)
+
+ 
