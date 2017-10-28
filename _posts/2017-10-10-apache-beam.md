@@ -249,4 +249,110 @@ elments, you can use the __Map__ transform.
     # Apply a Map with a lambda function to the PCollection 'words'
     word_lengths = words | beam.Map(len)
 
- 
+### GroupByKey
+
+The __GroupByKey__ transform is for processing collections of key/value pairs.
+It's a parallel reduction operation, similar to the Shuffle phase of
+Map/Shuffle/Reduce. The input to GroupByKey is a collection of key/value pairs
+that represents a __multimap__, where the collection contains multiple pairs
+that have the same key, but different values.
+
+You would use GroupByKey to aggregate data that has something in common. For
+example, a collection that stores records of customer orders, you might want to
+group by the postal code key/field and the 'value' is the rest of the record.
+
+Example
+
+    # Input File
+    cat, 1
+    dog, 5
+    and, 1
+    jump, 3
+    tree, 2
+    cat, 5
+    dog, 2
+    and, 2
+    ...
+
+
+    # Grouped By
+    cat, [1,5,9]
+    dog, [5,2]
+    and, [1,2,6]
+    jump, [3]
+    tree, [2]
+    ...
+
+We transform from a multiple (multiple keys to individual values) to
+__uni-map__ (unique keys to collections of values)
+
+#### CoGroupByKey
+
+__CoGroupByKey__ joins two or more key/value PCollections that have the same
+key type and emits a `KV<K, CoGbkResult>` pair, which is essentially a join.
+
+    // collection 1
+    user1, address1
+    user2, address2
+    user3, address3
+
+    // collection 2
+    user1, order1
+    user1, order2
+    user2, order3
+    guest, order4
+
+    // output of collection1 and collection2
+    user1, [[address1], [order1, order2]]
+    user2, [[address2], [order3]]
+    user3, [[address3], []]
+    guest, [[], [order4]]
+
+### Combine
+
+__Combine__ is a transform for combining collections of elements or values in
+your data. Combine can be used on entire PCollection(s) as well as the values
+for each key in PCollection(s). Pre-built combines include common numeric 
+combination operations like sum, min, and max.
+
+#### Simple Combine
+
+A simple combine
+
+    pc = [1, 10, 100, 1000]
+
+    def bounded_sum(values, bound=500):
+        return min(sum(values), bound)
+
+    small_sum = pc | beam.CombineGlobally(bounded_sum)  # [500]
+    large_sum = pc | beam.CombineGlobally(bounded_sum, bound=5000)  # [1111]
+
+An advanced Combine uses __CombineFn__, which defines complex combine
+functions. Here we have a custom subclass of CombineFn.
+
+    pc = ...
+
+    class AverageFn(beam.CombineFn):
+
+        def create_accumulator(self):
+            return (0.0, 0)
+
+        def add_input(self, sum_count, input):
+            (sum, count) = sum_count
+            return sum + input, count + 1
+
+        def merge_accumulators(self, accumulators):
+            sum, counts = zip(*accumulators)
+            return sum(sums), sum(counts)
+
+        def extract_output(self, sum_count):
+            (sum, count) = sum_count
+            return sum / count if count else float('NaN')
+
+### Flatten
+
+### Partition
+
+## Transforms
+
+
