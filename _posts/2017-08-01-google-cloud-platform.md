@@ -1368,4 +1368,83 @@ and historical data. What we need is a unifed language when querying both sets
 of data. If we use two types of systems for this type of analysis, it becomes
 much harder.
 
+### Examples of Data Streaming
+
+Sample Scenario 1
+
+* What is the scenario? San Diego Department of Transportation wants to bring 
+live updates on highway lanes to commuters on the highway
+* What data is sent? San Diego highway traffic data collected over many miles
+  of highway for all lanes, transmitted at 5-min intervals
+* What processing does this data need? We need the current traffic conditions
+  to power re-routing decisions. We also need the average speed and anomaly
+  detection to understand which lanes are slower
+* What analytics/queries do you want to run? We want results with min, max and
+  averages. We then want to compare averages between lanes to detect anomaly
+* What dashboard reporting would be most useful? We want near real-time updates
+  on lane slowdowns and a map with markers showing traffic congestion
+
+Sample Scenario 2
+
+* What is the scenario? PR department of an airline wants to handle negative
+  tweets
+* What data is sent? Tweets that mention the airline name, the hashtag of the
+  airline
+* What processing does this data need? We need sentiment analysis of the tweet
+  (e.g. are they mad, happy), location detction (city, airport), and entity
+  detection (delays, weather, baggage, flight attendant)
+* What analytics/queries do you want to run? Group by location, airport, time
+  of day
+* What dashboard/reporting would be most useful? Say the top 10 negative topics
+  segregrated in various ways
+
+
+
+### Google Pub/Sub
+
+You create __topics__ and __subscribe__ to the topics to receive messages 
+that are published.
+
+Example Code for Publisher
+
+
+    from google.cloud import pubsub
+    client = pubsub.Client()
+
+    topic = client.topic('sandiego')
+    topic.create()
+
+    # Publish a single message
+    topic.publish(b'hello')
+
+    # Publish a single message with attributes (usually good to include
+    # timestamp info here)
+    topic.publish(b'Another message payload', extra='EXTRA')
+
+    # Publish a set of messages to a topic (as a single request):
+    with topic.batch() as batch:
+        batch.publish(PAYLOAD1)
+        batch.publish(PAYLOAD2, extra=EXTRA)
+
+Pub/Sub allows for __Push__ and __Pull__ delivery flows, where subscribers 
+can ask to be notified immediately or subscribers can poll periodically 
+to see if there are any new messages from the topic.
+
+* __Pull__ subscription - delays between publication and delivery, good for
+  large number of dynamically created subscribers. To ensure that a message was
+  received, we send a __ack__.
+* __Push__ subscription - immediately delivery, no latency, endpoints can only
+  be HTTPS server. A successful response is a 200. A nonsuccessful response
+  would be say a 400, 404.
+
+Example Code for Subscription
+
+    subscription = topic.subscription(subscription_name)
+    subscription.create()
+
+    results = subscription.pull(return_immediately=True)
+
+    if results:
+        subscription.acknowledge([ack_id for ack_id, message in results])
+
 
