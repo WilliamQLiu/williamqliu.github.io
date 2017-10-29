@@ -351,8 +351,60 @@ functions. Here we have a custom subclass of CombineFn.
 
 ### Flatten
 
+__Flatten__ is a transform for PCollection objects that store the same data
+type. Flatten will merge multiple PCollection objects into a single
+PCollection.
+
+    # Takes a tuple of PCollection objects and returns a single PCollection
+    merged = (
+        (pcoll1, pcoll2, pcoll3)
+
+        # A list of tuples can be "piped" directly into a Flatten transform
+        | beam.Flatten()
+    )
+
+The coder for the output PCollection is the same as the coder for the first
+PCollection from the input list of PCollection.
+
 ### Partition
 
-## Transforms
+__Partition__ is a transform for Pcollection objects that splits a single
+PCollection into a fixed number of smaller collections. You provide the
+partitioning function logic that determines how to split up the elements of the
+input PCollection into eaach resulting partition PCollection.
+
+    # Provide an int value with the desired number of result partitions, and
+    a partitioning function (partition_fn in this example)
+    # Returns a tuple of PCollection objects containing each of the resulting
+    partitoins as individual PCollection objects
+
+    students = ...
+    def partition_fn(student, num_partitions):
+        return int(get_percentile(student) * num_partitions / 100)
+
+    by_decile = students | beam.Partition(partitoin_fn, 10)
+
+    # You can extract each partition from the tuple of PCollection objects as:
+    fortieth_percentile = by_decile[4]
+
+## Transform Requirements
+
+User code for a Beam Transform must keep below points in mind due to the
+distributed nature of the jobs:
+
+* Your function object must be __serializable__
+* Your function object must be __thread-compatible__ (Beam SDK is not
+  thread-safe)
+* Your function object is recommended to be __idempotent__
+
+The above applies to subclasses of __DoFn__, __CombineFn__, and __WindowFn__.
+
+### Serializability
+
+### Thread-Compability
+
+### Idempotence
+
+## Side Inputs
 
 
