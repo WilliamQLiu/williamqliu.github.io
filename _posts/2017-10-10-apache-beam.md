@@ -401,10 +401,27 @@ The above applies to subclasses of __DoFn__, __CombineFn__, and __WindowFn__.
 
 ### Serializability
 
+Any function object provided to a transform must be fully serilizable. The
+reason is that a copy of the function is serialized and sent to a remote worker
+in a processing cluster.
+
 ### Thread-Compability
+
+Any function object should be thread-compatible because each instance of the
+function object is accessed by a single thread on aworker instance. The Beam
+SDK is not thread-safe.
 
 ### Idempotence
 
+It is recommended that your function object be idempotent, meaning it should be
+able to be repeated/retried as many times as necessary without creating any
+unintended side effects.
+
 ## Side Inputs
 
+Besides a main input PCollection, you can also provide additional inputs to
+a ParDo transform as a __side input__. A side input is an additional input that
+your DoFn can access each time it processes an elemnet in the input
+PCollection. This side input needs to be determined at runtime (not
+hard-coded).
 

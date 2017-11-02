@@ -634,7 +634,13 @@ With our example we are only appending to a file, which would lead to running
 out of disk space. We can break the log into segments when a segment reaches
 a certain size, then make writes to a new segment. This allows __compaction__
 on the segments, meaning we throw away duplicate keys in the log and keeping
-only the most recent value for each key.
+only the most recent value for each key. Since compaction makes segments
+smaller by removing duplicate values on keys, we can also merge segments
+together (into new segments).
+
+Each segment has its own in-memory hash table mapping keys to file offsets. To
+find the value for a key, we check the most recent segment's hash map (and if
+not present, then check the second-most recent segment, etc).
 
 ##### SSTables and LSM-Trees
 
@@ -659,4 +665,5 @@ B-Trees need to maintain a write ahead log.
 ##### Comparing B-Trees and LSM-Trees
 
 Usually LSM-Trees are typically faster for writes and B-Trees are faster for reads.
+
 
