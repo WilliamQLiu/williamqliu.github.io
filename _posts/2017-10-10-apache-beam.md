@@ -421,7 +421,55 @@ unintended side effects.
 
 Besides a main input PCollection, you can also provide additional inputs to
 a ParDo transform as a __side input__. A side input is an additional input that
-your DoFn can access each time it processes an elemnet in the input
+your DoFn can access each time it processes an element in the input
 PCollection. This side input needs to be determined at runtime (not
 hard-coded).
+
+    # Side inputs are available as extra arguments in the DoFn's process method
+    # or Map / FlatMap's callable.
+    # In this example side inputs are passed to a FlatMap transform as extra
+    # arguments and consumed by 'filter_using_length'
+
+    words = ....
+
+    # Callable takes additional arguments
+    def filter_using_length(word, lower_bound, upper_bound=float('inf')):
+        if lower_bound <= len(word) <= upper_bound:
+            yield word
+
+    # Construct a deferred side input
+    avg_word_len = (words
+                    | beam.Map(len)
+                    | beam.CombineGlobally(beam.combiners.MeanCombineFn()))
+
+    # Call with explicit side inputs
+    small_words = words | 'small' >> beam.FlatMap(filter_using_length, 0, 3)
+
+    # A single deferred side input
+    larger_than_average = (words | 'large' >> beam.FlatMap(
+        filter_using_length,
+        lower_bound=pvalue.AsSingleton(avg_word_len)))
+
+    # Mix and Match
+    small_but_nontrivial_words = words | beam.FlatMap(
+        filter_using_length,
+        lower_bound=2,
+        upper_bound=pvalue.AsSingleton(avg_word_len))
+
+    # We can also pass side inputs to a ParDo transform, which will gets passed
+    # to its process method. The first two arguments for the process method
+    # would be self and element
+    class FilterUsingLength(beam.DoFn):
+        def process(self, element, lower_bound, upper_bound=float('inf')):
+            if lower_bound <= len(element) <= upper_bound:
+                yield element
+
+    small_words = words | beam.ParDo(FilterUsingLength(), 0, 3)
+
+### Side Inputs and Windowing
+
+TODO
+
+## Pipeline I/O
+
 
