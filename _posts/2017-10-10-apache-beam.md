@@ -472,4 +472,39 @@ TODO
 
 ## Pipeline I/O
 
+Pipelines often need to read data from an external source like a file or
+a database or likewise write to a file or database. Beam has a few common 
+data storage transforms or you can write your own read/write transforms.
+
+### Reading input data
+
+You can read data from an external source and return a PCollection at any point
+in the pipeline, though its common to have this data be in the start of your
+pipeline.
+
+    lines = pipeline | beam.io.ReadFromText('gs://some/inputData.txt')
+
+#### Reading multiple locations
+
+You can read from multiple locations at the same time using glob operators for
+files.
+
+    lines = p | 'ReadFromText' >> beam.io.ReadFromText('path/to/input-*.csv')
+
+### Writing output data
+
+You can write data from a PCollection to an external data source, usually at
+the end of your pipeline, but can technically be used at any point in the
+pipeline.
+
+    output | beam.io.WriteToText('gs://some/outputData')
+
+#### Writing to multiple output files
+
+You can write transforms to write to multiple output files.
+
+    filtered_words | 'WriteToText' >> beam.io.WriteToText(
+        '/path/to/numbers', file_name_suffix='csv')
+
+## Data Encoding
 
