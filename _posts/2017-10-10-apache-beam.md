@@ -508,3 +508,21 @@ You can write transforms to write to multiple output files.
 
 ## Data Encoding
 
+Python TypeDefault Coder
+
+int     VarIntCoder
+float   FloatCoder
+str     BytesCoder
+bytes   StrUtf8Coder
+Tuple   TupleCoder
+
+Changing default Coder:
+
+    apache_beam.coders.registry.register_code(int, BigEndianIntegerCoder)
+
+## Windowing
+
+__Windowing__ subdivides a PCollection according to the timestamps of its
+individual elements. Transforms that aggregate multiple elements like 
+GroupByKey and Combine.
+
