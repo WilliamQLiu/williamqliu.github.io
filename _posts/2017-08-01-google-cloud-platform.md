@@ -1447,4 +1447,132 @@ Example Code for Subscription
     if results:
         subscription.acknowledge([ack_id for ack_id, message in results])
 
+### Example Pub Sub Project - San Diego Traffic
+
+    # configure gcloud if you haven't yet
+    gcloud init
+    
+    # install gcloud beta command line component (if you haven't yet)
+    gcloud components install beta
+    or sudo apt-get install google-cloud-sdk
+
+    # create topic and publish a message
+    gcloud beta pubsub topics create sandiego
+    gcloud beta pubsub topics publish sandiego "hello"
+
+    # create a subscription for the topic
+    gcloud beta pubsub subscriptions create --topic sandiego mySub1
+
+    # Pull the first message that was published to your topic
+    gcloud beta pubsub topics publish sandiego "hello again"
+    sudo gcloud beta pubsub subscriptions pull --auto-ack mySub1
+
+    # Cancel your subscription
+    gcloud beta pubsub subscriptions delete mySub1
+
+Simulate traffic sensor data into PubSub
+
+    #vim send_sensor_data.py
+
+    import time
+    import gzip
+    import logging
+    import argparse
+    import datetime
+    from google.cloud import pubsub
+
+    TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+    TOPIC = 'sandiego'
+    INPUT = 'sensor_obs2008.csv.gz'
+
+    def publish(topic, events):
+        numobs = len(events)
+        if numobs > 0:
+           with topic.batch() as batch:
+               logging.info('Publishing {} events from {}'.
+                            format(numobs, get_timestamp(events[0])))
+               for event_data in events:
+                   batch.publish(event_data)
+
+    def get_timestamp(line):
+        # look at first field of row
+        timestamp = line.split(',')[0]
+        return datetime.datetime.strptime(timestamp, TIME_FORMAT)
+
+    def simulate(topic, ifp, firstObsTime, programStart, speedFactor):
+        # sleep computation
+        def compute_sleep_secs(obs_time):
+            time_elapsed = (datetime.datetime.utcnow() - programStart).seconds
+            sim_time_elapsed = (obs_time - firstObsTime).seconds / speedFactor
+            to_sleep_secs = sim_time_elapsed - time_elapsed
+            return to_sleep_secs
+
+        topublish = list() 
+
+        for line in ifp:
+            event_data = line   # entire line of input CSV is the message
+            obs_time = get_timestamp(line) # from first column
+
+            # how much time should we sleep?
+            if compute_sleep_secs(obs_time) > 1:
+                # notify the accumulated topublish
+                publish(topic, topublish) # notify accumulated messages
+                topublish = list() # empty out list
+
+                # recompute sleep, since notification takes a while
+                to_sleep_secs = compute_sleep_secs(obs_time)
+                if to_sleep_secs > 0:
+                    logging.info('Sleeping {} seconds'.format(to_sleep_secs))
+                    time.sleep(to_sleep_secs)
+            topublish.append(event_data)
+
+        # left-over records; notify again
+        publish(topic, topublish)
+
+    def peek_timestamp(ifp):
+        # peek ahead to next line, get timestamp and go back
+        pos = ifp.tell()
+        line = ifp.readline()
+        ifp.seek(pos)
+        return get_timestamp(line)
+
+
+    if __name__ == '__main__':
+        parser = argparse.ArgumentParser(description='Send sensor data to Cloud Pub/Sub in small groups, simulating real-time behavior')
+        parser.add_argument('--speedFactor', help='Example: 60 implies 1 hour of data sent to Cloud Pub/Sub in 1 minute', required=True, type=float)
+        args = parser.parse_args()
+
+        # create Pub/Sub notification topic
+        logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
+        psclient = pubsub.Client()
+        topic = psclient.topic(TOPIC)
+        if not topic.exists():
+            logging.info('Creating pub/sub topic {}'.format(TOPIC))
+            topic.create()
+        else:
+            logging.info('Reusing pub/sub topic {}'.format(TOPIC))
+     
+        # notify about each line in the input file
+        programStartTime = datetime.datetime.utcnow() 
+        with gzip.open(INPUT, 'rb') as ifp:
+            header = ifp.readline()  # skip header
+            firstObsTime = peek_timestamp(ifp)
+            logging.info('Sending sensor data from {}'.format(firstObsTime))
+            simulate(topic, ifp, firstObsTime, programStartTime, args.speedFactor)
+ 
+Download data
+
+    #./download_data.sh
+    #download_data.sh
+    gsutil cp gs://cloud-training-demos/sandiego/sensor_obs2008.csv.gz .
+
+Ensure Shell has the correct permissions
+
+    gcloud auth application-default login
+
+Run the sensor data
+    
+    # pip install google-cloud
+    ./send_sensor_data.py --speedFactor=60
+
 
