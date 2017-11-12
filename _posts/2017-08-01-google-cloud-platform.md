@@ -1575,4 +1575,107 @@ Run the sensor data
     # pip install google-cloud
     ./send_sensor_data.py --speedFactor=60
 
+## Google Cloud Dataflow
+
+Let's see how Google Cloud Dataflow is used in Stream Processing. How do we
+handle processing late data? (e.g. using watermarks, triggers, accumulation)
+
+Here's a few types of data processing on unbounded data:
+
+* __Element-wise__ data streaming is easy, an element comes in, you carry out some
+  processing, and each element is independent
+* __Aggregation__ is difficult - if you need to aggregrate more than one element,
+  it gets tougher (e.g. many elements with the same key and we need to process
+  some logic using that same key, whether that's summing, etc)
+* __Composite__ - is even more difficult - i.e. if you need to add data w/ data
+  from another source
+
+### Challenges of Stream Processing
+
+Most systems have two pipelines to balance latency, throughput, and fault tolerance.
+
+    We have a datastream for the speed layer ('streaming data')
+    We have another datastream for the batch layer ('batch data')
+
+The issue is that continuously arriving data can come out of order.
+Say you have some data that comes in timestamped at 8:00 am and on time (at 8:00 am), 
+but then at 3pm you get another piece of data for 8:00 am.
+
+What we want is a programming model that can process both batch and stream
+data. Beam has this concept of a __window__, which helps support time-based
+shuffle. It doesn't matter when the __input__ is (the __processing time__), it'll 
+get shuffled into the actual __output__ (the __event time__).
+
+Some other challenges include:
+
+* Size - traffic data will only grow w/ more sensors and higher frequency
+* Scalability and fault-tolerance - handle growing traffic data volumes,
+  distributed sensors and still be fault tolerant
+* Programming Model - compare traffic over past hour against that of last
+  Friday at same time (batch and stream code being the same)
+* Unboundedness - What happens if data from a sensor arrives late? 
+
+#### Size
+
+We need to process variable amounts of data that will grow over time. The data
+that we need to process is also coming in at different rates (e.g. more traffic
+during rush hour means higher rate of data). We have to think about how to
+provision servers to handle the different rates of incoming data. If we have
+either fixed or slowly scaled clusters, they become a waste. If we have
+underprovisioned clusters, we can't keep up with the workload.
+
+#### Windowing
+
+Windowing divdies data into event-time-based finite chunks (not just when we
+received the data). So where in event time do we need to do our computations?
+
+* __Fixed Windows__ means doing the computation logic in fixed windows (e.g.
+  run computation each hour)
+* __Sliding Windows__ means doing the computation logic in fixed windows, but
+  continuously do them (e.g. each five minutes redo computation for each 
+  hour)
+* __Sessions Windows__ means computing by a session (e.g. website monitors each
+  user's web session and checks the number of clicks per session). This window
+  is based on user activity instead of by time.
+
+Again, windowing is about __event time__, not by __processing time__. Sometimes
+you'll want data to be processed in batch, other times in stream; if we want
+something to have higher accuracy we'll need to settle for higher latency or if
+we want something to have lower latency we'll need to settle for less accuracy.
+
+### Watermarks
+
+In an ideal world, all events are processed immediately. In the real world, we
+might have an event time of 8:00pm with a process time of 8:03pm. The watermark
+tracks how far behind the system is (from event time to processing time, aka
+the __skew__).
+
+The watermark can also be seen as a heuristic/guarantee of completeness.
+
+### Triggers
+
+Triggers control when results are emitted:
+
+* __What__ are you computing? What = Transformations
+* __Where__ in event time? Where = Windowing
+* __When__ in processing time? When = Watermarks + Triggers
+* __How__ do refinements relate? How = Accumulation
+
+### Windows + Watermarks + Triggers
+
+Windows + Watermarks + Triggers collectively help you handle data arriving late
+and out-of-order.
+
+* Windowing Model - helps you with unaligned event time windows; just take all
+  the events and process it once. E.g. take all the input, then compute the sum
+* Triggering Model - take the windows (say each 2 minutes), take all the data
+  that was published in 12:00 - 12:02, 12:02 - 12:04, etc. and create a sum for
+  each.
+* Incremental Processing Model - With streaming, if you close the window at
+  12:02, you might not have all that data before you do your computations. 
+  How do I go back and recompute means, avgs? Using the heuristic watermark
+  (based off of what kind of event data is coming in currently), we might see
+  that by 12:07 all the data for 12:02 is complete. Then the window for 12:02
+  is closed and the computations (e.g. avg) are done for 12:02. The trigger
+  only happens once at the watermark.
 
