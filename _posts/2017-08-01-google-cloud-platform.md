@@ -1661,6 +1661,9 @@ Triggers control when results are emitted:
 * __When__ in processing time? When = Watermarks + Triggers
 * __How__ do refinements relate? How = Accumulation
 
+With triggers, you can specify early firings, late firings, and an allowed
+lateness for data.
+
 ### Windows + Watermarks + Triggers
 
 Windows + Watermarks + Triggers collectively help you handle data arriving late
@@ -1678,4 +1681,11 @@ and out-of-order.
   that by 12:07 all the data for 12:02 is complete. Then the window for 12:02
   is closed and the computations (e.g. avg) are done for 12:02. The trigger
   only happens once at the watermark.
+
+In your __DoFn__, you can get information about Windows and Triggers
+
+### Lab on Processing Streamed Data
+
+We are extracting the data, windowing it, grouping by sensor, then computing
+the average speed of traffic for every sensor along the highway.
 
