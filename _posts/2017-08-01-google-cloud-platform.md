@@ -1689,3 +1689,18 @@ In your __DoFn__, you can get information about Windows and Triggers
 We are extracting the data, windowing it, grouping by sensor, then computing
 the average speed of traffic for every sensor along the highway.
 
+### Ad-hoc analysis of data
+
+We can use BigQuery to create real time streaming analytics and dashboards. 
+The main issue we'll be dealing with is latency, meaning that we get data in
+real time, do computations (e.g. aggregations), write our computations to 
+disk, but once that's all done it'll be old data (e.g. 5 minutes late). Usually
+you combine BigQuery with something like Dataflow (processing engine) and
+possibly Pub/Sub (as an ingest messaging bus). BigQuery is the long term
+storage that you can run SQL queries. BigQuery is fast, about 100k rows 
+per table per second.
+
+### Google Cloud Spanner
+
+Google Cloud Spanner is Google's SQL database.
+
