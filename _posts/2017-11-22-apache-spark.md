@@ -17,5 +17,7 @@ Install Steps:
 2. tar -zxvf spark-2.2.0-bin-hadoop2.7 
 3. Access the shell under `/bin/pyspark` or `/bin/spark-shell` (for scala)
 
+OR if you're using python, run `pip install pyspark`
+
 
 
