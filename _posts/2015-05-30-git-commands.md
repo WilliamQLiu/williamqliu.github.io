@@ -119,6 +119,8 @@ You can clone an existing repository from another server (like GitHub) using the
     git diff  # View all the merge conflicts
     git reset --hard  # Undo a bad merge
     git push # push changes back to a remote repository (e.g. on GitHub)
+	git push --force  # use your copy, don't care about everything else
+    git push --force-with-lease  # better than --force, checks remote branch hasn't been updated
 
 ####<a id="stash">Stashing</a>
 
