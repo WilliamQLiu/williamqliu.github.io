@@ -148,70 +148,70 @@ See a web gui dashboard with: `minikube dashboard`
 
 Can access through command line or through web gui
 
-$kubectl get deployments
-NAME             DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
-hello-minikube   1         1         1            1           208d
+	$kubectl get deployments
+	NAME             DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+	hello-minikube   1         1         1            1           208d
 
-$kubectl get replicasets
-NAME                       DESIRED   CURRENT   READY     AGE
-hello-minikube-180744149   1         1         1         208d
+	$kubectl get replicasets
+	NAME                       DESIRED   CURRENT   READY     AGE
+	hello-minikube-180744149   1         1         1         208d
 
-$kubectl get pods
-NAME                             READY     STATUS    RESTARTS   AGE
-hello-minikube-180744149-sjp84   1/1       Running   1          208d
+	$kubectl get pods
+	NAME                             READY     STATUS    RESTARTS   AGE
+	hello-minikube-180744149-sjp84   1/1       Running   1          208d
 
 
-$kubectl describe pods
-Name:		hello-minikube-180744149-sjp84
-Namespace:	default
-Node:		minikube/192.168.99.100
-Start Time:	Thu, 24 Aug 2017 20:09:53 -0600
-Labels:		pod-template-hash=180744149
-		run=hello-minikube
-Annotations:	kubernetes.io/created-by={"kind":"SerializedReference","apiVersion":"v1","reference":{"kind":"ReplicaSet","namespace":"default","name":"hello-minikube-180744149","uid":"7bf06d75-893a-11e7-a63e-080027f...
-Status:		Running
-IP:		172.17.0.2
-Created By:	ReplicaSet/hello-minikube-180744149
-Controlled By:	ReplicaSet/hello-minikube-180744149
-Containers:
-  hello-minikube:
-    Container ID:	docker://7d691fffa7596e0803106d17bf2fe12d1582e8b2695b4277969ee40f6bf16114
-    Image:		gcr.io/google_containers/echoserver:1.4
-    Image ID:		docker-pullable://gcr.io/google_containers/echoserver@sha256:5d99aa1120524c801bc8c1a7077e8f5ec122ba16b6dda1a5d3826057f67b9bcb
-    Port:		8080/TCP
-    State:		Running
-      Started:		Wed, 21 Mar 2018 18:48:56 -0600
-    Last State:		Terminated
-      Reason:		Completed
-      Exit Code:	0
-      Started:		Fri, 25 Aug 2017 07:49:54 -0600
-      Finished:		Fri, 25 Aug 2017 07:50:27 -0600
-    Ready:		True
-    Restart Count:	1
-    Environment:	<none>
-    Mounts:
-      /var/run/secrets/kubernetes.io/serviceaccount from default-token-94g57 (ro)
-Conditions:
-  Type		Status
-  Initialized 	True 
-  Ready 	True 
-  PodScheduled 	True 
-Volumes:
-  default-token-94g57:
-    Type:	Secret (a volume populated by a Secret)
-    SecretName:	default-token-94g57
-    Optional:	false
-QoS Class:	BestEffort
-Node-Selectors:	<none>
-Tolerations:	<none>
-Events:
-  FirstSeen	LastSeen	Count	From			SubObjectPath			Type		Reason			Message
-  ---------	--------	-----	----			-------------			--------	------			-------
-  13m		13m		1	kubelet, minikube					Normal		SuccessfulMountVolume	MountVolume.SetUp succeeded for volume "default-token-94g57" 
-  13m		13m		1	kubelet, minikube					Normal		SandboxChanged		Pod sandbox changed, it will be killed and re-created.
-  13m		13m		1	kubelet, minikube	spec.containers{hello-minikube}	Normal		Pulled			Container image "gcr.io/google_containers/echoserver:1.4" already present on machine
-  13m		13m		1	kubelet, minikube	spec.containers{hello-minikube}	Normal		Created			Created container
-  13m		13m		1	kubelet, minikube	spec.containers{hello-minikube}	Normal		Started			Started container
+	$kubectl describe pods
+	Name:		hello-minikube-180744149-sjp84
+	Namespace:	default
+	Node:		minikube/192.168.99.100
+	Start Time:	Thu, 24 Aug 2017 20:09:53 -0600
+	Labels:		pod-template-hash=180744149
+			run=hello-minikube
+	Annotations:	kubernetes.io/created-by={"kind":"SerializedReference","apiVersion":"v1","reference":{"kind":"ReplicaSet","namespace":"default","name":"hello-minikube-180744149","uid":"7bf06d75-893a-11e7-a63e-080027f...
+	Status:		Running
+	IP:		172.17.0.2
+	Created By:	ReplicaSet/hello-minikube-180744149
+	Controlled By:	ReplicaSet/hello-minikube-180744149
+	Containers:
+	  hello-minikube:
+		Container ID:	docker://7d691fffa7596e0803106d17bf2fe12d1582e8b2695b4277969ee40f6bf16114
+		Image:		gcr.io/google_containers/echoserver:1.4
+		Image ID:		docker-pullable://gcr.io/google_containers/echoserver@sha256:5d99aa1120524c801bc8c1a7077e8f5ec122ba16b6dda1a5d3826057f67b9bcb
+		Port:		8080/TCP
+		State:		Running
+		  Started:		Wed, 21 Mar 2018 18:48:56 -0600
+		Last State:		Terminated
+		  Reason:		Completed
+		  Exit Code:	0
+		  Started:		Fri, 25 Aug 2017 07:49:54 -0600
+		  Finished:		Fri, 25 Aug 2017 07:50:27 -0600
+		Ready:		True
+		Restart Count:	1
+		Environment:	<none>
+		Mounts:
+		  /var/run/secrets/kubernetes.io/serviceaccount from default-token-94g57 (ro)
+	Conditions:
+	  Type		Status
+	  Initialized 	True 
+	  Ready 	True 
+	  PodScheduled 	True 
+	Volumes:
+	  default-token-94g57:
+		Type:	Secret (a volume populated by a Secret)
+		SecretName:	default-token-94g57
+		Optional:	false
+	QoS Class:	BestEffort
+	Node-Selectors:	<none>
+	Tolerations:	<none>
+	Events:
+	  FirstSeen	LastSeen	Count	From			SubObjectPath			Type		Reason			Message
+	  ---------	--------	-----	----			-------------			--------	------			-------
+	  13m		13m		1	kubelet, minikube					Normal		SuccessfulMountVolume	MountVolume.SetUp succeeded for volume "default-token-94g57" 
+	  13m		13m		1	kubelet, minikube					Normal		SandboxChanged		Pod sandbox changed, it will be killed and re-created.
+	  13m		13m		1	kubelet, minikube	spec.containers{hello-minikube}	Normal		Pulled			Container image "gcr.io/google_containers/echoserver:1.4" already present on machine
+	  13m		13m		1	kubelet, minikube	spec.containers{hello-minikube}	Normal		Created			Created container
+	  13m		13m		1	kubelet, minikube	spec.containers{hello-minikube}	Normal		Started			Started container
 
 ### Infrastructure as Code
 
