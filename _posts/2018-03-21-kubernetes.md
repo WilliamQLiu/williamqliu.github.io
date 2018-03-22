@@ -6,6 +6,10 @@ title: Kubernetes
 
 # {{ page.title }}
 
+# Installation
+
+Install Docker, Minikube, kubectl and VirtualBox
+
 # CNCF
 
 __CNCF__ (cncf.io) is a sub foundation of the Linux Foundation
