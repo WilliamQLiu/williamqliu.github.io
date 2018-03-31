@@ -613,9 +613,9 @@ There are various types of indexes, including:
 
 ##### Hash Indexes
 
-Hash indexes are for key-value data. Key-value stores are basically like the
-dictionary data type in programming languages and are implemented as a hash 
-map/hash table.
+Hash indexes are indexes for key-value data. Key-value stores are basically 
+like the dictionary data type in programming languages and are implemented 
+as a hash map/hash table.
 
 The idea is that you have an in-memory hash map where every key is mapped to
 a byte offset in a data file (location where the value can be found).
@@ -644,17 +644,78 @@ not present, then check the second-most recent segment, etc).
 
 ##### SSTables and LSM-Trees
 
+Remember that each log-structured storage segment is a sequence of key-value pairs.
+These pairs appear in the order that they were written and values later in the log
+take precedence over values for the same key earlier in the log.
+
 __Sorted String Table__ (aka __SSTable__) is where the sequence of key-value
 pairs are sorted by key. There's some advantages over a regular hash index:
 
-* merging segments is simple and efficient, even if files are larger than memory
+* merging segments is simple and efficient, even if files are larger than memory;
+  you start reading the input files side by side, look at the first key in each file,
+  copy the lowest key (according to sort order) to the output file, and repeat to
+  get the final result of a new merged segment file that is sorted by key. If there
+  are multiple segments containing the same key, we just keep the value from the most
+  recent segment and discard older values
 * to find a specific key, you don't have to keep an index of all the keys in
-  memory
+  memory; e.g. say a key is sorted alphabetically and you're looking for the key
+  for 'cat'. If you have the keys and offsets for 'apple' and 'dog', you know that
+  'cat' is somewhere inbetween.
+* We can group records into a block and compress it before writing to disk. Each entry
+  of the sparse in-memory index then points at the start of a compressed block.
 
-We can create __Log-Structured Merge-Tree__ (aka __LSM-Trees__) out of
-SSTables.
+###### Keeping a maintained order for SSTables
+
+So the issue is that after you sort your data, how do you keep sorting for new writes?
+You can look up data structures like __red-black trees__ or __AVL trees__. With these
+data structures, you can insert keys in any order and read them back in sorted order.
+
+* When a write comes in, add it to an in-memory balanced tree data structure (e.g.
+  red-black tree) called a __memtable__.
+* When the memtable gets larger past a threshold, write it out to disk as an SSTable file
+* This new SSTable file is the most recent segment of the database
+* When a read request comes in, look for the key in the memtable first, then on the most
+  recent on-disk segment, then in the next-older segment, etc.
+* Every now and then, run a merging and compaction process in the background to combine
+  segment files and to discard overwrriten or deleted values
+
+This works well except for database crashes since the most writes are in the memtable
+and have not been written to disk yet. To solve this problem, we can keep a separate
+log on disk where every write is immediately appended. Use this only to retore the memtable
+after a crash. Discard this log every time the memtable is written to disk.
+
+We can create __Log-Structured Merge-Tree__ (aka __LSM-Trees__) data structures out of
+SSTables. There are storage engines built out of this concept, including:
+
+* LevelDB
+* RocksDB
+* Cassandra
+* HBase
+
+###### SSTables and Full Text Searches
+
+Lucene (used by Elasticsearch and Solr) use a similar method for storing its
+__term dictionary__. A full-text index is more complex than a key-value index, but
+runs on a similar idea: given a word in a search query, find all documents that
+mention the word. The key is a word (a __term__) and the value is the list of IDs of all
+the documents that contain the word (the __postings list__)
+
+###### SSTables and Storage Engine Optimizations
+
+* LSM-tree alogirthms can be slow when looking up keys that do not exist in the database (e.g.
+  memtable, then most recent segment to oldest segment). You can use __Bloom filters__, an
+  memory-efficient data structure for approximating the contents of a set to help tell if a
+  key does not appear in the database
+* There are different strategies for the order and timing of how SSTables are compacted 
+  and merged, including __size-tiered__ and __leveled__ compaction.
+* In __size-tiered compaction__, newer and smaller SSTables are merged into older and larger SSTables.
+* In __leveled compaction__, the key range is split up into smaller SSTables and older data is moved into
+  separate 'levels', which allows the compaction to proceed more incrementally and use less disk space.
 
 ##### B-Trees
+
+The most widely used indexing structure is the __B-Tree__. They are the standard index
+implementation in almost all relational databases and many nonrelational databases.
 
 __B-Trees__ is maintaining a sorted structure on disk (opposed to memory),
 where the database is broken down into fixed-size __blocks__ (aka __pages__) of
