@@ -6,6 +6,49 @@ title: Kubernetes
 
 # {{ page.title }}
 
+# Background
+
+Container images are used to confine application code, its runtime, and all of its dependences in a
+predefined format. With container runtimes like __runC__, __containerd__, or __rkt__, we can use
+those prepackaged images to create one or more containers. All of these runtimes are good at running
+containers on a single host (e.g. a dev environment), but in practice we want to have a fault-tolerant
+and scalable solution by creating a single __controller/management unit__ that connects multiple nodes
+together; this unit is called the __container orchestrator__.
+
+## Containers
+
+__Containers__ are an application-centric way to deliver high performing, scalable applications
+on the infrastructure of your choice. You can run a container of say a Django web app or Nginx load
+balancer on your desktop or the cloud or a vm or on premise.
+
+__Container Image__ is when an application is bundled along with its runtime and dependencies.
+We can use the image to create an isolated executable environment, also known as container.
+
+## Dev/QA vs Production
+
+We can use a single host to develop and test applications, but we can't do this on a live environment
+because we need to make sure that our applications are:
+
+* fault-tolerant
+* can scale (on-demand)
+* uses resources optimally
+* can discover and communicate with other applications automatically
+* are accessible to the outside world
+* can update and rollback without any downtime
+
+__Container Orchestrators__ are the tools that group host together to form a cluster and run containers
+on production. A few examples include:
+
+* Docker Swarm, provided by Docker (part of Docker Engine)
+* Kubernetes, started by Google, now owned by Cloud Native Computing Foundation
+* Mesos Marathon (runs on Apache Mesos)
+* Amazon ECS (runs Docker containers)
+* Nomad by Hashicorp
+
+## Why Container Orchestrators?
+
+You can run and scale containers manually with scripts, but its a lot easier with orchestration tools
+
 # Installation
 
 Install Docker, Minikube, kubectl and VirtualBox
