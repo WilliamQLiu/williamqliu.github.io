@@ -77,10 +77,14 @@ Similar to:
 
 Kubernetes is the whole package instead of doing one piece and needing other pieces (e.g. Ansible + Ansible Vault for secrets)
 
-Automate container deployment across instances
-Schedule deployments
-Manage inter-container communication
-Group/organize containers
+* Automate container deployment across instances
+* Schedule deployments
+* Manage inter-container communication
+* Group/organize containers
+* Self-healing (automatically replaces and reschdules containers from failed nodes; auto kills and restarts containers that
+do not respond to health checks)
+* Automatic binpacking (automatically schedules the containers based on resource usage and constraints while keeping availability)
+* Service discovery and load balancing - groups of containers refer to each other via Domain Name System (DNS) / Kubernetes service.
 
 ## Features
 
@@ -93,6 +97,7 @@ Service Discovery/Load Balancing
 Automated Rollouts/backs
 Secrets/Config management
 Storage
+Batch execution (and long running jobs)
 
 ## General Architecture
 
