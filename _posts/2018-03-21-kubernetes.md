@@ -206,7 +206,11 @@ Some examples of CRI Shims include:
 Instead of connecting directly to Pods to access applications, we use a logical construct called a __Service__
 as a connection endpoint. A Service groups related Pods and when accessed, load balances to them.
 
-The __kube-proxy__ is the network proxy that runs on each worker node and that routes requests
+The __kube-proxy__ is the network proxy that runs on each worker node and that routes requests.
+For each Service endpoint, kube-proxy sets up the routes so that it can reach to it.
+
+We expose our services to the external world with kube-proxy so we can access our applications from
+outside the cluster.
 
 ### etcd
 
@@ -231,17 +235,115 @@ Each Pod gets a unique IP Address. For container networking, there are two prima
 * __Container Network Interface (CNI)__, proposed by CoreOS
 
 Currently Kubernetse uses CNI to assign the IP Address to each Pod.
+The container runtime offloads the IP assignment to CNI, which connects to the underlying
+configured plugin like LoopBack, Bridge, IPvlan or MACvlan to get the IP address. Once the IP
+address is given by the plugin, CNI forwards it back to the requested container runtime.
+
+### Communication between Containers inside a Pod
+
+All the container runtimes create an isolated network entity for each container that it starts.
+On Linux, the entiy is a network namespace. This network namespace can be shared across containers
+or with the host operating system.
+
+Inside a Pod, containers share the network namespace so they can reach to each other via localhost.
+
+### Communication between Pods across Nodes
+
+In a clustered environment, Pods can be scheduled on any node. We want to make sure that the
+Pods can communicate across the nodes and all nodes should be able to reach any Pod.
+Kubernetes puts in a condition that there shouldn't be any __Network Address Translation (NAT)__
+while doing Pod-to-Pod communication across hosts.
+
+## Kubernetes Configurations
+
+Kubernetes can be installed using different configurations, with the four major types:
+
+* All-in-One Single-Node - everything installed on a single node, good for learning only (e.g. Minikube)
+* Single-Node etcd, Single-Master, and Multi-Worker
+* Single-Node etcd, Multi-Master, and Multi-Worker
+* Multi-Node etcd, Multi-Master, and Multi-Worker
+
+## Kubernetes Install
+
+Kubernetes can be installed on-premise (on VMs and bare metal) or through the cloud
+
+### Kubernetes Install On-Premise
+
+On-Premise Installation on VMs via Vagrant, VMware vSphere, KVM, etc. Can use
+tools like __Ansible__ or __kubeadm__.
+
+On-Premise Installation on Bare Metal on top of different operating systems. Can
+use same tools as above.
+
+### Kubernetes Install on Cloud
+
+You can install on the cloud with:
+
+### Hosted Solutions
+
+Software is managed by the provider. Examples include:
+
+* Google Kubernetes Engine (GKE)
+* Azure Container Service (AKS)
+* Amazon Elastic Container Service for Kubernetes (EKS)
+* OpenShift Dedicated
+* Platform9
+* IBM Cloud Container Service
+
+### Turnkey Cloud Solutions
+
+Kubernetes can be installed in a few commands
+
+* Google Compute Engine
+* Amazon AWS
+* Microsfot Azure
+* Tectonic by CoreOS
+
+### Bare Metal
+
+Install Kubernetes on bare metal provided by cloud providers
+
+## Installation Tools
+
+* __kubeadm__
+* __KubeSpray__
+* __Kops__
+
+### kubeadm
+
+__kubeadm__ is a first-class citizen in the Kubernetes ecosystem. It is the recommended way
+to bootstrap the Kubernetes cluster.
+
+### KubeSpray
+
+With __KubeSpray__ (formerly __Kargo__) we can install highly available Kubernetes clusters on
+AWS, GCE, Azure, OpenStack, or bare metal. KubeSpray is based on Ansible.
+
+### Kops
+
+With __Kops__ we can create, destroy, upgrade, and maintain production-grade, high-available
+Kubernetes clusters from the command line. It can provision the machines as well.
+
+Check out Kelsey Hightower's Kubernetes The Hard Way GitHub project.
 
 
 ## Components
 
+An overview of components are:
+
+* pods
+* deployments
+* services
+
 ### Pods
 
-A logical set of containers
+A __Pod__ is the smallest and simplest Kubernetes object.
+
+A logical set of one or more containers
 Like Docker-Compose Up
 Scheduled on same host
 Share network namespace
-Mount same volumes
+Mount same volumes (same external storage)
 Can be labeled
 ReplicaSet represents pod group (say I want 4 of these types of pods, is a ReplicaSet)
 
@@ -279,6 +381,32 @@ Docker creates a cached layer of a virtual machine
 
 ## Minikube
 
+Allows you to create an all-in-one Kubernetes setup.
+
+### Minikube Installation Requirements
+
+Usually Minikube runs inside a VM on Linux, Mac, or Windows. We need to make sure that we have the
+supported hardware and the hypervisor to create VMs. We'll need:
+
+* kubectl - a binary used to access any Kubernetes cluster
+* On Linux - Virtualbox or KVM hypervisors (i.e. virtual machine monitors)
+* VT -x/AMD-v virtualization must be enabled in BIOS
+
+Install kubectl
+
+	curl -Lo kubectl
+	https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && chmod +x
+	kubectl && sudo mv kubectl /usr/local/bin/
+
+Install the Hypervisor (Virtualbox) with:
+
+	$ sudo apt-get install virtualbox
+
+Install Minikube
+
+	$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.0/minikube-linux-amd64 &&
+	$ chmod +x minikube && sudo mv minikube /usr/local/bin/
+
 ### Minikube Start
 
 Run with: `minikube start`, will see:
@@ -302,13 +430,157 @@ minikube: Running
 localkube: Running
 kubectl: Correctly Configured: pointing to minikube-vm at 192.168.99.100
 
-### Minikube Dashboard
+### Accessing Minikube
+
+You can access a running Kubernetes cluster via any of the following methods:
+
+* Command Line Interface (CLI)
+* Graphical User Interface (GUI)
+* APIs
+
+#### Accessing Minikube through the Command Line Interface (CLI)
+
+__kubectl__ is the __command line interface (cli)__ tool to manage the Kubernetes cluster resources
+and applications. We can also use kubectl to deploy our applications.
+
+#### Accessing Minikube through the Graphical User Interface (GUI)
 
 See a web gui dashboard with: `minikube dashboard`
 
-## Kubectl
+#### Accessing Minikube through the APIs
+
+Kubernetes has an API Server and operators/uesrs can connect to it from the external world to interact
+with the cluster. We can directly connect to the API server using its API endpoints and send commands to it,
+as long as we can access the master node and have the right credentials. The API space for Kubernetes is:
+
+	/
+	/healthz	/metrics	/api	/apis
+	/api/v1/pods	/api/v1/nodes	/api/v1/services
+	/apis/apps/v1/Depolyment	/apis/apps/v1/DaemonSet	/apis/apps/v1/StatefulSet
+
+The API space can be divided into three independent groups:
+
+* __Core Group__ includes objects such as Pods, Services, nodes, etc.
+* __Named Group__ includes objects in `/api/$NAME/$VERSION` format, e.g.
+	`/apis/batch/v2alpha1` - __alpha__ may be dropped at any point
+    `/apis/certifications.k8s.io/v1beta1` - __beta__ means well tested, but semantics of object may change
+    `/apis/networking.k8s.io/v1` - __stable__ means in released software
+* __System-Wide__ consists of system-wide API endpoints like `/healthz`, `/logs`, `/metrics`, `/ui`
+
+We can connect to the API server directly via calling the respective API endpoints or via CLI/GUI.
+
+## kubectl
 
 Can access through command line or through web gui
+
+### kubectl Configuration File
+
+To connect to the Kubernetes cluster, kubectl needs the master node endpoint and the credentials to connect to it.
+When starting Minikube, the process creates a configuration file __config__ inside the __.kube__ directory, which
+sits in the user's __home__ directory. The connfiguration file has all the connection details.
+The kubectl binary accesses this file to find the master node's connection endpoint along with the credentials.
+To view the file, check __~/.kube/config__ or run the command:
+
+	$kubectl config view
+	apiVersion: v1
+	clusters:
+	- cluster:
+	    certificate-authority: /home/will/.minikube/ca.crt
+	    server: https://192.168.99.100:8443
+	  name: minikube
+	contexts:
+	- context:
+	    cluster: minikube
+	    user: minikube
+	  name: minikube
+	current-context: minikube
+	kind: Config
+	preferences: {}
+	users:
+	- name: minikube
+	  user:
+	    client-certificate: /home/will/.minikube/client.crt
+	    client-key: /home/will/.minikube/client.key
+
+### kubectl cluster-info
+
+	$ kubectl cluster-info
+	Kubernetes master is running at https://192.168.99.100:8443
+
+### kubectl proxy
+
+__kubectl__ will authenticate with the API server on the master node and make the dashboard available with:
+
+	$ kubectl proxy
+
+Then you can see the dashboard on:
+
+	http://127.0.0.1:8001/api/v1/namespaces/kube-system/services/kubernetes-dashboard:/proxy/#!/overview?namespace=default
+
+The service will be called __kubernetes-dashboard__ inside the __kube-system__ namespace.
+
+### APIs with kubectl proxy
+
+With __kubectl proxy__ configured, we can send requests to __localhost__ on the __proxy__ port:
+
+Here we requested all the API endpoints from the API server.
+
+	$ curl http://localhost:8001/
+	{
+	 "paths": [
+	   "/api",
+	   "/api/v1",
+	   "/apis",
+	   "/apis/apps",
+	   ......
+	   ......
+	   "/logs",
+	   "/metrics",
+	   "/swaggerapi/",
+	   "/ui/",
+	   "/version"
+	 ]
+	}%
+
+### APIs without kubectl proxy
+
+Without the kubectl proxy configured, we can instead get a __Bearer Token__ using kubectl, then send
+that along with our API request. A Bearer Token is an __access token__ generated by the
+authentication server (the API server on the master node) and given back to the client. Using that
+token, the client can connect back to the Kubernetes API without providing additional authentication
+details and can then access resources.
+
+GET the token with:
+
+	$ TOKEN=$(kubectl describe secret $(kubectl get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t' | tr -d " ")
+
+GET the API server endpoint (make sure APIServer is pointing to your Minikube's IP)
+
+	$ APISERVER=$(kubectl config view | grep https | cut -f 2- -d ":" | tr -d " ")
+
+	$ echo $APISERVER
+	https://192.168.99.100:8443
+
+Access the API Server using curl:
+
+	$ curl $APISERVER --header "Authorization: Bearer $TOKEN" --insecure
+	{
+	 "paths": [
+	   "/api",
+	   "/api/v1",
+	   "/apis",
+	   "/apis/apps",
+	   ......
+	   ......
+	   "/logs",
+	   "/metrics",
+	   "/swaggerapi/",
+	   "/ui/",
+	   "/version"
+	 ]
+	}%
+
+### kubectl GET deployments
 
 	$kubectl get deployments
 	NAME             DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
@@ -414,6 +686,135 @@ Create - imperative management, tells kubernetes api you want to create, replace
 Apply - declarative management - changes that you may have applied to a live object are maintained even if you apply other changes to the object
 
 `kubectl apply -f pingpong.py`
+
+## Kubernetes Object Model
+
+Kubernetes has an object model that represents various entities in the Kubernetes cluster. Entities
+describe:
+
+* What containerized applications are running and on which code
+* Application resource consumption
+* Different policies attached to applications, like restart/upgrade policies, fault tolerance, etc.
+
+Each object declares our intent or desired state using the __spec__ field. Kubernetes manages the
+__status__ field for objects, which it uses to record the actual state of the object.
+
+Examples of objects include:
+
+* Pods - simplest type of Kubernetes object
+* ReplicaSets
+* Deployments
+* Namespaces
+
+### Create an Object
+
+To create an object, we provide the __spec__ field to the Kubernetes API server (saying here is the
+desired state) along with other details in a __JSON__ format. We can also provide an object
+definition in a __.yaml__ file, which is converted by kubectl into a JSON payload and sent to the
+API server.
+
+Example Deployment object:
+
+	apiVersion: apps/v1
+	kind: Deployment
+	metadata:
+	  name: nginx-deployment
+	  labels:
+	    app: nginx
+	spec:
+	  replicas: 3
+	  selector:
+	    matchLabels:
+	      app: nginx
+	  template:
+	    metadata:
+	      labels:
+	        app: nginx
+	    spec:
+	      containers:
+	      - name: nginx
+	        image: nginx:1.7.9
+	        ports:
+	        - containerPort: 80
+
+### Fields for Objects
+
+__apiVersion__ mentions the API endpoint on the API server that we're connecting to
+__kind__ mentions the object type (in this case, Deployment)
+__metadata__ we attach basic information to objects, like name
+__spec__ we define the desired state of the deployment (e.g. at least 3 pods are running)
+__labels__ are key-value pairs that can attach to any object
+Once the object is created, Kubernetes attaches the __status__ field to the object.
+
+### Labels
+
+__Labels__ are key-value pairs that can attach to any object (e.g. a Pod).
+They are used to organize and select a subset of objects (e.g. app:backend, app:frontend, env:qa, env:live)
+You can select with:
+
+__Equality-Based Selectors__ - allow filtering of objects based on Label keys and values
+e.g. `=`, `==`, `!=` like `env==dev`
+
+__Set-Based Selectors__ allow filtering of objects on a set of values
+e.g. `in`, `notin`, `exist` operators like `env in (dev,qa)`
+
+### ReplicationControllers
+
+A __ReplicationController (rc)__ is a controller that is part of the master node's controller
+manager. It makes sure that a specific number of replicas for a Pod are running at any time.
+If there are extra, it kills the extra Pods. If there are less, it brings up more.
+
+We use controllers like ReplicationController to create and manage Pods. ReplicationControllers only
+support Equality-Based Selectors.
+
+### ReplicaSets
+
+A __ReplicaSet (rs)__ is the next-generation ReplicationController. It supports both equality and
+set-based selection.
+
+ReplicaSets can be used independently, but are mostly used by Deployments to orchestrate the Pod
+creation, deletion, and updates. A Deployment automatically creates the ReplicaSets and we don't
+have to worry about managing them.
+
+### Deployments
+
+A __Deployment__ object provides declarative updates to Pods and ReplicaSets. The
+__DeploymentController__ is part of the master node's controller manager and it makes sure that the
+current state always matches the desired state.
+
+For example, we might have a Deployment that creates a ReplicaSet A. ReplicaSet A then creates
+3 Pods. Each Pod uses the container `nginx:1.7.9` image.
+
+#### Deployment Rollout
+
+__Deployment Rollout__ is when we change our containers to use an image from `nginx:1.7.9` to 
+`nginx:1.9.1`, we update the Pods Template and a new ReplicaSet B gets created. Once ReplicaSet B
+is ready, the Deployment starts pointing to it.
+
+Note: A rollout is only triggered when we update the Pods Template for a deployment. Operations like
+scaling the deployment do not trigger the deployment.
+
+If something goes wrong, Deployments have a feature called __Deployment Recording__, which allows
+you to rollback to a previously known state.
+
+### Namespaces
+
+We can partition the Kubernetes cluster into sub-clusters called __namespaces__. This is useful when
+you have many users that you would like to organize into teams/projects. The names of the
+resources/objects created inside a Namespace are unique, but not across Namespaces.
+
+To see all namespaces, run:
+
+	$kubectl get namespaces
+
+Usually there are two default namespaces:
+
+* __kube-sytsem__ - contains the objects created by the Kubernetes system
+* __default__ - contains the objects which belong to any other Namespace, connects here by default
+* __kube-public__ - a special namespace which is readable by all users and used for special purposes
+  like bootstrapping a cluster
+
+You can divide cluster resources within Namespaces using __Resource Quotas__.
 
 ## Config Maps
 
