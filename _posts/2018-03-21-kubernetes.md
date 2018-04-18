@@ -6,7 +6,7 @@ title: Kubernetes
 
 # {{ page.title }}
 
-# Background
+## Background
 
 Container images are used to confine application code, its runtime, and all of its dependences in a
 predefined format. With container runtimes like __runC__, __containerd__, or __rkt__, we can use
@@ -15,7 +15,7 @@ containers on a single host (e.g. a dev environment), but in practice we want to
 and scalable solution by creating a single __controller/management unit__ that connects multiple nodes
 together; this unit is called the __container orchestrator__.
 
-## Containers
+### Containers
 
 __Containers__ are an application-centric way to deliver high performing, scalable applications
 on the infrastructure of your choice. You can run a container of say a Django web app or Nginx load
@@ -24,7 +24,7 @@ balancer on your desktop or the cloud or a vm or on premise.
 __Container Image__ is when an application is bundled along with its runtime and dependencies.
 We can use the image to create an isolated executable environment, also known as container.
 
-## Dev/QA vs Production
+### Dev/QA vs Production
 
 We can use a single host to develop and test applications, but we can't do this on a live environment
 because we need to make sure that our applications are:
@@ -36,6 +36,8 @@ because we need to make sure that our applications are:
 * are accessible to the outside world
 * can update and rollback without any downtime
 
+### Container Orchestrators
+
 __Container Orchestrators__ are the tools that group host together to form a cluster and run containers
 on production. A few examples include:
 
@@ -45,7 +47,7 @@ on production. A few examples include:
 * Amazon ECS (runs Docker containers)
 * Nomad by Hashicorp
 
-## Why Container Orchestrators?
+### Why Container Orchestrators?
 
 You can run and scale containers manually with scripts, but its a lot easier with orchestration tools
 
@@ -61,6 +63,11 @@ Check out Linux Foundation's course on edx for Kubernetes (4 hours)
 Local Kubernetes via Minikube are some basic deployments
 
 # Kubernetes
+
+Kubernetes (aka __k8s__) stands for 'helmsman' or 'ship pilot'; 
+it is an open-source system for automating deployment, scaling, and management of containerized applications.
+
+There are new releases every 3 months.
 
 ## What is it
 
@@ -101,30 +108,137 @@ Batch execution (and long running jobs)
 
 ## General Architecture
 
-Master Node (can have multiple masters for high availablity)
-Master Node has a key-value store (etcd is default)
-Master Node links to Worker Nodes
+Kubernetes has the following main components:
+
+
+* One or more Master Nodes (can have multiple masters for high availablity w/ one as a leader)
+  On the Master Node, we have an API Server as well as a Scheduler and Controller
+* One or more Worker Nodes
+  On the Worker Node, we have a __kube-proxy__, a __Kublet__, and __pods__
+* Distributed key-value store (__etcd__ is default), usually connected through Master Node
+
+User interacts with the Master Node(s) through a CLI/API/Dashboard
 
 ## Master Node
 
-Communicate via API Server
-Scheduler interacts with workers
-Controller Manager manages state of cluster
+The __master node__ is response for managing the Kubernetes cluster.
+It is the entry point for all administrative tasks.
+
+* User sommunicate to master node via API Server, CLI, or the GUI (Dashboard)
+* __Scheduler__ interacts with workers
+* __Controller Manager__ manages state of cluster
+
+If there is multiple master nodes, they would be in __high availability (HA) mode__. One would be 
+the leader and performs all operations, the others would be followers.
+
+To manage the cluster state, Kubernetes uses __etcd__, a distributed key-value store. This
+distributed key-value store holds the state of the cluster.
+
+### Scheduler
+
+The __scheduler__ schedules the work to different worker nodes. The scheduler has the resource
+usage information for each worker node. It knows the constraints that users/operators may have set,
+such as scheduling work on a node that has the label `disk==ssd`.
+
+The scheduler schedules the work in terms of __Pods__ and __Services__.
+
+### Controller Manager
+
+The __controller manager__ manages different non-terminating control loops, which regulate the
+state of the Kubernetes cluster. Each control loop knows the desired state of the objects it
+manages by watching their current state through the API server. If the current state of the object
+does not match the desired state, the control loop takes corrective steps.
+
+### etc
+
+__etcd__ is a distributed key-value store that stores the state of the cluster. It can be
+configured externally (with Master nodes connecting to it)  or as part of the Kubernetes Master Node.
 
 ## Worker Nodes
 
-Container runtime (default is Docker, can be rkt)
-A __Pod__ is say a group of Apps together; say you hook up storage (shared among pod)
-Proxy routes requests
-Kubelet manages pods within runtime
+A __worker node__ is a machine that runs the applications using __Pods__ and is controlled by the
+master node. Pods are scheduled on the worker nodes. A __Pod__ is the scheduling unit in Kubernetes.
+It is a logical collection of one or more containers that are always scheduled together (e.g. a group
+of apps together). A worker node has:
 
-## Componetns
+* __container runtime__, what runs under the hood of the container
+* __kubelet__, an agent on each worker node that communicates with the master node
+* __kube-proxy__, a proxy that routes requests
+
+### Container Runtime
+
+A __Container runtime__ (default is Docker, can be __rkt__). Others include __containerd__, __lxd__.
+Technically __docker__ is a platform to run containers; it runs __containerd__ as a container runtime
+
+### Kubelet
+
+The __kubelet__ is an agent that runs on each worker node and manages pods within runtime (i.e. communicates
+with the master node). It runs the containers associated with the Pod. The kubelet connects to the container 
+runtime using __Container Runtime Interface (CRI)__.
+
+#### Kubelet - CRI
+
+The __Container Runtime Interface (CRI)__ consists of:
+
+* protocol buffers
+* gRPC API
+* libraries
+
+The kubelet (grpc client) connects to the CRI shim (grpc server) to perform container and image operations.
+CRI implements two services: __ImageService__ and __RuntimeService__.
+
+* __ImageService__ is responsible for all the image-related operations
+* __RuntimeService__ is responsible for all the Pod and container-related operations
+
+#### Kubelet - CRI Shims
+
+Some examples of CRI Shims include:
+
+* __dockershim__ is where containers are created using Docker and installed on worker nodes with the following:
+    dockershim - Kubelet - CRI - dockershim - docker - containerd - container
+* __cri-containerd__ is where we can directly use Docker's smaller core of __containerd__ to create and manage containers
+    cri-containerd - kubelet - CRI - cri-conntainerd - containerd - container
+* __CRI-O__ enables any __Open Container Initiative (OCI)__ compatible runtimes with Kubernetes. Examples
+ include __runC__ and __Clear Containers__ as container runtimes.
+
+### Kube-Proxy
+
+Instead of connecting directly to Pods to access applications, we use a logical construct called a __Service__
+as a connection endpoint. A Service groups related Pods and when accessed, load balances to them.
+
+The __kube-proxy__ is the network proxy that runs on each worker node and that routes requests
+
+### etcd
+
+__etcd__ stores the cluster state. etcd is a distributed key-value stored based on the __Raft Consensus Algorithm__.
+
+etcd is written in Go and is capable of storing configuration details like subnets, ConfigMaps, Secrets, etc.
+
+## Network
+
+A fully functioning Kubernetes cluster needs the following:
+
+* A unique IP assigned to each Pod
+* Containers in a Pod can communicate to each other
+* The Pod is able to communicate with other Pods in the cluster
+* If configured, the application deployed inside a Pod is accessible from the external world
+
+### Assign a unique IP Address to each Pod
+
+Each Pod gets a unique IP Address. For container networking, there are two primary specifcations:
+
+* __Container Network Model (CNM)__, proposed by Docker
+* __Container Network Interface (CNI)__, proposed by CoreOS
+
+Currently Kubernetse uses CNI to assign the IP Address to each Pod.
+
+
+## Components
 
 ### Pods
 
 A logical set of containers
 Like Docker-Compose Up
-Logical set of containers
 Scheduled on same host
 Share network namespace
 Mount same volumes
