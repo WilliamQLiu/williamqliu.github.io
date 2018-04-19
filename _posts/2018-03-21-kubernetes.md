@@ -471,7 +471,7 @@ We can connect to the API server directly via calling the respective API endpoin
 
 ## kubectl
 
-Can access through command line or through web gui
+__kubect__ allows access to a Kubernetes cluster through the command line.
 
 ### kubectl Configuration File
 
@@ -816,6 +816,60 @@ Usually there are two default namespaces:
 
 You can divide cluster resources within Namespaces using __Resource Quotas__.
 
+## Authenitcation, Authorization, and Admission Control
+
+To access and manage any resources/objects in the Kubernetes cluser, we need to access specific 
+API endpoints on the API server. Each access request goes through the following three stages:
+
+* Authentication - Logs in a user
+* Authorization - Authorizes the API requests added by the logged-in user
+* Admission Control - Software modules that can modify or reject the requests based on some
+  additional checks, like __Quota__
+
+### Authentication
+
+Kubernetes does not have an object called _user_, nor does it store _usernames_ or other related
+details in its object store. Even without that, Kubernetes can use usernames for access control
+and request logging.
+
+#### Authentication Users
+
+Kubernetes has two kinds of users:
+
+* __Normal Users__ - managed outside of the Kubernetes cluster via independent services like
+  User/Client Certifciates, a file listing usernames/passwords, Google accounts, etc.
+* __Service Accounts__ - with Service Account users, in-cluser processes communicate with the
+  API server to perform different operations. Most of the Service Account users are created
+  automatically via the API server, but can also be created manually. The Service Account
+  users are tied to a given Namespace and mount the respective credentials to communicate with
+  the API server as Secrets.
+* If properly configured, Kubernetes can also support __anonymouse requests__
+
+#### Authentication Modules
+
+For authenication, Kubernetes has different authenticator modules, including:
+
+* __Client Certificates__ - to enable client certificate authentication, we need to 
+reference a file containing one or more certificate authorities by passing `--client-ca-file=FILE`
+The certificate authorities mentioned in the file would validate the client certificates presented
+to the API server
+* __Static Token File__ - we can pass a file containing pre-defined bearer tokens with the
+`--token-auth-file=FILE` option to the API server.
+* __Bootstrap Token__ - used mainly for bootstrapping a new Kubernetes cluster
+* __Static Password File__ is similar to a Static Token File, just with a file containing basic authentication
+ details with `-basic-auth-file=FILE`
+* __Service Account Tokens__ - automatically enabled authenticator that uses signed bearer tokens to verify
+ the requests. These tokens are attached to Pods using the ServiceAccount Admission Controller, which
+ allows in-cluster processes to talk to the API server
+* __OpenID Connect Tokens__ - OpenID Connect connects with OAuth 2 providers to authenticate using external services
+* __Webhook Token Authentication__ - Verification of bearer tokens are offloaded to a remote service
+* __Keystone Password__ - can be enabled with `--experimental-keystone-url=<AuthURL>` option to the API server
+* __Authenticating Proxy__ - use authenticating proxy if you want to program additional authentication logic
+
+You can enable multiple authenticators with the first module to successfully authenticate the request to
+short-circuit the evaluation. You should enable at least two methods: the service account tokens authenticator
+and the user authenticator.
+
 ## Config Maps
 
 Kubernetes just creates a config map so you can access ENV variables on apps.
@@ -846,7 +900,80 @@ Secrets limited to 1MB, kept in a temporary file system and only run on nodes th
 
 ### Secrets vs ConfigMaps
 
+__ConfigMaps__ allow you to decouple configuration artifacts from image content to keep containerized
+applications portable.
+
+__Secrets__ are only accessible by this app or that app (not across apps), just strings (not much you can put in here,
+e.g. half a mb). ConfigMaps can be accessed across apps and can hold giant json blobs.
+
 ConfigMaps are more convenient. Can hold entire config files and JSON blobs (like redis configuration)
 When secrets change, pods are not automatically updated. Allows you to rotate keys and by default cut
 off access to potentially compromised pods. Pods get automatic updates when a ConfigMap changes.
+
+# Deploying Kubernetes to Production
+
+## Helm
+
+__Helm__ is the package manager for Kubernetes. A __chart__ says here's the list of items you want,
+here's the dependencies, etc.
+
+Charts allow you to create, version, share, and publish.
+
+## Steps
+
+Creating on Google Cloud Platform:
+
+1.) Create a Kubernetes Cluster
+2.) Install Helm (package manger)
+3.) Use Helm's Charts to install and deploy say Prometheus (monitoring), (nginx-ingress)
+4.) We're using GitLab (GitLab Runner to connect to project's repo and execute CI/CD jobs)
+5.) Applications appear in GitLab (e.g. you'll see Ingress to route requests to services, Prometheus
+    as an open-source monitoring system, GitLab Runner to connect to repo and execute CI/CD jobs,
+    Helm Tiller to streamline installing and managing Kubernetes applications; manages releases of your charts)
+6.) You can view the automatically created yaml file from GitLab's Auto Devops
+
+## GitLab's Auto DevOps
+
+GitLab's Auto Devops automatically creates yaml files of setting up every project with a complete workflow
+using some great boilerplate that has a lot of best practices.
+
+Protop: Look at a CI/CD Pipeline and look at the context of the container pipeline.
+We see 'Build', 'Test', 'Review', 'Dast' (security check), 'Performance' check, 'Cleanup'
+
+## Kubernetes Cert Manager
+
+There's a GitHub project called __cert-manager__ that will hit up letsencrypt for certificates.
+
+## Ambassador
+
+A Kubernetes API gateway that takes in say:
+
+  Comes in with prefix of `/qotm`/ then send over to the service `qotm`
+
+If you need things like __TLS__, just set TLS to True and then drop in your keys to `ambassador-certs`
+
+## Istio
+
+An open platform to connect, manage, and secure microservices; a __service mesh__.
+Each application you deploy has an envoy sidecar; handles server traffic logging, routing, service discovery, loading 
+balancing, etc.
+
+Lots of magic. Still very new. Mediates all inbound and outbound traffic for all services in the service mesh.
+
+Downside is stil alpha and beta for everything.
+
+## Environment Variables
+
+Inject Environment Variables into your CI/CD system (e.g. GitLab), don't put things like passwords in your files.
+Just call passwords to the Environment Variables
+
+## CrashLoopBackOff
+
+One of the things Kubernetes does is that if you take down a Pod and then bring it back up, but it crashes,
+it'll stop at a certain amount (e.g. say after 5 crashes).
+
+## Serverless
+
+When creating bash scripts, check logs.
+Creates AWS lambda functions, check logs from there.
 
