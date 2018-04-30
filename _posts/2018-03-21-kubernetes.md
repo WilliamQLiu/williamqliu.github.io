@@ -870,6 +870,17 @@ You can enable multiple authenticators with the first module to successfully aut
 short-circuit the evaluation. You should enable at least two methods: the service account tokens authenticator
 and the user authenticator.
 
+#### Authorization
+
+After a successful authentication, users can send the API requests to perform different operations.
+Then those API requests get authorized by Kubernetes using various authorization modules.
+
+Authorization depends on API request __attributes__ like user, group, extra, Resource, and Namespace.
+These attributes are compared against __policies__, ultimately saying if a request is allowed or not.
+
+* __Node Authorizer__ - Node authorization is an authorization mode that specifically authorizes API requests made by Kubelets.
+
+
 ## Config Maps
 
 Kubernetes just creates a config map so you can access ENV variables on apps.
@@ -977,3 +988,8 @@ it'll stop at a certain amount (e.g. say after 5 crashes).
 When creating bash scripts, check logs.
 Creates AWS lambda functions, check logs from there.
 
+
+
+## Kompose
+
+Install Kubernetes Compose to turn a Docker-Compose to a Kubernetes
