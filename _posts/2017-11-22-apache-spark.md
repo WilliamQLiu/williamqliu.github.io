@@ -92,3 +92,17 @@ Use a mappartition when you want an operation that requires a database connectio
 You want your regular code to be serializable, so with a mappartition, you can
 process a complete partition in one go (i.e. just called once per partition)
 
+## Anatomy of a Spark Job
+
+1.) Spark Context / Spark Session Object (i.e. our Spark Application)
+2.) Actions e.g. collect, saveAsTextFile (i.e. Job)
+3.) Wide Transformations like `sort`, `groupByKey` (i.e. Stage, Stage)
+4.) Computation to evaluate one partition, to combine narrow transforms (i.e. Task, Task)
+
+## How Jobs Are Submitted and Run
+
+Driver Program (i.e. SparkContext)
+Driver Program is managed by a 'Cluster Manger'
+There are many Worker Nodes that get jobs from the Driver Program
+Worker Nodes have Executors that run many Tasks
+
