@@ -98,12 +98,49 @@ Setup distributed mode using the celery executor
 
 ## Concepts
 
-### Dags
+### DAGs 
 
 A __DAG__ (__Directed Acyclic Graphic)__ is a collection of all the tasks you want to run, organized by their
 relationships and dependencies. A sample DAG can be three tasks: A, B, C. A DAG describes _HOW_ you want to carry
 out your workflow, but not say anything about exactly _WHAT_ we actually want to do (A, B, C can be anything).
 DAGS are defined in Python and placed into the `DAG_FOLDER`.
+
+#### DAGs and default arguments
+
+When we create a task, we can define a dictionary of default parameters that we can use. These parameters depend
+on the type of Operator you're choosing. Remember that all our tasks are nested into a DAG object. Here we create the
+DAG and pass in a default argument dictionary.
+
+    from datetime import datetime, timedelta
+    
+    # Define a dictionary of default arguments
+    default_args = {
+        'owner': 'airflow',
+        'depends_on_past': False,
+        'start_date': datetime(2015, 6, 1),
+        'email': ['airflow@example.com'],
+        'email_on_failure': False,
+        'email_on_retry': False,
+        'retries': 1,
+        'retry_delay': timedelta(minutes=5),
+        # 'queue': 'bash_queue',
+        # 'pool': 'backfill',
+        # 'priority_weight': 10,
+        # 'end_date': datetime(2016, 1, 1),
+    }
+
+    # Instantiate a DAG
+    dag = DAG(
+        'tutorial', default_args=default_args, schedule_interval=timedelta(1))
+
+#### DAG `schedule_interval`
+
+You can run a DAG on a schedule using the `schedule_interval`, which happens to take in CRON like times.
+
+    dag = DAG(dag_id='dag_do_stuff',
+          default_args=default_args,
+          schedule_interval='*/5 * * * *',  # Run every 5 minutes
+          dagrun_timeout=timedelta(seconds=120))
 
 ### Operators
 
@@ -123,9 +160,36 @@ describe a single task in a workflow, with rommon operators including:
 
 ### Tasks
 
-When an operator is instantiated, it is then a __task__. The parameterized task becomes a node in the DAG.
+When an __operator__ is instantiated, it is then a __task__. The parameterized task becomes a node in the DAG.
 __Task Instances__ are a specific run of a task and is a combination of a dag, a task, and a point in time.
 Task Instances have a __state__, which could be 'running', 'success', 'failed', 'skipped', etc.
+
+The arguments from an operator depend on the type of Operator. (e.g. `bash_command` comes from BashOperator and 
+`retries` comes from BaseOperator)
+
+Example tasks might look like:
+
+    t1 = BashOperator(
+        task_id='print_date',
+        bash_command='date',
+        dag=dag)
+
+    t2 = BashOperator(
+        task_id='sleep',
+        bash_command='sleep 5',
+        retries=3,
+        dag=dag) 
+    
+The precedence rules are:
+
+1. Explicitly passed arguments
+2. Values that exist in the `default_args` dictionary
+3. The operator's default value, if one exists
+
+The following fields are required:
+
+* `task_id` - this is __important__ because if you want to run a function independently, this is what gets called on the command line
+* `owner`
 
 ### XComs
 
@@ -188,4 +252,36 @@ __Undead__ processes have a process and a matching heartbeat, but Airflow isn't 
 the database. This mismatch occurs as the state of the database is altered (e.g. from deleting rows in the 'Task 
 Instances' view in the UI. During the heartbeat routine, tasks verify their state and terminate themselves if they
 are in this 'undead' state.
+
+
+## Real Life Scenario
+
+### Running a DAG
+
+Let's list the active dags
+
+    # print the list of active DAGs
+    airflow list_dags
+
+    # print the list of tasks from the DAG that has a dag_id of "tutorial"
+    airflow list_tasks tutorial
+
+    # print the hierarchy of tasks in the tutorial DAG
+    airflow list_tasks tutorial --tree
+
+### Testing a DAG
+
+You can test out a DAG with `airflow test` followed by the command layout:
+
+    command subcommand dag_id task_id date
+
+An example is:
+
+    # test print_date function from the tutorial dag
+    airflow test tutorial print_date 2016-01-01
+
+    airflow test tutorial sleep 2016-01-01
+
+### Backfill
+
 
