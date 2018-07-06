@@ -105,6 +105,13 @@ relationships and dependencies. A sample DAG can be three tasks: A, B, C. A DAG 
 out your workflow, but not say anything about exactly _WHAT_ we actually want to do (A, B, C can be anything).
 DAGS are defined in Python and placed into the `DAG_FOLDER`.
 
+So I think of this as a __DAG__ can only go down the line in tasks. The tasks might split so that some run in
+parallel, but they can't circle back to another task (because that'll cause an infinite loop for that task),
+which will only cause more issues when that task scheduled to run at regular intervals (say every 15 minutes, it
+creates another infinite loop). So yeah, that's why DAGs just go down the line in tasks instead of circling back.
+
+Important Note: For DAGs, these should be atomic, idempotent items.
+
 #### DAGs and default arguments
 
 When we create a task, we can define a dictionary of default parameters that we can use. These parameters depend
@@ -157,6 +164,7 @@ describe a single task in a workflow, with rommon operators including:
 * `SparkSubmitOperator`
 * `SparkSubmitHook`
 * `Sensor` - waits for a certain time, file, database row, S3 key, etc.
+* `S3FileTransferOperator`
 
 ### Tasks
 
@@ -284,4 +292,5 @@ An example is:
 
 ### Backfill
 
-
+You can run a __backfill__ to rerun tasks from a certain time period (e.g. say your tasks run once a day, but you
+want to backfill the last 7 days).
