@@ -149,12 +149,31 @@ You can run a DAG on a schedule using the `schedule_interval`, which happens to 
           schedule_interval='*/5 * * * *',  # Run every 5 minutes
           dagrun_timeout=timedelta(seconds=120))
 
-### Operators
+You can also pass in presents into the `schedule_interval`, including:
 
-__Operators__ describe _HOW_ to run a workflow, with `Operators` determining what actually gets done. Operators
-describe a single task in a workflow, with rommon operators including:
+* `None` - don't schedule, use for "externally triggered" DAGs
+* `@once` - schedule once and only once
+* `@hourly` - run once an hour at the beginning of the hour
+* `@daily` - run once a day at midnight
 
-* `BashOperator` - run a bash command
+etc.
+
+#### How DAG schedule runs
+
+The airflow scheduler monitors all tasks and all DAGs, triggering the task instances whose dependencies have been met.
+
+If you run a DAG on a `schedule_interval` of one day, then the run stamped `2016-01-01` will trigger after 
+`2016-01-01T23:59`. This means that the job instance is started once the period it covers has ended.
+
+It's very important to note: The scheduler runs your job one __schedule_interval__ AFTER the start date,
+at the END of the period.
+
+### Operators 
+
+__Operators__ describe _HOW_ to run a workflow, with `Operators` determining what actually gets done. 
+Operators describe a single task in a workflow, with rommon operators including: 
+
+* `BashOperator` - run a bash command 
 * `PythonOperator` - call python code
 * `EmailOperator` - to send email
 * `HTTPOperator` - send an HTTP Request
@@ -293,4 +312,42 @@ An example is:
 ### Backfill
 
 You can run a __backfill__ to rerun tasks from a certain time period (e.g. say your tasks run once a day, but you
-want to backfill the last 7 days).
+want to backfill the last 7 days). You can run a backfill on the command line with:
+
+    airflow backfill
+
+### Catchup
+
+If your DAG Run has not been run for a specific interval (or has been cleared), we can rerun those times with backfill.
+An exception would be if your DAG has its own catchup written (e.g. schedule is not limited to an interval, but instead
+uses `Now` for instance), then we'll want to turn off catchup (either on the DAG itself with `dag.catchup = False`
+inside the configuration file with `catchup_by_default = False`).
+
+With catchup turned off, you tell the scheduler to only create a DAG run for the most current instance of the DAG
+interval series. You should only turn this off if your DAG runs perform backfill internally.
+
+## Command Line Interface
+
+If you're running Airflow on a server, sometimes it might be easier to just jump into the command line.
+You can run command line airflow with:
+
+    airflow <command>
+
+Commands include:
+
+    __resetdb__ - burn down and rebuild the metadata database
+    __render__ - render a task instance's template(s)
+    __variables__ - CRUD operations on variables (e.g. --set, --get, --delete)
+    __connections__ - list/add/delete connections
+    __pause__ - pause a DAG
+    __unpause__ - unpause a DAG
+    __trigger_dag__ - trigger a DAG run
+    __dag_state__ - get the status of a dag run
+    __task_state__ - get the status of a task instance
+    __run__ - run a single task instance
+    __list_tasks__ - list the tasks within a DAG
+    __list_dags__ - list all the DAGs
+    __initdb__ - initialize the metadata database
+    __test__ - test a task instance (run a task without checking for dependencies or recording state in db)
+    __scheduler__ - run scheduler as a persistent service
+

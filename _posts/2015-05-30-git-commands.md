@@ -203,6 +203,15 @@ With __rebase__, you can rebase the feature branch to begin on the tip of the ma
     git checkout feature
     git rebase -i master
 
+### Rebase specific
+
+git rebase with n being the number of commits you need to access; change 'pick' to squash, leave the top commit as 'pick'
+
+    git rebase -i HEAD~n
+    git fetch origin pull/<pull_id>/head:<branch_name>
+    git push <wherever> --force-with-lease # don't overwrite others work, e.g. git push origin MYBRANCH --force-with-lease
+    git rebase --abort  # if something messes up
+
 ##<a id="diffworkflows">Different Workflows</a>
 
 Besides using git as just a simple save in time on one branch workflow, we can have other options depending on project and team size.
