@@ -9,6 +9,13 @@ title: Apache Spark
 
 Apache Spark is a fast and general engine for large-scale data processing.
 
+## Background
+
+### Compared to MySQL
+
+So Spark is focused on processing (with the ability to pipe data directly from/to external datasets like S3), 
+whereas you might be familiar with a relational database like MySQL, where you have storage and processing built in.
+
 ## Installation
 
 Install Steps:
@@ -30,10 +37,12 @@ of through pip
 
 ## Run
 
+
 ### Exploration
 
 If you want to explore around in a REPL, run `pyspark`
 If you want to submit a regular job, run: `bin/spark-submit`
+If you want to run spark sql, run `/bin/spark-sql`
 
 ### Standalone Cluster
 
@@ -44,8 +53,7 @@ Example, a standalone master server:
 	./sbin/start-master.sh
 
 You'll get a web ui and a url: http://localhost:8080/
-This will show you details like the master's url (e.g. Spark Master at
-spark://xps:7077)
+This will show you details like the master's url (e.g. Spark Master at spark://xps:7077)
 
 To connect workers to the master, run `./sbin/start-slave.sh spark://xps:7077`
 You should now see workers connected
@@ -54,7 +62,6 @@ Now if you want to submit jobs to the master, simply do `bin/spark-submit spark:
 For example: `spark-submit --master spark://xps:7077 --packages
 org.mongodb.spark:mongo-spark-connector_2.11:2.2.1 --jars
 /usr/share/java/mysql-connector-java.jar ~/GitHub/automatic-guacamole/parsy.py`
-
 
 ## Setup Hadoop
 
@@ -158,11 +165,29 @@ You can also log events here in the file `spark-defaults.conf` (`cp spark-defaul
 
 https://spark.apache.org/docs/latest/cluster-overview.html
 
+### Spark Application
+
+A Spark Application consists of a __driver__ process and a set of __executor__ processes.
+
+There is also a __SparkSession__ that gets created with a Spark Application: there is a one-to-one correspondence
+between a SparkSession and a Spark Application.
+
+#### Driver Process
+
 The Spark application that we're sending to run is an independent set of processes on a cluster that is coordinated
-by the `SparkContext` object in your main program (i.e. the __driver program__).
+by the `SparkContext` object in your main program (i.e. the __driver program__). The driver process runs your `main()`
+function. The driver program is responsible for three things:
+
+* Maintain information about the Spark Application
+* Respond to a user's program or input
+* Analyzes, Distributes, and Schedules work across __executors__
+
+#### Cluster Manager
 
 To run an application on a cluster, the SparkContext can connect to different __cluster managers__. These cluster
 managers can be standalone cluster managers, Mesos or YARN, which allocate resources across applications.
+
+#### Executors
 
 Once connected, Spark acquires __executors__ on nodes in the cluster, which are processes that run computations and
 store data in your application. Once Spark has executors, it sends your application code (e.g. Python file passed to
@@ -176,6 +201,13 @@ Some things to note about each of the above Spark Architecture:
   each application is isolated from each other). Data cannot be shared across different Spark applications (instances
   of SparkContext)
 * The driver program must listen for and accept incoming connections from its executors
+
+### Spark APIs
+
+There are two fundamental sets of APIs:
+
+* the low level "unstructured" APIs - Resilient Distributed Datasets (__RDD__) - don't use these
+* the higher level "structured" APIs - DataFrames, SparkSQL, Datasets (only available to Java and Scala)
 
 ### Spark Master
 
@@ -218,7 +250,8 @@ Worker Nodes have Executors that run many Tasks
 
 __Parquet__ files are a __columnar__ format supported by many data processing systems. Advantages include automatically
 preserving the schema of the original data. When writing Parquet files, all columns are automatically converted
-to be nullable (for compatibility reasons). Dataframes can be saved as Parquet files.
+to be nullable (for compatibility reasons). Dataframes can be saved as Parquet files. Note that Parquet is good about
+adding new columns, but not so great about deleting columns. Parquet is more suitable for high read intensive data.
 
 ### Why Parquet?
 
@@ -266,10 +299,121 @@ An example might look like:
 
 You can also write to another filesystem (e.g. HDFS, S3)
 
+## Avro
+
+__Avro__ is a row-based storage format (instead of column based like Parquet). If your use case is to scan or
+retrieve all of the fields in a row in each query, Avro is usually the best choice. Avro supports adding columns
+and deleting columns. Avro is best fit for write intensive operations.
+
+Schemas give a mechanism for reasoning about format changes (what will be a compatible change, meaning we don't need
+to do reprocessing and which ones will require reprocessing).
+
 ### PyArrow
 
 __PyArrow__ is an in-memory transport layer for data that is being read or written with Parquet files.
 You can also use PyArrow for reading and writing Parquet files with pandas.
 
     import pyarrow.parquet as pq
+
+## Logging with Python
+
+    # Get Spark's Logger
+    log4jLogger = sc._jvm.org.apache.log4j
+    LOGGER = log4jLogger.LogManager.getLogger(__name__)
+    LOGGER.info("INFO - pyspark script logger initialized!!!")  # appears in logs
+
+## Debugging w/ Java Tools
+
+Spark runs executors in individual Java Virtual Machines (JVMs). If you want to really debug, you can look at the
+individual virtual machines (VMs) to understand how your code runs. If you can't get the information from the
+Spark UI, you can use some of the following JVM utilities for low level debugging:
+
+* `jstack` for providing stack traces of a given JVM process; use if you think there is a deadlock
+    `jstack -F -l <process_id>` with `-F` to force the dump (use on hanged processes) and `-l to print info`
+* `jmap` for creating heap-dumps (without needing to cause any `OutOfMemoryErrors`) - prints shared object memory maps
+    or heap memory details of a given process or core file
+* `jstat` for reporting time-series statistics
+* `jconsole` for visually exploring various JVM properties
+* `jvisualvm` to help profile Spark jobs
+
+### Java Install
+
+Before debugging, you might need to install Java.
+
+    sudo apt-get update
+    sudo apt-get install default-jre  # install jre or jdk, jdk has some more
+    sudo apt-get install default-jdk
+
+    # check with
+    java -version
+    java version "10.0.1" 2018-04-17
+    Java(TM) SE Runtime Environment 18.3 (build 10.0.1+10)
+    Java HotSpot(TM) 64-Bit Server VM 18.3 (build 10.0.1+10, mixed mode)
+
+### OS tools
+
+The JVMs run on a host operating system (OS) and it's important to check that these machines are healthy.
+You want to check on things like CPU, network, and I/O. Usually cluster-level monitoring solutions provide this,
+but if you want to run specific tools on a machine, you can use:
+
+#### dstat
+
+__dstat__ allows you to view all of your system resources instantly. You can compare the network bandwidth to
+CPU usage, memory, and disk usage.
+
+Install with `sudo apt-get install dstat`
+
+    $ dstat
+    You did not select any stats, using -cdngy by default.
+    ----total-cpu-usage---- -dsk/total- -net/total- ---paging-- ---system--
+    usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw 
+     11   4  73  11   0   0|  24k  574k|   0     0 |  53B   81B|1288  5263 
+      9   4  64  22   0   0|   0   532k|  71k   67k|   0     0 |1508  3923 
+     10   5  64  21   0   0|   0   816k| 139k  137k|   0     0 |1592  5350 
+
+#### iostat
+
+__iostat__ reports on CPU statistics and input/output statistics for devices, partitions, and network filesystems (NFS).
+
+Install with: `sudo apt-get install sysstat`
+
+#### iotop
+
+__iotop__ shows current input/output (I/O) usage by process or threads. 
+
+Install with `sudo apt-get install iotop`
+
+The __I/O wait__ measurement is the canary for an I/O bottleneck. Wait is the percentage of time your processors
+are waiting on the disk. E.g. say it takes 1 second to grab 10,000 rows and the disk access takes 700ms, so
+I/O wait is 70% (because the processor is idle while waiting for disk)
+
+`cat /proc/cpuinfo` to see the number of cpu cores
+
+If your I/O wait percentage is greater than (`1 / # of CPU cores`) then your CPUs are waiting a significant
+amount of time for the disk to catch up. In the example above, the I/O wait is very large (say server has 8 cores 
+so 1/8 cores = 0.125).
+
+#### IOPS
+
+You should focus on how many input/output operations can be performed per-second (__IOPS__). To calculate how
+close you are to your maximum I/O throughput is to use your theoretical IOPs and compare it to your actual IOPs.
+If the numbers are close, there might be an I/O issue. Use this equation for calculating the __theoretical IOPs__:
+
+    I/O Operations Per Second = (number of disks * Average I/O Operations on 1 disk per second / % of read workload + (Raid Factor * % of write workload)
+
+Compare your theoretical IOPS to the `tps` given from `iostat`:
+
+    $iostat
+    07/17/2018 	_x86_64_	(4 CPU)
+
+    avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+              10.78    0.01    4.44   11.39    0.00   73.38
+
+    Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+    sda              42.98        23.81       573.90   31017832  747705100
+
+### Cluster Monitoring Tools
+
+If your cluster is not working, you want to know. Use a monitoring solution like __Ganglia__ or __Prometheus__.
+
 

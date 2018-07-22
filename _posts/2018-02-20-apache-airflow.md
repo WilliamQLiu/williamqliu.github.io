@@ -326,6 +326,29 @@ inside the configuration file with `catchup_by_default = False`).
 With catchup turned off, you tell the scheduler to only create a DAG run for the most current instance of the DAG
 interval series. You should only turn this off if your DAG runs perform backfill internally.
 
+### Macros
+
+The airflow engine passes a few variables by default that are accessible in templates.
+
+You might need say the execution datetime in your command that you're running, so it might look like the following
+where we have a templated command (and the `macro.ds_add`)
+
+    templated_command = """
+    {% for i in range(5) %}
+        echo "{{ ds }}"
+        echo "{{ macros.ds }}"
+        echo "{{ next_execution_date }}"
+        echo "{{ params.my_param }}"
+    {% endfor %}
+    """
+
+    t3 = BashOperator(
+        task_id='templated',
+        depends_on_past=False,
+        bash_command=templated_command,
+        params={'my_param': 'Parameter I passed in'},
+        dag=dag)
+
 ## Command Line Interface
 
 If you're running Airflow on a server, sometimes it might be easier to just jump into the command line.
@@ -350,4 +373,10 @@ Commands include:
     __initdb__ - initialize the metadata database
     __test__ - test a task instance (run a task without checking for dependencies or recording state in db)
     __scheduler__ - run scheduler as a persistent service
+
+
+### Example Bash Command
+
+https://github.com/trbs/airflow-examples/blob/master/dags/tutorial.py
+
 
