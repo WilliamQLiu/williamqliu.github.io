@@ -23,24 +23,31 @@ pip install apache-airflow[crypto]
 pip install apache-airflow[mysql]
 pip install apache-airflow[rabbitmq]
 
-I had issues with this rabbitmq so I built rabbitmq: 
-git clone git://github.com/celery/librabbitmq.git
-cd rabbitmq
-make install
+### RabbitMQ
 
+I had issues with this rabbitmq so I built rabbitmq: 
+
+    git clone git://github.com/celery/librabbitmq.git
+    cd rabbitmq
+    make install
 
 Setup Gunicorn:
-pip install gunicorn==19.3.0  # needed for python 3
-Then in my bashrc add:
-export PATH=$PATH:~/.local/bin
+
+    pip install gunicorn==19.3.0  # needed for python 3
+    Then in my bashrc add:
+    export PATH=$PATH:~/.local/bin
 
 Generating an RSA public/private-key pair
-openssl genrsa -out private.pem 2048
+
+### Self Sign Certificates
+
+    openssl genrsa -out private.pem 2048
 
 Generating a self-signed certificate
-openssl req -new -x509 -key private.pem -out cacert.pem -days 1095
 
-Then you can access the web gui with https:localhost:8080
+    openssl req -new -x509 -key private.pem -out cacert.pem -days 1095
+
+Then you can access the web gui with `https:localhost:8080`
 
 # In your airflow.cfg under [webserver]
 
@@ -49,13 +56,17 @@ web_server_ssl_key = path/to/private.pem
 
 ### Airflow Admin Connections
 
-In the Airflow Admin (e.g. https://localhost:8079/admin/connection/), select your connection (e.g. 'mysql_default')
+In the Airflow Admin (e.g. `https://localhost:8079/admin/connection/`), select your connection (e.g. 'mysql_default')
 and edit the info. Change the following to your connection information, e.g:
 
     host : my_db 
     Schema : airflow
     Login : root 
     Password : root 
+
+You can also add an environment variable with this connection info if you want to start it up by default:
+
+    ENV AIRFLOW_CONN_MYSQL_DEFAULT="mysql://root:root@my_db:3306/airflow"
 
 Now you can run ad hoc queries! Make sure you're not really using user root on a production system. You should be
 able to run a command like this:
@@ -85,16 +96,39 @@ able to run a command like this:
     | xcom              |
     +-------------------+
 
-
 ## Run Webserver and Scheduler
 
 airflow webserver  # shows GUI
 airflow scheduler
 airflow worker # picks up tasks
 
-## TODO: Distributed Mode
+## Distributed Mode
 
 Setup distributed mode using the celery executor
+
+With Distributed Mode you need a backend like RabbitMQ. We'll modify the `airflow.cfg` file to:
+
+    executor = CeleryExectuor # instead of SequentialExecutor
+
+    celery_result_backend = db+mysql://root:root@my_db:3306/airflow
+
+    # By default, the `airflow.cfg` specifies a default celery queue of `default_queue`
+    # Make sure to specify what `queue` to use (from BaseOperator)
+
+    # Remember to kick off some workers then with:
+    airflow worker
+
+    # To monitor your workers, check out 'Celery Flower' from
+    airflow flower
+
+## Systemd
+
+Airflow can integrate with __systemd__ based systems, allowing systemd to watch restarting a daemon on failure.
+In the `scripts/systemd` directory, there's unit files that you can copy over to `/usr/lib/systemd/system`.
+Airflow tasks will run under user `airflow:airflow`.
+
+Environment configuration is picked up from `/etc/sysconfig/airflow`. Make sure to specify `SCHEDULER_RUNS` and
+`AIRFLOW_HOME` and `AIRFLOW_CONFIG`.
 
 ## Concepts
 
@@ -170,8 +204,8 @@ at the END of the period.
 
 ### Operators 
 
-__Operators__ describe _HOW_ to run a workflow, with `Operators` determining what actually gets done. 
-Operators describe a single task in a workflow, with rommon operators including: 
+While __DAGS__ describe _HOW_ to run a workflow, __Operators__ determining what actually gets done. 
+Operators describe a single task in a workflow, with common operators including: 
 
 * `BashOperator` - run a bash command 
 * `PythonOperator` - call python code
@@ -184,6 +218,14 @@ Operators describe a single task in a workflow, with rommon operators including:
 * `SparkSubmitHook`
 * `Sensor` - waits for a certain time, file, database row, S3 key, etc.
 * `S3FileTransferOperator`
+
+#### When to split out multiple operators
+
+Operators are usually atomic; they should be able to stand on their own without sharing resources with any other
+operators. At scale, two operators may run on completely different machines so you need to be careful on how to 
+share information. If two operators need to share information, like a file or some data, consider combining them
+into a single operator. If it absolutely can't be avoided at all, then consider using operator cross-communication
+called __XCom__.
 
 ### Tasks
 
@@ -218,6 +260,30 @@ The following fields are required:
 * `task_id` - this is __important__ because if you want to run a function independently, this is what gets called on the command line
 * `owner`
 
+#### Task Running and Clearing
+
+Run - Run a single task instance (can only be done if using something other than SequentialExecutor)
+Clear - Clear a set of task instances, as if they never ran
+
+### Hooks
+
+Hooks are interfaces to external platforms and databases like S3, MySQL, Postgres, HDFS.
+Hooks keep authentication code and information out of pipelines, centralized in the metadata database.
+
+For example:
+
+    conn = MySqlHook(conn_name_attr='my_db')
+    conn.bulk_load(table_name, local_filepath)
+
+### Pools
+
+Some systems can get overwhelmed when too many processes hit them at the same time. Use an Airflow __pool__ to
+__limit the execution parallelism__ on specific tasks. A task can be associated to a pool with the `pool` paramter
+when creating the task (i.e. when setting up the Operator, e.g. BashOperator).
+
+You can also define `priority_weight` to define priorities in the queue and which tasks get executed first as slots
+open up in the pool. The default `priority_weight` is 1.
+
 ### XComs
 
 __XComs__ let tasks exchange messages, allowing you to have more control and share state across systems.
@@ -240,9 +306,14 @@ is a SQLAlchemy Model.
     foo = Variable.get("foo")
     bar = Variable.get("bar", deserialize_json=True)
 
+### Branching
+
+If you need to setup a workflow that goes down a certain path based on an arbitrary condition (e.g. if something
+happened on an upstream task), then use __branching__.
+
 ### SubDAGs
 
-__SubDAGs__ are used for repeating patterns. Defining a function that returns a DAG object is a nice design pattern
+__SubDAGs__ are used for __repeating patterns__. Defining a function that returns a DAG object is a nice design pattern
 when using Airflow. Airflow uses the __stage-check-exchange__ pattern when loading data. Data is staged in a temporary
 table, after which data quality checks are performed against that table. Once all the checks pass, the partition
 is moved into the production table.

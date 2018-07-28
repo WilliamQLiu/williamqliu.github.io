@@ -130,6 +130,40 @@ Sample job might look like:
 
     spark-submit my_job.py --master <master_url> --deploy-mode cluster -v
 
+### Python Additional Files
+
+Say you're using a Python library like Shapely or Pandas. You can build out a Python egg, but that will be specific
+to the client machine's CPU architecture (because of the required C compilation). Libraries that need eggs include
+Pandas, NumPy, SciPy. Distributing an egg is a brittle solution, but since we're doing distributed computing, we
+still need a way to get our libraries.
+
+So instead of distributing an egg, we're going to distrubte a `.zip` file using the `--py-files` parameter in 
+`spark-submit`. It'll look like `spark-submit --py-files dependencies.zip my_spark_job.py`
+
+Assuming you have a requirements.txt file, run the following to create a dependencies.zip:
+
+    pip install -t dependencies -r requirements.txt
+    cd dependencies
+    zip -r ../dependencies.zip .
+
+Now run with: `spark-submit --py-files dependencies.zip my_spark_job.py`. This `--py-files` sends the zip file to
+the Spark workers, but does not add it to the `PYTHONPATH`. To add the dependencies to the `PYTHONPATH`, add the
+following line to the `my_spark_job.py`:
+
+    from pyspark.sql import SparkSession
+
+    my_spark = SparkSession.builder.appName("willApp").config("py-files", "/root/airflow/dependencies.zip").getOrCreate()
+
+    my_spark.sparkContext.addPyFile("/root/airflow/dependencies.zip")
+
+You can then use the dependencies like:
+
+    from mylibrary import some_file
+
+Assuming that in your dependencies folder there's a `mylibrary` directory with a `some_file`
+
+Note that you need to import your libraries after your sparkContext runs `addPyFile`.
+
 ### Jobs UI
 
 You should be able to see all __currently running jobs__ through the UI here: 
@@ -171,6 +205,9 @@ A Spark Application consists of a __driver__ process and a set of __executor__ p
 
 There is also a __SparkSession__ that gets created with a Spark Application: there is a one-to-one correspondence
 between a SparkSession and a Spark Application.
+
+From Spark 2.0 and later, a SparkSession, you want to just use a SparkSession to access everything since a
+SparkSession includes all APIs.
 
 #### Driver Process
 
@@ -416,4 +453,83 @@ Compare your theoretical IOPS to the `tps` given from `iostat`:
 
 If your cluster is not working, you want to know. Use a monitoring solution like __Ganglia__ or __Prometheus__.
 
+## Pyspark Data Types
+
+Python has data types that eventually get converted over to Spark's Catalyst system.
+
+http://spark.apache.org/docs/latest/api/python/pyspark.sql.html?highlight=types#module-pyspark.sql.types
+
+There's many Python data types including:
+
+* DataType - base class for data types
+* NullType - i.e. `None`
+* StringType - Strings
+* BinaryType - Binary (byte array) data type
+* BooleanType - Boolean
+* DateType - Date (datetime.data)
+* TimestampType - Timestamp (datetime.datetime)
+* DecimalType - Decimal (decimal.Decimal)
+* DoubleType - Double precision floats
+* FloatType - Single precision floats
+* ByteType - Byte (a signed integer in a single byte)
+* IntegerType - Int (signed 32-bit integer)
+* LongType - Long (signed 64-bit integer)
+* ShortType - Short (a signed 16-bit integer)
+* ArrayType - Array (with a DataType for each element in the array)
+* MapType - keys and values in a map data type
+* StructField - your own schema, specify the field
+* StructType - your own schema, specify the entire schema w/ StructFields
+
+### How are data types used?
+
+Say you make a user defined function, you can specify a returned field type.
+
+    from pyspark.sql.types import FloatType
+
+    def square_float(x):
+        return float(x**2)
+
+    square_udf_float2 = udf(lambda z: square_float(z), FloatType())
+
+
+## Debugging with Python
+
+You can set your Log Level (Spark is by default verbose)
+Errors come showing the JVM stack trace and Python.
+
+Make sure you have good tests: `spark-testing-base` is on pip
+
+When launching a jupyter notebook, add any additional packages:
+
+    jupyter install --spark_opts="--packages com.databricks:spark-csv_2.10:1.3.0"
+
+
+### Apache Toree
+
+https://toree.apache.org/docs/current/user/installation/
+
+Apache Toree is a kernel for the Jupyter Notebook platform providing interactive access to Spark
+
+    pip install toree
+
+This installs a jupyter application called `toree`, which can be used to install and configure
+different Apache Toree kernels.o
+
+    jupyter toree install --spark_home=/usr/local/bin/apache-spark/
+
+Check that it's installed with:
+
+    jupyter kernelspec list
+    Available kernels:
+      python2                 /home/will/.local/share/jupyter/kernels/python2
+      apache_toree_pyspark    /usr/local/share/jupyter/kernels/apache_toree_pyspark
+      apache_toree_scala      /usr/local/share/jupyter/kernels/apache_toree_scala
+      spark_pyspark           /usr/local/share/jupyter/kernels/spark_pyspark
+      spark_scala             /usr/local/share/jupyter/kernels/spark_scala
+
+Toree is started using the `spark-submit` script. You can add in configurations with:
+
+    --jar-dir where your jar directory is
+
+    jupyter toree install --replace --spark_home=$SPARK_HOME --kernel_name="Spark" --spark_opts="--master=local[*]" --interpreters PySpark
 
