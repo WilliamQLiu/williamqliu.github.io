@@ -503,8 +503,142 @@ When launching a jupyter notebook, add any additional packages:
 
     jupyter install --spark_opts="--packages com.databricks:spark-csv_2.10:1.3.0"
 
+## Dataframe
+
+### Rows and Columns
+
+A __row__ is a record of data.
+
+A __column__ can be a __simple type__ (e.g. integer, string) or a __complex type__ (e.g. array, map, null value)
+
+To get the types:
+
+    from pyspark.sql.types import *
+
+    # example
+    b = ByteType()
+
+### Setup
+
+    my_spark = SparkSession.build.appName("MyAppName") \
+                   .config("jars", "/usr/local/spark-2.2.2-bin-hadoop2.7/jars/mysql-connector-java-5.1.45-bin.jar")
+                   .getOrCreate()
+
+### Read from DB from JDBC
+
+How to read from a database into a dataframe using a MySQL connector
+
+    my_df = my_spark.read.jdbc(url="jdbc:mysql://my_hostname:3306/my_server",
+                               table="(SELECT my_field FROM my_table) AS my_table_name",
+                               properties={'user': 'myusername', 'password': 'mypassword'})
+
+### Write to DB using JDBC
+
+    my_df.write.format('jdbc').options(
+        url="jdbc:mysql://my_hostname:3306/my_table",
+        driver="com.mysql.jdbc.Driver',
+        dbtable="my_table",
+        user="username",
+        password="password"
+    ).mode("overwrite").save()
+
+#### Write to DB (Partitioning)
+
+You can add in additional options like `partitionColumn`, `lowerBound`, `upperBound`, `numPartitions` to
+increase the throughput of the database write. For example, if you specify the number of partitions, then
+each executor can parallelize the ingestion of the data.
+
+##### Repartition
+
+You can repartition (to increase or decreate the number of partitions) with `repartition`. A repartition
+does a full shuffle of the data, then creates equal sized partitions of the data.
+
+    # See how many partitions
+    #print(joined_df.rdd.getNumPartitions())
+
+    # Set more partitions
+    #joined_df.repartition(5)
+    #print(joined_df.rdd.getNumPartitions())
+
+When repartitioning with a column, there will be a minimum of 200 partitions by default. There may be say
+two partitions with data (if a key only has say 'red' and 'blue') and 198 empty partitions. Partitioning by
+a column is similar to creating an index on a column in a relational database.
+
+In general, the rough number for number of partitions is to multiply the number of CPUs in the cluster by
+2, 3, or 4.
+
+    number_of_partitions = number_of_cpus * 4
+
+If you are writing data out to a file system, a reasonable partition size is if your files are reasonably sized
+(roughly 100MB each).
+
+Usually you'll want to do a repartition after a join or a filter; it'll increase downstream operations tremendously.
+
+##### Batch Size
+
+If you find that your jdbc connection is taking a long time to write, consider using the `batchSize` option.
+I needed to write 2 million records into a MySQL database and it would take anywhere from 30 minutes to over an
+hour to write. However, when I set the `batchSize` option, the process completed in about 4 minutes.
+
+    my_df.write.format('jdbc').options(
+        url='jdbc:mysql://my_server:3306/my_db',
+        driver='com.mysql.jdbc.Driver',
+        dbtable='my_table',
+        user='my_username',
+        password='my_password',
+        numPartitions='4',
+        batchSize='10000'  # <- this guy!
+    ).mode('overwrite').save()
+
+##### Coalesce
+
+You can reduce the number of partitions in a Dataframe with `coalesce`.
+
+    new_df = joined_df.coalesce(2)  # consolidate data into 2 partitions
+
+Coalesce combines existing partitions to avoid a full shuffle (whereas repartition algorithm does a full shuffle
+of the data and creates equal sized partitions of data)
+
+### Alias
+
+Make sure to set an alias to your dataframe, otherwise you'll get an error after you join your dataframes (if
+two columns are named the same thing and you reference one of the named columns).
+
+    my_df = my_df.alias("my_df") 
+
+### Join
+
+You can join with:
+
+    df_left.join(df_right, df_left.my_field == df_right.my_field, how='inner')
+
+    # Multiple Joins
+    joined_df = df_left.join(df_right, "my_field", "left") \
+                       .join(df_another, "my_field", "left")
+
+You can specify the how with:
+
+    inner, cross, outer, full, full_outer, left, left_outer, right, right_outer, left_semi, and left_anti
+
+### Modes
+
+mode - specifies the behavior of the save operation when data already exists.
+
+* `append`: Append contents of this DataFrame to existing data.
+* `overwrite`: Overwrite existing data.
+* `ignore`: Silently ignore this operation if data already exists.
+* `error` or `errorifexists` (default case): Throw an exception if data already exists.
+
+### collect() and take()
+
+To print all elements on the driver, one can use the collect() method to first bring the RDD to the driver node 
+thus: rdd.collect().foreach(println). This can cause the driver to run out of memory, though, because collect() 
+fetches the entire RDD to a single machine; if you only need to print a few elements of the RDD, 
+a safer approach is to use the take(): rdd.take(100).foreach(println).
 
 ### Apache Toree
+
+TODO: Get this part working
 
 https://toree.apache.org/docs/current/user/installation/
 
@@ -513,7 +647,7 @@ Apache Toree is a kernel for the Jupyter Notebook platform providing interactive
     pip install toree
 
 This installs a jupyter application called `toree`, which can be used to install and configure
-different Apache Toree kernels.o
+different Apache Toree kernels.
 
     jupyter toree install --spark_home=/usr/local/bin/apache-spark/
 
@@ -532,4 +666,12 @@ Toree is started using the `spark-submit` script. You can add in configurations 
     --jar-dir where your jar directory is
 
     jupyter toree install --replace --spark_home=$SPARK_HOME --kernel_name="Spark" --spark_opts="--master=local[*]" --interpreters PySpark
+
+I actually went and git cloned the project since I had a more recent release:
+
+    git clone git@github.com:apache/incubator-toree.git
+    cd incubator-toree
+    APACHE_SPARK_VERSION=2.2.2 make pip-release
+    pip3 install dist/toree-pip/toree-0.3.0.dev1.tar.gz
+
 

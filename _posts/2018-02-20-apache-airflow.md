@@ -12,16 +12,16 @@ Apache Airflow is an open source job scheduler made for data pipelines.
 
 While the installation is pretty straightforward, getting it to work is a little more detailed:
 
-export AIRFLOW_HOME=~/airflow
-pip install apache-airflow
-airflow initdb
-airflow webserver -p 8080
+    export AIRFLOW_HOME=~/airflow
+    pip install apache-airflow
+    airflow initdb
+    airflow webserver -p 8080
 
-pip install apache-airflow[devel]
-pip install apache-airflow[async]
-pip install apache-airflow[crypto]
-pip install apache-airflow[mysql]
-pip install apache-airflow[rabbitmq]
+    pip install apache-airflow[devel]
+    pip install apache-airflow[async]
+    pip install apache-airflow[crypto]
+    pip install apache-airflow[mysql]
+    pip install apache-airflow[rabbitmq]
 
 ### RabbitMQ
 
@@ -51,8 +51,8 @@ Then you can access the web gui with `https:localhost:8080`
 
 # In your airflow.cfg under [webserver]
 
-web_server_ssl_cert = path/to/cacert.pem
-web_server_ssl_key = path/to/private.pem
+    web_server_ssl_cert = path/to/cacert.pem
+    web_server_ssl_key = path/to/private.pem
 
 ### Airflow Admin Connections
 
@@ -420,6 +420,13 @@ where we have a templated command (and the `macro.ds_add`)
         params={'my_param': 'Parameter I passed in'},
         dag=dag)
 
+Note that since an item like `next_execution_date` is a python object (datetime), you can also call methods on it.
+For example:
+
+    echo '{{ next_execution_date }}'  # '2018-08-04 16:05:00'
+    echo '{{ next_execution_date.isoformat() }}'  # '2018-08-03T16:05:00'
+    echo '{{ next_execution_date.strftime("%d-%m-%Y") }'
+
 ## Command Line Interface
 
 If you're running Airflow on a server, sometimes it might be easier to just jump into the command line.
@@ -450,4 +457,73 @@ Commands include:
 
 https://github.com/trbs/airflow-examples/blob/master/dags/tutorial.py
 
+## Database Tables
+
+So if you're using a relational database like MySQL to store airflow database, the main tables might look like this:
+
+    mysql> use airflow
+
+    mysql> show tables;
+    +--------------------+
+    | Tables_in_airflow  |
+    +--------------------+
+    | alembic_version    |
+    | celery_taskmeta    |
+    | celery_tasksetmeta |
+    | chart              |
+    | connection         |
+    | dag                |
+    | dag_pickle         |
+    | dag_run            |
+    | dag_stats          |
+    | import_error       |
+    | job                |
+    | known_event        |
+    | known_event_type   |
+    | log                |
+    | sla_miss           |
+    | slot_pool          |
+    | task_fail          |
+    | task_instance      |
+    | users              |
+    | variable           |
+    | xcom               |
+    +--------------------+
+    21 rows in set (0.00 sec)
+
+### airflow.task_instance
+
+The task instance table shows you what dags have been executed, when, the state, etc.
+
+    mysql> describe task_instance;
+    +-----------------+---------------+------+-----+---------+-------+
+    | Field           | Type          | Null | Key | Default | Extra |
+    +-----------------+---------------+------+-----+---------+-------+
+    | task_id         | varchar(250)  | NO   | PRI | NULL    |       |
+    | dag_id          | varchar(250)  | NO   | PRI | NULL    |       |
+    | execution_date  | datetime(6)   | NO   | PRI | NULL    |       |
+    | start_date      | datetime(6)   | YES  |     | NULL    |       |
+    | end_date        | datetime(6)   | YES  |     | NULL    |       |
+    | duration        | float         | YES  |     | NULL    |       |
+    | state           | varchar(20)   | YES  | MUL | NULL    |       |
+    | try_number      | int(11)       | YES  |     | NULL    |       |
+    | hostname        | varchar(1000) | YES  |     | NULL    |       |
+    | unixname        | varchar(1000) | YES  |     | NULL    |       |
+    | job_id          | int(11)       | YES  | MUL | NULL    |       |
+    | pool            | varchar(50)   | YES  | MUL | NULL    |       |
+    | queue           | varchar(50)   | YES  |     | NULL    |       |
+    | priority_weight | int(11)       | YES  |     | NULL    |       |
+    | operator        | varchar(1000) | YES  |     | NULL    |       |
+    | queued_dttm     | datetime(6)   | YES  |     | NULL    |       |
+    | pid             | int(11)       | YES  |     | NULL    |       |
+    | max_tries       | int(11)       | YES  |     | -1      |       |
+    +-----------------+---------------+------+-----+---------+-------+
+
+    mysql> select * from task_instance;
+    +----------------------+---------------------+----------------------------+----------------------------+----------------------------+----------+---------+------------+--------------+----------+--------+------+---------+-----------------+--------------+----------------------------+------+-----------+
+    | task_id              | dag_id              | execution_date             | start_date                 | end_date                   | duration | state   | try_number | hostname     | unixname | job_id | pool | queue   | priority_weight | operator     | queued_dttm                | pid  | max_tries |
+    +----------------------+---------------------+----------------------------+----------------------------+----------------------------+----------+---------+------------+--------------+----------+--------+------+---------+-----------------+--------------+----------------------------+------+-----------+
+    | my_task_id_abcdefghi | dag_download_abcdef | 2018-08-02 00:05:00.000000 | 2018-08-03 15:46:14.788703 | 2018-08-03 15:46:18.545962 |  3.75726 | success |          1 | 3d3a39269fbd | root     |      2 | NULL | default |               2 | BashOperator | 2018-08-03 15:46:13.419580 |  965 |         2 |
+    | my_task_id_abcdefghi | dag_download_abcdef | 2018-08-02 01:05:00.000000 | 2018-08-03 15:46:23.427211 | 2018-08-03 15:46:26.416335 |  2.98912 | success |          1 | 3d3a39269fbd | root     |      4 | NULL | default |               2 | BashOperator | 2018-08-03 15:46:22.171445 | 1000 |         2 |
+    | my_task_id_abcdefghi | dag_download_abcdef | 2018-08-02 02:05:00.000000 | 2018-08-03 15:46:32.067906 | 2018-08-03 15:46:35.113323 |  3.04542 | success |          1 | 3d3a39269fbd | root     |      5 | NULL | default |               2 | BashOperator | 2018-08-03 15:46:30.859648 | 1043 |         2 |
 
