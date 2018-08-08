@@ -425,7 +425,7 @@ For example:
 
     echo '{{ next_execution_date }}'  # '2018-08-04 16:05:00'
     echo '{{ next_execution_date.isoformat() }}'  # '2018-08-03T16:05:00'
-    echo '{{ next_execution_date.strftime("%d-%m-%Y") }'
+    echo '{{ next_execution_date.strftime("%d-%m-%Y") }}'
 
 ## Command Line Interface
 
