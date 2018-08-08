@@ -276,12 +276,32 @@ process a complete partition in one go (i.e. just called once per partition)
 3.) Wide Transformations like `sort`, `groupByKey` (i.e. Stage, Stage)
 4.) Computation to evaluate one partition, to combine narrow transforms (i.e. Task, Task)
 
-## How Jobs Are Submitted and Run
+### How Jobs Are Submitted and Run
 
 Driver Program (i.e. SparkContext)
 Driver Program is managed by a 'Cluster Manger'
 There are many Worker Nodes that get jobs from the Driver Program
 Worker Nodes have Executors that run many Tasks
+
+### Actions
+
+Below are some sample __Actions__ by Spark. 
+
+https://spark.apache.org/docs/2.2.0/rdd-programming-guide.html
+
+* `reduce(func)` - aggregate elements of a dataset using a function (func). Make sure the function is
+  commutative and associative so that it can be computed correctly in parallel.
+* `collect()` - return all the elements of the dataset as an array at the driver program. Usually this is done
+  after a filter or other operation that returns a small subset of the data.
+* `count()` - return the number of elements in the dataset.
+* `first()` - return an array with the first element of the dataset (same as `take(1)`
+* `take(n)` - return an array with the first _n_ elements of the dataset
+* `takeSample()` - return an array with a random sample of _num_ elements of the dataset, with or without replacement
+* `saveAsTextFile(path)` - write the elements of the dataset as a text file (or set of text files) in a given
+  directory in a local filesystem, HDFS or any other Hadoop-supported file system. Spark will call `toString` on each
+  element to convert it to a line of text in the file
+* `countByKey()` - only available on RDDs of type (K, V)
+* `foreach(func)` - Run a function `func` on each element of the dataset.
 
 ## Parquet
 
@@ -548,9 +568,30 @@ You can add in additional options like `partitionColumn`, `lowerBound`, `upperBo
 increase the throughput of the database write. For example, if you specify the number of partitions, then
 each executor can parallelize the ingestion of the data.
 
+##### Shuffle
+
+Certain operations in Spark trigger an event called the __shuffle__. The shuffle is Spark's way of re-distributing
+data so it's grouped differently across partitions. A shuffle typically involves copying data across executors
+and machines, making the shuffle a complex and costly operation.
+
+An example of this is the `reduceByKey` operation, where a new RDD is generated and all values for a single key
+are combined to a tuple. The issue is that all values for a single key might not be on the same partition, or even
+the same machine, but they have to be co-located to compute the result.
+
+This requires that Spark do an all-to-all operation, meaning it must read from all partitions to find all values
+for all keys, then bring together values across partitions to compute the final result for each key. 
+This is called the shuffle.
+
+Operations that can cause shuffles include:
+
+* `repartition`
+* `coalesce`
+* `ByKey` operations (except for counting), like `groupByKey`, `reduceByKey`, join operators like `cogroup`, `join`
+
+
 ##### Repartition
 
-You can repartition (to increase or decreate the number of partitions) with `repartition`. A repartition
+You can repartition (to increase or decreate the number of partitions) with `repartition`. A __repartition__
 does a full shuffle of the data, then creates equal sized partitions of the data.
 
     # See how many partitions
@@ -635,6 +676,45 @@ To print all elements on the driver, one can use the collect() method to first b
 thus: rdd.collect().foreach(println). This can cause the driver to run out of memory, though, because collect() 
 fetches the entire RDD to a single machine; if you only need to print a few elements of the RDD, 
 a safer approach is to use the take(): rdd.take(100).foreach(println).
+
+## Spark Broadcast and Accumulators
+
+### Broadcast
+
+With distributed computing, sometimes you want to share variables and dataframes using __broadcast__. Keep in mind
+that these variables and dataframes have to fit in memory on a single machine so keep it small. Broadcast
+variables are immutable (if you need something that changes, then use an __accumulator__). Basically, use broadcast
+variables as "static lookup tables".
+
+An example use case might be if you had an app like Foursquare, you might need to know what neighborhoods are
+around. You can ship around the small 'Neighborhood' table to each node in the cluster (instead of say doing a join
+on the checkin table with the neighborhood table because of __shuffle__).
+
+The broadcast variable is handled by a torrent-like protocol, where the variable is distributed as quickly and
+efficiently as possible by downloading what they can and uploading what they can (as opposed to one node
+having to try to do everything and push the data to all other nodes).
+
+### Accumulators
+
+__Accumulators__ are variables that are "added" to through an associative and commutative "add" operation (meaning
+operations like `sum` and `max` satisfy the conditions, but not `average`). They are a container for accumulating 
+partial values across multiple tasks (running on executors). Basically, accumulators aggregate information across executors.
+For example, we might have:
+
+    Accumulable     Value
+    counter         45
+
+So why do we need them? Why not just have a variable? Remember that we're doing distributed computing so when Spark 
+ships code to every executor, the variables become local to that node. Any updates to that variable is not relayed
+back to the driver. We need to make accumulators so we can get the values back from each executor.
+
+You can see each executor running in the Web UI and what those accumulators are (e.g. Counter: 1, Counter: 17).
+Workers only have write-only data access. Accessing the value in the accumulator is only allowed by the driver.
+
+One thing to note is that since Spark is evaluated lazily, we need an __action__ to happen otherwise the
+transformation will not be executed (e.g. a `map()` is a lazy transformation so accumulator update is not 
+guaranteed if inside a map). Spark guarantees to update accumulators inside actions only once.
+If a task is restarted, there may be undesirable side effects like accumulators being updated more than once.
 
 ### Apache Toree
 
