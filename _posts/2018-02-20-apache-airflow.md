@@ -57,7 +57,7 @@ Then you can access the web gui with `https:localhost:8080`
 ### Airflow Admin Connections
 
 In the Airflow Admin (e.g. `https://localhost:8079/admin/connection/`), select your connection (e.g. 'mysql_default')
-and edit the info. Change the following to your connection information, e.g:
+(or define your own), then create or edit this information. E.g. change the following to your connection information:
 
     host : my_db 
     Schema : airflow
@@ -202,6 +202,16 @@ If you run a DAG on a `schedule_interval` of one day, then the run stamped `2016
 It's very important to note: The scheduler runs your job one __schedule_interval__ AFTER the start date,
 at the END of the period.
 
+#### Dag Views
+
+You can view DAGs through the GUI, with the following views:
+
+* `Graph View` shows you how your DAG runs from left to right. I found this the most intuitive for order of operations.
+* `Tree View` is not as intuitive, but shows you the run times and whether those were successful. It's not as
+  intuitive to me because your first task starts on the bottom (like a tree root) and goes upwards for downstream
+  tasks. Basically your first tasks start on the bottom and your last tasks appear on top.
+* `Gantt View` shows each task and how long it took to complete
+
 ### Operators 
 
 While __DAGS__ describe _HOW_ to run a workflow, __Operators__ determining what actually gets done. 
@@ -217,7 +227,13 @@ Operators describe a single task in a workflow, with common operators including:
 * `SparkSubmitOperator`
 * `SparkSubmitHook`
 * `Sensor` - waits for a certain time, file, database row, S3 key, etc.
+* `SqlSensor` - runs a sql statement until a criteria is met; it will keep trying while sql returns no row, or if
+  the first cell is one of the following values: `(0, '0', '')`
 * `S3FileTransferOperator`
+* `ShortCircuitOperator` - derived from the Python operator, the workflow continues only if a condition is met,
+  otherwise the workflow "short circuits" and downstream tasks are skipped. Any downstream tasks are marked as
+  a state of "skipped". If the condition is True, downstream tasks proceed as normal. Useful if you have heavy tasks
+  that you want to skip to save compute resources
 
 #### When to split out multiple operators
 
@@ -269,11 +285,36 @@ Clear - Clear a set of task instances, as if they never ran
 
 Hooks are interfaces to external platforms and databases like S3, MySQL, Postgres, HDFS.
 Hooks keep authentication code and information out of pipelines, centralized in the metadata database.
+Hooks use the `airflow.models.Connection` model.
 
 For example:
 
     conn = MySqlHook(conn_name_attr='my_db')
     conn.bulk_load(table_name, local_filepath)
+
+#### Hooks and Connections
+
+If we want to store a password in a Hook (encrypted with fernet key), you can do the following:
+
+Create a Connection (with encrypted password) like so:
+
+    from airflow.models import Connection
+    def create_conn(username, password, host=None):
+        new_conn = Connection(conn_id=f'{username}_connection',
+                                      login=username,
+                                      host=host if host else None)
+        new_conn.set_password(password)
+
+Access the Connection (and password) like so:
+
+    from airflow.hooks.base_hook import BaseHook
+
+    connection = BaseHook.get_connection("username_connection")
+    # this connection gives you the host, login, and password for your db connection
+
+    password = connection.password # This is a getter that returns the unencrypted password.
+
+We do this over an Airflow variable so that we get an encrypted password.
 
 ### Pools
 
