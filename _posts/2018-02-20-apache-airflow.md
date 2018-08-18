@@ -23,6 +23,17 @@ While the installation is pretty straightforward, getting it to work is a little
     pip install apache-airflow[mysql]
     pip install apache-airflow[rabbitmq]
 
+## Docker
+
+A good Docker container setup is here:
+
+https://github.com/puckel/docker-airflo://github.com/puckel/docker-airflow
+
+## Resources
+
+* https://medium.com/@rchang/a-beginners-guide-to-data-engineering-part-i-4227c5c457d7
+* https://github.com/jghoman/awesome-apache-airflow
+
 ### RabbitMQ
 
 I had issues with this rabbitmq so I built rabbitmq: 
