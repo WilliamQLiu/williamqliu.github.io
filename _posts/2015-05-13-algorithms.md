@@ -23,6 +23,8 @@ title: Algorithms
     -  [Log N Runtimes](#lognruntimes)
     -  [Recursive Runtimes](#recursiveruntimes)
     -  [Space Complexity](#bigospace)
+*  [Primitive Types](#primitivetypes)
+    -  [Bitwise Operators](#bitwiseoperators)
 *  [Arrays and Strings](#arraysandstrings)
     -  [Hashing](#hashing)
         +  [Hash Table](#hashtable)
@@ -128,22 +130,23 @@ of input__.  See __Big O__ for further details.
 
 1. the __size of input__ normally means looking at the _number of items
 in the input_; for other problems like multiplying integers, we look at
-the _total number of bits_ used.  2. the __running time__ is the number of
-'steps' (i.e. the number of times something is executed).
+the _total number of bits_ used.
+2. the __running time__ is the number of 'steps' (i.e. the number of 
+times something is executed).
 
 ####<a id="algorithmstable">Is a sorting algorithm stable?</a>
 
 For sorting algorithms, you might hear that one type is 'stable' while
 others are 'unstable'.
 
-* A stable sorting algorithm keeps the original order of the input set,
+* A __stable sorting algorithm__ keeps the original order of the input set,
 which only matters when two elements are equal (say sorting cards by
-value, but we have two 5's, one of hearts and one of diamond).  * An
-unstable sorting algorithm does not keep the original order of the input
+value, but we have two 5's, one of hearts and one of diamond).
+* An __unstable sorting algorithm__ does not keep the original order of the input
 set, so if you sorted the same cards from above, the order might not
-be preserved (e.g. 5 of diamonds comes before 5 of hearts) * Things end
-up being a tradeoff, with stable sorting usually being less efficient,
-but sometimes you need the original order preserved.
+be preserved (e.g. 5 of diamonds comes before 5 of hearts)
+* Things end up being a tradeoff, with stable sorting usually being 
+less efficient, but sometimes you need the original order preserved.
 
 ##<a id="bigo">Big O</a>
 
@@ -267,6 +270,86 @@ caches, and parallelism (single, multiple cores).
 
 The general rule is if we need to create an array of size `n`, we would
 require `O(n)` space.
+
+##<a id="primitivetypes">Primitive Types</a>
+
+A program updates variables in memory according to code. Variables
+come in __types__, a classification of data saying what the possible
+values are and what operations can be performed on it (e.g. add a
+number, check the length of a string). In Python, everything is
+an object, including different types like:
+
+* __numerics__ (Boolean, integers)
+* __sequences__ (lists)
+* __mappings__ (dict)
+* __classes__
+* __instances__
+* __exceptions__
+
+###
+
+###<a id="bitwiseoperators">Bitwise Operators</a>
+
+__Bitwise operators__ act on operands as if they were a string of binary
+digits. It operates bit by bit, meaning we have `O(1)` computations per
+bit and a time complexity of `O(n)`. Common bitwise operators in Python are:
+
+    &  # bitwise AND, e.g. x& y =0      (0000 0000)
+    |  # bitwise OR, e.g. x | y = 14    (0000 1110)
+    ~  # bitwise NOT, e.g. ~x = -11     (0000 0101)
+    ^  # bitwise XOR, e.g. x ^ y = 14   (0000 1110)
+    >> # bitwise right shift, x>> 2 = 2 (0000 0010)
+    << # bitwise left shift, x<< 2 = 40 (0010 1000)
+
+So what exactly does a bitwise operator do?
+
+* AND is 1 only if both of its inputs are 1, otherwise it's 0.
+* OR is 1 if one or both of its inputs are 1, otherwise it's 0.
+* XOR is 1 only if exactly one of its inputs are 1, otherwise it's 0.
+* NOT is 1 only if its input is 0, otherwise it's 0.
+
+These can appear as a truth table:
+
+    AND | 0 1     OR | 0 1     XOR | 0 1    NOT | 0 1
+    ----+-----    ---+----     ----+----    ----+----
+     0  | 0 0      0 | 0 1       0 | 0 1        | 1 0
+     1  | 0 1      1 | 1 1       1 | 1 0
+
+An example would be if you only wanted the lower 4 bits of an integer, you `AND`
+it with 15 (binary `1111`). The zero bits act as a filter, forcing the bits in
+the result to be zero as well.
+
+        201: 1100 1001
+    AND  15: 0000 1111
+    ------------------
+     IS   9  0000 1001
+
+In addition, >> and << are often included as bitwise operators, and they 
+"shift" a value respectively right and left by a certain number of bits, 
+throwing away bits that roll of the end you're shifting towards, and 
+feeding in zero bits at the other end.
+
+    1001 0101 >> 2 gives 0010 0101
+    1111 1111 << 4 gives 1111 0000
+
+Note that with Python, a left shift simply expands the width of the
+number for the extra bits (whereas other languages drop off the extra bits).
+
+###<a id="numericmethods">Numeric Methods</a>
+
+Key methods for numeric types are:
+
+* `abs(-35)`
+* `math.ceil(2.17)`
+* `math.floor(3.14)`
+* `min(x, -4)`  # returns the minimum number out of these
+* `max(3.14, y)`  # returns the maximum number out of these
+* `pow(2.71, 3.14)`  # same as `2.71 ** 3.14`
+* `math.sqrt(225)`
+* float(`inf`)  # floats are not inifnite precision, use this to refer to infinity
+* float(`-inf`)  # floats are not inifnite precision, use this to refer to negative infinity
+* `math.isclose()`  # for comparing floating point values, returns True or False
+* random.randrange(5, 10, 2)`  # e.g. returns 7, random number from 5 to 10 with increments of 2
 
 ##<a id="arraysandstrings">Arrays and Strings</a>
 
