@@ -118,8 +118,8 @@ to Algorithms' by Thome H. Cormen.
 An algorithm is correct if _every_ input instance halts with the correct
 output.  A single input is an __instance of a problem__.  For example:
 
-    // an instance of a problem Input Sequence of {31, 41, 59, 26, 41,
-    58} Output Sequence of {26, 31, 41, 41, 58, 59}
+    // an instance of a problem Input Sequence of {31, 41, 59, 26, 41, 58}
+    // Output Sequence of {26, 31, 41, 41, 58, 59}
 
 ####<a id="algorithmefficient">Is the algorithm efficient?</a>
 
@@ -131,7 +131,7 @@ of input__.  See __Big O__ for further details.
 1. the __size of input__ normally means looking at the _number of items
 in the input_; for other problems like multiplying integers, we look at
 the _total number of bits_ used.
-2. the __running time__ is the number of 'steps' (i.e. the number of 
+2. the __running time__ is the number of 'steps' (i.e. the number of
 times something is executed).
 
 ####<a id="algorithmstable">Is a sorting algorithm stable?</a>
@@ -145,7 +145,7 @@ value, but we have two 5's, one of hearts and one of diamond).
 * An __unstable sorting algorithm__ does not keep the original order of the input
 set, so if you sorted the same cards from above, the order might not
 be preserved (e.g. 5 of diamonds comes before 5 of hearts)
-* Things end up being a tradeoff, with stable sorting usually being 
+* Things end up being a tradeoff, with stable sorting usually being
 less efficient, but sometimes you need the original order preserved.
 
 ##<a id="bigo">Big O</a>
@@ -182,15 +182,18 @@ Common __O Notation__ runtimes are below (from the fastest first to
 slowest last):
 
 *  `O(1)` - __constant__; e.g. check if a number is even or odd (uses
-a constant-size lookup or hash table) *  `O(log N)` - __logarithmic__;
-e.g. find an item in a sorted array with a binary search (because we
-split in half) *  `O(N)` - __linear__; e.g. find an item in an unsorted
-list *  `O(N log N)` - __loglinear__; e.g. heapsort, quicksort (best
-and avg case), merge sort *  `O(N^2)` - __quadratic__; e.g. selection
-sort, insertion sort, worst case for bubble sort, quicksort *  `O(2^N)`
-- __exponential__; e.g. finding exact solution to traveling salesman
-problem using dynamic programming *  `O(N!)` - __factorial__; e.g. solving
-traveling salesman problem via brute-force search
+    a constant-size lookup or hash table)
+*  `O(log N)` - __logarithmic__; e.g. find an item in a sorted array
+    with a binary search (because we split in half)
+*  `O(N)` - __linear__; e.g. find an item in an unsorted list
+*  `O(N log N)` - __loglinear__; e.g. heapsort, quicksort (best and avg case),
+    merge sort
+*  `O(N^2)` - __quadratic__; e.g. selection sort, insertion sort,
+    worst case for bubble sort, quicksort
+*  `O(2^N)` - __exponential__; e.g. finding exact solution to traveling salesman
+    problem using dynamic programming
+*  `O(N!)` - __factorial__; e.g. solving traveling salesman problem via
+    brute-force search
 
 A good cheatsheet is [here](http://bigocheatsheet.com/ "Big O Cheatsheet")
 
@@ -199,10 +202,10 @@ A good cheatsheet is [here](http://bigocheatsheet.com/ "Big O Cheatsheet")
 When evaluating time, we can look at the __O Notation__ a few different
 ways.
 
-*  __big omega__ looks at the __worst-case running time__; this is the
-norm *  __big theta__ looks at the __average-case running time__; this
-is usually used for _probabilistic analysis_.  *  __big O (aka O)__
-looks at the __best-case running time__.
+*  __big omega__ looks at the __worst-case running time__; this is the norm
+*  __big theta__ looks at the __average-case running time__; this
+   is usually used for _probabilistic analysis_.
+*  __big O (aka O)__ looks at the __best-case running time__; not usually used
 
 ####<a id="bigoasymptotic">Asymptotic Notation</a>
 
@@ -211,10 +214,9 @@ notation__ runtime, which is how the algorithm runtime scales for
 very large inputs and not in the minute details or small inputs.
 This means we:
 
-*  Drop the Constants (e.g. `O(2N)` is actually `O(N)`) *  Drop the
-Non-Dominant Terms (e.g. `O(N^2 + N^2)` is actually `O(N^2)`)
-    -  E.g. `O(N + log N)` becomes `O(N)` -  E.g. `O(N^2 + N)` becomes
-    `O(N^2)`
+*  Drop the Constants (e.g. `O(2N)` is actually `O(N)`)
+*  Drop the Non-Dominant Terms (e.g. `O(N^2 + N^2)` is actually `O(N^2)`)
+    -  E.g. `O(N + log N)` becomes `O(N)` -  E.g. `O(N^2 + N)` becomes `O(N^2)`
 *  Keep the terms that grow bigger when `N` approaches `infinity`
 
 __Add or Multiple__
@@ -242,19 +244,24 @@ array, the options are:
 
 The runtime for this looks like this (say given an N-element array of 16):
 
-1. N=16 # divide by 2 2. N=8  # divide by 2 3. N=4  # divide by 2 4. N=2
+1. N=16 # divide by 2
+2. N=8  # divide by 2
+3. N=4  # divide by 2 4. N=2
 # divide by 2 5. N=1  # divide by 2
 
 We could reverse this to say how many times can we multiply by 2 until
 we get N?
 
-1. N=1  # multiply by 2 2. N=2  # multiply by 2 3. N=4  # multiply by
-2 4. N=8  # multiply by 2 5. N=16 # multiply by 2
+1. N=1  # multiply by 2
+2. N=2  # multiply by 2
+3. N=4  # multiply by 2
+4. N=8  # multiply by 2
+5. N=16 # multiply by 2
 
 We then get `2^k=N`, which is what `log` expresses.  For example:
 
-*  `2^4=16`, which is `logBase(16,2)=4`  where `logBase(value, base)` *
-`logBase(N,2)=k`, which is `2^k=N`
+*  `2^4=16`, which is `logBase(16,2)=4`  where `logBase(value, base)`
+* `logBase(N,2)=k`, which is `2^k=N`
 
 ####<a id="bigorecursive">Recursive Runtimes</a>
 
@@ -322,9 +329,9 @@ the result to be zero as well.
     ------------------
      IS   9  0000 1001
 
-In addition, >> and << are often included as bitwise operators, and they 
-"shift" a value respectively right and left by a certain number of bits, 
-throwing away bits that roll of the end you're shifting towards, and 
+In addition, >> and << are often included as bitwise operators, and they
+"shift" a value respectively right and left by a certain number of bits,
+throwing away bits that roll of the end you're shifting towards, and
 feeding in zero bits at the other end.
 
     1001 0101 >> 2 gives 0010 0101
@@ -372,9 +379,9 @@ It's good to know what the max size is on your machine using `sys.maxsize` and `
     +>>> sys.maxsize
     9223372036854775807
     +>>> sys.float_info
-    sys.float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308, 
+    sys.float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308,
     min_exp=-1021, min_10_exp=-307, dig=15, mant_dig=53, epsilon=2.220446049250313e-16, radix=2, rounds=1)
-     
+
 
 ###<a id="computingparity">Computing the Pairity of a Word</a>
 
@@ -388,6 +395,20 @@ Parity checks are used to detect single bit errors in data storage and communica
         00101100  x
         00101011  x-1
         00101000  result
+
+###<a id="builtintypes">Built-in Types</a>
+
+Python has a few built-in types. This is for Python 3.6:
+
+* Numeric Types - int, float, complex
+* Iterator Types
+* Sequence Types - list, tuple, range
+* Text Sequence Type - str
+* Binary Sequence Types - bytes, bytearray, memoryview
+* Set Types - set, frozenset
+* Mapping Types - dict
+
+https://docs.python.org/3.6/library/index.html
 
 ##<a id="arraysandstrings">Arrays and Strings</a>
 
@@ -614,8 +635,7 @@ Here is some sample code for a hash table implementation:
 
 
     import unittest from nose.tools import assert_equal, assert_not_equal,
-    assert_true, \
-                           assert_false
+    assert_true, assert_false
 
 
     class TestUnitHashTable(unittest.TestCase):
@@ -626,8 +646,7 @@ Here is some sample code for a hash table implementation:
             # char, int scenario self.b = SlotItem(1, 1)  # int, int
             scenario self.c = SlotItem('f', 'morestuff')  # char, char
             scenario self.ht.table = [[self.a], [self.b], [], [self.c],
-            [], [], [], [],
-                             [], [], []]
+                                      [], [], [], [], [], [], []]
 
         def test_keys_can_be_integers(self):
             try:
@@ -638,8 +657,7 @@ Here is some sample code for a hash table implementation:
         def test_keys_can_be_characters(self):
             try:
                 # hello = 104*1 + 101*2 + 108*3 + 108*4 + 111*5 = 1617 =>
-                %11=0 self.ht.set('hello', 'world')  # pos: 'hello'(0),
-                value: 'world'
+                %11=0 self.ht.set('hello', 'world')  # pos: 'hello'(0), value: 'world'
             except TypeError:
                 self.fail("UT: Hashing func cannot handle key with chars")
 
@@ -654,8 +672,7 @@ Here is some sample code for a hash table implementation:
             try:
                 self.ht.set('a1b3e', 'somevalue')
             except TypeError:
-                self.fail("UT: Hashing func cannot handle key with ints
-                & chars")
+                self.fail("UT: Hashing func cannot handle key with ints & chars")
 
         def test_hashes_anagram_keys_to_different_buckets(self):
             """ Ensure hashing of keys with anagrams turns out unique
@@ -676,12 +693,12 @@ Here is some sample code for a hash table implementation:
             assert_equal(value5, value1)
 
         def test_identify_empty_hash_table_index(self):
-            bucket2 = self.ht.table[2] assert_false(bucket2)  # Check
-            if list in this bucket is empty
+            # Check if list in this bucket is empty
+            bucket2 = self.ht.table[2] assert_false(bucket2)
 
         def test_identify_filled_hash_table_index(self):
-            bucket1 = self.ht.table[1] assert_true(bucket1)  # Check if
-            list in this bucket is empty
+            # Check if list in this bucket is empty
+            bucket1 = self.ht.table[1] assert_true(bucket1)
 
         def test_get_existing_hash_table_item(self):
             value = self.ht.get('hello') assert_equal(value, 1112223333)
@@ -694,14 +711,13 @@ Here is some sample code for a hash table implementation:
             assert_equal(self.ht.get(16), 'abc')
 
         def test_set_data_on_existing_hash_table_slot(self):
-            assert_equal(self.ht.get('f'), 'morestuff') self.ht.set('f',
-            'differentstuff') assert_equal(self.ht.get('f'),
-            'differentstuff')
+            assert_equal(self.ht.get('f'), 'morestuff')
+            self.ht.set('f', 'differentstuff')
+            assert_equal(self.ht.get('f'), 'differentstuff')
 
         def test_remove_data_on_existing_key_with_value(self):
             assert_equal(self.ht.get('hello'), 1112223333)
-            self.ht.remove('hello') assert_equal(self.ht.get('hello'),
-            None)
+            self.ht.remove('hello') assert_equal(self.ht.get('hello'), None)
 
         def test_remove_data_on_nonexisting_key(self):
             try:
@@ -711,36 +727,34 @@ Here is some sample code for a hash table implementation:
                 raise
 
         def test_set_load_factor_high(self):
-            assert_equal(self.ht.size, 11) self.ht.table = [[self.a],
-            [self.b], [self.a], [self.c], [self.a],
-                             [self.c], [], [self.a], [self.a], [self.b],
-                             []]
-            self.ht.set(10, 'here') # TODO: if more time,
-            trigger auto resize #assert_equal(self.ht.size, 22)
-            #assert_equal(self.ht.get(10), 'here')  # check value here
-            after resize
-
-        # TODO: check hash value not too high # TODO: check uniform
-        distribution of values
+            assert_equal(self.ht.size, 11)
+            self.ht.table = [[self.a], [self.b], [self.a], [self.c], [self.a],
+                             [self.c], [], [self.a], [self.a], [self.b], []]
+            self.ht.set(10, 'here')
+            # TODO: if more time, trigger auto resize
+            #assert_equal(self.ht.size, 22)
+            #assert_equal(self.ht.get(10), 'here')  # check value here after resize
+            # TODO: check hash value not too high
+            # TODO: check uniform distribution of values
 
     class TestFunHashTable(object):
         """ Functional Tests - Test all pieces together from end to end
         """
 
         def test_end_to_end(self):
-            hash_table = HashTable(11) print "FT: Created Hash Table of
-            size, ", hash_table.size
+            hash_table = HashTable(11)
+            print "FT: Created Hash Table of size, ", hash_table.size
 
             print "FT: Default value type at slot 0 is None"
             assert_equal(hash_table.get(0), None)
 
             print "FT: Setting value in slot 13 (i.e. 13%11=2)
-            with value dee" hash_table.set(13, 'dee')
+            with value "dee":
+                hash_table.set(13, 'dee')
             assert_equal(hash_table.get(13), 'dee')
 
             print "FT: Adding value in slot 3 with value dee"
-            hash_table.set(3, 'dee') assert_equal(hash_table.get(3),
-            'dee')
+            hash_table.set(3, 'dee') assert_equal(hash_table.get(3), 'dee')
 
             print "FT: Checking that two values are the same"
             assert_equal(hash_table.get(13), hash_table.get(3))
@@ -750,9 +764,10 @@ Here is some sample code for a hash table implementation:
 
 
     class SlotItem(object):
-        """ An items in the same hash table slot """ def __init__(self,
-        key, value):
-            self.key = key self.value = value
+        """ An items in the same hash table slot """
+        def __init__(self, key, value):
+            self.key = key
+            self.value = value
 
         def __str__(self):
             return self.key
@@ -765,7 +780,8 @@ Here is some sample code for a hash table implementation:
         """
 
         def __init__(self, size):
-            self.size = size self.table = [[]] * self.size
+            self.size = size
+            self.table = [[]] * self.size
 
         def hash_function(self, key):
             """
@@ -778,9 +794,8 @@ Here is some sample code for a hash table implementation:
             if type(key) is int or type(key) is long:  # numbers only
                 return key % self.size
             else:
-                total = 0  # characters involved for position in
-                xrange(len(key)):
-                    total = total + (ord(key[position]) * (position+1))
+                total = 0  # characters involved for position in xrange(len(key)):
+                total = total + (ord(key[position]) * (position+1))
                 return total % self.size
 
         def set(self, key, value):
@@ -792,14 +807,14 @@ Here is some sample code for a hash table implementation:
             for slot in self.table[index]:  # look inside slot for key
                 if slot.key == key:  # key found, replace current value
                     slot.value = value return
-            self.table[index].append(SlotItem(key, value))  # key not
-            found, add
+            self.table[index].append(SlotItem(key, value))  # key not found, add
 
             self.check_load_factor(upper_limit=.8, resize=2)
 
         def get(self, key):
             """ Finds slot with hash_function, returns slot value or
-            else None """ index = self.hash_function(key)
+            else None """
+            index = self.hash_function(key)
 
             for slot in self.table[index]:  # look inside slot for key
                 if slot.key == key:  # key found, return current value
@@ -808,8 +823,8 @@ Here is some sample code for a hash table implementation:
 
         def remove(self, key):
             """ Given a key, remove the key-value pair """
-            index = self.hash_function(key) for i, slot in
-            enumerate(self.table[index]):
+            index = self.hash_function(key)
+            for i, slot in enumerate(self.table[index]):
                 if slot.key == key:  # key found, return current value
                     del self.table[index][i]
 
@@ -822,14 +837,12 @@ Here is some sample code for a hash table implementation:
                     if slot:
                         load += 1
 
-            load_factor = float(load)/float(self.size) #print "Load
-            factor is ", load_factor
+            load_factor = float(load)/float(self.size)
+            #print "Load factor is ", load_factor
 
-            if load_factor > upper_limit:  # need to resize for larger
-            hash table
+            if load_factor > upper_limit:  # need to resize for larger hash table
                 print "Load Factor is past upper limit, you should resize"
-                # TODO: Create deepcopy, dynamically resize for high
-                and low limit
+                # TODO: Create deepcopy, dynamically resize for high and low limit
 
             else:
                 pass  # load_factor is in acceptable limits
@@ -841,7 +854,8 @@ Here is some sample code for a hash table implementation:
         unittest.TestLoader().loadTestsFromTestCase(TestUnitHashTable)
         unittest.TextTestRunner(verbosity=2).run(suite)
 
-        A = TestFunHashTable() A.test_end_to_end()
+        A = TestFunHashTable()
+        A.test_end_to_end()
 
 ##<a id="linkedlists">Linked Lists</a>
 
@@ -933,7 +947,8 @@ recursive algorithm must call itself, recursively.
 __Recursive Example of calculating the Fibonacci number__
 
     def fib(n):
-        """ return the Fibonacci number """ if n==0:
+        """ return the Fibonacci number """
+        if n==0:
             return 0
         elif n==1:
             return 1
@@ -949,7 +964,8 @@ __Recursive Example of Removing Duplicates Letters next to each other__
             return removeDups(word[1:])
         else:
             return word[0] + removeDups(word[1:])
-    word = 'aaaabbbbbcccdd' print word print removeDups(word)  # abcd
+        word = 'aaaabbbbbcccdd'
+        print word print removeDups(word)  # abcd
 
 Other examples of recursive problems include:
 
@@ -1007,24 +1023,24 @@ Example Code:
 
     def insertionSort(mylist):
         for index in range(1, len(mylist)):
-            print "Index is ", index  # 1, 2, 3, 4, 5, 6, 7, 8; this is
-            the outer loop
+            print "Index is ", index  # 1, 2, 3, 4, 5, 6, 7, 8; this is the outer loop
 
             # setup first case (only one item) currentvalue =
             mylist[index] position = index
 
-            # this is the inner loop, loops through the sorted list
-            backwards and compares values while position > 0 and
-            mylist[position-1] > currentvalue:
-                mylist[position] = mylist[position-1] position = position
-                - 1
+            # this is the inner loop, loops through the sorted list backwards and compares values
+            while position > 0 and mylist[position-1] > currentvalue:
+                mylist[position] = mylist[position-1] position = position - 1
 
-            mylist[position] = currentvalue  # found spot in inner sorted
-            loop to place item
+            # found spot in inner sorted loop to place item
+            mylist[position] = currentvalue
+
 
     if __name__ == '__main__':
-        mylist = [54,26,93,17,77,31,44,55,20] print "Original: ", mylist
-        insertionSort(mylist) print "Insertion Sorted: ", mylist
+        mylist = [54,26,93,17,77,31,44,55,20]
+        print "Original: ", mylist
+        insertionSort(mylist)
+        print "Insertion Sorted: ", mylist
 
 So why would you want one of the O(n^2) algorithms when there are O(n
 log n) algorithms? Well, insertion sort is good when:
@@ -1045,18 +1061,19 @@ are in the wrong order.
 
 Here is a sample run:
 
-    # first pass 5 1 4 2 8  # original 1 5 4 2 8  # swap the first pair
-    (5, 1) 1 4 5 2 8  # check to swap the next pair (4, 5), but no swap
-    needed (4 < 5) 1 4 2 5 8  # swap 5 and 2 1 4 2 5 8  # check to swap
-    the next pair (5, 8), but no swap needed (5 < 8)
+    # first pass 5 1 4 2 8
+    # original 1 5 4 2 8
+    # swap the first pair
+    (5, 1) 1 4 5 2 8  # check to swap the next pair (4, 5), but no swap needed
+    (4 < 5) 1 4 2 5 8  # swap 5 and 2 1 4 2 5 8
+    # check to swap the next pair (5, 8), but no swap needed (5 < 8)
 
-    # second pass 1 4 2 5 8 1 2 4 5 8  # swap 2 and 4 1 2 4 5 8  # check
-    to swap the next pair (4, 5), but no swap needed (4 < 5) 1 2 4 5 8  #
-    check to swap the next pair (5, 8), but no swap needed (5 < 8)
+    # second pass 1 4 2 5 8 1 2 4 5 8
+    # swap 2 and 4 1 2 4 5 8
+    # check to swap the next pair (4, 5), but no swap needed
+    (4 < 5) 1 2 4 5 8  # check to swap the next pair (5, 8), but no swap needed (5 < 8)
 
-    # third pass checks through each pair, but no swaps needed since
-    its sorted
-
+    # third pass checks through each pair, but no swaps needed since its sorted
 
 For example, say we were sorting scrabble tiles into alphabetical order.
 
@@ -1076,13 +1093,15 @@ Example Code
 
     # Bubble Sort def bubbleSort(mylist):
         for passnum in range(len(mylist)-1, 0, -1):
-            #print passnum  # backwords (8,7,6,..2,1) b/c other items
-            are already sorted for i in range(passnum):
+            #print passnum
+            # backwords (8,7,6,..2,1) b/c other items are already sorted
+            for i in range(passnum):
                 if mylist > mylist[i+1]:  # compare neighbors
                     mylist, mylist[i+1] = mylist[i+1], mylist  # swap
 
     if __name__ == '__main__':
-        mylist = [54,26,93,17,77,31,44,55,20] print "Original: ", mylist
+        mylist = [54,26,93,17,77,31,44,55,20]
+        print "Original: ", mylist
         bubbleSort(mylist) print "Bubble Sorted: ", mylist
 
 ####<a id="selectionsort">Incremental: selection sort</a>
@@ -1097,14 +1116,15 @@ largest value was).
 
 Here is an example run:
 
-    #sorted | unsorted 64 25 12 22 11  # initial state 11|25 12 22 64  #
-    find smallest value (11) and swap with first element (64) 11 12|25 22
-    64  # find next smallest value from unsorted (12) and compare with
-    second element (25), do swap (12 < 25) 11 12 22|25 64  # find next
-    smallest value from unsorted (22) and compare with third element
-    (25), do swap (22 < 25) 11 12 22 25|64  # find next smallest value
-    from unsorted (25) and compare with fourth element (25), no need to
-    swap (25 < 64) 11 12 22 25 64| # all sorted
+    #sorted | unsorted 64 25 12 22 11
+    # initial state 11|25 12 22 64
+    # find smallest value (11) and swap with first element (64) 11 12|25 22 64
+    # find next smallest value from unsorted (12) and compare with second element (25),
+      do swap (12 < 25) 11 12 22|25 64
+    # find next smallest value from unsorted (22) and compare with third element
+      (25), do swap (22 < 25) 11 12 22 25|64  # find next smallest value
+    #from unsorted (25) and compare with fourth element (25), no need to swap (25 < 64) 11 12 22 25 64|
+    # all sorted
 
 Similar to bubble sort, after the initial pass, the largest item appears
 in place.  The final item is in place after `n-1` passes to sort `n`
@@ -1116,22 +1136,22 @@ do as many exchanges.  Big O Runtime is still `O(n^2)`.
 
     def selectionSort(mylist):
         for fillslot in range(len(mylist)-1, 0, -1):
-            #print fillslot  # backwords (8,7,6,..2,1) b/c other items
-            are already sorted positionOfMax = 0 for i in range(1,
-            fillslot+1):
-                if mylist[i] > mylist[positionOfMax]:  # is value greater
-                than value at max
+            #print fillslot
+            # backwords (8,7,6,..2,1) b/c other items are already sorted
+            positionOfMax = 0 for i in range(1, fillslot+1):
+                if mylist[i] > mylist[positionOfMax]:  # is value greater than value at max
                     positionOfMax = i
 
             # to move the largest value to the largest index,
-            we 'swap' the item # currently in the largest index
-            position mylist[fillslot], mylist[positionOfMax] =
-            mylist[positionOfMax], mylist[fillslot]
+            # we 'swap' the item # currently in the largest index
+            position mylist[fillslot], mylist[positionOfMax] = mylist[positionOfMax], mylist[fillslot]
 
 
     if __name__ == '__main__':
-        mylist = [54,26,93,17,77,31,44,55,20] print "Original: ", mylist
-        selectionSort(mylist) print "Selection Sorted: ", mylist
+        mylist = [54,26,93,17,77,31,44,55,20]
+        print "Original: ", mylist
+        selectionSort(mylist)
+        print "Selection Sorted: ", mylist
 
 
 The algorithm can be changed to swap out for the smallest item instead of
@@ -1161,18 +1181,24 @@ the first element of each list.
 
 Here is an example run:
 
-    k     i       j 0 1 2 3 4 5 6 7  # position 9 7 3 8 4 5 6 2  #
-    original values in list
+    # k     i       j
+    # 0 1 2 3 4 5 6 7
+    # position 9 7 3 8 4 5 6 2
+    # original values in list
 
-    # start splitting up (divide by two) 9 7 3 8 | 4 5 6 2  # divide into
-    two lists 9 7 | 3 8 | 4 5 | 6 2  # divide by two again into four lists
-    9 | 7 | 3 | 8 | 4 | 5 | 6 | 2  # divide until all items are separated
+    # start splitting up (divide by two) 9 7 3 8 | 4 5 6 2
+    # divide into two lists
+    9 7 | 3 8 | 4 5 | 6 2
 
-    # now merge back with the merged pairs sorted 7 9 | 3 8 | 4 5 |
-    2 6  # merge from single items to pairs that are sorted 3 7 8 9 |
-    2 4 5 6  # merge again, key is that we only compare first item from
-    each list (since they are sorted) 2 3 4 5 6 7 8 9 # combine again,
-    get final sorted list
+    # divide by two again into four lists
+    9 | 7 | 3 | 8 | 4 | 5 | 6 | 2
+    # divide until all items are separated
+
+    # now merge back with the merged pairs sorted 7 9 | 3 8 | 4 5 | 2 6
+    # merge from single items to pairs that are sorted 3 7 8 9 | 2 4 5 6
+    # merge again, key is that we only compare first item from each list (since they are sorted)
+    2 3 4 5 6 7 8 9
+    # combine again, get final sorted list
 
 For example, if we want to sort a hand of playing cards:
 
@@ -1193,13 +1219,13 @@ Example Code:
         print "Splitting", mylist
 
         if len(mylist) > 1:
-            mid = len(mylist) // 2 lefthalf = mylist[:mid] righthalf =
-            mylist[mid:]
+            mid = len(mylist) // 2 lefthalf = mylist[:mid] righthalf = mylist[mid:]
 
             mergeSort(lefthalf) mergeSort(righthalf)
 
             # below code merges the two smaller sorted lists to larger
-            sorted list i = 0  # left half index j = 0  # right half
+            sorted list i = 0  # left half index j = 0
+            # right half
             index k = 0  # main / large sorted list
 
             while i < len(lefthalf) and j < len(righthalf):
@@ -1212,18 +1238,20 @@ Example Code:
                     j += 1
                 k += 1
 
-            # insert remaining values from lefthalf while i <
-            len(lefthalf):
+            # insert remaining values from lefthalf
+            while i < len(lefthalf):
                 mylist[k] = lefthalf[i] i += 1 k += 1
 
-            # insert remaining values from righthalf while j <
-            len(righthalf):
+            # insert remaining values from righthalf
+            while j < len(righthalf):
                 mylist[k] = righthalf[j] j += 1 k += 1
         print "Merging", mylist
 
     if __name__ == '__main__':
-        mylist = [54,26,93,17,77,31,44,55,20] print "Original: ", mylist
-        mergeSort(mylist) print "Merge Sorted: ", mylist
+        mylist = [54,26,93,17,77,31,44,55,20]
+        print "Original: ", mylist
+        mergeSort(mylist)
+        print "Merge Sorted: ", mylist
 
 
 ####<a id="quicksort">Divide and Conquer: quick sort</a>
@@ -1436,31 +1464,34 @@ or may not have links back to their parent nodes.
 __Real life examples of trees__
 
 *  A web site
-    -  Starts at `<html>` -  Next level has `<head>` node and `<body>`
-    node -  `<head>` splits into `<meta>` and `<title>`; `<body>` splits
-    into `<h1>` and `<h2>`
+    -  Starts at `<html>` -  Next level has `<head>` node and `<body>` node
+    -  `<head>` splits into `<meta>` and `<title>`; `<body>` splits into `<h1>` and `<h2>`
 *  File system on a computer (e.g. UNIX)
-    -  Starts at `/` -  Next level has `dev/`, `etc/`, `usr/`, `var/`,
-    etc.
+    -  Starts at `/` -  Next level has `dev/`, `etc/`, `usr/`, `var/`, etc.
 
 __Pieces of Trees__
 
 *  __Node__ has a name (the __key__) and can also contain additional
 information (the __payload__).  The highest node is the __root node__,
-which has no parent.  *  __Edge__ - an edge connects two nodes to show
-that there is a relationship between them.  Every node except the root
-node has one incoming edge from another node.  Each node can have several
-outgoing edges.  *  __Path__ - a path is an ordered list of nodes that are
-connected by edges.  E.g. `C:` -> `Users\` -> `WLiu` -> `My Documents` *
+which has no parent.
+*  __Edge__ - an edge connects two nodes to show that there is a
+relationship between them.  Every node except the root node has one
+incoming edge from another node.  Each node can have several
+outgoing edges.
+*  __Path__ - a path is an ordered list of nodes that are connected by edges
+    E.g. `C:` -> `Users\` -> `WLiu` -> `My Documents` *
 __Parent__ - node A is the parent node of B if A has outgoing edges that
-connect to B.  *  __Children__ - node B is a child node of node A if B
-has incoming edges from A.  *  __Siblings__ - node C and B are siblings if
-they share the same parent node A.  *  __Subtree__ - A subtree is a set of
-nodes and edges with parent A and all the descendants of that parent.  *
-__Leaf Node__ - A leaf node is a node that has no children.  *  __Level__
-- the level of a node n is the number of edges on the path from the
-root node to n.  The level of the root node is zero.  *  __Height__ -
-the height of a tree is the maximum level of any node in the tree.
+connect to B.
+*  __Children__ - node B is a child node of node A if B has incoming
+edges from A.
+*  __Siblings__ - node C and B are siblings if they share the same
+parent node A.
+*  __Subtree__ - A subtree is a set of nodes and edges with parent A and all 
+    the descendants of that parent.
+* __Leaf Node__ - A leaf node is a node that has no children.
+*  __Level__ - the level of a node n is the number of edges on the path from the
+root node to n.  The level of the root node is zero.
+*  __Height__ - the height of a tree is the maximum level of any node in the tree.
 
 __How to appraoch trees__
 
@@ -1566,24 +1597,24 @@ where `w, v` makes up `V`.  Optionally, we can add a third component to
 the edge tuple to represent a weight.
 
 *  __vertex__ (aka a __node__) has a name (the __key__) with additional
-information (the __payload__).  *  __edge__ (aka an __arc__) connects
-two vertices to show their relationship.  Edges can be __one-way__
-(creating a __directed graph__, aka __digraph__) or __two-way__ (creating
-an __undirected graph__).
+    information (the __payload__).
+*  __edge__ (aka an __arc__) connects two vertices to show their
+    relationship. Edges can be __one-way__ (creating a __directed graph__,
+    aka __digraph__) or __two-way__ (creating an __undirected graph__).
     -  When two 'vertices' are connected by an edge, they are
-    __adjacent__.  -  Example of a 'directed graph' is if Person A knows
-    Person B, but Person B does not necessarily know Person A -  Example
-    of an 'undirected graph' is if Person A shakes hands with Person B,
-    Person B has also shaken hands with Person A
+    __adjacent__.
+    -  Example of a 'directed graph' is if Person A knows Person B,
+       but Person B does not necessarily know Person A
+    -  Example of an 'undirected graph' is if Person A shakes hands with Person B,
+        Person B has also shaken hands with Person A
 *  __weight__ is the cost to go from one vertex to another.
     -  Example is a graph of roads that connect one city to another;
     the weight on the edge might represent the distance between the
     two cities.
-*  __Path__ in a graph is a sequence of vertices that are connected
-by edges.  *  __Cycle__ in a directed graph is a path that starts and
-ends at the same vertex.
-    -  A graph with no cycles is an __acyclic graph__.  -  A 'directed
-    graph' with no cycles is called a __directed acyclic graph__ (aka
+*  __Path__ in a graph is a sequence of vertices that are connected by edges.
+*  __Cycle__ in a directed graph is a path that starts and ends at the same vertex.
+    -  A graph with no cycles is an __acyclic graph__.
+    -  A 'directed graph' with no cycles is called a __directed acyclic graph__ (aka
     a __DAG__).
 
 ####<a id="graphabstractdatatype">Graph Abstract Data Type (ADT)</a>
@@ -1625,8 +1656,12 @@ from node v to node w.
 __Example adjacency matrix__
 
         v0  v1  v2  v3  v4  v5
-    v0       5               2 v1           4 v2               9 v3
-    7   3 v4   1 v5           1       8
+    v0       5               2
+    v1           4
+    v2               9
+    v3                   7   3
+    v4   1
+    v5           1       8
 
 *  an __adjacency list__ implementation involves keeping a master list of
 all the vertices in the Graph object and then each vertex object in the
@@ -1639,9 +1674,12 @@ the weights)
 
 __Example adjacency list__
 
-    v0: id=v0, adj={v1:5, v5:2} v1: id=v1, adj={v2:4} v2: id=v2,
-    adj={v3:9} v3: id=v3, adj={v4:7, v5:3} v4: id=v4, adj={v0:1} v5:
-    id=v5, adj={v2:1, v4:8}
+    v0: id=v0, adj={v1:5, v5:2}
+    v1: id=v1, adj={v2:4}
+    v2: id=v2, adj={v3:9}
+    v3: id=v3, adj={v4:7, v5:3}
+    v4: id=v4, adj={v0:1}
+    v5: id=v5, adj={v2:1, v4:8}
 
 ####<a id="adjacencylistimplement">Adjacency List Implementation</a>
 
@@ -1669,11 +1707,11 @@ arbitrarily selected node) and explore each edge/neighbor before going on
 to any of their children (thus the name breadth-first) before we go deep.
 To keep track of which vertices have been visited, we color them to:
     -  `white` - all vertices are initialized as white when constructed;
-    this means the vertex is undiscovered (i.e. not visited yet) -  `gray`
-    - when a vertex is initially discovered it is colored gray.  When a
+    this means the vertex is undiscovered (i.e. not visited yet)
+    -  `gray` - when a vertex is initially discovered it is colored gray.  When a
     vertex is colored gray, there may be some white vertices adjacent to
-    it (indicating that there are still additional vertices to explore) -
-    `black` - when a vertex is completely explored, it is colored black.
+    it (indicating that there are still additional vertices to explore)
+    - `black` - when a vertex is completely explored, it is colored black.
     Once a vertex is black, there are no white vertices adjacent to it.
 
 The heart of a __BFS__ is a `Queue`, which decides which vertex to
