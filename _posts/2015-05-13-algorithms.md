@@ -286,8 +286,6 @@ an object, including different types like:
 * __instances__
 * __exceptions__
 
-###
-
 ###<a id="bitwiseoperators">Bitwise Operators</a>
 
 __Bitwise operators__ act on operands as if they were a string of binary
@@ -335,6 +333,23 @@ feeding in zero bits at the other end.
 Note that with Python, a left shift simply expands the width of the
 number for the extra bits (whereas other languages drop off the extra bits).
 
+So why is this important? Think of when you `chmod` a file to give permissions.
+Each file and folder has 8-bit data that controls the permissions.
+
+* Read is equivalent to ‘4’.
+* Write is equivalent to ‘2’.
+* Execute is equivalent to ‘1’
+
+`000` means no permissions. To read and write it would be `6 (4+2)`. To read, write
+and execute it would be `7 (4+2+1)`. Common permissions are:
+
+* `755` common in web servers; owner has all permissions, everyone else read and execute,
+  but not make changes to a file
+* `777` everyone can do everything
+* `644` only the owner can read and write, everyone else can only read. No one can execute
+* `655` only the owner can read and write, but not execute the file. Everyone else can
+  read and execute, but cannot modify the file.
+
 ###<a id="numericmethods">Numeric Methods</a>
 
 Key methods for numeric types are:
@@ -350,6 +365,29 @@ Key methods for numeric types are:
 * float(`-inf`)  # floats are not inifnite precision, use this to refer to negative infinity
 * `math.isclose()`  # for comparing floating point values, returns True or False
 * random.randrange(5, 10, 2)`  # e.g. returns 7, random number from 5 to 10 with increments of 2
+
+It's good to know what the max size is on your machine using `sys.maxsize` and `sys.float_info`
+
+    +>>> import sys
+    +>>> sys.maxsize
+    9223372036854775807
+    +>>> sys.float_info
+    sys.float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308, 
+    min_exp=-1021, min_10_exp=-307, dig=15, mant_dig=53, epsilon=2.220446049250313e-16, radix=2, rounds=1)
+     
+
+###<a id="computingparity">Computing the Pairity of a Word</a>
+
+The pairity of a binary word is 1 if the number of 1's in the word is odd. Otherwise, it is 0.
+Parity checks are used to detect single bit errors in data storage and communication.
+
+    x & (x-1)  # equals x with its lowest set bit erased
+    e.g. x = (00101100), then x - 1 = (00101011)
+         x & (x-1) = (00101100) & (00101011) = (00101000)
+
+        00101100  x
+        00101011  x-1
+        00101000  result
 
 ##<a id="arraysandstrings">Arrays and Strings</a>
 
