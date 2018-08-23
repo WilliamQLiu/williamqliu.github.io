@@ -293,6 +293,38 @@ an object, including different types like:
 * __instances__
 * __exceptions__
 
+###<a id="bitsbytes">Bits and Bytes</a>
+
+A __bit__ is atomic, the smallest unit of storage, storing just a `0` or `1`
+If we have just one bit, the pattern can be either `0` or `1`.
+If we have two bits, we can have patterns like `00`, `01`, `10`, `11`
+If we have three bits, we can have patterns like `000`, `001`, `010`, etc.
+With each additional bit, we can double the number of previous patterns
+
+    1 bit = 2 patterns
+    2 bits = 4 patterns
+    3 bits = 8 patterns
+    4 bits = 16 patterns
+    5 bits = 32 patterns
+    6 bits = 64 patterns
+    7 bits = 128 patterns
+    8 bits = 256 patterns (one byte)
+
+Mathematically: n bits yields `2^n` patterns
+
+A __byte__ is a collection of 8 bits. One byte can store one character (e.g. 'A', '$')
+
+    Kilobyte (KB) = 1 thousand bytes
+    Megabyte (MB) = 1 million bytes
+    Gigabyte (GB) = 1 billion bytes
+    Terabyte (TB) = 1 trillion bytes
+
+Examples of ASCII
+
+    A is 65
+    B is 66
+    space is 32
+
 ###<a id="bitwiseoperators">Bitwise Operators</a>
 
 __Bitwise operators__ act on operands as if they were a string of binary
@@ -410,7 +442,83 @@ Python has a few built-in types. This is for Python 3.6:
 
 https://docs.python.org/3.6/library/index.html
 
+##<a id="mustknow">Must Knows</a>
+
+###<a id="mustknowdatastructures">Data Structures</a>
+
+* Linked Lists
+* Trees, Tries, & Graphs
+* Stacks & Queues
+* Heaps
+* Vectors / ArrayLists
+* Hash Tables
+
+###<a id="mustknowalgorithms">Algorithms</a>
+
+* Breadth-First Search
+* Depth-First Search
+* Binary Search
+* Merge Sort
+* Quick Sort
+
+###<a id="mustknowconcepts">Concepts</a>
+
+* Bit Manipulation
+* Memory (Stack vs Heap)
+* Recursion
+* Dynamic Programming
+* Big O Time & Space
+
+###<a id="mustknowtable">Powers of 2 Table</a>
+
+Use this table below for questions about scalability or memory limitation.
+For example, if we have a bit vector mapping of every 32-bit integer to a boolean 
+value, we need 2^32 bits (or 2^30 bytes) to store this mapping; that's approximately 
+1 GB of memory. Remember that 1 bit = .125 bytes (8 bits = 1 byte)
+
+    Power of 2  |   Exact Value (X)     |   Approx Value    |   X Bytes in MB, GB, TB
+            7   |               128     |                   |
+            8   |               256     |                   |
+           10   |              1024     |   1 thousand      |           1 KB
+           16   |             65536     |                   |          64 KB
+           20   |           1048576     |    1 million      |           1 MB
+           30   |        1073741824     |    1 billion      |           1 GB
+           32   |        4294967296     |                   |           4 GB
+           40   |     1099511627776     |    1 trillion     |           1 TB
+
+
 ##<a id="arraysandstrings">Arrays and Strings</a>
+
+###<a id="arrays">Arrays</a>
+
+The __array__ is the simplest data structure; it is a contiguous block of memory,
+usually used to represent sequences. If we have an Array _A_, then we can say that
+`A[i]` is the `(i + 1)th` object stored in the array (because `A[i]` starts at 0).
+Retrieving and updating `A[i]` takes `O(1)` calculation time.
+
+Inserting
+
+Insertion into a full array is handled by resizing. We allocate a new array with
+additional memory, then copy over the entries from the original array. This increases
+the worst-case scenario of insertion, but if the new array has a constant factor
+larger than the original array, then the average time for insertion is constance
+since resizing is infrequent.
+
+Deleting
+
+Deleting an element from an array means moving all successive elements one over
+to the left to fill the vacated space. For example, if an array is:
+`[2, 3, 5, 7, 9, 11, 13, 17]`, then deleting an element at index 4 results in
+`[2, 3, 5, 7, 11, 13, 17, 0]`. The time complexity of deleting an element at
+index `i` from an array of length `n` is `O(n-i)`. The same is true for inserting
+a new element (as opposed to updating an existing entry)
+
+####<a id="arrayproblem1">Array Problem 1</a>
+
+Say we have an input array consisting of integers. Your job is to reorder its entries
+so that the even entries appear first. We can do this easily in `O(n)` space where `n`
+is the length of the array. However, this is more difficult to solve without allocating
+additional storage.
 
 ####<a id="hashing">Hashing</a>
 
@@ -1486,7 +1594,7 @@ connect to B.
 edges from A.
 *  __Siblings__ - node C and B are siblings if they share the same
 parent node A.
-*  __Subtree__ - A subtree is a set of nodes and edges with parent A and all 
+*  __Subtree__ - A subtree is a set of nodes and edges with parent A and all
     the descendants of that parent.
 * __Leaf Node__ - A leaf node is a node that has no children.
 *  __Level__ - the level of a node n is the number of edges on the path from the
