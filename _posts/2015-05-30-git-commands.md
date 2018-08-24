@@ -34,24 +34,34 @@ title: Git Commands
 *  [Different Workflows](#diffworkflows)
     -   [Feature Branch](#featurebranch)
     -   [GitFlow](#gitflow)
-   
+*  [Git Commands](#gitcommands)
+
 ##<a id="summary">Summary</a>
 
-__Git__ is a local software version control system.  The service __GitHub__ is one of many companies that does remote hosting of your git repositories.
+__Git__ is a local software version control system.  The service __GitHub__ is
+one of many companies that does remote hosting of your git repositories.
 
 ####<a id="howgitworks">How Git works</a>
 
-The concept of git is that data is seen as a set of snapshots of this mini filesystem.  Every time you commit and save your project, it basically takes a picture of what all your files look like at that moment and stores a reference to the snapshot.
+The concept of git is that data is seen as a set of snapshots of this mini
+filesystem.  Every time you commit and save your project, it basically
+takes a picture of what all your files look like at that moment and
+stores a reference to the snapshot.
 
-If files have not changed, git does not store the file again (just a link to the previous identical file it has already stored).  Git is different than some other systems (like __mercurial__) in that some other systems store the deltas between saves (which saves space).
+If files have not changed, git does not store the file again
+(just a link to the previous identical file it has already stored).
+Git is different than some other systems (like __mercurial__) in that some
+other systems store the deltas between saves (which saves space).
 
 ####<a id="stages">Stages of Git</a>
 
-To see your current status and branch, do: `git status`.  This tells you the state (tracked or untracked) of each file.  The three main stages are:
+To see your current status and branch, do: `git status`.
+This tells you the state (tracked or untracked) of each file.
+The three main stages are:
 
-1. __Modified__ means you changed the file, but have not tracked the changes yet.
-2. __Staged__ means you marked a modified file in its current version to go to your next commit snapshot.
-3. __Committed__ means this change has been safely snapshotted.
+1. __Modified__ means you changed the file, but have not tracked the changes yet
+2. __Staged__ means you marked a modified file in its current version to go to your next commit snapshot
+3. __Committed__ means this change has been safely snapshotted
 
 ####<a id="setup">Setup</a>
 
@@ -64,6 +74,7 @@ Download git and optionally signup for GitHub.
 *  Setup SSH-KeyGen with `ssh-keygen -t rsa -c "william.q.liu@gmail.com"`
     -  On Windows, ssh is by default setup like `C:\Users\wliu.ssh`
     -  On Mac, ssh is by default setup like `Mac HD > Users > williamliu`
+    -  On Linux, ssh is in ~/.ssh/
     -  Assuming you name the file `id_rsa`, you get two files:
         +  `id_rsa` is the private half of the key (keep this secret)
         +  `id_rsa.pub` is the public half of the key (free to give away)
@@ -78,7 +89,6 @@ So how does Git work in the real world?
 4. Once approved, merge the feature branch back into master.
 5. Optionally Tag the releases.
 
-
 ##<a id="init">Initialize a Repository</a>
 
 To get started, you can either create an empty project or copy an existing repository from another server (like GitHub).
@@ -88,14 +98,15 @@ To get started, you can either create an empty project or copy an existing repos
 If you want to create a new project, you can do the following:
 
 1.  `git init` initializes a new project directory
-2.  This step creates a `.git` subdirectory that has all your necessary repository files (e.g. your `.gitignore` file, a file that says what files to ignore)
+2.  This step creates a `.git` subdirectory that has all your necessary repository files
+    (e.g. your `.gitignore` file, a file that says what files to ignore)
 3.  You may want to create your `.gitignore` file (what to ignore) and add a License
 
 ####<a id="clone">Clone an existing repository</a>
 
 You can clone an existing repository from another server (like GitHub) using the command:  `git clone https://github.com/WilliamQLiu/myrepo.git`.
 
-*  You can change the option from `https` to `git` if you want to use SSH transfer.
+*  You can change the option from `https` to `git` if you want to use SSH to transfer.
 *  If you want to call this something else, just add an additional argument (e.g. `mynewrepo` after `myrepo.git`)
 
 ##<a id="basiccommands">Basic Commands</a>
@@ -103,8 +114,22 @@ You can clone an existing repository from another server (like GitHub) using the
 ####<a id="addcommit">Add and Commit</a>
 
     git add .   # Adds all files or specify the specific files
-    git commit -m "This is a git message for the commit"  # Commit with msg
+    git commit -m "This is a git message for the commit"  # Commit with quick message
     git commit -a -m "Made a change"  # Automatic Adds and Commits
+    git commit # Pulls up your editor and lets you make your commit message and description
+    git commit --amend  # modify the most recent commit instead of creating an entirely new commit, be careful it replaces entirely as a new commit
+
+Note that `git commit --amend` is commonly used to edit a few files that we would like to say add to the commit
+or to modify the commit message. Don't amend if you're on a publish branch that others are working off of because
+you'll rewrite history!
+
+####<a id="commitmsg">Commit Message</a>
+
+Try to follow these rules for making a good git commit message: https://chris.beams.io/posts/git-commit/
+The key things are:
+
+* Think about the context about a change; a diff tells you what changed, but the commit message should say why it changed
+* Be concise and consistent
 
 ####<a id="branches">Create Branch, Checkout Branch</a>
 
@@ -121,6 +146,26 @@ You can clone an existing repository from another server (like GitHub) using the
     git push # push changes back to a remote repository (e.g. on GitHub)
 	git push --force  # use your copy, don't care about everything else
     git push --force-with-lease  # better than --force, checks remote branch hasn't been updated
+
+####<a id="deletebranch">Deleting branches</a>
+
+Delete a local branch with: `git branch -d mybranch"
+Force delete a local branch (e.g. unmerged to master): `git branch -D mybranch"
+Delete a remote branch with: `git push origin --delete mybranch`
+
+####<a id="branchheadsha">Branches vs HEAD vs SHA</a>
+
+`HEAD` is the name Git uses to refer to "where your file system is pointing right now". Usually HEAD is
+pointed towards a named branch, but it doesn't always have to.
+
+Scenario:
+
+* Let's say you have commits A, B, C, D on 'master' and `HEAD` is pointing to `master`.
+* If you made an error on `B` and need to change the history, you could normally just make a new commit with the changes.
+  However, since we're practicing, we'll `git checkout B`. HEAD will now be at `B` in `detached HEAD`.
+* Now to catch up our new master branch, we'll run a `git checkout master`
+* We'll then use `git rebase temporarybranch` to reply commits C and D on top of our new B.
+* The rebase will create new commits C and D with different SHAs
 
 ####<a id="stash">Stashing</a>
 
@@ -222,8 +267,57 @@ The __Feature Branch Workflow__ is a git workflow where all feature development 
 
 ####<a id="gitflow">GitFlow Workflow</a>
 
-GitFlow is a specific type of workflow for larger projects and is built off of the __Feature Branch Workflow__.  The branch structure is slightly more complicated by having more specific roles to different branches and adding in tags around a project release.
+GitFlow is a specific type of workflow for larger projects and is built off of the __Feature Branch Workflow__.
+The branch structure is slightly more complicated by having more specific roles to different branches and adding in tags around a project release.
 
   * Historical Branches - instead of a single master branch, there is now __master__ and __develop__
   * Feature Branches - each feature resides in its own branch.  Feature branches branch from __develop__ instead of master.
   * Once develop has enough features for a release, you fork a release branch off of develop.  No new features are added and only bug fixes, document generation are added.  Once this is ready to ship, the release gets merged into __master__ and tagged with a version number.  Once merged back to master, we merge back into develop.
+
+###<a id="gitoperators">Git Operators</a>
+
+####<a id="tilde">Tilde</a>
+
+The tilde `~` operator is used in git to point to a parent of a commit.
+An example of `HEAD~` indicates the revision before the last one committed.
+To move further back, just indicate `HEAD~N` (e.g. `HEAD~3`) to take you back N (e.g. 3) levels back.
+This works great until you run into merges since merge commits have two parents. The `~` just selects the
+first one.
+
+####<a id="carrot">Carrot</a>
+
+The carrot `^` operator moves to a specific parent of the specificed version. You use a number to
+indicate which parent. For example, `HEAD^2` tells git to select the second parent of the last one
+committed, not the 'grandparent'.
+
+You can repeat this multiple times to move back further.
+`HEAD^2^^` takes you back three levels, selecting the second parent on the first step.
+If you don't give a number, Git assumes 1.
+
+###<a id="gitcommands">Git Commands</a>
+
+Some good commands to know are:
+
+    git checkout myotherbranch fileonmyotherbranch.py
+    git log --all --decorate --oneline --graph
+    git log --oneline -5 --before "Sat Aug 20 2018"
+    git blame
+    git revert
+    git shortlog
+    git reflog
+
+####<a id="doubledot">Double Dot Notation</a>
+
+The __double dot__ notation is for specifying ranges, e.g.
+This says show me commits after `fb6`... up to and including `2c30`...
+This also says "show me all commits that are included in the second commit that are not included in the first commit"
+
+
+    git log fb6a21154cc5fd2a09bc905ff4745a2b3b4fd4ec..2c3090f55c042c7c23c1f63fc5d764ff1670f4d6
+
+####<a id="tripledot">Triple Dot Notation</a>
+
+The __triple dot__ notation is for showing all commits that are in __either__ revision that are __not__ included in
+__both__ revisions.
+
+
