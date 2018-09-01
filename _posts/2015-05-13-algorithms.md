@@ -148,6 +148,161 @@ be preserved (e.g. 5 of diamonds comes before 5 of hearts)
 * Things end up being a tradeoff, with stable sorting usually being
 less efficient, but sometimes you need the original order preserved.
 
+##<a id="walkthrough">Walking through an Algorithm Problem</a>
+
+1. Listen Carefully
+2. Draw an Example
+3. State a Brute Force
+4. Optimize
+5. Walk Through
+6. Implement
+
+###<a id="walkthroughlisten">Listen Carefully</a>
+
+Mentally record any _unique_ information in the problem. For example:
+
+* "Given two arrays that are sorted, find..."
+    - Because the data is sorted, the optimal algorithm is different
+      than in an unsorted situation
+* "Design an algorithm to run repeatedly on a server that..."
+    - Run repreatedly is different than run once. Maybe you have to
+      cache your data or you can do more precomputation on the initial
+      dataset?
+
+Ask yourself if you've used all the information in the problem,
+especially if you get stuck.
+
+###<a id="walkthroughexample">Draw an Example</a>
+
+Draw a good example, meaning watch out to:
+
+* Make an example that is not too small, not too large (most tend to be too small)
+* Needs to be specific - use real numbers or strings
+* Make sure its not a special case
+
+###<a id="walkthroughbruteforce">State a Brute Force</a>
+
+After the example, state a brute force answer (even if it's obvious to you).
+It's okay that the initail solution is terrible. Explain the space and time
+complexity, then improve it. It's a great starting point for optimizations
+and it helps you wrap your head around the problem.
+
+###<a id="walkthroughoptimize">Optimize</a>
+
+After the brute force algorithm, you'll need to come up with an optimized algorithm.
+
+* Look for unused information (e.g. if an array was sorted)
+* Use a fresh example - sometimes a new example will unclog your mind or help
+  you see a pattern in the problem
+* Solve it "incorrectly" to see if that gives you any insights to finding the correct solution
+* Make time vs space tradeoffs. Sometimes storing extra state can help optimize the runtime
+* Precompute information - e.g. can you reorganize the data (i.e. sort) or compute some
+  values upfront that will help save time in the long run?
+* Use a hash table - these are very common
+* Think about the best conceivable runtime
+
+###<a id="walkthrough">Walk Through</a>
+
+After you've gotten an optimal algorithm, don't dive into coding. Take a moment
+to solidify your understanding of the algorithm.
+
+Whiteboard coding is very slow; same with testing and fixing code. Make sure
+you have code that is close to perfect in the beginning.
+
+If you don't understand exactly what you're about to write, you'll struggle to code it.
+It will take longer to finish the code and you'll make major errors.
+
+###<a id="walkthroughimplement">Implement</a>
+
+When you have an optimal algorithm and know exactly what you're going to write, then
+go ahead and implement it. Start coding on the top left corner, avoid "line creep"
+(where each line of code is at a slant) and remmber spacing.
+
+Write beautiful code, meaning:
+
+* __Modularized code__ - e.g. have function `init_matrix(size)` instead of filling in details
+* __Error checks__ - Add tests or at least add a TODO
+* Use other classes/structs where appropriate (e.g. a list of start and end points could be
+  a two-dimensional array, but probably better as a single list of objects as Class `StartEndPair`)
+  You can fill in the details for that new Class later and will allow you to expand on that dataset.
+* Choose good variable names, not single variable names
+
+###<a id="walkthroughtest">Test</a>
+
+Don't submit code in an interview without testing it.
+
+* Start with a 'conceptual' test - meaning just read and analyze what each line of code does.
+  Does the code do what you think it should do?
+* Weird looking code - double check that weird code
+* Hot spots - Check for the base case in recursive code, integer division, null nodes in binary trees,
+  the start and end of iteration through linked list, etc.
+* Small test cases - Use small test cases like an array of 3 or 4 elements. You'll find the same bugs, but faster
+* Special cases - Test your code against null or single element values, extreme cases
+
+When you find bugs, don't just make the first correction you can think of. Analyze why the bug
+occurred and ensure your fix is the best one.
+
+##<a id="bud">Optimize and Solve Technique 1: BUD</a>
+
+Look for __BUD__:
+
+* Bottlenecks
+* Unnecessary work
+* Duplicated work
+
+###<a id="bottlenecks">Bottlenecks</a>
+
+A __bottleneck__ is a part of your algorithm that slows down the overall runtime. This can occur
+when:
+
+* You have one-time work that slows down your algorithm
+* You have a chunk of work that's done repeatedly, like searching
+
+###<a id="unnecessarywork">Unnecessary Work</a>
+
+###<a id="duplicatedwork">Duplicated Work</a>
+
+##<a id="diy">Optimize and Solve Technique 2: DIY</a>
+
+Try to solve the problem manually with a real life example, like instead 
+of "Create a sorting algorithm" using binary search, we think about how to 
+locate a student's paper.
+
+##<a id="simplifygeneralize">Optimize and Solve Technique 3: Simplify and Generalize</a>
+
+We'll implemnet a multi-step approach:
+
+* First, simplify or tweak some constraint, such as the data type
+* Then solve this new simplified version of the problem
+
+##<a id="basecaseandbuild">Optimize and Solve Technique 4: Base Case and Build</a>
+
+We solve the problem first for a base case (e.g. `n=1`) and then try to build up
+from there. When we get to more complex cases (e.g. `n=3`, `n=4`), we try to build
+those using the prior solutions. Now that we understand the pattern, try to use
+say a recursive algorithm.
+
+##<a id="datastructurebrainstorm">Optimize and Solve Technique 5: Data Structure Brainstorm</a>
+
+Run through the list of data structures and try to apply each one.
+This might help if you're stuck on a problem and realize that if you used say a tree, it's a trivial problem.
+
+Use data structures generously!!!
+
+##<a id="bcr">Best Conceivable Runtime (BCR)</a>
+
+Consider the best conceivable runtime and what that solution might look like in Big O.
+
+##<a id="goodcode">Good Code</a>
+
+Try to write good code, meaning:
+
+* Correct - code operates correctly on all expected and unexpected inputs
+* Efficient - code operates efficiently as possible in terms of both time and space
+* Simple - code should be simple and be as quick to write as possible
+* Readable - a different developer should be able to read your code and understand what it does
+* Maintainable - code should be reasonably adaptable to changes during the life cyle of a product
+
 ##<a id="bigo">Big O</a>
 
 We use __Big O notation__ to give an estimated running time based on the
@@ -414,7 +569,6 @@ It's good to know what the max size is on your machine using `sys.maxsize` and `
     sys.float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308, min=2.2250738585072014e-308,
     min_exp=-1021, min_10_exp=-307, dig=15, mant_dig=53, epsilon=2.220446049250313e-16, radix=2, rounds=1)
 
-
 ###<a id="computingparity">Computing the Pairity of a Word</a>
 
 The pairity of a binary word is 1 if the number of 1's in the word is odd. Otherwise, it is 0.
@@ -485,7 +639,6 @@ value, we need 2^32 bits (or 2^30 bytes) to store this mapping; that's approxima
            30   |        1073741824     |    1 billion      |           1 GB
            32   |        4294967296     |                   |           4 GB
            40   |     1099511627776     |    1 trillion     |           1 TB
-
 
 ##<a id="arraysandstrings">Arrays and Strings</a>
 
