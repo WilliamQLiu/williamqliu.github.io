@@ -63,7 +63,6 @@ In the command line, to see what databases are available for access, do:
 
     $psql --list
 
-
 #### <a id="createdb">Create Database</a>
 
 Create a database called `mydb`
@@ -80,7 +79,19 @@ Connect to a database (e.g. db is named mydb)
 
 Now that you're in psql, you can also list all databases
 
-     \list
+    # \list
+    or
+    # \l
+    
+                                 List of databases
+       Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+    -----------+----------+----------+------------+------------+-----------------------
+     airflow   | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+     postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+     template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+               |          |          |            |            | postgres=CTc/postgres
+     template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+               |          |          |            |            | postgres=CTc/postgres
 
 #### <a id="seeroles">See Roles</a>
 
@@ -117,6 +128,8 @@ View all of the tables, views, and sequences
 To connect to another database (e.g. db 'jobwaffle_prod')
 
     \connect jobwaffle_prod
+    or
+    \c jobwaffle_prod 
 
 #### <a id="queries">Queries</a>
 
