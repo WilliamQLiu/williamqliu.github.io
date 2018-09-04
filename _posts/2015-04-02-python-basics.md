@@ -1279,3 +1279,18 @@ PEP 343 introduces a new __with__ statement to Python so we don't have to be as 
     finally:
         VAR.__exit__()
 
+## <a id="testing">Testing</a>
+
+## <a id="packaging">Packaging</a>
+
+Python has a couple ways to package and distribute your Python code:
+
+* __Distutils__ is the standard tool for packaging in Python. It's
+  included in the standard library and is useful for simple Python
+  distributions, but lacks features. It introduces the distutils
+  packages that can be imported in your setup.py script
+* __Setuptools__ is not part of the standard libary, but was developed
+  to overcome Distutil's limitations. Setuptools has a Python package
+  that can be imported in your setup.py script. There's also a
+  `pkg_resources` Python package that can be imported in your code
+  to locate data files installed with a distribution.
