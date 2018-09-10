@@ -709,13 +709,22 @@ across an array of slots.  A sample function would look like `index =
 f(key, array_size)` and `hash = hashfunc(key)`.  The goal of the hash
 function is to:
 
-*  Be deterministic - i.e. equal keys produce the same hash value all the
-time *  Be efficient - Computing the hash should be quick *  Be uniform -
-distribute the keys uniformly so they do not cluster
+*  Be deterministic - i.e. equal keys produce the same hash value all the time 
+*  Be efficient - Computing the hash should be quick 
+*  Be uniform - distribute the keys uniformly so they do not cluster
+
+####<a id="hashtimespace">Hash Time and Space</a>
 
 A __perfect hash function__ is the case where every item is mapped to
 a unique slot, which then runs in `O(1)` time.  We don't need a perfect
 hash function in order for the hash to be efficient.
+
+For worst case scenario (high number of collisions), the worst case
+runtime is `O(N)` where `N` is the number of keys.
+
+Another implementation of the hash table is with a balanced binary
+search tree, which will give us `O(log N)` lookup time. This will
+use less space since we no longer allocate a large array.
 
 ####<a id="hashexample">Hash Example</a>
 
@@ -757,10 +766,9 @@ a remainder of `5`, which would create a __hash collision__ with `93`;
 this means at least two values are trying to fit into the same bucket
 (in our example, the values of `93` and `71`).  We have two goals:
 
-1. __minimize hash collisions__ - what can we do to prevent hash
-collisions?  2. __hash resolution__ - despite our best efforts to prevent
-hash collision, we'll probably run into them; what can we do once a hash
-collision happens?
+1. __minimize hash collisions__ - what can we do to prevent hash collisions?
+2. __hash resolution__ - despite our best efforts to prevent hash collision, 
+  we'll probably run into them; what can we do once a hash collision happens?
 
 ####<a id="hashminimizecollision">Minimizing Hash Collision</a>
 
@@ -769,8 +777,7 @@ in mind that you want a function to __uniformly distribute__ hash values.
 These can be tested using statistical tests (e.g. __Pearson's chi-squared
 test__ for _discrete uniform distributions_)
 
-####<a id="hashfolding">Minimizing Hash Collision with the Folding
-Method</a>
+####<a id="hashfolding">Minimizing Hash Collision with the Folding Method</a>
 
 One way of trying to minimize hash collision is with the __folding
 method__.
@@ -786,8 +793,7 @@ remainder of `1` (`210%11=1`) to place the value `210` into position `1`.
 the addition.  e.g. `43+65+55+46+01` turns into `43+56+55+64+01=219`,
 which `219%11=10`
 
-####<a id="hashmidsquare">Minimizing Hash Collision with the Mid-Square
-Method</a>
+####<a id="hashmidsquare">Minimizing Hash Collision with the Mid-Square Method</a>
 
 Another way of trying to minimize hash collision is with the __mid-square
 method__.
@@ -798,8 +804,7 @@ of the resulting digits.  e.g. if the item is `44`, we calculate
 (e.g. `93` from `1936`) and taking the modulus to get the remainder
 (`93%11=5`)
 
-####<a id="hashchars">Minimizing Hash Collision when Hashing
-Characters</a>
+####<a id="hashchars">Minimizing Hash Collision when Hashing Characters</a>
 
 We can create hash functions for character-based items like strings.
 For example, we have: `99+97+116=312`, then `312%11=4`.
