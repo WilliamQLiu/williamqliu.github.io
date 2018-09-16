@@ -34,7 +34,9 @@ title: Git Commands
 *  [Different Workflows](#diffworkflows)
     -   [Feature Branch](#featurebranch)
     -   [GitFlow](#gitflow)
+*  [Open Source](#opensource)
 *  [Git Commands](#gitcommands)
+
 
 ##<a id="summary">Summary</a>
 
@@ -136,6 +138,15 @@ The key things are:
     git branch features  # Create a branch called features
     git checkout features  # Check out a branch named features
     git checkout master  # Check out the master branch
+
+####<a id="gitfetchpull">Git Fetch and Git Pull</a>
+
+* `git fetch` is used to update your remote-tracking branches; it downloads
+   new data from a remote repository, but it doesn't integrate any of the new
+   data into your working files
+    - e.g. `git fetch origin` or `git fetch remote`
+`git pull` does a `git fetch` followed by a `git merge`
+    - e.g. git pull origin master
 
 ####<a id="branches">Merging changes back to master branch</a>
 
@@ -273,6 +284,26 @@ The branch structure is slightly more complicated by having more specific roles 
   * Historical Branches - instead of a single master branch, there is now __master__ and __develop__
   * Feature Branches - each feature resides in its own branch.  Feature branches branch from __develop__ instead of master.
   * Once develop has enough features for a release, you fork a release branch off of develop.  No new features are added and only bug fixes, document generation are added.  Once this is ready to ship, the release gets merged into __master__ and tagged with a version number.  Once merged back to master, we merge back into develop.
+
+##<a id="opensource">Open Source</a>
+
+Open Source projects normally have a different workflow than if you were a normal
+contributor to your own project. For an open source project, you probably need
+to fork your own copy instead of creating branches and being able to push commits
+to the repository itself. After you make your changes to your fork, you then create 
+a pull request back to the original.
+
+* Fork the original project
+    - Original Project: `https://github.com/apache/incubator-airflow`
+    - Forked Project: `https://github.com/WilliamQLiu/incubator-airflow`
+* Clone your fork into your local copy
+    - E.g. `git clone git@github.com:WilliamQLiu/incubator-airflow.git`
+* To make sure that your project is in sync, add the original project as a remote upstream
+    - E.g. `git remote add upstream https://github.com/apache/incubator-airflow`
+    - Check that the upstream branch is available through: `git remote -v`
+    - `git fetch upstream` to sync up with the original project
+    - Merge your upstream/master with your local master with `git merge upstream/master`
+    - If your local branch didn't have any unique commits, Git will run a 'fast-forward'
 
 ###<a id="gitoperators">Git Operators</a>
 
