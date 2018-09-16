@@ -80,9 +80,9 @@ sudo apt-get install ssh
 sudo apt-get install openssh-client openssh-server
 
 
-Run this otherwise you'll get permission denied when trying to ssh into your
-own server
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+Run this otherwise you'll get permission denied when trying to ssh into your own server
+
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 Hadoop Cluster on:
 
@@ -666,9 +666,17 @@ You can specify the how with:
 mode - specifies the behavior of the save operation when data already exists.
 
 * `append`: Append contents of this DataFrame to existing data.
-* `overwrite`: Overwrite existing data.
+* `overwrite`: Overwrite existing data (i.e. rewrite the entire table) - be careful with this,
+  as sometimes it'll be just a `truncate table`, while other dbs might drop the table and completely
+  recreate with indices and foreign keys lost (see option `truncate`)
 * `ignore`: Silently ignore this operation if data already exists.
 * `error` or `errorifexists` (default case): Throw an exception if data already exists.
+
+#### Modes
+
+So the most common mode is `append`. But what happens if we run into the following scenarios?
+* say Table X has columns `a, b, c` and we try to write `a, b, c, d`, we get an error saying col `d` is not in the schema
+* If we `append` to a nonexistent table, a table will be created
 
 ### collect() and take()
 
