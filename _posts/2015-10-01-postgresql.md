@@ -71,6 +71,10 @@ Create a database called `mydb`
 
 #### <a id="accessdb">Access Database</a>
 
+Login to psql
+
+    psql -U myusername
+
 Connect to a database (e.g. db is named mydb)
 
     psql mydb [optional user name]

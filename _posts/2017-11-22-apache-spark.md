@@ -37,7 +37,6 @@ of through pip
 
 ## Run
 
-
 ### Exploration
 
 If you want to explore around in a REPL, run `pyspark`
@@ -500,6 +499,23 @@ There's many Python data types including:
 * StructField - your own schema, specify the field
 * StructType - your own schema, specify the entire schema w/ StructFields
 
+### PySpark Schema
+
+So how does data types work with schemas? You might setup a `StructType` as your own schema,
+with a bunch of `StructFields`.
+
+	from pyspark.sql.types import StringType, StructField, StructType, BooleanType, ArrayType, IntegerType, DateType, TimestampType	
+	
+    schema = StructType([  # StructType is a data type for a collection of StructFields
+	            StructField(name='my_field', dataType=IntegerType(), nullable=False, metadata={'master': 'a_field'}),
+				StructField(name='another_field', dataType=StringType(), nullable=False, metadata={'master': 'b_field'})
+	])
+
+Be aware that for different connectors, e.g. JDBC, the defaults might not be what you're expecting.
+For example, a StructField with `dataType=StringType()` might have a default of `text` instead of
+a `varchar`. You can change these settings, but will have to modify your jdbc connection config
+and then enter in a maxlength into your field's metadata.
+
 ### How are data types used?
 
 Say you make a user defined function, you can specify a returned field type.
@@ -649,9 +665,14 @@ two columns are named the same thing and you reference one of the named columns)
 
 ### Join
 
-You can join with:
+You can join dataframes with:
 
+	# inner join on one field
     df_left.join(df_right, df_left.my_field == df_right.my_field, how='inner')
+
+	# inner join with multiple columns (use `&` for 'and' logic, `|` for 'or' logic)
+	df_left.join(df_right, (df_left.my_field_a == df_right.my_field_a) &
+                           (df_left.my_field_b == df_right.my_field_b))
 
     # Multiple Joins
     joined_df = df_left.join(df_right, "my_field", "left") \
@@ -659,7 +680,34 @@ You can join with:
 
 You can specify the how with:
 
-    inner, cross, outer, full, full_outer, left, left_outer, right, right_outer, left_semi, and left_anti
+    inner, cross, outer, full, full_outer, left, left_outer, right, right_outer, leftsemi, and leftanti
+
+If you joined with `left`, `right`, you'll get columns from both dataframes, even
+if the column names match. In terms of SQL, it looks like this:
+
+	SELECT ta.*, tb.*
+	FROM ta
+	INNER JOIN tb
+	ON ta.name = tb.name
+
+If you want to select one of these fields, you'll have to run something like:
+
+	left_join = ta.join(tb, ta.name == tb.name, how='left')
+	left_join.filter(col('tb.name').isNull()).show()  # notice how we have to specify which table alias
+
+Make sure to apply an alias to the dataframe, otherwise you’ll receive an error
+after you create your joined dataframe. With two columns named the same thing,
+referencing one of the duplicate named columns returns an error that
+essentially says it doesn’t know which one you selected.
+
+     df_m = df_master.alias('df_m')
+     df_n = df_new.alias('df_n')
+
+Without an alias, you'll get an error like:
+
+	TaskSetManager: Lost task 8.0 in stage 14.0 (TID 215) on 172.23.0.7, executor 0: java.sql.BatchUpdateException (Column 'my_field_a' specified twice) [duplicate 1]
+
+If you didn't want columns from both dataframes, then you'll want `how` = `left_semi` or `right_semi`
 
 ### Modes
 
@@ -675,8 +723,45 @@ mode - specifies the behavior of the save operation when data already exists.
 #### Modes
 
 So the most common mode is `append`. But what happens if we run into the following scenarios?
+
 * say Table X has columns `a, b, c` and we try to write `a, b, c, d`, we get an error saying col `d` is not in the schema
-* If we `append` to a nonexistent table, a table will be created
+* If we `append` our dataframe (say we have `a, b, c` columns) and our table has `a, b, c, d`, we're okay and will
+  only write `a, b, c` (e.g. say `d` is a timestamp field with update now)
+* If we `append` to a nonexistent table, a table will be created (but be warned, if you don't have types
+  created yet, everything will be a `text` type if you're using MySQL)
+* If we have a database constraint on say MySQL (e.g. needs a default value) and our dataframe does not
+  have it, then the job will fail with an error message like 'Field `my_required_field` does not have a default value)
+
+#### Upserts
+
+One of the things you'll notice is that there is no Spark mode for UPSERTS. You'll
+need to handle that logic either in the app code or through the database.
+
+* App Code
+
+For App Code, I join
+
+    # Create an alias otherwise you'll have difficulty using the joined dataframe
+    df_m = df_master.alias('df_m')
+    df_n = df_new.alias('df_n')
+
+    # Join and keep only the ones from the new dataframe (df_n) that aren't in the existing dataframe (df_m)
+    df_joined = df_n.join(df_m,
+        (df_n.my_id == df_m.my_id) &
+        (df_n.other_id == df_m.other_id), how='leftsemi')
+
+    # Drop Duplicates, keeps first row (i.e. the one with the latest data based on the orderBy)
+    df_joined = df_joined.orderBy("date_entered", ascending=False).drop_duplicates(subset=['my_id', 'other_id'])
+
+
+    # Write the joined dataframe
+    df_joined.write.format('jdbc').options(
+        url='jdbc:mysql://my_db_url',
+        driver='com.mysql.jdbc.Driver',
+        dbtable='my_db_table',
+        user=db_'my_user',
+        password='my_db_password') \
+        .mode('append').save()
 
 ### collect() and take()
 

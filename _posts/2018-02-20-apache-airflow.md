@@ -472,6 +472,39 @@ where we have a templated command (and the `macro.ds_add`)
         params={'my_param': 'Parameter I passed in'},
         dag=dag)
 
+### Params
+
+Params is a dictionary that you can pass in. This is useful if you have say a variable like `MY_CONSTANT`
+that is used in multiple Operators. You can just pass in that param now. E.g.
+
+    TIMEZONE_SETTING='EST'
+    
+    t3 = BashOperator(
+        ...
+        params={'timezone': TIMEZONE_SETTING},
+        bash_command="python myprogram --timezone_setting {{ params.timezone }}"
+    )
+
+#### User Defined Macros
+
+You can create your own macros, say you have your own custom function. One advantage to this is that
+if you need a value from your rendered template (e.g. the `execution_date`), then calling the function
+through the DAG's `user_defined_macro` will give you the actual value.
+
+    def compute_next_execution_date(dag, execution_date):
+        return dag.following_schedule(execution_date)
+
+    dag = DAG('my_simple_dag', schedule_interval='@hourly',
+              user_defined_macros={
+                  'next_execution_date': compute_next_execution_date
+              })
+
+    task = BashOperator(
+        task_id='bash_operation',
+        bash_command='echo "{{ next_execution_date(dag, execution_date) }}"',
+        dag=dag
+    )
+
 Note that since an item like `next_execution_date` is a python object (datetime), you can also call methods on it.
 For example:
 
