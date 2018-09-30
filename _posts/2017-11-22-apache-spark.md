@@ -527,7 +527,6 @@ Say you make a user defined function, you can specify a returned field type.
 
     square_udf_float2 = udf(lambda z: square_float(z), FloatType())
 
-
 ## Debugging with Python
 
 You can set your Log Level (Spark is by default verbose)
@@ -700,14 +699,23 @@ after you create your joined dataframe. With two columns named the same thing,
 referencing one of the duplicate named columns returns an error that
 essentially says it doesn’t know which one you selected.
 
-     df_m = df_master.alias('df_m')
-     df_n = df_new.alias('df_n')
+    df_m = df_master.alias('df_m')
+    df_n = df_new.alias('df_n')
 
 Without an alias, you'll get an error like:
 
 	TaskSetManager: Lost task 8.0 in stage 14.0 (TID 215) on 172.23.0.7, executor 0: java.sql.BatchUpdateException (Column 'my_field_a' specified twice) [duplicate 1]
 
-If you didn't want columns from both dataframes, then you'll want `how` = `left_semi` or `right_semi`
+If you didn't want columns from both dataframes, then you can use `how` = `leftsemi` or `rightsemi` (if you're doing
+a join where you want rows only if criteria meets both dataframes).
+
+Another way is that you can run your regular join, then select columns from a specific dataframe.
+
+    joined_df = df_n.join((df_n.other_id == df_m.other_id), how='left_outer').select('df_m.*')
+
+You can also run your regular join, then select certain columns from both dataframes.
+
+    joined_df = df_n.join((df_n.other_id == df_m.other_id), how='left_outer').select('df_m.*', 'df_n.some_field')
 
 ### Modes
 
@@ -720,7 +728,7 @@ mode - specifies the behavior of the save operation when data already exists.
 * `ignore`: Silently ignore this operation if data already exists.
 * `error` or `errorifexists` (default case): Throw an exception if data already exists.
 
-#### Modes
+#### Append Mode
 
 So the most common mode is `append`. But what happens if we run into the following scenarios?
 
@@ -739,20 +747,32 @@ need to handle that logic either in the app code or through the database.
 
 * App Code
 
-For App Code, I join
+For App Code, I run logic like this:
+
+* Check if we need to run the upsert logic (e.g. if you're appending to an empty DataFrame, you can just append and
+  ignore the upsert logic): `if (df_master.limit(1).count() > 0):`
+* If there is existing data, we'll do a join:
+
 
     # Create an alias otherwise you'll have difficulty using the joined dataframe
     df_m = df_master.alias('df_m')
     df_n = df_new.alias('df_n')
 
-    # Join and keep only the ones from the new dataframe (df_n) that aren't in the existing dataframe (df_m)
+    # Join and keep only the columns from the new dataframe (df_n), but keep rows that are in both (df_m and df_n),
     df_joined = df_n.join(df_m,
         (df_n.my_id == df_m.my_id) &
-        (df_n.other_id == df_m.other_id), how='leftsemi')
+        (df_n.other_id == df_m.other_id), how='left') \
+        .filter(df_m.my_id.isNull()) \
+        .select(*[col('df_n.' + c) for c in df_n.columns])  # can also select('df_n.*')
+
+    # Or: left outer join and only keep columns from the df_m dataframe
+    df_joined = df_n.join(df_m,
+        (df_n.my_id == df_m.my_id) &
+        *df_n.other_id == df_m.other_id), how='left_outer').select('df_m.*')
 
     # Drop Duplicates, keeps first row (i.e. the one with the latest data based on the orderBy)
-    df_joined = df_joined.orderBy("date_entered", ascending=False).drop_duplicates(subset=['my_id', 'other_id'])
-
+    df_joined = df_joined.orderBy("date_entered", ascending=False) \
+                         .drop_duplicates(subset=['my_id', 'other_id'])
 
     # Write the joined dataframe
     df_joined.write.format('jdbc').options(
@@ -769,6 +789,10 @@ To print all elements on the driver, one can use the collect() method to first b
 thus: rdd.collect().foreach(println). This can cause the driver to run out of memory, though, because collect() 
 fetches the entire RDD to a single machine; if you only need to print a few elements of the RDD, 
 a safer approach is to use the take(): rdd.take(100).foreach(println).
+
+### show()
+
+To show what's inside your dataframe, just run: `df.show(n=5)`
 
 ## Spark Broadcast and Accumulators
 
@@ -809,7 +833,45 @@ transformation will not be executed (e.g. a `map()` is a lazy transformation so 
 guaranteed if inside a map). Spark guarantees to update accumulators inside actions only once.
 If a task is restarted, there may be undesirable side effects like accumulators being updated more than once.
 
-### Apache Toree
+## Configuration Tuning
+
+One of the issues with Map-Reduce apps is that data needs to be stored somewhere between each stage, which
+wastes a lot of time on I/O operations. With Spark, everything is in memory, making it much quicker.
+
+### Memory
+
+As a developer, you need to understand how to make proper adjustments for spark's workflow, meaning you need
+to understand how to allocate memory across:
+
+* passing data between execution and storage
+* passing data across tasks, running in parallel
+* passing data across operators, running with the same task
+
+#### Executor Memory
+
+So let's look at an __executor__, which is Spark's JVM process that is launched on a worker node. Executors run tasks
+in _threads_ and is responsible for keeping relevant partitions of data. Each process has an allocated _heap_ with
+available memory (executor/driver).
+
+With default executor configurations, we have `spark.executor.memory=1GB, spark.memory.fraction=0.6`, meaning we
+will have about 350MB allocated for execution and storage regions. The other 40% is reserved for storing meta-data,
+user data structures, safeguarding against OOM errors, etc. There is also a dedicated hard-coded portion of
+_reserved memory_ (300 MB * 1.5) used for storing internal spark objects.
+
+A Spark task operates in two main memory regions:
+
+* __execution__ - used for shuffles, joins, sorts, and aggregations - 'short lived' memory, immediately evicted after
+                  each operation, making space for the next ones
+* __storage__ - used to cache partitions of data - handle the persistence of data (an RDD's `cache()` and `persist()` functions)
+                Partitions can exist in memory or on the disk (can view in the 'Storage' tab in the Spark UI)
+
+Beware that if you allocate too much memory, this will result in excessive garbage collection dleays. 64GB is a good
+rough upper limit for a single executor. Also remember that a server's OS will take some room (e.g. about 1GB) so
+don't overallocate the memory you have.
+
+#### Off-heap
+
+## Apache Toree
 
 TODO: Get this part working
 

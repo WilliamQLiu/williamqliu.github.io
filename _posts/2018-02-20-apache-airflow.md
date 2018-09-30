@@ -60,10 +60,22 @@ Generating a self-signed certificate
 
 Then you can access the web gui with `https:localhost:8080`
 
-# In your airflow.cfg under [webserver]
+In your airflow.cfg under [webserver]
 
     web_server_ssl_cert = path/to/cacert.pem
     web_server_ssl_key = path/to/private.pem
+
+## Important Configs
+
+Under `airflow.cfg`, there's a few important settings, including:
+
+* `parallelism` - the amount of parallelism as a setting to the executor. This defines the max number of task
+  instances that should run simultaneously on this airflow installation. Basically, if I have two computers running 
+  as airflow workers, this is the "maximum active tasks"
+* `dag_concurrency` - the task concurrency per worker - think of it as the "max active tasks per worker".
+* `non_pooled_task_slot_count` - when not using pools, the size of the 'default pool'.
+* `max_active_runs_per_dag` - the maximum number of active DAG runs per DAG. E.g. Try to run 16 active DAGs instances
+  at the same time
 
 ### Airflow Admin Connections
 
@@ -290,7 +302,14 @@ The following fields are required:
 #### Task Running and Clearing
 
 Run - Run a single task instance (can only be done if using something other than SequentialExecutor)
+
+### Clear
+
 Clear - Clear a set of task instances, as if they never ran
+
+Say a DAG needs to be completely rerun, then just run clear:
+
+    airflow clear my_dag -s 2018-09-21 -e 2018-09-22
 
 ### Hooks
 
@@ -434,10 +453,11 @@ An example is:
 
 ### Backfill
 
-You can run a __backfill__ to rerun tasks from a certain time period (e.g. say your tasks run once a day, but you
-want to backfill the last 7 days). You can run a backfill on the command line with:
+You can run a __backfill__ to rerun parts of your tasks from a certain time period (e.g. say you have a DAG that 
+consists of 5 operations, but only the last 2 operations failed and that these tasks normally run once 
+a day. You can backfill and say only run these last two operations for the last 7 days).
 
-    airflow backfill
+    airflow backfill my_dag -s 2018-09-10 -e 2018-09-11
 
 ### Catchup
 
@@ -536,6 +556,7 @@ Commands include:
     __initdb__ - initialize the metadata database
     __test__ - test a task instance (run a task without checking for dependencies or recording state in db)
     __scheduler__ - run scheduler as a persistent service
+    __clear__ - clear a previous run
 
 
 ### Example Bash Command
