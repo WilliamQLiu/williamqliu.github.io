@@ -198,10 +198,65 @@ You can nest lists (create lists that contain other lists).
 *  `list.pop([i])` removes the `i` item or last item if not specified
 
 #### Stacks
+
 A **stack** is using a list with first-in, last-out functionality.  The main methods for stacks are `append()` and `pop()`.  Note that with append, the items you add can be other lists (i.e. you can have a list with lists inside as individual items)
 
 #### Queues
-A **queue** is a specific list built for efficient first-in, first-out functionality.  For more specialized containers, look up `collections`.
+
+A **queue** is a specific list built for efficient first-in, first-out functionality.
+For more specialized containers, look up `collections`.
+
+### Collections
+
+__Collections__ are high-performance container datatypes. We have the following:
+
+* __namedtuple()__ - factory function for creating tuple subclasses with named fields
+* __deque__ - list-like container with fast appends and pops on either end
+* __ChainMap__ - dict-like class for creating a single view of multiple mappings
+* __Counter__ - dict subclass for counting hashable objects
+* __OrderedDict__ - dict subclass that remembers the order entries were added
+* __defaultdict__ - dict subclass that calls a factory function to supply missing values
+
+To use these, run:
+
+    from collections import defaultdict, Counter  # etc
+
+#### Counter
+
+A __Counter__ object is made to support rapid tallies. E.g.
+
+    from collections import Counter
+    cnt = Counter()
+    for word in ['red', 'blue', 'green', 'blue', 'red', 'red']:
+        cnt[word] += 1
+    
+    cnt
+    # Counter({'red': 3, 'blue': 2, 'green': 1})
+
+If you try to get a key that does not exist, instead of getting a `KeyError`, it'll show up as 0.
+
+	c = Counter(['eggs', 'ham'])
+	c['bacon']
+	0
+
+Common methods for a Counter object are:
+
+	# elements()
+	+>>> sorted(cnt.elements())
+	['blue', 'blue', 'green', 'red', 'red', 'red']
+
+	# most_common([n]) to return the n most common elements and their counts (most common to least)
+	+>>> cnt.most_common(2)
+	[('red', 3), ('blue', 2)]
+
+	# subtract([iterable-or-mapping]), subtracts counts instead of replacing them
+
+
+#### Deque
+
+A __deque__ object is a generalization of stacks and queues (the name is short for 'double-ended queue').
+You can run appends and pops from either side of the deque with about the same `O(1)` performance in either direction.
+If there is no `maxlen` specificed or it is `None`, deques can grow to an arbitrary length.
 
     from collections import deque
     queue = deque(["Eric", "John", "Michael"])
@@ -212,7 +267,7 @@ A **queue** is a specific list built for efficient first-in, first-out functiona
     queue  # deque(['Michael', 'Terry', 'Graham'])
     print type(queue)  # <type 'collections.deque'>
 
-#### List comprehensions
+### List comprehensions
 
 List comprehensions are a concise way of making lists based on an operation or if the item satisifes a certain condition.  This is a compact for-loop that builds lists.  Here are different ways of doing a regular loop along with the list comprehension equivalent:
 
@@ -299,6 +354,7 @@ Notes about tuples:
   (e.g. no list in there like `my_tuple = ("hey", [1, 2])`
 
 #### <a id="sequencemethods">Sequence Methods</a>
+
 Assuming `s` and `t` are sequences and `n`, `i`, `j` are integers.
 
 *  `x in s`  # True if an item of s is equal to x, else False
@@ -335,7 +391,8 @@ A useful built-in function for sequences is Enumerate.  Enumerate means you retu
 
 #### <a id="sequencesort">Sorting Sequences</a>
 
-Python has a `sort` method that modifies a list in-place and a `sorted` method that builds a new sorted list from an iterable.  NumPy also has a `sort` method, but it does not modify the list in-place.
+Python has a `sort` method that modifies a list in-place and a `sorted` method that builds a new sorted list 
+from an iterable.  NumPy also has a `sort` method, but it does not modify the list in-place.
 
     my_list = ['hello', 'world', 'will', 'was', 'here']
     
@@ -370,6 +427,24 @@ A common pattern is to sort objects using the object indices as a key.  For exam
     #[('john', 'A', 15), ('jane', 'B', 12), ('dave', 'B', 10)]
     sorted(student_tuple, key=lambda student: student[2])  # sort by age
     #[('dave', 'B', 10), ('jane', 'B', 12), ('john', 'A', 15)]
+
+Another example is an OrderedDict, which remembers the insertion order. This can be used with sorting to make a sorted
+dictionary:
+
+    >>> # regular unsorted dictionary
+	>>> d = {'banana': 3, 'apple': 4, 'pear': 1, 'orange': 2}
+
+	>>> # dictionary sorted by key
+	>>> OrderedDict(sorted(d.items(), key=lambda t: t[0]))
+	OrderedDict([('apple', 4), ('banana', 3), ('orange', 2), ('pear', 1)])
+
+	>>> # dictionary sorted by value
+	>>> OrderedDict(sorted(d.items(), key=lambda t: t[1]))
+	OrderedDict([('pear', 1), ('orange', 2), ('banana', 3), ('apple', 4)])
+
+	>>> # dictionary sorted by length of the key string
+	>>> OrderedDict(sorted(d.items(), key=lambda t: len(t[0])))
+	OrderedDict([('pear', 1), ('apple', 4), ('orange', 2), ('banana', 3)])
 
 #### operator (itemgetter, attrgetter, methodcaller)
 
@@ -734,7 +809,6 @@ a function parameter (immutable types are perfectly safe).
         param.append("thing")
         return param
 
-
 ### <a id="mutableimmutableefficiency">Efficiency</a>
 
 You can concatenate two strings together like this:
@@ -757,8 +831,6 @@ Instead, you want to do something that takes advantage of the mutability of a si
 	
 	### Or use a map function
 	"".join(map(str, container))
-
-
 
 - - - -
 
@@ -1280,6 +1352,9 @@ PEP 343 introduces a new __with__ statement to Python so we don't have to be as 
         VAR.__exit__()
 
 ## <a id="testing">Testing</a>
+
+Unittest
+Pytest
 
 ## <a id="packaging">Packaging</a>
 
