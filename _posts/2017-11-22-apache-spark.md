@@ -163,6 +163,20 @@ Assuming that in your dependencies folder there's a `mylibrary` directory with a
 
 Note that you need to import your libraries after your sparkContext runs `addPyFile`.
 
+This is a good post to get your pyfiles working:
+
+    https://stackoverflow.com/questions/36461054/i-cant-seem-to-get-py-files-on-spark-to-work
+
+#### Python Additional Files (eggs)
+
+If you're sending an egg, you can build it with:
+
+    python setup.py bdist_egg
+
+You'll see this in a `dist` folder with a name like `myprogram-0.0.1-py3.6egg`.
+Make sure that the computer running the egg is using the same version of python 
+as the computer that built the egg.
+
 ### Jobs UI
 
 You should be able to see all __currently running jobs__ through the UI here: 
@@ -329,6 +343,12 @@ Files are stored with `.parquet` appended (e.g. `my_file.parquet`)
 
 You can read or write a single Parquet file, which can be represented in say a table or a pandas dataframe.
 You can read a single file back with say `pq.read_table('my_file.parquet')`
+
+### Parquet with Spark
+
+When you're writing parquet for use by Spark, make sure to have the option `use_deprecated_int96_timestamps=True`.
+
+    pq.write_to_dataset(my_pyarrow_table, root_path=root_path, partition_cols=['year', 'month', 'day'], use_deprecated_int96_timestamps=True)
 
 #### Parquet Dataset
 
@@ -547,9 +567,29 @@ It'll automatically sanitize field characters unsupported by Spark SQL.
 
 https://github.com/apache/parquet-mr
 
-https://github.com/apache/parquet-mr/tree/master/parquet-tools
-cd parquet-tools && mvn clean package -Plocal
-     
+Java version:
+
+    https://github.com/apache/parquet-mr/tree/master/parquet-tools
+    sudo apt-get install maven
+    cd parquet-tools && mvn clean package -Plocal
+
+Python version:
+
+    sudo apt-get install libsnappy-dev
+    pip3 install python-snappy
+    pip3 install parquet
+
+Can then run with:
+
+`parquet 7026c2af982a4564a92c7602b43976cf.parquet` - see file
+`parquet --metadata 7026c2af982a4564a92c7602b43976cf.parquet` -- see metadata about the file (e.g. schema)
+`parquet --limit 2 7026c2af982a4564a92c7602b43976cf.parquet` -- see data (limited)
+
+### Parquet with S3
+
+With a dataframe, just write your parquet to an S3 bucket like so:
+
+
 
 ## Avro
 
@@ -722,6 +762,8 @@ Say you make a user defined function, you can specify a returned field type.
         return float(x**2)
 
     square_udf_float2 = udf(lambda z: square_float(z), FloatType())
+
+You can also use field types in things like schemas.
 
 ## Debugging with Python
 
@@ -989,6 +1031,27 @@ a safer approach is to use the take(): rdd.take(100).foreach(println).
 ### show()
 
 To show what's inside your dataframe, just run: `df.show(n=5)`
+
+## User Defined Functions
+
+There's a lot of pyspark functions in the `pyspark.sql` module, from built-in functions to DataFrame methods.
+However, there will be a time when you need to run some custom code on say a DataFrame; that's when you'll need
+a __user defined function__ (aka __udf__).
+
+A simple example might be:
+
+    from pyspark.sql.functions import udf
+    from pyspark.sql.types import IntegerType
+
+
+    def squared(s):
+        """ Simple Squared Method used for testing out UDFs """
+        return s * s
+
+
+    squared_udf = udf(squared, IntegerType())
+    df= df.withColumn("my_number_squared", squared_udf("my_number"))  # Add a new column 'my_number_squared' and fill with udf
+
 
 ## Spark Broadcast and Accumulators
 
