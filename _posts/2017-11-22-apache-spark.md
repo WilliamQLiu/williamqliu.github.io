@@ -316,6 +316,128 @@ https://spark.apache.org/docs/2.2.0/rdd-programming-guide.html
 * `countByKey()` - only available on RDDs of type (K, V)
 * `foreach(func)` - Run a function `func` on each element of the dataset.
 
+## Tuning
+
+When you submit a spark submit, you want to be able to see exactly what is going on with that 'job'.
+
+In Spark, an operation that physically moves data to produce a result is called a 'job'.
+Some jobs are triggered by user API calls (e.g. `count`).
+
+Each job is made up of different 'stages', each separated by a `shuffle`. The shuffle is needed to the `reduce` part
+of the parallel computation, where we move data in order to complete the current phase of computation. For example,
+if we have a distributed set of numbers and each is locally sorted partitions, then sooner or later we need to
+impose a global ordering that requires comparisons of data records from all over the cluster, necessitating a shuffle.
+
+### Spark Web UI
+
+For the Spark UI, you can access this at say 0.0.0.0:4040 (and will increment port to find open port if concurrent jobs).
+Here you can see the 'Jobs' tab and 'Stages' tab. Once you click on a Job, it'll take you to a stage.
+
+#### Job UI
+
+	Job Id 3, Description of 'save at NativeMethodAccessorImpl.java:0', Duration, Stages Succeeded/Total (1/3),
+	Tasks (for all stages): Succeeded/Total
+
+#### Stage UI
+
+	Total Time Across All Tasks: 13 min
+	Locality Level Summary: Process local: 6
+	Input Size / Records: 5.5 MB / 2019
+	Shuffle Write: 281.9 KB / 1570
+
+##### Stage UI - DAG Visualization
+
+An example Stage might have a DAG Visualization look like:
+
+	WholeStageCodegen - FileScanRDD [16] save at NativeMethodAccessorImpl.java:0
+	WholeStageCodegen - MapPartitionsRDD[17] save at NativeMethodAccessorImpl.java:0
+
+	BatchEvalPython - MapPartitionsRDD[18] save at NativeMethodAccessorImpl.java:0
+	BatchEvalPython - MapPartitionsRDD[19] save at NativeMethodAccessorImpl.java:0
+
+	WholeStageCodegen - MapPartitionsRDD[20] save at NativeMethodAccessorImpl.java:0
+
+	Exchange - MapPartitionsRDD[21] save at NativeMethodAccessorImpl.java:0
+
+##### Stage UI - Event Timeline
+
+The event timeline gives you a graph of what's going on.
+
+* If you have a lot large tasks with one task taking a while to finish, you might have some skew in one of the
+  partitions or tasks.
+* If you have too many partitions, you'll have too many tasks that appear here. You'll see a lot of short tasks
+  dominated by time spent in non-compute activities
+
+Adjust your configs as necessary:
+
+	SparkSession \
+        .builder \
+        .appName(app_name) \
+        .config("packages", "mysql:mysql-connector-java-5.1.45") \
+        .config("jars", "/usr/share/java/mysql-connector-java.jar") \
+        .config("jars", "/usr/local/spark-2.2.2-bin-hadoop2.7/jars/mongodb-driver-core-3.8.0.jar") \
+        .config("jars", "/usr/local/spark-2.2.2-bin-hadoop2.7/jars/mongo-java-driver-3.8.0.jar") \
+        .config("jars", "/usr/local/spark-2.2.2-bin-hadoop2.7/jars/mysql-connector-java-5.1.45-bin.jar") \
+        .config("spark.mongodb.input.uri", mongodb_connection_url) \
+        .config("spark.executor.memory", "2g") \
+        .config("spark.driver.memory", "4g") \
+        .config("spark.cores.max", "2") \
+        .config("spark.sql.shuffle.partitions", "10") \
+        .getOrCreate()
+
+https://www.protechtraining.com/blog/post/911
+
+##### Stage UI - Summary Metrics
+
+Look at the summary metrics to determine how your app is performing. Make sure to click 'Show Additional Metrics'
+to see some of these optional metrics:
+
+* Duration - time based on executorRunTime
+* Scheduler Delay - time to ship the task from the scheduler to executors and time to send result from executors to scheduler
+	If the scheduler delay is large, consider decreasing the size of tasks or decreasing the size of task results
+* Task Deserialization Time - based off executorDeserializeTime
+* GC Time - time spent from an executor for Java garbage collection while task was running
+* Result Serialization Time - time spent serializing the task result on an executor before sending it back to the driver
+* Getting Result Time - time that the driver spends fetching task results from workers - if this is large, consider
+  decreasing the amount of data returned from each task.
+* Peak Execution Meory - Sum of peak sizes of the internal data structures created during shuffles, joins, and aggregations
+* Input Size / Records - bytes and records read from Hadoop or from a Spark Storage
+* Output Size / Records - bytes and records written to Hadoop or to a Spark Storage
+* Shuffle Write Size / Records
+
+You'll want to watch out for skew, which means it takes a lot longer for 75th percentile to Max than it did for say
+Min to 25th percentile.
+
+##### Optimizations - JDBC
+
+For JDBC - if you're reading from a jdbc source like MySQL, you can specify the number of partitions.
+Use the partitions from that table to allow for parallel reads.
+
+Writes very slow
+
+When I timed my application, I found that Database Writes were very very slow (as in most operations would be measured
+in seconds, but db writes would be in minutes). Stackoverflow showed that if you set the following parameters
+in the url, you can increase writes to db:
+
+	`?useServerPrepStmts=false&rewriteBatchedStatements=true"
+
+What the above does is:
+
+* `rewriteBatchedStatements=true` improves performance dramatically because it does so by rewriting prepared statements
+for `INSERT` into `MULTI-VALUE INSERTS` when `executeBatch()`. This means that instead of sending the following
+`n` insert statements to mysql server each time an `executeBatch()` is called:
+
+	INSERT INTO X VALUES (A1, B1, C1)
+	INSERT INTO X VALUES (A2, B2, C2)
+	INSERT INTO X VALUES (A3, B3, C3)
+
+It now creates a single INSERT statement
+
+	INSERT INTO X VALUES (A1, B1, C1), (A2, B2, C2), etc.
+
+You can see this by toggling `SET global general_log = 1` on mysql, which would log into a file each statement
+sent to the mysql server.
+
 ## Parquet
 
 __Parquet__ files are a __columnar__ format supported by many data processing systems. Advantages include automatically
