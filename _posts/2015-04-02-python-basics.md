@@ -597,7 +597,8 @@ Python has the usual control flow statements.  These include:
 
 ### <a id="lambda">lambda expression</a>
 
-Lambda is a way to create small anonymous functions (i.e. a function without a name).  These are often used in combination with `filter()`, `map()`, and `reduce()`
+Lambda is a way to create small anonymous functions (i.e. a function without a name).
+These are often used in combination with `filter()`, `map()`, and `reduce()`
 
     # a general lambda expression
     lambda x: 'big' if x > 100 else 'small'
@@ -605,7 +606,9 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
 
 #### <a id="filter">filter()</a>
 
-`filter(function, sequence)` is a function that filters out all the elements of a sequence where the function returns `True`.  The first argument is the function that returns a Boolean and this is applied to every element of the list.  A sequence is returned where the values are only where the function returns `True`.
+`filter(function, sequence)` is a function that filters out all the elements of a sequence where the function returns `True`.  
+The first argument is the function that returns a Boolean and this is applied to every element of the list.
+A sequence is returned where the values are only where the function returns `True`.
 
     # filter() with number
     def lessThanFive(element):
@@ -628,7 +631,9 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
 
 #### <a id="map">map</a>
 
-`map(function, sequence)` is a function with two arguments.  The first argument is the name of a function and the second is a _sequence data type_ (e.g. a list).  Map applies the function to all the elements of the sequence and returns this as a new list.
+`map(function, sequence)` applies a function to one or more iterables.
+The first argument is the name of a function and the second is a _sequence data type_ (e.g. a list).
+Map applies the function to all the elements of the sequence and returns this as a new list.
 
     # map()
     def fahrenheit(T):
@@ -643,15 +648,21 @@ Lambda is a way to create small anonymous functions (i.e. a function without a n
 
 #### <a id="reduce">reduce</a>
 
-`reduce(function, sequence)` applies a function to a sequence and returns a single value (instead of a list like the above).  The idea is that the first two items are reduced to a single value, then that single value and the third value is reduced into a new single value.  This repeats until no more items are in the list.
+`reduce(function, sequence)` applies a function to a sequence and returns a single value (instead of a list like the above).
+The idea is that the first two items are reduced to a single value, 
+then that single value and the third value is reduced into a new single value.
+This repeats until no more items are in the list and we only have a single value.
 
     # reduce()
     result = reduce(lambda x,y: x+y, [47, 11, 42, 13])
     print result  # 113
 
+Reduce is available through `functools.reduce`.
+
 #### <a id="zip">zip</a>
 
-`zip(sequence1, sequence2)` returns a list of tuples, where each tuple contains the ith element from each of the sequences.  The returned list is truncated to the length of the shortest argument sequence.
+`zip(sequence1, sequence2)` returns a list of tuples, where each tuple contains the ith element from each of the sequences. 
+The returned list is truncated to the length of the shortest argument sequence.
 
     # zip()
     temp = zip(range(5), range(1, 20, 2))

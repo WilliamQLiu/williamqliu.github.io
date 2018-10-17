@@ -438,6 +438,9 @@ It now creates a single INSERT statement
 You can see this by toggling `SET global general_log = 1` on mysql, which would log into a file each statement
 sent to the mysql server.
 
+If you really need to speed inserts up, you can try `LOAD DATA INFILE` (speeds up 7-8x more). Note: I haven't tried it
+this route since I didn't need the additional speed.
+
 ## Parquet
 
 __Parquet__ files are a __columnar__ format supported by many data processing systems. Advantages include automatically
