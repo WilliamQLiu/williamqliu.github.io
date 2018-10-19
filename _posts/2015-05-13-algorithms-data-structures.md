@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Algorithms
+title: Algorithms and Data Structures
 ---
 
 ## {{ page.title }}
@@ -41,14 +41,23 @@ title: Algorithms
         +  [Hash Collision Resolution with Open Addressing and Quadriatic Probing](#hashquadriaticprobe)
         +  [Hash Collision Resolution with Separate Chaining](#hashseparatechaining)
     -  [Array Resizing](#arrayresize)
+*  [Lists](#lists)
+    -  [Tuples](#tuples)
+    -  [Sets](#sets)
 *  [Linked Lists](#linkedlists)
     -  [Create a linked list](#)
     -  [Delete a Node from a Singly Linked List](#)
     -  [The 'Runner' Technique](#)
     -  [Recursive Problems](#)
+    -  [Singly Linked Lists](#singlylinkedlists)
+    -  [Doubly Linked Lists](#doublylinkedlists)
+    -  [XOR Linked Lists](#xorlinkedlists)
+    -  [Circular Linked Lists](#circularlinkedlists)
 *  [Stacks and Queues](#stacksqueues)
     -  [Implement a Stack](#)
     -  [Implement a Queue](#)
+    -  [Priority Queue](#priorityqueues)
+    -  [Deque](#deque)
 *  [Algorithm Design](#algorithmdesign)
     - [Incremental](#incremental)
         + [mathmatical induction](#mathmaticalinduction)
@@ -75,6 +84,13 @@ title: Algorithms
     - [Trees](#trees)
     - [Graphs](#graphs)
 
+*  [Heaps](#heaps)
+*  [Trees](#trees)
+    - [Binary Trees](#binarytrees)
+    - [Binary Search Trees](#binarysearchtrees)
+*  [Graphs](#graphs)
+
+
 TODO:
 
 *  [Data Structures](#datastructures)
@@ -86,7 +102,15 @@ TODO:
 *  [Parallelism](#parallelism)
 
 
+# DATA STRUCTURES
+
 ##<a id="summary">Summary</a>
+
+In computer science, a data structure is a data organization,
+management and storage format that enables efficient access
+and modification. A data structure is a collection of data
+values, the relationships among them, and the functions or
+operations that can be applied to the data.
 
 ####<a id="datastructure">Structure of Data</a>
 
