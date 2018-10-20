@@ -128,6 +128,25 @@ our pointer to the records.
 A __sorting algorithm__ is the method that we determine the sorted order
 (regardless of individual fields or large satellite data).
 
+####<a id="abstractdatatype">Abstract Data Type (ADT)</a>
+
+An __abstract data type__ is a mathematical model for data types,
+where a data type is defined by its behavior from the point of view of
+a user of the data, specifically in terms of possible values, possible
+operations on data of this type, and the behavior of these operations.
+
+We call these 'abstract' because it gives an implementation independent
+view, (hiding the details of the implementation). For example, we have
+data types like `int`, `float`, `char` with the knowledge of what values
+can be assigned and what operations can be performed, but not know the
+implementation details.
+
+The issue with Python compared to other programming languages is that in say
+Java, the naming scheme of a standard data structure is pretty straightforward.
+In Java, there isn't just a `list`; it's either a `LinkedList` or an `ArrayList`.
+In Python, we have a more 'human' naming scheme, meaning we just call it a `list`,
+but really don't know if this is a linked list or a dynamic array.
+
 ####<a id="whatisalgorithm">What is an Algorithm?</a>
 
 So let's take a step back.  An __algorithm__ is a sequence of steps
