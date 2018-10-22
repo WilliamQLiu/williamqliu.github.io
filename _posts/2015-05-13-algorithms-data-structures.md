@@ -147,14 +147,43 @@ In Java, there isn't just a `list`; it's either a `LinkedList` or an `ArrayList`
 In Python, we have a more 'human' naming scheme, meaning we just call it a `list`,
 but really don't know if this is a linked list or a dynamic array.
 
-####<a id="whatisalgorithm">What is an Algorithm?</a>
+##<a id="whatisalgorithm">What is an Algorithm?</a>
 
-So let's take a step back.  An __algorithm__ is a sequence of steps
-that takes an __input__ (i.e. some value(s)) and produces an __output__
+An __algorithm__ is a procedure to accomplish a specific task.
+An algorithm must solve a general, well-specified _problem_.
+An algorithmic problem is specified by describing the complete set of
+_instances_ it must work on and of its output after running on one of
+these instances.
+
+We take an __input__ (i.e. some value(s)) and produces an __output__
 (some value(s)).  For example, we might encounter a _sorting problem_
 where we want to sort a sequence of numbers into nondecreasing order.
-Most of these notes below are taken from reading the book 'Introduction
-to Algorithms' by Thome H. Cormen.
+
+An _instance_ of sorting might be an array of names like `['Mike', 'Bob',
+'Sally', 'Jill', 'Jan']` whereas an algorithm takes any of the possible
+input instances and transforms it to the desired output.
+
+###<a id="expressingalgorithms">Expressing Algorithms</a>
+
+You can express algorithms in three common forms:
+
+* English
+* pseudocode
+* a real programming language
+
+The best notation depends on which method you are most comfortable with.
+Usually I prefer to express the _ideas_ of an algorithm in English, then
+move to a more formal programming language like Python.
+
+###<a id="agoodalgorithm">What makes a good algorithm?</a>
+
+In a good algorithm, you want to look for:
+
+1. Is the algorithm correct?
+2. Is the algorithm efficient?
+3. Is the algorithm easy to implement?
+
+Sometimes you can't achieve all three.
 
 ####<a id="algorithmcorrect">Is the algorithm correct?</a>
 
@@ -163,6 +192,23 @@ output.  A single input is an __instance of a problem__.  For example:
 
     // an instance of a problem Input Sequence of {31, 41, 59, 26, 41, 58}
     // Output Sequence of {26, 31, 41, 41, 58, 59}
+
+It is usually not obvious whether a given algorithm correctly solves a given problem.
+
+Correct algorithms usually come with a __proof of correctness__, which is
+an explanation of why we know that the algorithm must take every instance of
+the problem to the desired result. We can't just say "it's obvious", because usually
+it's not obvious.
+
+There's a fundamental difference between __algorithms__, which always produce a
+correct result, and __heuristics__, which may usually do a good job, but without
+providing any guarantee.
+
+#####<a id="provealgorithms>Proving and Disproving algorithm correctness</a>
+
+You must demonstrate that an algorithm is correct.
+
+* Seek counterexamples that break pretender algorithms
 
 ####<a id="algorithmefficient">Is the algorithm efficient?</a>
 
