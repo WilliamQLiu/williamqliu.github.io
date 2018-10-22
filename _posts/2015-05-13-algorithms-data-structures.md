@@ -173,7 +173,28 @@ You can express algorithms in three common forms:
 
 The best notation depends on which method you are most comfortable with.
 Usually I prefer to express the _ideas_ of an algorithm in English, then
-move to a more formal programming language like Python.
+move to a more formal programming language like Python. If your idea
+is not clearly revealed when you express an algorithm, then you are using
+too low-level a notation to describe it.
+
+###<a id="whatareyousolving">What's the problem?</a>
+
+Before even looking at an algorithm, ask yourself if you have a careful 
+description of the problem that the algorithm is trying to solve? Problem
+specifications usually have two parts:
+
+1. The set of allowed input instances
+2. The required properties of the algorithm's output
+
+It is impossible to prove the correctness of an algorithm for a fuzzily-stated problem.
+Ask the wrong problem and you will get the wrong answer.
+
+Its very important that you try to narrow the set of allowable instances
+until there is a correct and efficient algorithm.
+
+For example, what is the best route between these two places? We need to
+define what 'best' means, whether that is shortest in distance, time, or
+minimizing the number of turns.
 
 ###<a id="agoodalgorithm">What makes a good algorithm?</a>
 
@@ -204,11 +225,22 @@ There's a fundamental difference between __algorithms__, which always produce a
 correct result, and __heuristics__, which may usually do a good job, but without
 providing any guarantee.
 
-#####<a id="provealgorithms>Proving and Disproving algorithm correctness</a>
+#####<a id="disprovealgorithms>Disproving algorithms</a>
 
-You must demonstrate that an algorithm is correct.
+Searching for __counterexamples__ is the best way to disprove the correctness of a heuristic.
 
-* Seek counterexamples that break pretender algorithms
+Good counterexamples have all unnecessary details boiled away. Make it clear
+why the proposed algorithm fails. Try to:
+
+* think small - when algorithms fail, there is usually a very simple example that fails
+* think exhaustively - think of the types of possible answers
+* hunt for the weakness - if an algorithm "always takes the biggest" (aka greedy), think
+  of weaknesses like "what is there is a tie" or mix extremes (e.g. tiny and huge, near and far)
+
+#####<a id="provealgorithms>Proving algorithms</a>
+
+A proof or demonstration of correctness is needed. Usually this is done
+through __mathematical induction__.
 
 ####<a id="algorithmefficient">Is the algorithm efficient?</a>
 
