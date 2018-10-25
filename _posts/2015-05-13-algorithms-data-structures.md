@@ -115,7 +115,7 @@ operations that can be applied to the data.
 ####<a id="datastructure">Structure of Data</a>
 
 An individual data piece (i.e. a __record__) is usually part of a bigger
-collection of data.  Each record has a __key__ (the value to be sorted)
+collection of data.  Each record has a __key__ (e.g. a value to be sorted)
 and the rest of the record has __satellite data__ (data carried around
 with the key).
 
@@ -126,7 +126,8 @@ write to another place in hard drive) so instead we normally just move
 our pointer to the records.
 
 A __sorting algorithm__ is the method that we determine the sorted order
-(regardless of individual fields or large satellite data).
+(regardless of individual fields or large satellite data). There's various
+algorithms we can apply and various ways we can store our data.
 
 ####<a id="abstractdatatype">Abstract Data Type (ADT)</a>
 
@@ -146,6 +147,62 @@ Java, the naming scheme of a standard data structure is pretty straightforward.
 In Java, there isn't just a `list`; it's either a `LinkedList` or an `ArrayList`.
 In Python, we have a more 'human' naming scheme, meaning we just call it a `list`,
 but really don't know if this is a linked list or a dynamic array.
+
+#####<a id="datamodeling">Modeling a Problem</a>
+
+Modeling is the art of formulating your application in terms of precisely
+described, well understood problems. Modeling is the key to applying algorithmic
+design techniques to real-world problems. It's a way of relating your application
+to what has been done before.
+
+Most algorithms are designed to work on a rigorously defined __abstract__ structure,
+such as a permutation or graph or set. To utilize algorithms to their fullest
+extent, you have to be able to describe your problem abstractly in terms of
+procedures on fundamental structures.
+
+What this means is that if you're in a company building software for "widgets",
+you can't look up a solution to a "widget optimization problem".
+Instead, you have to describe how your widget fits into common data structures
+(to then leverage the common methods of those data structures).
+
+#####<a id="fundamentaldatastructures">Fundamental Data Structures</a>
+
+So with your widget, you can see if it fits any of these fundamental data structures:
+
+* __Permutations__ - an arrangement, or ordering, of items. For example,
+  {1, 2, 3, 4} and {3, 2, 4, 1} are two distinct permutations of the same
+  set of numbers. Note that ordering matters. Usually in questions that 
+  look for an "arrangement", "tour", "ordering" or "sequence"
+* __Subsets__ - represents selections from a set of items. For example,
+  {1, 3, 4} and {2} are two distinct subsets of the first four integers.
+  Order does not matter in subsets. {1, 3, 4} is identical to {3, 4, 1}.
+  Usually in questions that look for a "cluster", "collection", "committee",
+  "group", "packaging", or "selection"
+* __Trees__ - represents hierarchical relationships between items. Trees
+  are usually in questions seeking a "hierarchy", "dominance relationship",
+  "ancestor/descendant relationship" or "taxonomy"
+* __Graphs__ - represents relationships between arbitrary pairs of objects.
+  An example is a network of roads as a graph, where the vertices are cities
+  and the edges are roads between connecting pairs of cities. Usually in
+  questions that look for "network", "circuit", "web", or "relationship"
+* __Points__ - represents locations in some geometric space. For example,
+  the location of a restaurant or house on a map. Usually in questions that
+  look for "sites", "positions", "data records", or "locations"
+* __Polygons__ - represents regions in a geometric space. For example,
+  the borders of a county or state as shown on a map. Polygons and polyhedra
+  are likely in questions working on "shapes", "regions", "configurations",
+  or "boundaries".
+* __Strings__ - represents sequences of characters or patterns. For example,
+  the names of students in a class. Strings are likely in questions dealing
+  with "text", "characters", "patterns", or "labels"
+
+These fundamental data structures are important because they provide the
+language to use to model applications. Study the _input_ and _output_ of each
+problem and you'll know where to look when the problem arises in your application.
+
+Modeling is only the first step in designing an algorithm for a problem,
+but its also the most important step towards a solution. Make sure you
+model the problem correctly before trying to solve it.
 
 ##<a id="whatisalgorithm">What is an Algorithm?</a>
 
@@ -236,11 +293,31 @@ why the proposed algorithm fails. Try to:
 * think exhaustively - think of the types of possible answers
 * hunt for the weakness - if an algorithm "always takes the biggest" (aka greedy), think
   of weaknesses like "what is there is a tie" or mix extremes (e.g. tiny and huge, near and far)
+* seek extremes - it is easier to verify or reason about extreme examples
+  than more muddled ones
 
 #####<a id="provealgorithms>Proving algorithms</a>
 
 A proof or demonstration of correctness is needed. Usually this is done
-through __mathematical induction__.
+through __mathematical induction__. So what is it? Think of mathematical induction
+like recursion. You break a problem up by solving a base case and then any
+smaller pieces.
+
+######<a id="thinkrecursively">Recursive Objects</a>
+
+Learning to think recursively is to learn how to look for big things that
+are made from smaller things that are made exactly the same type as the big thing.
+Think of houses as sets of rooms, then adding or deleting a room and you still
+have a house behind. If we look at our fundamental data structures, we have:
+
+* Permutations - delete the first element of a permutation {1, ..., n} and you get a
+  permutation of the remaining `n-1` things.
+* Subsets - every subset of the elements {1, ..., n} contains a subset of {1, ...., n-1}
+  by deleting element n
+...
+
+These recursive descriptions of objects require both decomposition rules and _basis cases_,
+namely the specification of the smallest and simplest objects where the decomposition stops.
 
 ####<a id="algorithmefficient">Is the algorithm efficient?</a>
 
@@ -295,11 +372,17 @@ especially if you get stuck.
 
 ###<a id="walkthroughexample">Draw an Example</a>
 
-Draw a good example, meaning watch out to:
+Do not skip this step. Draw a good example, meaning watch out to:
 
 * Make an example that is not too small, not too large (most tend to be too small)
 * Needs to be specific - use real numbers or strings
 * Make sure its not a special case
+
+Make sure you really understand what you're trying to solve.
+You can't come up with the right solution if you're solving the wrong problem!
+
+Your example should help reinforce your understanding of the problem and
+whether any algorithms that you apply will work.
 
 ###<a id="walkthroughbruteforce">State a Brute Force</a>
 
@@ -451,6 +534,33 @@ If we compare these two scenarios, the 'Airplane Transfer' time is slower
 for small files, but at some point beats out the 'Electronic Transfer'.
 This general idea is that the _running time of an algorithm is a function
 of the size of its inputs_.
+
+###<a id="algorithmanalysistools">Algorithm Analysis Tools</a>
+
+Big O is used to compare the efficiency of algorithms without implementing them.
+We have a couple tools for this:
+
+1.) RAM model of computation
+2.) Asymptotic analysis of worst-case complexity
+
+####<a id="rammodel">RAM Model of Computation</a>
+
+Machine-independent algorithm design depends upon a hypothetical computer
+called the _Random Access Machine_ (RAM). This computer strikes a balance
+of capturing essential behavior of computers while being simple to work with.
+
+* Each simple operation (`+`, `*`, `-` etc) takes exactly one time step 
+* Loops and subroutines are not considered simple operations
+* Each memory access takes exactly one time step
+* We have unlimited memory
+* There is no notice if an item is in cache or on disk
+
+We measure _run time_ by counting up the number of steps an algorithm takes
+on a given problem. Our imaginary machine runs a given number of steps per second.
+
+With RAM, we can count how many steps our algorithm takes on any given input instance
+by executing it. We look at the best-case, average-case, and worst-case complexity.
+Usually we use the worst-case complexity.
 
 ####<a id="bigocommon">Common O Notations</a>
 
