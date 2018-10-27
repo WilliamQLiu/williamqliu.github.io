@@ -256,7 +256,8 @@ Some things to note about each of the above Spark Architecture:
 
 There are two fundamental sets of APIs:
 
-* the low level "unstructured" APIs - Resilient Distributed Datasets (__RDD__) - don't use these
+* the low level "unstructured" APIs - Resilient Distributed Datasets (__RDD__) - don't use these unless you have to
+  Sometimes you do have to use them when there isn't an equivalent dataframe function
 * the higher level "structured" APIs - DataFrames, SparkSQL, Datasets (only available to Java and Scala)
 
 ### Spark Master
@@ -688,6 +689,18 @@ An example code where you write data to a Pandas DataFrame, then convert this to
 Note: use "flavor='spark'" on writing data so that the data will work with Spark's constraints on types of files it can read.
 It'll automatically sanitize field characters unsupported by Spark SQL.
 
+### Parquet Pretty/JSON Output
+
+With the command line tool `parquet` (from pip install`, you can peak at a parquet file pretty easily.
+
+    # Show columnar data format
+    parquet myfile.parquet
+
+However, if you have a lot of columns, it gets pretty messy. Try outputting the format to json:
+
+    parquet --format json --limit 1 faa8cf616f0a47f585eabb879b33c347.parquet
+    {"some_col": "3", ... }
+
 ### Parquet Tools
 
 https://github.com/apache/parquet-mr
@@ -713,8 +726,6 @@ Can then run with:
 ### Parquet with S3
 
 With a dataframe, just write your parquet to an S3 bucket like so:
-
-
 
 ## Avro
 
@@ -1177,6 +1188,18 @@ A simple example might be:
     squared_udf = udf(squared, IntegerType())
     df= df.withColumn("my_number_squared", squared_udf("my_number"))  # Add a new column 'my_number_squared' and fill with udf
 
+Be careful with pyspark udfs, since if you want to pass a parameter into the user defined function, make sure to 
+mention the type and use `lit()` so you can access any of the `pyspark.sql.Column` methods / treat standard Python
+scalar as a constant column.
+
+    def power(value, power):
+        """ value to the power """
+        return value ** power
+
+    power_udf = udf(power, IntegerType())
+    power_number = 10
+    df = df.withColumn("my_number", power_udf("my_x_value", lit("power_number")))
+
 
 ## Spark Broadcast and Accumulators
 
@@ -1254,6 +1277,33 @@ rough upper limit for a single executor. Also remember that a server's OS will t
 don't overallocate the memory you have.
 
 #### Off-heap
+
+
+## Spark Distributed Datasets (RDDs)
+
+You want to use a Spark DataFrame, but sometimes you'll have to switch over to the older Spark RDD when
+some functions are not available to DataFrames.
+
+### Convert from DF to RDD
+
+To convert from a spark dataframe to an RDD, run:
+
+    print(df.rdd.take(5))  # e.g. [Row(my_field=None, another_field=Decimal('1.00')...]
+
+    # filter for a specific column
+    df.select("my_specific_column").rdd.take(5)  # [Row(my_specific_column=None), Row(my_specific_column=None)...]
+
+### RDD functions
+
+Say you want to run an RDD function, like creating a unique id or index
+
+    df.select("my_col").rdd.zipWithUniqueId().collect()
+
+### Convert from RDD to DF
+
+To convert an RDD back to a DataFrame, run `toDF()`
+
+    my_df = df.select('my_field').rdd.map(lambda x: my_function(x)).toDF()
 
 ## Apache Toree
 
