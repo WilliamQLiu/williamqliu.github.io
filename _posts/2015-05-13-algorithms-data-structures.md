@@ -83,7 +83,6 @@ title: Algorithms and Data Structures
 *  [Graph Theory](#graphtheory)
     - [Trees](#trees)
     - [Graphs](#graphs)
-
 *  [Heaps](#heaps)
 *  [Trees](#trees)
     - [Binary Trees](#binarytrees)
@@ -93,8 +92,6 @@ title: Algorithms and Data Structures
 
 TODO:
 
-*  [Data Structures](#datastructures)
-*  [Algorithm Techniques](#algorithmtechnique)
 *  [Graph Theory](#graphtheory)
 *  [Greedy Methods](#greedy)
 *  [Dynamic Programming](#dynamicprogramming)
@@ -147,6 +144,20 @@ Java, the naming scheme of a standard data structure is pretty straightforward.
 In Java, there isn't just a `list`; it's either a `LinkedList` or an `ArrayList`.
 In Python, we have a more 'human' naming scheme, meaning we just call it a `list`,
 but really don't know if this is a linked list or a dynamic array.
+
+#####<a id="fundamentalabstractdatatype">Fundamental Abstract Data Type (ADT)</a>
+
+There are three fundamental abstract data types:
+
+* Containers
+* Dictionaries
+* Priority Queues
+
+These can be implemented with arrays and lists.
+In Python, arrays are lists and lists are say custom classes for singled linked
+list (sorted), single linked list (unsorted), double linked list (sorted), double linked
+list (unsorted), etc.
+
 
 #####<a id="datamodeling">Modeling a Problem</a>
 
@@ -204,6 +215,31 @@ Modeling is only the first step in designing an algorithm for a problem,
 but its also the most important step towards a solution. Make sure you
 model the problem correctly before trying to solve it.
 
+###<a id="contiguouslinked">Contiguous vs Linked Data Structures</a>
+
+Data structures can be either __contiguous__ or __linked__, depending
+on whether they are based on arrays or pointers.
+
+* __Contiguously-allocated structures__ are single slabs of memory;
+  these include arrays, matrices, heaps, and hash tables
+* __Linked data structures__ are distinct chunks of memory bound
+  together by _pointers_, and include lists, trees, and graph adjacency
+  lists
+
+####<a id="comparisonarraylinked">Comparison: Linked Lists versus static Arrays</a>
+
+Advantages of Linked List over Arrays
+
+* Overflow on a linked list can never occur unless the memory is actually full
+* Insertions and deletions are simpler on linked lists than a contiguous arrays
+* With large records, moving pointers is easier and faster than moving the items themselves
+
+Advantages of Arrays over Linked Lists
+
+* Linked structures require more space for storing pointer fields (whereas arrays just store the data)
+* Linked lists do not allow efficient random access to items
+* Arrays allow better memory locality and cache performance than random pointer jumping
+
 ##<a id="whatisalgorithm">What is an Algorithm?</a>
 
 An __algorithm__ is a procedure to accomplish a specific task.
@@ -252,6 +288,23 @@ until there is a correct and efficient algorithm.
 For example, what is the best route between these two places? We need to
 define what 'best' means, whether that is shortest in distance, time, or
 minimizing the number of turns.
+
+###a id="thinkrecursively">Recursive Objects</a>
+
+When you're trying to find what the problem is, learning to think recursively 
+is to important so that you know how to look for big things that
+are made from smaller things that are made exactly the same type as the big thing.
+Think of houses as sets of rooms, then adding or deleting a room and you still
+have a house behind. If we look at our fundamental data structures, we have:
+
+* Permutations - delete the first element of a permutation {1, ..., n} and you get a
+  permutation of the remaining `n-1` things.
+* Subsets - every subset of the elements {1, ..., n} contains a subset of {1, ...., n-1}
+  by deleting element n
+...
+
+These recursive descriptions of objects require both decomposition rules and _basis cases_,
+namely the specification of the smallest and simplest objects where the decomposition stops.
 
 ###<a id="agoodalgorithm">What makes a good algorithm?</a>
 
@@ -302,22 +355,6 @@ A proof or demonstration of correctness is needed. Usually this is done
 through __mathematical induction__. So what is it? Think of mathematical induction
 like recursion. You break a problem up by solving a base case and then any
 smaller pieces.
-
-######<a id="thinkrecursively">Recursive Objects</a>
-
-Learning to think recursively is to learn how to look for big things that
-are made from smaller things that are made exactly the same type as the big thing.
-Think of houses as sets of rooms, then adding or deleting a room and you still
-have a house behind. If we look at our fundamental data structures, we have:
-
-* Permutations - delete the first element of a permutation {1, ..., n} and you get a
-  permutation of the remaining `n-1` things.
-* Subsets - every subset of the elements {1, ..., n} contains a subset of {1, ...., n-1}
-  by deleting element n
-...
-
-These recursive descriptions of objects require both decomposition rules and _basis cases_,
-namely the specification of the smallest and simplest objects where the decomposition stops.
 
 ####<a id="algorithmefficient">Is the algorithm efficient?</a>
 
@@ -880,22 +917,47 @@ usually used to represent sequences. If we have an Array _A_, then we can say th
 `A[i]` is the `(i + 1)th` object stored in the array (because `A[i]` starts at 0).
 Retrieving and updating `A[i]` takes `O(1)` calculation time.
 
-Inserting
+####<a id="arrayadvdisadv">Array Advantages and Disadvantages"</a>
 
-Insertion into a full array is handled by resizing. We allocate a new array with
-additional memory, then copy over the entries from the original array. This increases
-the worst-case scenario of insertion, but if the new array has a constant factor
-larger than the original array, then the average time for insertion is constance
-since resizing is infrequent.
+Advantages of a contiguously-allocated arrays (i.e. a 'list' in Python) are:
 
-Deleting
+* Constant-time access when given the index. The index of each element maps directly
+  to a particular memory address so we can access arbitrary data items instantly
+  if we know the index.
+* Space efficient - Arrays are made of purely data; there's no links/pointers or
+  any other information. We don't even need an 'end-of-record' info because
+  arrays are built from fixed-size records
+* Memory locality - Programming commonly requires iterating through all the elements
+  of a data structure. Arrays are good for this because they have excellent memory
+  locality, meaning that because the physical memory being accessed is so close to 
+  each other, we can take advantage of the high-speed __cache memory__ on modern computers.
 
-Deleting an element from an array means moving all successive elements one over
-to the left to fill the vacated space. For example, if an array is:
+Disadvantages are:
+
+* We cannot adjust the size of an array in the middle of a program's execution.
+  If we allocate an extremely large array, this can waste space
+ 
+We can efficiently enlarge arrays as we need them through __dynamic arrays__.
+As soon as we need a larger array, we double the size and copy the contents of the
+smaller array into the larger array. The primary thing lost using dynamic arrays
+is the guarantee that each array access takes constant time in the worst case.
+All queries will be fast, except those relatively few queries triggering array doubling.
+
+####<a id="arraycrudoperations">Array CRUD Operations"</a>
+
+The time for operations really depends on whether an array is sorted or unsorted.
+
+####<a id="sortedarrays">Sorted Arrays</a>
+
+Inserting and Deleting
+
+For a sorted array, deleting an element from an array means moving all successive 
+elements one over to the left to fill the vacated space. For example, if an array is:
 `[2, 3, 5, 7, 9, 11, 13, 17]`, then deleting an element at index 4 results in
 `[2, 3, 5, 7, 11, 13, 17, 0]`. The time complexity of deleting an element at
 index `i` from an array of length `n` is `O(n-i)`. The same is true for inserting
-a new element (as opposed to updating an existing entry)
+a new element (as opposed to updating an existing entry). The reason for this is that
+we now need to move elements over.
 
 ####<a id="arrayproblem1">Array Problem 1</a>
 
@@ -1364,16 +1426,45 @@ memory allocation is done for all of its elements as one block of memory
 (easier since its all the same data types).  A linked list instead does
 memory allocation so that each element (aka __linked list element__,
 __node__), gets its own memory block.  The linked list gets its overall
-structure by using pointers to connect all its nodes together.
+structure by using __pointers__ to connect all its nodes together.
 
 So what are some examples of linked lists?
 
+* The list is the simplest kind of linked structure. The only operations
+  for this are searching, inserting, and deleting.
 * Singly Linked List - a scavenger hunt where one clue points to the
-place of the next clue (but that clue has no reference to the previous
-clue) * Doubly Linked List - a train car that has a previous and next
-train car connected to it * Circular Linked List - Whose turn is it on
-a multiplayer game (keeps going around), same with resource pooling on
-a shared resource (e.g. round robin scheduling)
+  place of the next clue (but that clue has no reference to the previous
+  clue)
+* Doubly Linked List - a train car that has a previous and next
+  train car connected to it. Each node points to both the predecessor
+  and its sucessor element
+* Circular Linked List - Whose turn is it on a multiplayer game 
+  (keeps going around) or resource pooling on a shared 
+  resource (e.g. round robin scheduling)
+
+In terms of implementation, we can search for an item in a linked list
+either iteratively or recursively.
+
+###<a id="pointers">Pointers</a>
+
+Before we get too in-depth with linked list/structures, we need to get
+into detail about pointers. __Pointers__ are the connections that hold
+the pieces of linked structures together.
+
+Pointers represent the address of a location in memory. A variable
+that stores a pointer to a given data item can provide more freedom
+than storing a copy of the item itself.
+
+A real life example might be a cell-phone number can be thought of as a
+pointer to its owner as they move around.
+
+In programming languages like C, we have:
+
+* pointer `p` is assumed to give the address in memory where a chunk of data is located
+* pointers in C have types declared at compile time, denoting the data type it can point to
+* we use `*p` to denote the item that is pointed to by pointer `p`
+* we use `&x` to denote the address of (i.e. pointer to) of a particular variable `x`.
+* a `NULL` pointer value is used to denote structure-terminating or unassigned pointers
 
 ###<a id="createlinkedlist">Creating a Linked List</a>
 
@@ -1851,7 +1942,7 @@ each with an associated value called a __key__.  There's __max-priority
 queue__ (e.g. used to schedule jobs on a server and set their relative
 priorities) and a __min-priority queue__ (e.g. used for _discrete
 event-driven simulation_ models like determining how many patients can
-be served from changing 8 hours to 9 hours of operation when avg surguery
+be served from changing 8 hours to 9 hours of operation when avg surgery
 takes say 4 hours).
 
 ##<a id="decisiontree">Sorting Algorithms with Linear Time (Decision
