@@ -1473,6 +1473,84 @@ Each node contains two fields:
 * a 'data' field to store the actual value.  * a 'next' field, which is
 a pointer used to link the node to the next node
 
+##<a id="stacksqueues">Stacks and Queues</a>
+
+A __container__ is a data structure that lets you store and retrieve
+data items _independent of content_. Containers are in contrast to dictionaries,
+which are abstract data types that retrieve based on key values or content.
+There are a few types of containers and they're identified by
+the retrieval order. The two most important are:
+
+* __Stacks__ - Stacks are containers that retrieve content based on 
+Last-In, First-Out (LIFO) order. Stacks are simple to implement and
+very efficient. Choose to use a stack when the retrieval order doesn't
+matter at all. The `put` and `get` operation for stacks are called
+`push` and `pop`. An example is a subway car where the people that come
+in first have the hardest time getting out during busy hours.
+* __Queues__ - Queues are containers that retrieve content based on
+First-In, First-Out (FIFO) order. This order is useful when you want to
+minimize the _maximum_ time spent waiting (Note: the _average_ time waiting
+will still be the same for FIFO or LIFO). Queues are trickier to implement
+than stacks, but they're the right container to choose when the order is
+important. The `get` and `put` operations in queuse are usually called
+`enqueue` (insert item x at the back of the queue q) or `dequeue` (return
+and remove the front item from queue q). Queues are the fundamental
+data structure controlling __breadth-first searches__ in graphs.
+
+You can implement a stack or queue using either arrays or linked lists.
+
+###<a id="stacksqueuespython">Stacks and Queues in Python</a>
+
+In Python, you can use a list as a __stack__ very easily (just run
+`mylist.append(myitem)` or `mylist.pop(myitem)`.
+
+In Python, if you need a __queue__, just use the `collections.deque`.
+You can use a list as a queue, but it's not efficient (due to inserts
+or pops from the beginning of a list since all the other elements have 
+to be shifted by one). With a __deque__, you can run `get` and `put` with:
+`myqueue.popleft()` and `myqueue.append(myitem)`
+
+##<a id="dictionaries">Dictionaries</a>
+
+The __dictionary__ data type allows access to data items by content.
+The idea is that you stick an item into a dictionary so you can find it later.
+The primary operations on a dictionary are:
+
+* __Search__ - in a dictionary `D` and search key `k`, return a pointer to the element
+  in the dictionary whose key value is `k` (if one exists)
+* __Insert__ - in a dictionary `D` and a data item `x`, add it to the set in the dictionary
+* __Delete__ - in a dictionary `D` and given a pointer to a given data item `x`, remove the
+  data item from the dictionary 
+* __Max__ or __Min__ - Retrieve the item with the largest (or smallest) key from the dictionary
+  This is important because the dictionary can serve as a __priority queue__.
+* __Predecessor__ or __Successor__ - Retrieve the item from the dictionary whose key is
+  immediately before (or after) the item in sorted order. These methods allow us to
+  iterate through the elements of the data structure
+
+###<a id="dictionaryexamples">Dictionary Examples</a>
+
+A lot of common data processing tasks take dictionaries. For example, if we want
+to remove all duplicate names from a mailing list, we can:
+
+1. Initialize an empty dictionary where the search key is the record name
+2. Iterate through the mailing list
+3. For each record, _search_ to see if a name exists in the dictionary
+4. If there is no record, then _insert_ the record
+5. Once we finish iterating through the mailing list, we need to extract the names out of the dictionary
+6. We start from the first item with _Min_, then repeatedly call _Successor_ until we obtain _Max_.
+
+When we define a problem in terms of an abstract dictionary's operations, we can avoid
+the details of the data structure's representation and instead focus on the task
+
+###<a id="dictionaryuses">Dictionary Uses</a>
+
+There are various dictionaries based on:
+
+* Arrays
+* Linked Lists
+* Binary Search Trees
+* Hash Tables
+
 ##<a id="algorithmdesign">Designing Algorithms</a>
 
 We briefly cover the structure of data, then go into a couple of design
