@@ -1551,6 +1551,147 @@ There are various dictionaries based on:
 * Binary Search Trees
 * Hash Tables
 
+###<a id="dictionaryruntimes">Dictionary Runtimes</a>
+
+Remember that a data representation can have some efficient operations while
+other operations are more expensive. A lot of these operation costs depend
+on whether the data structure is sorted or unsorted.
+
+####<a id="dictionaryruntimesarrays">Dictionary Runtimes (Sorted Array and Unsorted Arrays)</a>
+
+Dictionary runtimes as a __sorted array__ and __unsorted array__ are:
+
+                    Unsorted array  Sorted array
+    Search          O(n)            O(log n)
+    Insert          O(1)            O(n)
+    Delete          O(1)*           O(n)
+    Successor       O(n)            O(1)
+    Predecessor     O(n)            O(1)
+    Minimum         O(n)            O(1)
+    Maximum         O(n)            O(1)
+
+You can see that the implementation of a dictionary using a sorted array
+completely reverses our notations of what is easy and what is hard.
+
+In a sorted array, insertion and deletion become more expensive because 
+making room for a new item or filling a hole requires moving around a lot of items.
+While in a sorted array, get methods like search and successor and minimum/maximum
+are quick operations.
+
+When designing data structures, make sure to balance all the different
+operations it supports. The fastest data structure to support both
+operations A and B might not be the fastest data structure to support
+either operation A or B.
+
+####<a id="dictionaryruntimeslists">Dictionary Runtimes (Lists)</a>
+
+A dictionary can be implemented as __sorted list__ or __unsorted list__.
+A dictionary can also be implemented as a __singly-linked list__ or __doubly-linked list__.
+
+We then have:
+
+* a __singly-linked unsorted list__
+* a __double-linked unsorted list__
+* a __singly-linked sorted list__
+* a __doubly-linked sorted list__
+
+Dictionary runtimes as a the above are:
+
+                    Singly      Double      Singly      Doubly
+                    Unsorted    Unsorted    Sorted      Sorted
+    Search          O(n)        O(n)        O(n)        O(n)
+    Insert          O(1)        O(1)        O(n)        O(n)
+    Delete          O(n)*       O(1)        O(n)*       O(1)
+    Successor       O(n)        O(n)        O(1)        O(1)
+    Predecessor     O(n)        O(n)        O(n)*       O(1)
+    Minimum         O(n)        O(n)        O(1)        O(1)
+    Maximum         O(n)        O(n)        O(1)*       O(1)
+
+Same as unsorted arrays, search operations are slow when we have unsorted
+while maintenance operations are fast.
+
+###<a id="dictionaryruntimesbinarysearchtrees">Dictionary Runtimes (Binary Search Trees)</a>
+
+So far we've seen data structures that allow either fast search OR flexible updates, but
+not both fast search AND flexible updates.
+
+__Binary Search__ requires that we have fast access to _two elements_, being the
+median elements above and below the given node. We create this by using a 'linked list'
+with two pointers per node and that gives us __binary search trees__.
+
+There's a __rooted binary tree__ that is recursively defined as either:
+
+1. empty
+2. consisting of a node called the root, together with two rooted binary trees
+   called the left and right subtree (The order matters among 'brother' nodes in rooted trees)
+
+A binary search tree labels each node in a binary tree with a single key (say `x`).
+The labeling scheme is special, with:
+
+* Any nodes in the left subtree of `x` have keys `< x`.
+* Any nodes in the right subtree of `x` have keys `> x`.
+* For any binary tree on `n` nodes, and any set of `n` keys, there is exactly one labeling
+  that makes it a binary search tree.
+
+####<a id="binarysearchtreeexamples">Binary Search Tree Examples</a>
+
+For example, on a three node tree, there are five distinct binary search trees:
+
+      3     3       2      1       1
+     2     1       1 3      3       2
+    1       2              2         3
+
+####<a id="binarysearchtreeimplementation">Binary Search Tree Implementation and Operations</a>
+
+Binary tree nodes have a:
+
+* __left__ pointer field
+* __right__ pointer field
+* an optional __parent__ pointer field
+* a __data__ field
+
+Binary trees have the following basic operations:
+
+* __Searching__ - we start at the root and either return the root node `x`, or we proceed `left` (< x) or `right` (> x)
+                  Remember that both the left and right subtrees of a binary search tree are also binary search trees
+                  We get `O(h)` runtime where `h` is the height
+* __Minimum and Maximum__ - it's easy to find the `minimum` and `maximum` element in the tree.
+                  The smallest key is in the leftmost subtree of the root and largest key is in the rightmost subtree of the root
+* __Traversal__ - traversal means to visit all the nodes and runs on `O(n)` time where n is the number of nodes in the tree
+* __Insertion__ - there's only one place to insert an item `x` into a binary search tree `T` where it'll know how to find it again
+                  Insertion runs on `O(h)` time
+* __Deletion__ - Deletion is tricky because removing a node means appropriately linking its two descendant subtrees
+                 back into the tree somewhere else. There are three cases: 1) no children, easy to handle, just delete
+                 2) deleted node only has one child; link the child node to the parent node
+                 3) deleted node has two children; relabel this node with the key of its immediate successor in sorted order.
+                    The successor must be the smallest value in the right subtree (leftmost descendant in the right subtree)
+
+####<a id="binarysearchtreeruntimes">Binary Search Tree Runtimes</a>
+
+All three dictionary operations take `O(h)` time, where `h` is the height of the tree.
+The smallest height we can hope for is when the tree is perfectly balanced, where
+`h = log n`. The issue is that the tree has to be perfectly balanced.
+
+With binary search trees, the order that we insert data greatly affects runtimes (since
+that's the shape/height we create for our tree)
+
+For example, if we insert our data that has been sorted, we have `n` list items with an
+`n` tree. Say we have a list of `[5, 9, 11, 12]`. This creates a binary tree of:
+
+    5
+     9
+      11
+       12
+
+So with the above example, we have `n` runtime because we only have right insertions,
+creating a skinny tree. Our implementation depends a lot on __randomization__ and hoping
+for the best results based on the input.
+
+There are different implementations of binary search trees caused __balanced binary search
+trees__, such as __red-black trees__ and __splay trees__ that guarantee the height always
+be `O(log n)` (by adjusting the tree a little after each insertion / keeping it close enough
+to be balanced).
+
 ##<a id="algorithmdesign">Designing Algorithms</a>
 
 We briefly cover the structure of data, then go into a couple of design
