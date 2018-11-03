@@ -1692,6 +1692,43 @@ trees__, such as __red-black trees__ and __splay trees__ that guarantee the heig
 be `O(log n)` (by adjusting the tree a little after each insertion / keeping it close enough
 to be balanced).
 
+##<a id="priorityqueues">Priority Queues</a>
+
+Many algorithms process items in a specific order. __Priority Queues__ are data structures
+that provide more flexibility than simple sorting; instead they allow new elements to
+enter a system at arbitrary intervals. It's cost-effective to insert a new job into a priority
+queue than to re-sort everything on each new item's arrival. So the idea is that you can
+add items at any time, but only the item with the highest priority can be removed first.
+
+Priority Queues are often used with heaps since we're sure that the value of a node is less
+than all the values in its subtrees. The smallest element is the one with the highest priority.
+
+We have three primary operations:
+
+* __Insert__ - given an item `x` with key `k`, insert it into the priority queue `Q`
+* __Find Min or Max__ - returns a pointer to the item whose key value is smaller or larger
+than any other key in the priority queue `Q`
+* __Delete Min or Max__ - remove the item from the priority queue Q whose key is the
+minimum or maximum
+
+###<a id="priorityqueueexample">Priority Queue Example</a>
+
+Examples of priority queues could be:
+
+* patients in an emergency room; can keep adding, but only the one with the highest emergency gets sent to ER
+
+###<a id="priorityqueueruntimes">Priority Queue Runtimes</a>
+
+            Unsorted        Sorted      Balanced
+            Array           Array       Tree
+Insert      O(1)            O(n)        O(log n)
+Find Min    O(1)            O(1)        O(1)
+Delete Min  O(n)            O(1)        O(log n)
+
+The trick is to use an extra variable to store the pointer/index to the minimum
+entry in each of these structures so we can return this value whenever we're asked
+to find the minimum.
+
 ##<a id="algorithmdesign">Designing Algorithms</a>
 
 We briefly cover the structure of data, then go into a couple of design
@@ -2141,13 +2178,25 @@ as a binary tree.  Think of this algorithm as two parts:
 
 1. We have some data (e.g. a list of `[6, 5, 3, 1, 8, 7, 2, 4]`) that we
 use to create the _heap_, a data structure that looks like a binary tree.
+
+A __heap__ is a complete binary tree in which the node is less than all
+the values in its subtrees (or greater if reversed). An example looks like:
+
+               3
+              /  \
+            9     4
+           / \   / \
+          26 10 18 20
+          
 As we're building this binary tree, the heap swaps elements depending
 on the type (e.g. min or max) of the binary heap (e.g. sorting smallest
 to largest, larger nodes don't stay below smaller node parents and end
 up swapping; `8` can't be below `5` on the heap).  Once the binary tree
 is built, we have a tree where each array index represents a node and
 also has the index of the node's parent, left child branch, or right
-child branch.  2. We then create a _sorted array_ by repeatedly removing
+child branch.
+
+2. We then create a _sorted array_ by repeatedly removing
 the largest element from the root of the heap and inserting it into
 the array.  The heap is updated after each removal to maintain the heap.
 The heap incrementally gets smaller until all objects have been removed
