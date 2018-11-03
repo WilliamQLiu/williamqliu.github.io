@@ -297,7 +297,7 @@ Driver Program is managed by a 'Cluster Manger'
 There are many Worker Nodes that get jobs from the Driver Program
 Worker Nodes have Executors that run many Tasks
 
-### Actions
+### Actions (RDD)
 
 Below are some sample __Actions__ by Spark. 
 
@@ -316,6 +316,11 @@ https://spark.apache.org/docs/2.2.0/rdd-programming-guide.html
   element to convert it to a line of text in the file
 * `countByKey()` - only available on RDDs of type (K, V)
 * `foreach(func)` - Run a function `func` on each element of the dataset.
+
+### Actions (DataFrame)
+
+* `df.withColumn()`
+* `df.select()`
 
 ## Tuning
 
@@ -1281,6 +1286,9 @@ don't overallocate the memory you have.
 
 ## Spark Distributed Datasets (RDDs)
 
+In Spark, we have RDDs called __resilient distributed dataset__ (RDD) that are a collection of elements partitioned
+across the nodes of the cluster that can be operated on in parallel.
+
 You want to use a Spark DataFrame, but sometimes you'll have to switch over to the older Spark RDD when
 some functions are not available to DataFrames.
 
@@ -1304,6 +1312,35 @@ Say you want to run an RDD function, like creating a unique id or index
 To convert an RDD back to a DataFrame, run `toDF()`
 
     my_df = df.select('my_field').rdd.map(lambda x: my_function(x)).toDF()
+
+## Spark Streaming
+
+__Spark Streaming__ is an extension of the core Spark API. Spark Streaming enables scalable, high-throughput, fault-tolerant
+stream processing of live data streams. Data is ingested from sources like Kafka, Flume, Kinesis, HDFS/S3, or TCP sockets,
+and data is processed using high-level functions like `map`, `reduce`, `join`, and `window`. Processed data is pushed
+out to filesystems and databases.
+
+Spark Streaming receives live input data streams and divides the data into batches, when are then processed by the
+Spark engine to generate the final stream of results in batches.
+
+### DStreams
+
+Spark Streaming has a high-level abstraction called __discretized stream__ or __DStream__, which represents a
+continuous stream of data. DStreams are created from input data sources (e.g. Kafka, Flume, Kineses) or by applying
+high-level operations on other DStreams. Internally, a DStream is just a sequence of RDDs (Spark's abstraction of
+an immutable, distributed dataset). Each RDD in a DStream contains data from a certain interval.
+
+DStreams have __Input DStreams__ and __Receivers__. An example of an input stream is `socketTextStream`. There are
+two types of receivers based on their __reliability__. Some sources like Kafka and Flume allow the transferred data
+to be acknowledged. If the system receiving data from these reliable sources acknowledges the received data correctly,
+we can ensure that there will be no data lost. The other type is an an _unreliable receiver_, where we do not send
+acknowledgement to a source.
+
+When configuring your Spark cluster, keep in mind that you need to have enough allocated cores so that you can
+process the received data (as well as to run the receiver).
+
+#### DStream Transformations 
+
 
 ## Apache Toree
 
