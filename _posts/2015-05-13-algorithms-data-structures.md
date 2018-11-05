@@ -966,12 +966,26 @@ so that the even entries appear first. We can do this easily in `O(n)` space whe
 is the length of the array. However, this is more difficult to solve without allocating
 additional storage.
 
-####<a id="hashing">Hashing</a>
+##<a id="hashingandstrings">Hashing and Strings</a>
+
+__Hash tables__ are a very practical way to maintain a dictionary.
+They exploit the fact that looking up an item in an array takes constant time
+once you have its index. A __hash function__ is a mathematical function that
+maps keys to integers. We use the value of our hash function as an index into
+an array, and store our item at that position. Here are the steps:
+
+1. Map each key to a big integer
+2. The result is unique identifier numbers, but they are so large they exceed
+   the number of slots in the hash table. We take the remainder (e.g. same principle as a roulette wheel)
+3. The resulting hash values should be fairly __uniformly distributed__
+
+##<a id="hashing">Hashing</a>
 
 We do __hashing__ because of its speed.  If we know information about
 the structure of our data (e.g. if a list is ordered or not), we can
 use this knowledge to do efficient searches (e.g. in `O(log N)` runtime
-using a _binary search_ instead of `O(N)`).
+using a _binary search_ instead of `O(N)`). We can get this even faster
+with a technique called hashing.
 
 If we know where every item should be, then our search can do a single
 comparison to find the item.  This concept is called __hashing__ and it
@@ -992,8 +1006,8 @@ papers in categories of A-Z based on their first names (or specific
 buckets like W-Z if there are not a lot of names with those characters,
 as long as we get about an even distribution). If there are multiple
 people with the same first letter (e.g. Laura, Lisa), we have a hash
-collision that can be fixed with 'chaining' (multiple names are added
-to the same category).
+collision that can be fixed with a few different methods, with 
+__chaining__ being the simplest (i.e. multiple names are added to the same category).
 
 ####<a id="hashfunction">Hash Function</a>
 
@@ -1120,7 +1134,7 @@ char, etc).  For example:
 __Collision resolution__ is the method for resolving _hash collision_,
 which means what do we do when two or more items are hashed to the same
 slot in the _hash table_.  There are many ways of attempting to address
-this including __open addressing__ and __separate chaining__.
+this including __open addressing__ and __separate chaining__ (chaining).
 
 ####<a id="hashopenaddressing">Resolving Hash Collision with Open
 Addressing</a>
@@ -1136,11 +1150,12 @@ cannot exceed the number of slots.
 There are many probe sequences, which has different takes on trying to
 minimize clustering of hash values.  These probing sequences include:
 
-*  __linear probing__ - where the interval between probes is fixed
-(e.g. 1, every other) *  __quadratic probing__ - where the interval
+*  __linear probing__ (aka __sequential probing__) - where the interval 
+between probes is fixed (e.g. 1, every other)
+*  __quadratic probing__ - where the interval
 between probes is increased by adding the successive outputs of a
 quadratic polynomial to the starting value given by the original hash *
-__double hashing__ - where the interval between probes is computed by
+* __double hashing__ - where the interval between probes is computed by
 another hash function
 
 ####<a id="hashlinearprobe">Resolving Hash Collision with Open Addressing
@@ -1170,6 +1185,9 @@ Chaining</a>
 __Separate chaining__ (aka __chaining__) allows many items to exist at
 the same location in the hash table.  When a hash collision happens,
 the item does not do probing and instead is placed in the proper slot.
+This is the easiest resolution, but devotes a considerable amount
+of memory to pointers. This is space that could be used to make the
+table larger and the 'lists' smaller.
 
 When we search for an item, we use the hash function to generate the slot
 where it should be.  Each slot has a collection so we use a searching
@@ -1719,12 +1737,16 @@ Examples of priority queues could be:
 
 ###<a id="priorityqueueruntimes">Priority Queue Runtimes</a>
 
+When the data structure is: an unsorted array, a sorted array, or a balanced search tree,
+the runtimes are:
+
             Unsorted        Sorted      Balanced
             Array           Array       Tree
 Insert      O(1)            O(n)        O(log n)
 Find Min    O(1)            O(1)        O(1)
 Delete Min  O(n)            O(1)        O(log n)
 
+Notice how find minimum is in constant time for each of these data structures.
 The trick is to use an extra variable to store the pointer/index to the minimum
 entry in each of these structures so we can return this value whenever we're asked
 to find the minimum.
