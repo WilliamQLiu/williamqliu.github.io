@@ -1158,6 +1158,20 @@ quadratic polynomial to the starting value given by the original hash *
 * __double hashing__ - where the interval between probes is computed by
 another hash function
 
+Deletion in an open addressing scheme could get ugly since removing
+one element might break a chain of insertions. We have no alternative
+except to reinsert all the items in the run following the new hole.
+
+                Hash Table      Hash Table
+                (Expected)      (Worst Case)
+    Search      O(n/m)          O(n)
+    Insert      O(1)            O(1)
+    Delete      O(1)            O(1)
+    Successor   O(n + m)        O(n + m)
+    Predecessor O(n + m)        O(n + m)
+    Minimum     O(n + m)        O(n + m)
+    Maximum     O(n + m)        O(n + m)
+
 ####<a id="hashlinearprobe">Resolving Hash Collision with Open Addressing
 and Linear Probing</a>
 
@@ -1433,6 +1447,19 @@ Here is some sample code for a hash table implementation:
 
         A = TestFunHashTable()
         A.test_end_to_end()
+
+###<a id="stringmatching">String Matching via Hashing</a>
+
+__Strings__ are sequences of characters where the order of the character matters.
+The primary data structure for representing strings is an array of characters.
+We get a constant-time access to the `ith` character of the string.
+
+You'll often run into a substring search. There's different approaches, including:
+
+* quadratic bound worst-case scenario of searching the presence of pattern `p` in
+text `t` at every position in the text.
+* a better performing (linear _expected-time_) called __Rabin-Karp__ algorithm
+  based on hashing.
 
 ##<a id="linkedlists">Linked Lists</a>
 
