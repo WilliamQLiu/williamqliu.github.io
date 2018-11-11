@@ -1457,9 +1457,47 @@ We get a constant-time access to the `ith` character of the string.
 You'll often run into a substring search. There's different approaches, including:
 
 * quadratic bound worst-case scenario of searching the presence of pattern `p` in
-text `t` at every position in the text.
-* a better performing (linear _expected-time_) called __Rabin-Karp__ algorithm
-  based on hashing.
+text `t` at every position in the text
+* a better performing (linear _expected-time_) called the __Rabin-Karp__ algorithm,
+  based on hashing (i.e. compute a hash function on both the pattern string `p` and
+  the `m` character substring starting from the `i`th position of `t`. If these
+  two strings are different, the hash values will almost certainly be different.
+  False positives are so rare that we can easily spend `O(m)` time to check.
+
+###<a id="duplicatedetectionviahashing"> Duplicate Detection Via Hashing</a>
+
+The key idea of hashing is to represent a large object (e.g. a key, a string, a substring)
+using a single number. This representation of a large object is to be able to manipulate
+the object in constant time.
+
+Hashing is used most often in speeding up search, including:
+
+* Is a given document different from all the rest in a large corpus?
+* Is a part of this document plagiarized from a document in a large corpus?
+* How can I convince you that a file hasn't changed?
+
+Hashing is a fundamental idea in randomized algorithms, yielding linear expected-time algorithms.
+
+##<a id="specializeddatastructures>Specialized Data Structures</a>
+
+We have basic data structures that represent an unstructured set of items so
+we can run retrieval operations.
+
+There's also another set of data structures that represent more structured or
+specialized kinds of objects, like points in space, strings, and graphs. These include:
+
+* __string data structures__ - character strings are usually represented by
+  arrays of characters. __Suffix trees/arrays__ are special data structures that
+  preprocess strings to make pattern matching operations faster
+* __geometric data structures__ - are usually collections of data points and regions.
+  regions in the plane can be described by polygons, usually made up of a chain of line segments.
+  Spatial data structures like __kd-trees__ organize points and regions by geometric
+  location to support fast search. 
+* __graph data structures__ - are usually represented using either __adjacency matrices__
+  or __adjacency lists__. The choice of representation can have a substantial impact on
+  the design of the resulting graph algorithms.
+* __set data structures__ - are subsets of items that are typically represented using
+  a dictionary to support fast membership queries.
 
 ##<a id="linkedlists">Linked Lists</a>
 
