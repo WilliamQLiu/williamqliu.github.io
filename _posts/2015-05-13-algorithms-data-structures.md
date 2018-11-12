@@ -1902,8 +1902,22 @@ Other examples of recursive problems include:
 
 *  The Tower of Hanoi *  Exploring a Maze
 
-##<a id="comparisonsortalgorithms">Sorting Algorithms with Comparison
-Sorts</a>
+##<a id="sortingandsearching">Sorting and Searching</a>
+
+__Sorting__ is the basic building block that many other algorithms are
+built around. By really understanding sorting, we can then understand
+how to solve other problems. A lot of the interesting ideas in the design
+of algorithms appear in the context of sorting (e.g. divide-and-conquer,
+data structures, randomized algorithms).
+
+There are several fundamental sorting algorithms, including:
+
+* __heapsort__
+* __mergesort__
+* __quicksort__
+* __distribution sort__
+
+###<a id="comparisonsortalgorithms">Sorting Algorithms - Comparison Sorts</a>
 
 A basic computational problem is the __sorting problem__, where you sort
 a sequence of _n_ numbers (aka __keys__).  We apply the above general
@@ -1912,6 +1926,44 @@ algorithms.  The following algorithms (_insertion sort_, _bubble sort_,
 _selection sort_, _merge sort_, _heapsort_, and _quicksort_) are all
 __comparison sorts__ (i.e. they determine the order of an input array
 by comparing elements).
+
+How to use Sorting:
+
+A really important algorithm design technique is to use sorting as
+a basic building block because many other problems become easy once a set
+of items is sorted.
+
+###<a id="sortingruntimes">Sorting Runtimes</a>
+
+Clever sorting algorithms exist that run in `O(n log n)` whereas naive
+sorting algorithms are really slow with `O(n^2)`. Let's look at some sample
+numbers for n:
+    
+    n           n^2/4           n lg n
+    10          25              33
+    100         2500            664
+    1000        250000          9965
+    10000       25000000        132877
+    100000      2500000000      1660960
+
+###<a id="applicationsofsearching">Applications of Searching</a>
+
+Some sample applications of searching are:
+
+* __Searching__ - Search processing, meaning that we do a binary search test on whether 
+  an item is in a dictionary in `O (log n)` time, providing keys are all sorted
+* __Closest Pair__ - Given a set of `n` numbers, how do you find the pair of numbers
+  that have the smallest difference between them. Once the numbers are sorted, the
+  closest pair of numbers must lie next to each other somewhere in sorted order.
+  A linear-time scan through the sorted numbers completes the job for a total of `O (n log n)`
+  time, including the sorting
+* __Element Uniqueness__ - Are there any duplicates in a given set of `n` items?
+  This is a special case of the above closest-pair problem, where the pair separated
+  is by a gap of zero. The most efficient algorithm sorts the numbers and then does a linear
+  scan through checking all adjacent pairs
+* __Frequency Distribution__ - Given a set of `n` items, which elements occurs the largest
+  number of times in the set. If the items are sorted, we can sweep from left to right
+  and count them, since all identical items will be lumped together during sorting
 
 ####<a id="insertionsort">Incremental: insertion sort</a>
 
