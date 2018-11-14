@@ -1964,6 +1964,33 @@ Some sample applications of searching are:
 * __Frequency Distribution__ - Given a set of `n` items, which elements occurs the largest
   number of times in the set. If the items are sorted, we can sweep from left to right
   and count them, since all identical items will be lumped together during sorting
+* __Selection__ - What is the `k`th largest item in an array? If the keys are placed in
+  sorted order, the `k`th largest can be found in constant time by simply looking at the
+  `k`th position of the array.
+* __Convex Hulls__ - What is the polygon of smallest area that contains a given set of `n`
+  points in two dimensions? Think of the convex hull as a rubber band stretched over the
+  points in the plane and then released. Basically, the convex hull gives a nice presentation
+  of the shape of the points and is needed to build more complicated geometric algorithms.
+  Once you have the points sorted by the `x` coordinate, the points can be inserted from
+  left to right into the hull. Since we know that the right-most point is always on the boundary,
+  we know the point will appear in the hull. Adding a new point might cause another point to
+  be deleted, but even then the total time is linear after the sorting has been done.
+
+####<a id="sortingexample">Sorting Example Problem</a>
+
+Say you have two sets (size `m` and size `n`) and need to determine if they're disjoint (i.e.
+no element in common). Analyze the worst-case complexity in terms of `m` and `n` if `m` is
+substantially smaller than `n`. You have a few different algoirthms that you can do, including:
+
+* First sort the big set - sort the big set in `O(n log n)`, then do a binary search with each
+  of the `m` elements in the second, looking to see if it exists in the big set.
+  Total time is `O((n+m) log n)`
+* First sort the small set - sort the small set in `O(m log m)`, then do a binary search with each
+  of the `n` elements in the big set, looking to see if it exists in the small one.
+  Total time is `O((n+m) log m)`
+* Sort both sets - If we sort both sets, we don't have to do binary search to detect a common element.
+  We can compare the smallest elements of the two sorted sets, and discard the smaller one if they are
+  not identical. Cost is `O(n log n + m log m + n + m)`.
 
 ####<a id="insertionsort">Incremental: insertion sort</a>
 
