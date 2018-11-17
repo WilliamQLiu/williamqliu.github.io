@@ -1992,6 +1992,20 @@ substantially smaller than `n`. You have a few different algoirthms that you can
   We can compare the smallest elements of the two sorted sets, and discard the smaller one if they are
   not identical. Cost is `O(n log n + m log m + n + m)`.
 
+####<a id="pragmaticsofsorting">Pragmatics of Sorting</a>
+
+So now that we know the importance of sorting and how to start sorting, we need to ask ourselves
+what order do we want our items sorted? Some questions to ask are:
+
+* Increasing or Decreasing Order; different applications call for different orders
+* Sort just the key or the entire record? - Sorting a data set involves maintaining the
+  integrity of complex data records. Sometimes you might want to just sort the key, as in
+  say the name given a mailing list of records with names, addresses, and phone numbers.
+* Equal keys - what do we do about equal keys? You can bunch together equal key values
+  or you can create a relative order among these keys. Sometimes you can resort to __secondary keys__,
+  like by Last Name, then First Name. A sorting algorithm is __stable__ if you want to leave items 
+  in the same relative order as the original permutation. If you don't 
+
 ####<a id="insertionsort">Incremental: insertion sort</a>
 
 __Insertion sort__ is a simple sorting algorithm based on the incremental
