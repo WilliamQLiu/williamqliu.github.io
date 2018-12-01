@@ -257,6 +257,7 @@ Operators describe a single task in a workflow, with common operators including:
   otherwise the workflow "short circuits" and downstream tasks are skipped. Any downstream tasks are marked as
   a state of "skipped". If the condition is True, downstream tasks proceed as normal. Useful if you have heavy tasks
   that you want to skip to save compute resources
+* `SSHOperator` - run a command through SSH (beware that ENV variables don't transfer)
 
 #### When to split out multiple operators
 
