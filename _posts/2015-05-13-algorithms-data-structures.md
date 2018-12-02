@@ -2004,7 +2004,18 @@ what order do we want our items sorted? Some questions to ask are:
 * Equal keys - what do we do about equal keys? You can bunch together equal key values
   or you can create a relative order among these keys. Sometimes you can resort to __secondary keys__,
   like by Last Name, then First Name. A sorting algorithm is __stable__ if you want to leave items 
-  in the same relative order as the original permutation. If you don't 
+  in the same relative order as the original permutation. Usually faster algorithms are not stable.
+* The right way to specify what matters in your sorting algorithm is with an application-specific
+  pairwise-element comparison function (i.e. is a < b, a > b, a = b). We just pass items to this
+  sorting function and it'll tell you how to sort. Usuaully your language has a sort method that
+  you should use instead of building your own.
+
+####<a id="whylearnsorting">Why learn Sorting?</a>
+
+Again, you might wonder why we want to learn the different ways of sorting when you're usually
+better off not implementing them and instead should use a built-in library function instead.
+The answer is that these __design techniques__ are very important for other algorithm problems
+that you will encounter.
 
 ####<a id="insertionsort">Incremental: insertion sort</a>
 
@@ -2338,6 +2349,9 @@ an unsorted region and it iteratively shrinks the unsorted region by
 extracting the largest element and moving that to the sorted region.
 This heapsort is really efficient at managing __priority queues__.
 
+Really, heapsort is just an implementation of __selection sort__ using
+the right data structure.
+
 Note: In programming languages like Java or Lisp, heap refers to
 'garbage-collected storage'; this is not what we're talking about here.
 
@@ -2350,6 +2364,24 @@ attributes (_length_, _heap-size_) and determine what part is valid
 `A.heap-size` gives us how many elements in the heap are stored within
 array _A_.  *  The heap would then be calculated as `A[1 ... A.heap-size]`
 where `0 <= A.heap-size <= A.length`
+
+#####<a id="heaps">Heaps</a>
+
+__Heaps__ are a simple data structure for efficiently working with priority queue
+operations _insert_ and _extract-min_. They work by maintaining a partial order
+on the set of elements that are weaker than the sorted order (i.e. efficient to maintain),
+yet stronger than random order (so finding minimum element is quick)
+
+Power in any hierarchically-structured organization is reflected by a tree, where each
+node represents a person. Each edge `(x, y)` implies that `x` directly supervises `y`
+(aka `x __dominates__ y`). The top person is at the root of the heap / `top of the heap`.
+
+There's a couple variations for a __heap-labeled tree__, where we have a binary tree
+that has the key labeling of each node __dominating__ the key labeling of each of its
+children.
+
+* A __min-heap__ is where a node dominates its children by having a smaller key than the children
+* A __max-heap__ is where a node dominates its children by having a larger key than the children
 
 ####<a id="binaryheap">(Binary) Heap</a>
 
