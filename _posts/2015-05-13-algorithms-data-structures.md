@@ -2383,6 +2383,49 @@ children.
 * A __min-heap__ is where a node dominates its children by having a smaller key than the children
 * A __max-heap__ is where a node dominates its children by having a larger key than the children
 
+A binary tree might look like:
+
+                     1492
+                  /        \
+               1783        1776
+              /     \     /    \
+            1804   1865 1945  1963
+            /
+          1918
+
+This binary tree might be represented as a node with points to its two children. However,
+the memory used by the pointers can easily outweight the size of keys.
+
+The __heap__ is a data structure that will let us represent binary trees without using any
+pointers. We store data as an array of keys, and the important difference is that we will use
+the position of the keys to implicitly satisfy the role of the pointers.
+
+We store the root of the tree in the first position of the array. In the second position,
+we have the left child. On the third position, we have the right child. The positions can
+actually be calculated, where given an array `k`, the __left children__ of `k` will sit
+at positoin `2k` and the __right children__ will be `2k+1` while the parent of `k` will be
+in position `k/2`. We can then move around without any pointers.
+
+    1   1492
+    2   1783
+    3   1776
+    4   1804
+    5   1865
+    6   1945
+    7   1963
+    8   1918
+
+####<a id="heapissues">Heap Issues</a>
+
+We can store any binary tree in an array without pointers, but the issue is that we might
+get a tree that is __sparse__. If we were given a tree with height `h` that was sparse (number
+of nodes `n < 2^h`, then all missing internal nodes still take up space in our structure.
+We need to represent the full binary tree to maintain the positional mapping between parents
+and children.
+
+Space efficiency demands that we not allow holes in our tree (i.e. each level be packed as much
+as it can be)
+
 ####<a id="binaryheap">(Binary) Heap</a>
 
 A __(binary) heap__ data structure is an array object that we can view
