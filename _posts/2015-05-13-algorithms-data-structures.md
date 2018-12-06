@@ -2417,14 +2417,65 @@ in position `k/2`. We can then move around without any pointers.
 
 ####<a id="heapissues">Heap Issues</a>
 
+Space
+
 We can store any binary tree in an array without pointers, but the issue is that we might
 get a tree that is __sparse__. If we were given a tree with height `h` that was sparse (number
 of nodes `n < 2^h`, then all missing internal nodes still take up space in our structure.
 We need to represent the full binary tree to maintain the positional mapping between parents
-and children.
+and children. Space efficiency demands that we not allow holes in our tree (i.e. each level 
+be packed as much as it can be)
 
-Space efficiency demands that we not allow holes in our tree (i.e. each level be packed as much
-as it can be)
+Search for a particular key
+
+We can't search for a particular key in a heap beause we don't know anything about the relative
+order of the n/2 leaf elements in a heap. We have to do linear search through them.
+In order to do a binary search (i.e. we have a sorted list, then divide by 2 to see if we're
+looking at the upper or lower, etc), we need a binary search tree. We're missing the order of
+elements in the heap.
+
+####<a id="constructingaheap">Constructing a Heap</a>
+
+Heaps are constructed incrementally, by inserting each new element into the left-most open
+spot in the array, namely the (n+1)st position of a previously n-element heap. We get a
+balanced shape out of a heap-labeled tree, but note that we don't necessarily maintain the
+dominance ordering of the keys.
+
+The new key might be less than its parent in a min-heap or greater than its parent in 
+a max-heap. We'll need to swap any dissatisfied element with its parent. We do this process
+repeatedly, essentially _bubbling up_ the new key to its right position. The swap process
+takes constant time. With an `n` element heap, we have a height of `lg n`, which makes each 
+insertion take at most `O(log n)` time. That means an initial construction of the heap
+takes `O(n log n)` time.
+
+We can make faster heaps using the `bubble_down` procedure, which will create heaps
+in linear time instead of `O (n log n)` time. However, also note that construction time
+does not help improve worst-case performance.
+
+####<a id="heapextractminimum">Extracting the Minimum from a Heap</a>
+
+We can identify the dominant element of a heap since it sits at the top of the heap
+in the first positoin of the array. Removing the top element leaves a hole in the array.
+We can fill the hole by moving the element from the _right-most_ leaf (at the `n`th position
+of the array) into the first position.
+
+Heapify with `bubble_down`
+
+The shape of the tree is restored, however the labeling of the root might not satisfy the
+heap property (e.g. if min-heap, key might be less than its parent / i.e. the new root may be
+dominated by its both of its children). We can swap by _bubbling down_ the heap until the
+element dominates all its children; this percolate-down operation is called __heapify__
+because it merges two heaps (the subtrees below the original root) with a new key.
+
+####<a id="heapsort">Heapsort</a>
+
+When we exchange the maximum element with the last element and call heapify repeatedly,
+we get an `O (n log n)` sorting algorithm called __Heapsort__. Heapsort is easy to program,
+runs an _in-place_ sort (i.e. uses no extra memory) and has a worst-case of `O(n log n)` time,
+which is the best that you can expect from any sorting algorithm.
+
+There are some other algorithms that are slightly faster in practice, but you can't go wrong
+with heapsort for sorting data that sits in your computer's memory.
 
 ####<a id="binaryheap">(Binary) Heap</a>
 
