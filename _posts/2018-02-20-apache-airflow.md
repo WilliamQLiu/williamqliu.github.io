@@ -423,7 +423,6 @@ the database. This mismatch occurs as the state of the database is altered (e.g.
 Instances' view in the UI. During the heartbeat routine, tasks verify their state and terminate themselves if they
 are in this 'undead' state.
 
-
 ## Real Life Scenario
 
 ### Running a DAG
@@ -532,6 +531,21 @@ For example:
     echo '{{ next_execution_date }}'  # '2018-08-04 16:05:00'
     echo '{{ next_execution_date.isoformat() }}'  # '2018-08-03T16:05:00'
     echo '{{ next_execution_date.strftime("%d-%m-%Y") }}'
+
+### User Defined Libraries
+
+Say you install a library of your own with:
+
+    python setup.py build
+    python setup.py install
+
+When you run your library through say a Bash Command, you'll want to make sure
+that your files have:
+
+    if __name__ == '__main__':
+        pass
+
+Otherwise for some reason, files might not get picked up.
 
 ## Command Line Interface
 
