@@ -2613,6 +2613,21 @@ used to model pairwise relations between objects.  A __graph__ is made
 up of __vertices__ (aka __nodes__; note that a node is called a __leaf__
 if it has no children) and lines that connect them are called __edges__.
 
+###<a id="graphalgorithms">Famous Graph Algorithms</a>
+
+####<a id="dijkstra">Dijkstra's Shortest Path</a>
+
+__Dijkstra's shortest path__ algorithm is commonly used to find the 
+the shortest paths on a graph from a source to all vertices.
+
+####<a id="prims">Prim's Algorithm for Minimum Spanning Tree</a>
+
+__Prim's Algorithm for Minimum Spanning Tree__ is a greedy algorithm that 
+takes a spanning tree (all vertices must be connected) where the two 
+disjoint subsets of vertcies are connected to make a Spanning Tree.
+
+TODO: How this algorithm works
+
 ####<a id="trees">Trees</a>
 
 __Trees__ are a type of graph and they're described as: *  Each tree
