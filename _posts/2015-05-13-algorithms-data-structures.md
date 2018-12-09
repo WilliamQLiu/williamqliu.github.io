@@ -152,9 +152,11 @@ vehicle. What would be an 'abstract vehicle'? You would know what some of the
 actions you could do with it would be (e.g. drive the vehicle, sit in the vehicle),
 but it doesn't say exactly how you would do that (whether that's an automatic 
 or manual vehicle, whether you need to open the door because its in a car or motorcycle).
+Some of the data stored might be say the color of the vehicle, number of wheels, etc.
 The idea is that we get an implmentation independent view. We hide the details of 
 so that it's an __abstraction__. We don't care about details like the number of wheels,
-the number of doors (if any); it's a black box.
+the number of doors (if any) or how to apply an action (e.g. drive stick or automatic); 
+it's all a black box. We do this to create an __encapsulation__ around the data.
 
 So we might have an Abstract Data Type like an Integer (e.g. -2, -1, 0, 1, 2) where
 we can do operations like addition, subtraction, multiplication, division, and comparisons
@@ -178,23 +180,165 @@ Some common abstract data types include:
 * Double-ended queue
 * Double-ended priority queue
 
+User vs Implementor
+
+Imagine if you're the __user__ that has to interact with the interface, using the
+operations that have been specified by the abstract data type. You might call a `get_max`
+method or a `delete_last` method, but not be concerned about how its implemented, since
+there can be many different ways to implement an abstract data type; i.e. we create
+an __implementation-indepdent__ view of the data.
+
+The implementation of an abstract data type is often called the __data structure__.
+
 Programming Specific
 
 In a programming language like Python, we have objects like Abstract Base Class.
+Here we see what methods are available, but they're not yet implemented.
+
 
 #####<a id="fundamentalabstractdatatype">Fundamental Abstract Data Type (ADT)</a>
 
-There are three fundamental abstract data types:
+There are a few fundamental abstract data types:
 
 * Containers
 * Dictionaries
+* Binary Search Trees
 * Priority Queues
 
-These can be implemented with arrays and lists.
-In Python, arrays are lists and lists are say custom classes for singled linked
-list (sorted), single linked list (unsorted), double linked list (sorted), double linked
-list (unsorted), etc.
+Containers
 
+__Containers__ are _abstract data types_ that hold stuff. We use the container to
+hold data and retrieve data items independently of content. Some popular types of
+containers are:
+
+* Stacks
+* Queues
+* Tables (implemented through arrays)
+
+Dictionaries
+
+__Dictionaries__ are a form of container that gives you access to data (values) by keys.
+
+Binary Search Trees
+
+__Binary Search Trees__ is a binary tree where each node contains at most two children. 
+Each child can be identified as either a left or right child.
+
+Priority Queues
+
+__Priority Queues__ are a list with a priority (i.e. sorting items inside).
+Priority Queue operations can be implemented in time by representing the heap with a
+binary search tree.
+
+####<a id="adtandclasses">Abstract Data Types and Classes</a>
+
+So how does an __Abstract Data Type__ work with a programming language's __Class__?
+We define a class to be a description of what:
+
+* the data looks like (i.e. the state)
+* what the data can do (i.e. the behavior)
+
+Data items are called __objects__ in this object-oriented paradigm. An object is an instance
+of a class.
+
+Python specific Classes
+
+Python has a number of built-in classes, from:
+
+* Boolean Classes (e.g. i.e. True, False)
+* Numeric Classes (e.g. int, float)
+* Ordered Collection Classes (e.g. lists, strings, tuples)
+* Unordered Collection Classes (e.g. sets, dictionaries)
+
+####<a id="listfordatastructures">Using Lists to build data structures</a>
+
+A lot of data structures can be implemented with the help of arrays and lists.
+In Python, arrays are lists and lists are say custom classes for:
+
+* single linked list (sorted)
+* single linked list (unsorted)
+* double linked list (sorted)
+* double linked list (unsorted)
+
+You might see the following methods for the data structure of `alist`.
+
+Operations include:
+
+* indexing - `[]` to access an element of a sequence
+* concatentation - `+` to combine sequences together
+* repetition - `*` to concatenate a repeated number of times (good for initializing a list)
+* membership - `in` to check if an item is in a sequence
+* length - `len` to return the number of items in the sequence
+* slicing - `[:]` to extract a part of a sequence (up to, but not including)
+
+Methods include:
+
+* `append` - `alist.append(item)` - add a new item to the end of a list
+* `insert` - `alist.insert(i, item)` - insert an item at the `i`th position in a list
+* `pop` - `alist.pop()` to remove and return the last item in a list
+* `pop` - `alist.pop(i)` to remove and return the `i`th item in a list
+* `sort` - `alist.sort()` to modify a list to be sorted (modifies inplace)
+* `reverse` - `alist.reverse()` to modify a list to be in reversed order
+* `del` - `del alist[i]` to delete the item in ith position (modifies inplace)
+* `index` - `alist.index(item)` - returns the index of the first occurrence of item
+* `count` - `alist.count(item)` - returns the number of occurrences of item
+* `remove` - `alist.remove(item)` - removes the first occurrence of item
+
+####<a` id="stringfordatastructures">Using Strings to build data structures</a>
+
+You might see the following methods for the data structure of `astring`.
+
+Methods include:
+
+* `center` - `astring.center(w)` - returns a string as size `w` that is center-justified (e.g. `   hey there   `)
+* `count` - `astring.count(item)` - returns the number of occurrences of `item` in the string
+* `ljust` - `astring.ljust(w)` - returns a string as size `w` that is left-justified
+* `lower` - `astring.lower()` - returns a string in all lowercase
+* `rjust` - `astring.rjust(w)` - returns a string as size `w` that is right-justified
+* `find` - `astring.find(item)` - returns the index of the first occurrence of `item`
+* `split` - `astring.split(schar)` - splits a string into substrings at `schar`
+
+####<a` id="setsfordatastructures">Using Sets to build data structures</a>
+
+Use Sets with:
+
+    engineers = set(['John', 'Jane', 'Jack', 'Janice'])
+
+Operations include:
+
+* `in` - checks for set membership (e.g. `'John' in set(['John', 'Jane'])`)
+* `len` - returns the cardinality of the set (e.g .`len(set(['John', 'John', 'Jane']))`)
+* `|` - `aset | otherset` returns a new set with all elements from both sets
+* `&` - `aset & otherset` returns a new set with only those elements common to both sets
+* `-` - `aset - otherset` returns a new set with all items from the first set not in the second set
+* `<=` - `aset <= otherset` asks Boolean whether all elements of the first set are in the second set
+
+Methods include:
+
+* `union` - `aset.union(otherset)` - returns a new set with all elements from both sets
+* `intersection` - `aset.intersection(otherset)` - returns a new set with only those elements common to both sets
+* `difference` - `aset.difference(otherset)` - returns a new set with all items from first set, not otherset
+* `issubset` - `aset.issubset(otherwise)` - Asks whether all elements of one set are in the other set
+* `add` - `aset.add(item)` - adds item to the set (inplace)
+* `remove` - `aset.remove(item)` - removes item to the set (inplace)
+* `pop` - `aset.pop()` - remove an arbitrary element from the set
+* `clear` - `aset.clear()` - removes all elements from the set
+
+####<a` id="dictsfordatastructures">Using Dictionaries to build data structures</a>
+
+Operators include:
+
+* `[]` - `myDict[k]` returns the value for key `k`, otherwise an error
+* `in` - `mykey in mydict` - returns True if key is in the dictionary, otherwise False
+* `del` - `del mydict[key]` - removes the entry from the dictionary
+
+Methods include:
+
+* `keys` - `mydict.keys()` - returns the keys of the dictionary in a `dict_keys` object
+* `values` - `mydict.values()` - returns the values of the dictionary in a `dict_values` object
+* `items` - `mydict.items()` - returns the key-value pairs in a `dict_items` object
+* `get` - `mydict.get(mykey)` - returns the value associated with key 'mykey', `None` otherwise
+* `get` - `mydict.get(mykey, altvalue)` - returns the value associated with key 'mykey', 'altvalue' otherwise
 
 #####<a id="datamodeling">Modeling a Problem</a>
 
