@@ -130,7 +130,7 @@ algorithms we can apply and various ways we can store our data.
 
 An __abstract data type__ is a mathematical model for data types,
 where a data type is defined by its behavior from the point of view of
-a user of the data, specifically in terms of possible values, possible
+a _user_ of the data, specifically in terms of possible values, possible
 operations on data of this type, and the behavior of these operations.
 
 We call these 'abstract' because it gives an implementation independent
@@ -144,6 +144,43 @@ Java, the naming scheme of a standard data structure is pretty straightforward.
 In Java, there isn't just a `list`; it's either a `LinkedList` or an `ArrayList`.
 In Python, we have a more 'human' naming scheme, meaning we just call it a `list`,
 but really don't know if this is a linked list or a dynamic array.
+
+What?
+
+So let's try to break this down a bit. Say we swapped out 'data type' with
+vehicle. What would be an 'abstract vehicle'? You would know what some of the
+actions you could do with it would be (e.g. drive the vehicle, sit in the vehicle),
+but it doesn't say exactly how you would do that (whether that's an automatic 
+or manual vehicle, whether you need to open the door because its in a car or motorcycle).
+The idea is that we get an implmentation independent view. We hide the details of 
+so that it's an __abstraction__. We don't care about details like the number of wheels,
+the number of doors (if any); it's a black box.
+
+So we might have an Abstract Data Type like an Integer (e.g. -2, -1, 0, 1, 2) where
+we can do operations like addition, subtraction, multiplication, division, and comparisons
+like equals, greater than, less than. We don't care how the computer moves the data
+around, whether it's a binary number or a binary-coded decimal. We simply say 'hey, add
+these two numbers together and give me the result'.
+
+Some common abstract data types include:
+
+* Container
+* List
+* Set
+* Multiset
+* Map
+* Multimap
+* Graph
+* Tree
+* Stack
+* Queue
+* Priority Queue
+* Double-ended queue
+* Double-ended priority queue
+
+Programming Specific
+
+In a programming language like Python, we have objects like Abstract Base Class.
 
 #####<a id="fundamentalabstractdatatype">Fundamental Abstract Data Type (ADT)</a>
 
