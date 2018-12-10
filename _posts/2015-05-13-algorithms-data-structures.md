@@ -2395,6 +2395,10 @@ sorts the smaller list.  The trick is that since all of our lists are
 already sorted, when we combine pairs of lists, we only need to look at
 the first element of each list.
 
+Use mergesort when quicksort is impractical (e.g. when the data set is so
+large that is can't be stored in memory / stored on external devices).
+Mergesort is better able to be done in parallel computing.
+
 Here is an example run:
 
     # k     i       j
@@ -2476,22 +2480,34 @@ __Quick sort__ is an efficient algorithm that does a sort 'in place'
 by splitting the array into two smaller arrays, one with lower value
 elements and one with higher value elements based off a 'pivot' element.
 
+Quicksort is my go-to sorting algorithm. This is a really good algorithm
+to know offhand. It performs fast in most real-world data (because its inner
+loop can be efficiently implemented in most architectures)
+
 Example Run:
 
      6 5 1 3 8 4 6 9 5  # initial list
 
     # we pick a pivot (say for this example it is the last element of
-    the list, which is 2; can also be any item, e.g. the first item
-    of the list, median) |6 5 1 3 8 4 6 9 5 # we setup the pivot wall
-    (separated by `|`), items to the left should be smaller, items to
-    the right of the wall are larger |6 5 1 3 8 4 6 9 5 # we compare the
-    pivot element 5 with the first element to the right of the wall (6);
-    5 < 6 so no swap needed |6 5 1 3 8 4 6 9 5 # we compare the pivot
-    element 5 with the next element to the right of the wall (5); 5 ==
-    5 so no swap needed
-     1|5 6 3 8 4 6 9 5 # our current element 1 is smaller than the pivot
-     element 5 so we switch the current element (1) with the lowest
-     index item on the right side of the wall (6)
+    #the list, which is 2; can also be any item, e.g. the first item of the list, median)
+    |6 5 1 3 8 4 6 9 5
+
+    # we setup the pivot wall (separated by `|`), 
+    # items to the left should be smaller, items to
+    # the right of the wall are larger
+    |6 5 1 3 8 4 6 9 5
+    
+    # we compare the pivot element 5 with the first element to the right of the wall (6);
+    # 5 < 6 so no swap needed
+    |6 5 1 3 8 4 6 9 5
+
+    # we compare the pivot element 5 with the next element to the right of the wall (5);
+    #5 == 5 so no swap needed
+    1|5 6 3 8 4 6 9 5
+
+    # our current element 1 is smaller than the pivot
+    # element 5 so we switch the current element (1) with the lowest
+    # index item on the right side of the wall (6)
 
 It's similar to _merge sort_ in that it does the divide and conquer
 approach. The advantage is that you do not need as much storage over
@@ -2516,7 +2532,6 @@ two items and repeate the process again.
 Example Code:
 
     #quicksort
-
 
 ####<a id="heapsort">Divide and Conquer: heap sort</a>
 
@@ -2801,6 +2816,14 @@ if it has no children) and lines that connect them are called __edges__.
 __Dijkstra's shortest path__ algorithm is commonly used to find the 
 the shortest paths on a graph from a source to all vertices.
 
+####<a id="astar">`A*` search algorithm</a>
+
+The `A*` (__A Star__) algorithm is used in pathfinding and graph traversal,
+which is the process of finding a path between multiple points (aka __nodes__).
+Its used due to its performance and accuracy, but in practical travel-routing systems,
+it is generally outperformed by algorithms which can pre-process the graph to
+attain better performance.
+
 ####<a id="prims">Prim's Algorithm for Minimum Spanning Tree</a>
 
 __Prim's Algorithm for Minimum Spanning Tree__ is a greedy algorithm that 
@@ -2874,11 +2897,12 @@ search tree__, which has the _additional_ requirement that `all left
 descendants <= n < all right descendents` for every node.  Note that
 some definitions of a binary search tree cannot have duplicates, others
 the duplicate values will be on the right or can be on either side.
-All are valid definitions.  *  __balanced__ vs __unbalanced__ does not
-mean that the left aznd right subtrees are exactly the same size (like
-a _perfect binary tree_).  It simply means that they're balanced enough
-to ensure `O(log n)` run times for `insert` and `find` operations.  *  A
-__complete binary tree__ is a binary tree where every level of the tree is
+All are valid definitions.
+*  __balanced__ vs __unbalanced__ does not mean that the left aznd right 
+subtrees are exactly the same size (like a _perfect binary tree_).
+It simply means that they're balanced enough to ensure `O(log n)` run 
+times for `insert` and `find` operations.
+*  A __complete binary tree__ is a binary tree where every level of the tree is
 fully filled, except for possibly the last level (filled left to right).
 Examples of these include __min binary heaps__ and __max binary heaps__.
 *  A __full binary tree__ is a binary tree in which every node has either
@@ -2912,6 +2936,20 @@ A trie is commonly used to store the entire English language for quick
 prefix lookups.  A hash table can quickly look up whether a string
 is a valid word, but it cannot tell us if a string is a prefix of any
 valid words.
+
+#####<a id="typesoftrees">Types of Trees</a>
+
+We have different types of trees including:
+
+* __Binary Tree__
+* __Binary Search Tree__
+* __AVL Tree__
+* __Heaps__
+
+####<a id="exampletrees">Example Trees</a>
+
+An example tree belongs to the category directed acyclic graphs (DAGs).
+Git is a great example of a DAG. Other examples are say an Airflow scheduled job.
 
 ####<a id="graphs">Graphs</a>
 
@@ -3075,4 +3113,35 @@ To keep track of which vertices have been visited, we color them to:
 The heart of a __BFS__ is a `Queue`, which decides which vertex to
 explore next.
 
+####<a id="treesvsgraphs">Trees vs Graphs</a>
+
+You can think of a __tree__ as just a restricted form of a __graph__.
+The main difference is that a tree is setup so that each node has only 
+one parent, but graphs can have multiple predecessors (i.e. we don't
+say 'parent' for graphs because there can be multiple connections)
+Trees have a root node while graphs don't.
+
+Trees also don't contain cycles. Trees fit into a category called __Directed Acyclic Graphs__ (DAG),
+meaning that there are no cycles (i.e. acyclic). Graphs can be cyclic or acyclic (remember
+that a tree is always a graph, but a graph is not always a tree).
+
+An example of a tree would be a scheduled job that depended on previous jobs.
+An example of a graph would be a map with cities being connected.
+
+##<a id="npcompleteproblems">NP-Complete Problems</a>
+
+A __NP-Complete__ problem stands for __nondeterministic polynomial time__ problem.
+There is no known way to find a solution quickly (i.e. the time required to solve
+a problem using any currently known algorithm increases rapidly as the size of the
+problem grows). Note: By quickly, it means in __polynomial time__.
+
+Some famous NP-Complete problems are:
+
+* Traveling Salesman
+* Knapsack
+
+###<a id="nphardproblems">NP-Hard Problems</a>
+
+A __NP-Hard__ problem is one that is not solvable in polynomial time, but can be
+verified in polynomial time.
 
