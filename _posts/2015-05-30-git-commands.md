@@ -43,6 +43,10 @@ title: Git Commands
 __Git__ is a local software version control system.  The service __GitHub__ is
 one of many companies that does remote hosting of your git repositories.
 
+###<a id="tools">Tools</a>
+
+Tig - curses interface for git available at: https://github.com/jonas/tig/
+
 ####<a id="howgitworks">How Git works</a>
 
 The concept of git is that data is seen as a set of snapshots of this mini
@@ -54,6 +58,8 @@ If files have not changed, git does not store the file again
 (just a link to the previous identical file it has already stored).
 Git is different than some other systems (like __mercurial__) in that some
 other systems store the deltas between saves (which saves space).
+
+A good video is here: https://www.youtube.com/watch?v=1ffBJ4sVUb4
 
 ####<a id="stages">Stages of Git</a>
 
@@ -336,6 +342,10 @@ Some good commands to know are:
     git revert
     git shortlog
     git reflog
+    git fetch
+    git merge
+    git branch
+    git checkout -d somebranch
 
 ####<a id="doubledot">Double Dot Notation</a>
 
