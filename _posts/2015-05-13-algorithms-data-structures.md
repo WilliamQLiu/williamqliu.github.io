@@ -542,7 +542,8 @@ smaller pieces.
 There are different algorithms to solve the same problem and they are
 often drastically different in efficiency.  We normally measure efficiency
 by looking at __running time__, which is mainly affected by the __size
-of input__.  See __Big O__ for further details.
+of input__.  However, Big O notation is also used to check space complexity. 
+See __Big O__ for further details.
 
 1. the __size of input__ normally means looking at the _number of items
 in the input_; for other problems like multiplying integers, we look at
@@ -735,6 +736,22 @@ We characterize these functions according to their __rate of growth__
 (aka __growth rate__), which is represented using the __O Notation__. We
 also care about space (so see Space Complexity below).
 
+Note: We also use Big O for measuring space complexity (not just time)!
+
+###<a id="bigooperations">Big O Operations</a>
+
+When we say calculate Big O, we often have some scenarios we want to look at:
+
+* Time Complexity vs Space Complexity
+* Average vs Worst
+* For Data Structures: Access, Search, Insertion, Deletion
+* For Sorting: Best, Average, Worst
+
+Note: Access vs Search - Access is like if I knew your mailbox, I would go there directly. Search would be I know
+      your mailbox is somewhere in this block, start searching through.
+      You might not always have a constant Access (e.g. linked list might take you through multiple items before
+      you find the one you're looking for)
+
 ####<a id="bigoexample">Big O Example</a>
 
 Say you want to get a hard drive of information to your friend across
@@ -810,6 +827,7 @@ ways.
 *  __big theta__ looks at the __average-case running time__; this
    is usually used for _probabilistic analysis_.
 *  __big O (aka O)__ looks at the __best-case running time__; not usually used
+
 
 ####<a id="bigoasymptotic">Asymptotic Notation</a>
 
@@ -2397,7 +2415,15 @@ the first element of each list.
 
 Use mergesort when quicksort is impractical (e.g. when the data set is so
 large that is can't be stored in memory / stored on external devices).
+
 Mergesort is better able to be done in parallel computing.
+
+Here's a chart:
+
+    Algorithm   Time Complexity                         | Space   Complexity
+                Best        Average     Worst           | Worst
+    Quicksort   Ω(n log(n)) Θ(n log(n)) O(n^2)          | O(log(n))
+    Mergesort   Ω(n log(n)) Θ(n log(n)) O(n log(n))     | O(n)
 
 Here is an example run:
 
