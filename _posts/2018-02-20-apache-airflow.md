@@ -300,6 +300,17 @@ The following fields are required:
 * `task_id` - this is __important__ because if you want to run a function independently, this is what gets called on the command line
 * `owner`
 
+#### Run even if previous task failed
+
+You can set an Operator to run, even if the previous job failed using `trigger_rule="all_done"`.
+
+    t2 = BashOperator(
+        task_id='sleep',
+        bash_command='sleep 5',
+        retries=3,
+        trigger_rule="all_done",
+        dag=dag) 
+
 #### Task Running and Clearing
 
 Run - Run a single task instance (can only be done if using something other than SequentialExecutor)
