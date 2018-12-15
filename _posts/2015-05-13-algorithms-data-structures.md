@@ -810,7 +810,7 @@ slowest last):
 *  `O(N log N)` - __loglinear__; e.g. heapsort, quicksort (best and avg case),
     merge sort
 *  `O(N^2)` - __quadratic__; e.g. selection sort, insertion sort,
-    worst case for bubble sort, quicksort
+    worst case for bubble sort, quicksort (worst case)
 *  `O(2^N)` - __exponential__; e.g. finding exact solution to traveling salesman
     problem using dynamic programming
 *  `O(N!)` - __factorial__; e.g. solving traveling salesman problem via
@@ -2557,7 +2557,117 @@ two items and repeate the process again.
 
 Example Code:
 
-    #quicksort
+    """ Quick Sort """
+
+
+    def quickSort(mylist):
+        quickSortHelper(mylist, 0, len(mylist)-1)
+
+    def quickSortHelper(mylist, first, last):
+        if first < last:
+            splitpoint = partition(mylist, first, last)
+
+            quickSortHelper(mylist, first, splitpoint-1)
+            quickSortHelper(mylist, splitpoint+1, last)
+
+    def partition(mylist, first, last):
+        pivotvalue = mylist[first]
+
+        leftmark = first+1
+        rightmark = last
+
+        done = False
+        while not done:
+
+            while leftmark <= rightmark and mylist[leftmark] <= pivotvalue:
+                leftmark += 1
+
+            while mylist[rightmark] >= pivotvalue and rightmark >= leftmark:
+                rightmark -= 1
+
+            if rightmark < leftmark:
+                done = True
+            else:
+                # swap
+                mylist[leftmark], mylist[rightmark] = mylist[rightmark], mylist[leftmark]
+
+        # swap
+        mylist[leftmark], mylist[rightmark] = mylist[rightmark], mylist[leftmark]
+
+
+    if __name__ == '__main__':
+        mylist = [54,26,93,17,77,31,44,55,20]
+        print "Original: ", mylist
+        quickSort(mylist)
+        print "Quick Sorted: ", mylist
+
+####<a id="quickselect">Quickselect Algorithm</a>
+
+The __quickselect__ algorithm is a selection algorithm, whereas the __quicksort__
+algorithm is a sorting algorithm. It's similar to quicksort except that we
+only need to recursively call one side of the partition to be re-partitioned.
+Instead of a runtime of `O(log n)`, we get `O(n)`.
+
+What this solves is that if we get an unordered list of items and want to find
+the k-th smallest or k-th largest item, we can get items in `O(n)`.
+
+    """ Python 3 implementation of a quickselect algorithm """
+    from typing import List
+    import unittest
+    import random
+
+
+    class Solution:
+
+        def quickselect(self, items, item_index):
+            if items is None or len(items) < 1:
+                return None
+
+            if item_index < 0 or item_index > len(items) - 1:
+                raise IndexError()
+
+            return self.select(items, 0, len(items) - 1, item_index)
+
+        def select(self, lst, l, r, index):
+            # base case
+            if r == l:
+                return lst[l]
+
+            # choose random pivot
+            pivot_index = random.randint(l, r)
+
+            # move pivot to beginning of list
+            lst[l], lst[pivot_index] = lst[pivot_index], lst[l]
+
+            # partition
+            i = l
+            for j in range(l+1, r+1):
+                if lst[j] < lst[l]:
+                    i += 1
+                    lst[i], lst[j] = lst[j], lst[i]
+
+            # move pivot to correct location
+            lst[i], lst[l] = lst[l], lst[i]
+
+            # recursively partition one side only
+            if index == i:
+                return lst[i]
+            elif index < i:
+                return self.select(lst, l, i-1, index)
+            else:
+                return self.select(lst, i+1, r, index)
+
+
+    class SolutionTest(unittest.TestCase):
+
+        def test_quickselect(self):
+            s = Solution()
+            response = s.quickselect([12, 2, 4, 3, 5], 2)
+            assert response == 4
+
+            response = s.quickselect([12, 2, 4, 3, 5], 0)
+            assert response == 2
+
 
 ####<a id="heapsort">Divide and Conquer: heap sort</a>
 
