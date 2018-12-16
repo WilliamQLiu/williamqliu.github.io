@@ -2413,10 +2413,9 @@ sorts the smaller list.  The trick is that since all of our lists are
 already sorted, when we combine pairs of lists, we only need to look at
 the first element of each list.
 
-Use mergesort when quicksort is impractical (e.g. when the data set is so
-large that is can't be stored in memory / stored on external devices).
-
-Mergesort is better able to be done in parallel computing.
+Use mergesort when quicksort is impractical (if you can't have the possibility
+of quicksort's worst case runtime of 'O(n^2)'.
+Mergesort is also better able to be done in parallel computing.
 
 Here's a chart:
 
@@ -2502,7 +2501,7 @@ Example Code:
 
 ####<a id="quicksort">Divide and Conquer: quick sort</a>
 
-__Quick sort__ is an efficient algorithm that does a sort 'in place'
+__Quick sort__ is an efficient algorithm that does a sort _in place_
 by splitting the array into two smaller arrays, one with lower value
 elements and one with higher value elements based off a 'pivot' element.
 
@@ -2547,11 +2546,12 @@ on if the __pivot value__ selected is near the middle).
 reorder the array so that all elements with values less than the pivot
 are on one side while all elements with values greater than the pivot
 are on the other side (equal values can go either way).  After this
-paritioning, the pivot element is in its final position.  3. Partitions
-begin by locating two position markers (e.g. _leftmark_ and _rightmark_)
+paritioning, the pivot element is in its final position.
+3. Partitions begin by locating two position markers (e.g. _leftmark_ and _rightmark_)
 at the beginning and end of the remaining items in the list.  The goal of
 the partition process is to move items that are on the wrong side with
-respect to the pivot value while also converging on the split point.
+respect to the pivot value while also converging on the __split point__
+(i.e. the actual position where the pivot value belongs in the final sorted list)
 4. We increment __leftmark__ until we locate a value that is greater
 than the pivot value.  We then decrement __rightmark__ until we locate
 a value less than the pivot value.  When this happens, we exchange the
@@ -2559,49 +2559,77 @@ two items and repeate the process again.
 
 Example Code:
 
-    """ Quick Sort """
+    """ Quick Sort in Python3
+    Quick sort uses divide and conquer to gain the same advantages as merge sort,
+    with the benefit of using less storage, but at the cost of a worse worst case runtime
+    O(n^2) if the pivot values are bad.
+    """
+    import pdb
+    from typing import List
 
 
     def quickSort(mylist):
+        """ Initialize our recursive function """
         quickSortHelper(mylist, 0, len(mylist)-1)
 
     def quickSortHelper(mylist, first, last):
-        if first < last:
+        """ Recursive function to split up """
+        if first < last:  # check if need to sort still
+
             splitpoint = partition(mylist, first, last)
 
+            # now that we know our splitpoint, we can then recursively run quicksort on the list's bottom half and top half
             quickSortHelper(mylist, first, splitpoint-1)
             quickSortHelper(mylist, splitpoint+1, last)
 
     def partition(mylist, first, last):
-        pivotvalue = mylist[first]
+        """ Partition Process, made up of:
+        * Pick a pivot value (i.e. what we'll compare our unsorted numbers to)
+        Based off this value, we'll compare our unsorted values and either move
+        our items to the left of the pivot or to the right of the pivot.
+        * """
+        pivotvalue = mylist[first]  # get the first value as pivotvalue
 
-        leftmark = first+1
+        leftmark = first + 1
         rightmark = last
 
         done = False
         while not done:
 
+            # Go from leftmost side onwards (to right) and try to find a value
+            # that is greater than the pivot value (i.e. left side of pivot should be
+            # smaller values than pivot value, if we found one that is greater, we
+            # stop at leftmark, saying we need to do a swap to the right side)
             while leftmark <= rightmark and mylist[leftmark] <= pivotvalue:
                 leftmark += 1
 
-            while mylist[rightmark] >= pivotvalue and rightmark >= leftmark:
+            # Go from rightmost side inwards (to left) and try to find a value
+            # that is less than the pivot value (i.e. right side of pivot should be
+            # greater values than pivot value, if we found one that is smaller, we
+            # stop at rightmark, saying we need to do a swap to the left side)
+            while rightmark >= leftmark and mylist[rightmark] >= pivotvalue:
                 rightmark -= 1
 
             if rightmark < leftmark:
-                done = True
+                done = True  # we're done sorting through this list because we've crossed
             else:
-                # swap
+                # we have a swap between a value in the left list and a value in the right list
                 mylist[leftmark], mylist[rightmark] = mylist[rightmark], mylist[leftmark]
 
-        # swap
-        mylist[leftmark], mylist[rightmark] = mylist[rightmark], mylist[leftmark]
+        # Once rightmark is less than leftmark, then rightmark is now the split point.
+        # That means what we picked as the pivot value can now be exchanged with the 
+        # contents of the split point and the pivot value is now in the correct place
+        # Note: remember that our pivot value was the first value in our list
+        mylist[first], mylist[rightmark] = mylist[rightmark], mylist[first]
+
+        return rightmark
 
 
     if __name__ == '__main__':
-        mylist = [54,26,93,17,77,31,44,55,20]
-        print "Original: ", mylist
+        mylist = [54, 26, 93, 17, 77, 31, 44, 55, 20]
+        print("Original: ", mylist)
         quickSort(mylist)
-        print "Quick Sorted: ", mylist
+        print("Quick Sorted: ", mylist)
 
 ####<a id="quickselect">Quickselect Algorithm</a>
 
