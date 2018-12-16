@@ -2535,6 +2535,8 @@ Example Run:
     # element 5 so we switch the current element (1) with the lowest
     # index item on the right side of the wall (6)
 
+A good video of quicksort is here: https://www.youtube.com/watch?v=kUon6854joI
+
 It's similar to _merge sort_ in that it does the divide and conquer
 approach. The advantage is that you do not need as much storage over
 _merge sort_, but the performance could possibly be diminished (depending
