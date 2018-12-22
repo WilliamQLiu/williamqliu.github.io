@@ -6,7 +6,87 @@ title: Linux Tracing
 
 # {{ page.title }}
 
-I read Julia Evans' [post on Linux Tracing Systems](https://jvns.ca/blog/2017/07/05/linux-tracing-systems/) and was inspried to learn more about the topic of tracing and debugging.
+I read Julia Evans' [post on Linux Tracing Systems](https://jvns.ca/blog/2017/07/05/linux-tracing-systems/)
+and was inspried to learn more about the topic of tracing and debugging.
+
+## Summary (Linux Tracing Systems)
+
+Linux Tracing Systems and how they fit together:
+
+* __Data Sources__ - kernel functions (k probes), kernel tracepoints, uprobes (userspace c functions), usdt /dtrace probes, ltting userspace tracing
+* __Ways to extract tracing data__ - perf, ftrace, LTTng, system tap, eBPDF, sysdig
+* __Frontends__ - pef, ftrace, trace-cmd, catapult, kernelshark, trace compass, bcc, sysdig, LTTng, system tap
+
+### Data Sources
+
+__Probes__
+
+Probes are embedded "markers" that can be observed by say a DTrace or SystemTap script so you can easily monitor
+what the process on a system is really doing.
+
+__k probes__ - __k__ stands for kernel. __KProbes__ is a way to debug the Linux kernel by monitoring events inside a production system.
+__u probes__ - __u__ stands for user. __UProbes__ is user-level dynamic tracing; it lets you trace user-level functions
+
+__Tracepoints__
+
+A __tracepoint__ is something you compile into your program. When someone using your program wnats to see
+what happens when that tracepoint is hit and extract data, they can 'enable'/'activate' that tracepoint.
+
+1. Compile a tracepoint into your program
+2. As long as nobody activates it, no overhead
+3. Your users can activate the tracepoints with tools (e.g. _ftrace_ / _dtrace_) to know what your program is doing
+
+Tracepoints for userspace programs
+
+* `dtrace` probes / `USDT` (User-Level Statically Defined Tracing) probes - You can compile Python (e.g. CPython) + other programs with dtrace probes
+* `ltting-ust`
+
+Tracepoints for the kernel
+
+* kernel tracepoints
+
+### Ways to extract tracing data 
+
+There's a few ways to collect tracing data. These 3 are built into the Linux kernel:
+
+* ftrace, uprobes, kprobes, kernel tracing, where you read from and write to files at `/sys/kernel/debug/tracing/`
+
+    /sys/kernel/debug/tracing# ls
+    available_events            events                    options              set_event_pid       stack_trace         trace_stat
+    available_filter_functions  free_buffer               per_cpu              set_ftrace_filter   stack_trace_filter  tracing_cpumask
+    available_tracers           function_profile_enabled  printk_formats       set_ftrace_notrace  trace               tracing_max_latency
+    buffer_size_kb              hwlat_detector            README               set_ftrace_pid      trace_clock         tracing_on
+    buffer_total_size_kb        instances                 saved_cmdlines       set_graph_function  trace_marker        tracing_thresh
+    current_tracer              kprobe_events             saved_cmdlines_size  set_graph_notrace   trace_marker_raw    uprobe_events
+    dyn_ftrace_total_info       kprobe_profile            saved_tgids          snapshot            trace_options       uprobe_profile
+    enabled_functions           max_graph_depth           set_event            stack_max_size      trace_pipe
+
+* `perf_events`, kernel tracepoints works by 1.) calling the `perf_event_open` syscall 2.) kernel writes data to a ring buffer `perf buffer`
+* eBPF, uprobes, kprobes, dtrace probes, kernel tracepoints - 1.) Write a eBPF program 2.) Ask Linux to attach it to a kprobe/uprobe/tracepoint 3.) eBPF program sends data to userspace with ftrace/perf/BPF maps
+
+Other ways to extract data:
+
+* `SystemTap` - write some C code, compile it into a custom kernel module, insert that module into the kernel
+* `LTTng` - Insert the LTTng kernel module, then use the LTTng tools to get it to collect data for you
+* `sysdig` - just traces the system calls
+
+### Frontends
+
+Frontends are tools to help you:
+
+* tell the kernel what data to collect / programs to run
+* display the data in a useful way
+
+These include:
+
+`perf trace` - `perf` can use `perf_event_open` and also `ftrace` to record tracing data. You can use `perf trace` to trace syscalls.
+`ftrace` - no frontend, just cat this text file
+`trace-cmd` - command line user interface to ftrace
+`perf-tools` - a collection of tools by Brendan Gregg for perf and ftrace. check out the kprobe and uprobe scripts.
+
+Additional frontends:
+
+`bcc` for eBPF - Python framework to help write eBPF programs at: https://github.com/iovisor/bcc
 
 ## `strace` command
 
