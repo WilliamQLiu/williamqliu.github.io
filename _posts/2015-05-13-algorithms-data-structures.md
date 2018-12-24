@@ -1198,7 +1198,7 @@ __hashes__).
 A __hash table__ (aka __hash map__) is a collection of items that are
 stored in a way where we can find the items very quickly.  Each position
 in the hash table is called a __slot__ (sometimes the entire slot is
-refered to as a __bucket__) and can hold an item.
+referred to as a __bucket__) and can hold an item.
 
 What is a real life example of this? Say a teacher sorts their student's
 papers in categories of A-Z based on their first names (or specific
@@ -1418,6 +1418,94 @@ array that resizes to the size it needs (or say doubling the array size).
 
 Here is some sample code for a hash table implementation:
 
+HashTable Implementation
+
+    class SlotItem(object):
+        """ An items in the same hash table slot """
+        def __init__(self, key, value):
+            self.key = key
+            self.value = value
+
+        def __str__(self):
+            return self.key
+
+    class HashTable(object):
+        """
+            Implementation of a hash table using chaining instead of
+            open addressing.  Each slot has a list of items that are
+            appended when there is a hash collision.
+        """
+
+        def __init__(self, size):
+            self.size = size
+            self.table = [[]] * self.size
+
+        def hash_function(self, key):
+            """
+                Return modulus (i.e. remainder) and handles two scenarios:
+                1 - numbers only (int or long); just take modulus 2 -
+                characters involved; create hash from position and ordinal
+                    value of character (position added to handle anagrams)
+            """
+
+            if type(key) is int or type(key) is long:  # numbers only
+                return key % self.size
+            else:
+                total = 0  # characters involved for position in xrange(len(key)):
+                total = total + (ord(key[position]) * (position+1))
+                return total % self.size
+
+        def set(self, key, value):
+            """
+                Finds slot with hash_function, then saves key-value pair.
+                If there is an existing key, we overwrite that value.
+            """ index = self.hash_function(key)  # find correct slot
+
+            for slot in self.table[index]:  # look inside slot for key
+                if slot.key == key:  # key found, replace current value
+                    slot.value = value return
+            self.table[index].append(SlotItem(key, value))  # key not found, add
+
+            self.check_load_factor(upper_limit=.8, resize=2)
+
+        def get(self, key):
+            """ Finds slot with hash_function, returns slot value or
+            else None """
+            index = self.hash_function(key)
+
+            for slot in self.table[index]:  # look inside slot for key
+                if slot.key == key:  # key found, return current value
+                    return slot.value
+            return None  # no key found
+
+        def remove(self, key):
+            """ Given a key, remove the key-value pair """
+            index = self.hash_function(key)
+            for i, slot in enumerate(self.table[index]):
+                if slot.key == key:  # key found, return current value
+                    del self.table[index][i]
+
+        def check_load_factor(self, upper_limit=.8, resize=2):
+            """
+                Check load factor, if limit reached, warn to resize
+                larger table
+            """ load = 0 for i in xrange(self.size):
+                for slot in self.table[i]:
+                    if slot:
+                        load += 1
+
+            load_factor = float(load)/float(self.size)
+            #print "Load factor is ", load_factor
+
+            if load_factor > upper_limit:  # need to resize for larger hash table
+                print "Load Factor is past upper limit, you should resize"
+                # TODO: Create deepcopy, dynamically resize for high and low limit
+
+            else:
+                pass  # load_factor is in acceptable limits
+
+
+Tests for Hashtable Implementation
 
     """ Implement a hashmap (with amortized constant time look-ups)
     without using a hashmap primitive.  Includes an executable testing
@@ -1553,91 +1641,6 @@ Here is some sample code for a hash table implementation:
             assert_equal(hash_table.get(2), None)
 
 
-    class SlotItem(object):
-        """ An items in the same hash table slot """
-        def __init__(self, key, value):
-            self.key = key
-            self.value = value
-
-        def __str__(self):
-            return self.key
-
-    class HashTable(object):
-        """
-            Implementation of a hash table using chaining instead of
-            open addressing.  Each slot has a list of items that are
-            appended when there is a hash collision.
-        """
-
-        def __init__(self, size):
-            self.size = size
-            self.table = [[]] * self.size
-
-        def hash_function(self, key):
-            """
-                Return modulus (i.e. remainder) and handles two scenarios:
-                1 - numbers only (int or long); just take modulus 2 -
-                characters involved; create hash from position and ordinal
-                    value of character (position added to handle anagrams)
-            """
-
-            if type(key) is int or type(key) is long:  # numbers only
-                return key % self.size
-            else:
-                total = 0  # characters involved for position in xrange(len(key)):
-                total = total + (ord(key[position]) * (position+1))
-                return total % self.size
-
-        def set(self, key, value):
-            """
-                Finds slot with hash_function, then saves key-value pair.
-                If there is an existing key, we overwrite that value.
-            """ index = self.hash_function(key)  # find correct slot
-
-            for slot in self.table[index]:  # look inside slot for key
-                if slot.key == key:  # key found, replace current value
-                    slot.value = value return
-            self.table[index].append(SlotItem(key, value))  # key not found, add
-
-            self.check_load_factor(upper_limit=.8, resize=2)
-
-        def get(self, key):
-            """ Finds slot with hash_function, returns slot value or
-            else None """
-            index = self.hash_function(key)
-
-            for slot in self.table[index]:  # look inside slot for key
-                if slot.key == key:  # key found, return current value
-                    return slot.value
-            return None  # no key found
-
-        def remove(self, key):
-            """ Given a key, remove the key-value pair """
-            index = self.hash_function(key)
-            for i, slot in enumerate(self.table[index]):
-                if slot.key == key:  # key found, return current value
-                    del self.table[index][i]
-
-        def check_load_factor(self, upper_limit=.8, resize=2):
-            """
-                Check load factor, if limit reached, warn to resize
-                larger table
-            """ load = 0 for i in xrange(self.size):
-                for slot in self.table[i]:
-                    if slot:
-                        load += 1
-
-            load_factor = float(load)/float(self.size)
-            #print "Load factor is ", load_factor
-
-            if load_factor > upper_limit:  # need to resize for larger hash table
-                print "Load Factor is past upper limit, you should resize"
-                # TODO: Create deepcopy, dynamically resize for high and low limit
-
-            else:
-                pass  # load_factor is in acceptable limits
-
-
     if __name__ == '__main__':
 
         # run unit tests suite =
@@ -1646,6 +1649,7 @@ Here is some sample code for a hash table implementation:
 
         A = TestFunHashTable()
         A.test_end_to_end()
+
 
 ###<a id="stringmatching">String Matching via Hashing</a>
 
@@ -3311,3 +3315,10 @@ Some famous NP-Complete problems are:
 A __NP-Hard__ problem is one that is not solvable in polynomial time, but can be
 verified in polynomial time.
 
+##<a id="gotchas">Gotchas</a>
+
+Remember when whiteboarding, its a bit different than coding because you can't just
+run your code. Some things to watch out for include:
+
+* Off by 1 - (e.g. `range(10)` will be `0` to `9`, but not 10)
+* 
