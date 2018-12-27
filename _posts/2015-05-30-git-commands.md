@@ -221,6 +221,18 @@ For example, with a `git reset`, we have:
 
 `git revert` is the only one that does not have a file-level counterpart.
 
+####<a id="undoexample">Undo Example</a>
+
+Say we have a previous commit that deleted a lot of files you needed. You can go back and grab those files.
+
+  * Say you make a separate branch from master for this: `git checkout -b RESTOREFILES`
+  * Then you grep around to see the commit that deleted your files: `git log | grep -B 10 -A 10 whateveryourelookingfor`
+  * `git checkout dfdjkf343jkdfsakljflsafjllkds3~1 mydir/myfile1.py mydir/myfile2.py`
+  * Then `git commit -m "Restored files"`
+
+The `~1` means to take the previous commit
+The `-B 10` and `-A 10` in grep means to show before and after 10 lines.
+
 ##<a id="cleanup">Cleanup with BFG</a>
 
 BFG Repo-Cleaner is a tool to remove large (e.g. blobs bigger than 1M) or bad data (e.g. passwords, credentials, private data) and this is faster and easier to use than the `git-filter-branch` command.
