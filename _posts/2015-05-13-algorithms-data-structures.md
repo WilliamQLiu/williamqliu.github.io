@@ -83,10 +83,12 @@ title: Algorithms and Data Structures
 *  [Graph Theory](#graphtheory)
     - [Trees](#trees)
     - [Graphs](#graphs)
-*  [Heaps](#heaps)
 *  [Trees](#trees)
     - [Binary Trees](#binarytrees)
     - [Binary Search Trees](#binarysearchtrees)
+*  [Heaps](#heaps)
+    - [Max Heaps](#maxheaps)
+    - [Min Heaps](#minheaps)
 *  [Graphs](#graphs)
 
 
@@ -965,7 +967,7 @@ So what exactly does a bitwise operator do?
 * AND is 1 only if both of its inputs are 1, otherwise it's 0.
 * OR is 1 if one or both of its inputs are 1, otherwise it's 0.
 * XOR is 1 only if exactly one of its inputs are 1, otherwise it's 0.
-* NOT is 1 only if its input is 0, otherwise it's 0.
+* NOT / Ones Compliment is 1 only if its input is 0, otherwise it's 0.
 
 These can appear as a truth table:
 
@@ -1986,7 +1988,7 @@ enter a system at arbitrary intervals. It's cost-effective to insert a new job i
 queue than to re-sort everything on each new item's arrival. So the idea is that you can
 add items at any time, but only the item with the highest priority can be removed first.
 
-Priority Queues are often used with heaps since we're sure that the value of a node is less
+Priority Queues are often implemented with heaps since we're sure that the value of a node is less
 than all the values in its subtrees. The smallest element is the one with the highest priority.
 
 We have three primary operations:
