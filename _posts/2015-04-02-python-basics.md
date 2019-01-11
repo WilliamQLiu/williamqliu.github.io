@@ -197,11 +197,14 @@ You can nest lists (create lists that contain other lists).
 *  `list.index(x)` returns index in the list whose value is `x` or an error if none found
 *  `list.count(x)` returns the number of times `x` appears in the list
 *  `list.sort()` sorts the items of the list in place
-*  `list.pop([i])` removes the `i` item or last item if not specified
+*  `list.pop(i)` removes the ith item or last item if not specified
 
 #### Stacks
 
-A **stack** is using a list with first-in, last-out functionality.  The main methods for stacks are `append()` and `pop()`.  Note that with append, the items you add can be other lists (i.e. you can have a list with lists inside as individual items)
+A **stack** is using a list with first-in, last-out functionality.
+The main methods for stacks are `append()` and `pop()`.
+Note that with append, the items you add can be other lists
+(i.e. you can have a list with lists inside as individual items)
 
 #### Queues
 
@@ -271,7 +274,9 @@ If there is no `maxlen` specificed or it is `None`, deques can grow to an arbitr
 
 ### List comprehensions
 
-List comprehensions are a concise way of making lists based on an operation or if the item satisifes a certain condition.  This is a compact for-loop that builds lists.  Here are different ways of doing a regular loop along with the list comprehension equivalent:
+List comprehensions are a concise way of making lists based on an operation or 
+if the item satisifes a certain condition.  This is a compact for-loop that builds lists.
+Here are different ways of doing a regular loop along with the list comprehension equivalent:
 
     sqaures = []
     for x in range(10):  # range(10) loops from 0 - 9
