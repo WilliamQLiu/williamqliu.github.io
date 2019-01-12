@@ -394,6 +394,174 @@ is a SQLAlchemy Model.
 If you need to setup a workflow that goes down a certain path based on an arbitrary condition (e.g. if something
 happened on an upstream task), then use __branching__.
 
+### TriggerDagRunOperator - Trigger another Dag from current Dag
+
+If branching isn't enough (i.e. based off some conditional logic, execute a set of tasks), you might want to 
+consider `TriggerDagRunOperator` so you can kick off entire DAGs from your current DAG. To do this, you need:
+
+* A Controller DAG - the DAG that conditionally executes a trigger
+* A Target DAG - the DAG that is being triggered
+
+You might want to do a Trigger job if you want to do some safety checks/testing before running your real operation.
+
+#### Example Controller DAG
+
+The Controller DAG conditionally executes the trigger.
+
+    # -*- coding: utf-8 -*-
+    #
+    # Licensed to the Apache Software Foundation (ASF) under one
+    # or more contributor license agreements.  See the NOTICE file
+    # distributed with this work for additional information
+    # regarding copyright ownership.  The ASF licenses this file
+    # to you under the Apache License, Version 2.0 (the
+    # "License"); you may not use this file except in compliance
+    # with the License.  You may obtain a copy of the License at
+    #
+    #   http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing,
+    # software distributed under the License is distributed on an
+    # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    # KIND, either express or implied.  See the License for the
+    # specific language governing permissions and limitations
+    # under the License.
+    """This example illustrates the use of the TriggerDagRunOperator. There are 2
+    entities at work in this scenario:
+    1. The Controller DAG - the DAG that conditionally executes the trigger
+    2. The Target DAG - DAG being triggered (in example_trigger_target_dag.py)
+    This example illustrates the following features :
+    1. A TriggerDagRunOperator that takes:
+      a. A python callable that decides whether or not to trigger the Target DAG
+      b. An optional params dict passed to the python callable to help in
+         evaluating whether or not to trigger the Target DAG
+      c. The id (name) of the Target DAG
+      d. The python callable can add contextual info to the DagRun created by
+         way of adding a Pickleable payload (e.g. dictionary of primitives). This
+         state is then made available to the TargetDag
+    2. A Target DAG : c.f. example_trigger_target_dag.py
+    """
+
+    import pprint
+    from datetime import datetime
+
+    from airflow import DAG
+    from airflow.operators.dagrun_operator import TriggerDagRunOperator
+
+    pp = pprint.PrettyPrinter(indent=4)
+
+
+    def conditionally_trigger(context, dag_run_obj):
+        """This function decides whether or not to Trigger the remote DAG"""
+        c_p = context['params']['condition_param']
+        print("Controller DAG : conditionally_trigger = {}".format(c_p))
+        if context['params']['condition_param']:
+            dag_run_obj.payload = {'message': context['params']['message']}
+            pp.pprint(dag_run_obj.payload)
+            return dag_run_obj
+
+
+    # Define the DAG
+    dag = DAG(
+        dag_id='example_trigger_controller_dag',
+        default_args={
+            "owner": "airflow",
+            "start_date": datetime.utcnow(),
+        },
+        schedule_interval='@once',
+    )
+
+    # Define the single task in this controller example DAG
+    trigger = TriggerDagRunOperator(
+        task_id='test_trigger_dagrun',
+        trigger_dag_id="example_trigger_target_dag",
+        python_callable=conditionally_trigger,
+        params={'condition_param': True, 'message': 'Hello World'},
+        dag=dag,
+    )
+
+#### The Target DAG
+
+The DAG that is triggered (externally instead of scheduled regularly) and run
+
+    # -*- coding: utf-8 -*-
+    #
+    # Licensed to the Apache Software Foundation (ASF) under one
+    # or more contributor license agreements.  See the NOTICE file
+    # distributed with this work for additional information
+    # regarding copyright ownership.  The ASF licenses this file
+    # to you under the Apache License, Version 2.0 (the
+    # "License"); you may not use this file except in compliance
+    # with the License.  You may obtain a copy of the License at
+    #
+    #   http://www.apache.org/licenses/LICENSE-2.0
+    #
+    # Unless required by applicable law or agreed to in writing,
+    # software distributed under the License is distributed on an
+    # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    # KIND, either express or implied.  See the License for the
+    # specific language governing permissions and limitations
+    # under the License.
+
+    import pprint
+    from datetime import datetime
+
+    from airflow.models import DAG
+    from airflow.operators.bash_operator import BashOperator
+    from airflow.operators.python_operator import PythonOperator
+
+    pp = pprint.PrettyPrinter(indent=4)
+
+    # This example illustrates the use of the TriggerDagRunOperator. There are 2
+    # entities at work in this scenario:
+    # 1. The Controller DAG - the DAG that conditionally executes the trigger
+    #    (in example_trigger_controller.py)
+    # 2. The Target DAG - DAG being triggered
+    #
+    # This example illustrates the following features :
+    # 1. A TriggerDagRunOperator that takes:
+    #   a. A python callable that decides whether or not to trigger the Target DAG
+    #   b. An optional params dict passed to the python callable to help in
+    #      evaluating whether or not to trigger the Target DAG
+    #   c. The id (name) of the Target DAG
+    #   d. The python callable can add contextual info to the DagRun created by
+    #      way of adding a Pickleable payload (e.g. dictionary of primitives). This
+    #      state is then made available to the TargetDag
+    # 2. A Target DAG : c.f. example_trigger_target_dag.py
+
+    args = {
+        'start_date': datetime.utcnow(),
+        'owner': 'airflow',
+    }
+
+    dag = DAG(
+        dag_id='example_trigger_target_dag',
+        default_args=args,
+        schedule_interval=None,
+    )
+
+
+    def run_this_func(ds, **kwargs):
+        print("Remotely received value of {} for key=message".
+              format(kwargs['dag_run'].conf['message']))
+
+
+    run_this = PythonOperator(
+        task_id='run_this',
+        provide_context=True,
+        python_callable=run_this_func,
+        dag=dag,
+    )
+
+    # You can also access the DagRun object in templates
+    bash_task = BashOperator(
+        task_id="bash_task",
+        bash_command='echo "Here is the message: '
+                     '{{ dag_run.conf["message"] if dag_run else "" }}" ',
+        dag=dag,
+    )
+
+
 ### SubDAGs
 
 __SubDAGs__ are used for __repeating patterns__. Defining a function that returns a DAG object is a nice design pattern
@@ -401,10 +569,61 @@ when using Airflow. Airflow uses the __stage-check-exchange__ pattern when loadi
 table, after which data quality checks are performed against that table. Once all the checks pass, the partition
 is moved into the production table.
 
+
+
 ### SLAs
 
 __Service Level Agreements__ is the time that a task or DAG should have succeeded (by setting a task level as 
 a `timedelta`).  If one or more instances haven't succeeded by that time, you can send out an alert email.
+You can set the SLA like this example here by adding `sla` to your arguments:
+
+https://github.com/apache/airflow/blob/master/airflow/example_dags/tutorial.py#L49
+
+    # These args will get passed on to each operator
+    # You can override them on a per-task basis during operator initialization
+    default_args = {
+        'owner': 'airflow',
+        'depends_on_past': False,
+        'start_date': airflow.utils.dates.days_ago(2),
+        'email': ['airflow@example.com'],
+        'email_on_failure': False,
+        'email_on_retry': False,
+        'retries': 1,
+        'retry_delay': timedelta(minutes=5),
+        # 'queue': 'bash_queue',
+        # 'pool': 'backfill',
+        # 'priority_weight': 10,
+        # 'end_date': datetime(2016, 1, 1),
+        # 'wait_for_downstream': False,
+        # 'dag': dag,
+        # 'adhoc':False,
+        'sla': timedelta(hours=2),
+        # 'execution_timeout': timedelta(seconds=300),
+        # 'on_failure_callback': some_function,
+        # 'on_success_callback': some_other_function,
+        # 'on_retry_callback': another_function,
+        # 'trigger_rule': u'all_success'
+    }
+
+    dag = DAG(
+        'tutorial',
+        default_args=default_args,
+        description='A simple tutorial DAG',
+        schedule_interval=timedelta(days=1),
+    )
+
+### Email
+
+If you want to setup sending email, make sure to edit your `airflow.cfg` file under the `[smtp]` section:
+
+    [smtp]
+    smtp_host = smtp.gmail.com
+    smtp_starttls = True
+    smtp_ssl = False
+    smtp_user = YOUR_EMAIL_ADDRESS
+    smtp_password = 16_DIGIT_APP_PASSWORD # Or password in raw text for testing if you don't want to generate a Google App Password
+    smtp_port = 587
+    smtp_mail_from = YOUR_EMAIL_ADDRESS
 
 ### Trigger Rules
 
