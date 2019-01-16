@@ -23,7 +23,8 @@ You can also test for bidirectional throughput testing with `iperf -c 198.51.100
 ## iftop
 
 iftop shows network usage like what top does for CPU usage. iftop listens to network traffic on a named interface
-and displays a table of current bandwidth usage by pairs of hosts.
+and displays a table of current bandwidth usage by pairs of hosts. Basically, whose using up all the bandwidth and
+what are they doing?!
 
 Use `sudo ifconfig` OR `sudo ip addr show` to find all attached network interfaces on your Linux system.
 Then use the `-i` flag to specify the interface you want to monitor, e.g. `sudo iftop -i wlp58s0`
@@ -50,4 +51,40 @@ Then use the `-i` flag to specify the interface you want to monitor, e.g. `sudo 
                                                              <=                                                          62.6Kb  12.5Kb  3.13Kb
     will-xps.lan                                             => 209.85.164.184                                           19.5Kb  3.90Kb   998b
                                                              <=                                                          64.5Kb  12.9Kb  3.22Kb
+
+The last three columns show the average bandwidth the last 2, 10, and 40 seconds
+
+`TX` stands for Overall Transmitted Traffic
+`RX` stands for overall received traffic
+
+## nslookup
+
+Nslookup is a program to query Internet domain name servers.
+
+    $nslookup -type=any google.com
+    nslookup -type=any google.com
+    Server:     192.168.1.8
+    Address:    192.168.1.8#53
+
+    Non-authoritative answer:
+    Name:   google.com
+    Address: 172.217.12.14
+    google.com  nameserver = ns2.google.com.
+    google.com
+        origin = ns1.google.com
+        mail addr = dns-admin.google.com
+        serial = 229344848
+        refresh = 900
+        retry = 900
+        expire = 1800
+        minimum = 60
+    google.com  mail exchanger = 20 alt1.aspmx.l.google.com.
+    google.com  text = "globalsign-smime-dv=CDYX+XFHUw2wml6/Gb8+59BsH31KzUr6c1l2BPvqKX8="
+    google.com  has AAAA address 2607:f8b0:400f:801::200e
+    google.com  rdata_257 = 0 issue "pki.goog"
+
+    Authoritative answers can be found from:
+    ns2.google.com  internet address = 216.239.34.10
+    alt1.aspmx.l.google.com internet address = 64.233.185.27
+
 

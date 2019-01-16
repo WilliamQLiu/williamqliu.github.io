@@ -516,5 +516,6 @@ pairings, ordered by the time.
     2012-09-21 15:30:00	Tennis Court 1
     2012-09-21 16:00:00	Tennis Court 2
 
+## <a id="Aggregates">Aggregates</a>
 
-
+You can select aggregates using `COUNT`, `SUM`, and `AVG`, `MAX`, `MIN`. `DISTINCT` can be used with aggregates.
