@@ -3,5 +3,7 @@
   "short_name": "will dev",
   "lang": "en-US",
   "start_url": "/",
-  "display": "standalone"
+  "display": "standalone",
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF"
 }
