@@ -38,11 +38,49 @@ A design pattern has four essential elements:
 
 # Types of Design Patterns
 
-__Design Patterns__ fall into three categories:
+__Design Patterns__ fall into three categories.
 
 * __Creational__
 * __Structural__
 * __Behavioral__
+
+The above categories are classified based off two criteria:
+
+1.) __Purpose__ reflects what a pattern does
+
+Creational patterns are about object creation.
+Structural patterns deal with the composition of classes or objects
+Behavorial patterns characterize the ways in which classes or objects interact and distribute responsibility
+
+2.) __Scope__ specifies whether the pattern applies primarily to __classes__ or to __objects__.
+For Python, everything is an object while classes are essentially a template to create your objects
+
+__Class patterns__ deal with relationships between classes and their subclasses; these relationships are established
+through inheritance, so they are static - fixed at compile-time.
+
+__Object patterns__ deal with object relationships, which can be changed at run-time and are more dynamic.
+
+Almost all patterns use inheritance so some extent so the only patterns labeled 'class patterns' are those that
+focus on class relationships. Most patterns are thus labeled in the Object patterns.
+
+                     -------------------------------------------------------------------
+                     |                        Purpose                                  |
+                     -------------------------------------------------------------------
+                     |   Creational      |   Structural      |   Behaviroal            |
+    ------------------------------------------------------------------------------------
+    |Scope |  Class  |   Factory Method  |   Adapter (class) | Interpreter             |
+    |      |         |                   |                   | Template Method         |
+    |      -----------------------------------------------------------------------------
+    |      |  Object |  Abstract Factory |  Adapter (object) | Chain of Responsibility |
+    |      |         |  Builder          |  Bridge           | Command                 |
+    |      |         |  Prototype        |  Composite        | Iterator                |
+    |      |         |  Singleton        |  Decorator        | Mediator                |
+    |      |         |                   |  Facade           | Memento                 |
+    |      |         |                   |  Flyweight        | Observer                |
+    |      |         |                   |  Proxy            | State                   |
+    |      |         |                   |                   | Strategy                |
+    |      |         |                   |                   | Visitor                 |
+    ----------------------------------------------------------------------------------
 
 # Catalog of Design Patterns
 
@@ -63,10 +101,28 @@ Common design patterns include:
                   alternative to subclassing for extending functionality
 * __Facade__ - provide a unified interface to a set of interfaces in a subsystem. Facade defines a higher-level
                interface that makes the subsystem easier to use
-* __Factory Method__
-* __Observer__
-* __Strategy__
-* __Template Method__
+* __Factory Method__ - define an interface for creating an object, but let subclasses decided which class to instantiate
+* __Flyweight__ - use sharing to support large numbers of fine-grained objects efficiently
+* __Interpreter__ - given a language, define a representation for its grammar along with an interpreter that uses
+                    the representation to interpret sentences in the language
+* __Iterator__ - provide a way to access the elements of an aggregate object sequentially without exposing its underlying representation
+* __Mediator__ - define an object that encapsulates how a set of objects interact; allows loose coupling by keeping
+                 objects from referring to each other explicitly, and it lets you vary their interaction independently
+* __Memento__ - Without violating encapsulation, capture and externalize an object's internal state so that the object
+                can be restored to this state later
+* __Observer__ - define a one-to-many dependency between objects so that when one object changes state, all its
+                 dependents are notified and updated automatically
+* __Prototype__ - specify the kinds of objects to create using a prototypical instance, and create new objects by
+                  copying this prototype
+* __Proxy__ - provide a surrogate or placeholder for another object to control access to it
+* __Singleton__ - ensure a class only has one instance, and provide a global point of access to it
+* __State__ - allow an object to alter its behavior when its internal state changes. The object will appear to change its class
+* __Strategy__ - define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the
+                 algorithm vary independently from clients that use it
+* __Template Method__ - define the skeleton of an algorithm in an operation, deferring some steps to subclasses. Template
+                        Method lets subclasses redefine certain steps of an algorithm without changing the algorithm's structure
+* __Visitor__ - represent an operation to be performed on the elements of an object structure. Visitor lets you define
+                a new operation without changing the classes of the elements on which it operates
 
 # Example Design Pattern - the MVC 
 
@@ -117,3 +173,18 @@ scrolling capabilities to a single object.
 
 MVC might have a Controller that specifies the default Controller Class for a View. We can use the __Factory Pattern__
 to create objects without having to specify the exact class of the object that will be created.
+
+# How to Select a Design Pattern
+
+Here's several approaches to finding the design pattern that's right for your problem:
+
+* Consider how design patterns solve design problems
+* Scan Intent for all the patterns
+* Study how patterns interrelate - see relationships between design patterns to find the right pattern/group of patterns
+* Study patterns of like-purpose - see similarities and differences between patterns of like purpose
+* Examine a cause of redesign - look at the causes of redesign to see if your problem involves one or more of them, then
+                                look at the patterns that help you avoid the causes of redesign
+* Consider what should be variable in your design - instead of focusing on the the cause of redesign, we consider what
+                                might force a change to a design (i.e. what can you change without a redesign)
+
+
