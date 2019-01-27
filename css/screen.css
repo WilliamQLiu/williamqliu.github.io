@@ -95,7 +95,6 @@ ul.posts {
 }
 
   .site .title a {
-    color: #888;
     text-decoration: none;
   }
 
@@ -104,7 +103,6 @@ ul.posts {
   }
 
   .site .title a.extra {
-    color: #aaa;
     text-decoration: none;
     margin-left: 1em;
   }
@@ -131,7 +129,6 @@ ul.posts {
     }
 
       .site .footer .contact a {
-        color: #8085C1;
       }
 
     .site .footer .rss {
