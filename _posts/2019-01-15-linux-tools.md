@@ -88,3 +88,44 @@ Nslookup is a program to query Internet domain name servers.
     alt1.aspmx.l.google.com internet address = 64.233.185.27
 
 
+## glances
+
+__Glances__ is a monitoring tool similar to htop, but with some additional information more focused on I/O.
+For example:
+
+
+    CPU  [||||||||||||||||||||||                                                    29.9%]   CPU /    29.9%  nice:     0.0%  ctx_sw:    5K      MEM -   56.1%  active:    5.49G      SWAP -    0.0%      LOAD    4-core
+    MEM  [|||||||||||||||||||||||||||||||||||||||||                                 56.1%]   user:    24.6%  irq:      0.0%  inter:   7309      total:  7.68G  inactive:  1.14G      total:   15.8G      1 min:    1.34
+    SWAP [                                                                           0.0%]   system:   5.1%  iowait:   0.4%  sw_int:   899      used:   4.31G  buffers:   1.67G      used:        0      5 min:    1.18
+                                                                                             idle:    69.7%  steal:    0.0%                     free:   3.37G  cached:    1.86G      free:    15.8G      15 min:   1.08
+
+    NETWORK     Rx/s   Tx/s   TASKS 270 (1080 thr), 1 run, 199 slp, 70 oth sorted automatically by cpu_percent, flat view
+    docker0       0b     0b
+    lo          232b   232b   Systemd          7    Services loaded: 192 active: 192 
+    wlp58s0       0b     0b
+                                CPU%  MEM%  VIRT   RES   PID USER        NI S     TIME+   R/s   W/s Command 
+    DefaultGateway      7ms     42.4   4.6 1.05G  362M 18172 will         0 S  25:57.51     0     0 /opt/google/chrome/chrome
+                                30.8   0.5  477M 39.1M 30574 will         0 R   0:18.26     0     0 /usr/bin/python3 /usr/bin/glances
+    DISK I/O     R/s    W/s     11.9   5.4 2.06G  422M 15716 will         0 S   1h49:46     0   12K /opt/google/chrome/chrome
+    nvme0n1       4K    62K     11.6   2.6  835M  201M 28863 will         0 S   1:21.24     0     0 /opt/google/chrome/chrome
+    nvme0n1p1      0      0      8.7   0.1 1.09G 11.7M  4310 will       -11 S  17:42.90     0     0 /usr/bin/pulseaudio --start --log-target=syslog
+    nvme0n1p2      0      0      7.5   1.0  735M 78.2M 29040 will         0 S   8:32.93    4K     0 /usr/bin/python /usr/bin/x-terminal-emulator
+    nvme0n1p3     4K    62K      6.6   0.8  355M 59.0M  4083 will         0 S  33:54.50     0     0 /usr/lib/xorg/Xorg vt2 -displayfd 3 -auth /run/user/1001/gdm/Xauthority -background none -noreset -keeptty -verbose
+    nvme0n1p4      0      0      3.0   1.3  749M  101M 31033 will         0 S   0:01.93     0     0 /opt/google/chrome/chrome
+                                 2.7   1.1  687M 83.9M 21727 will         0 S   2:01.23     0     0 /opt/google/chrome/chrome
+    FILE SYS    Used  Total      1.8   2.6  857M  206M 21683 will         0 S   1:36.43     0     0 /opt/google/chrome/chrome
+    /           131G   216G      1.2   0.0     0     0   422 root         0 S   5:37.87     0     0 irq/51-DLL075B:
+    /boot/efi  6.09M   238M      1.2   4.0 1.09G  314M 21963 will         0 S   2:27.74     0     0 /opt/google/chrome/chrome
+    _ore/5897  88.2M  88.2M      1.2   4.1 1.14G  319M 22275 will         0 S   1:21.57     0     0 /opt/google/chrome/chrome
+    _ore/6034  89.5M  89.5M      0.6   2.1  832M  167M 21894 will         0 S   2:00.31     0     0 /opt/google/chrome/chrome
+    _ore/6130  89.5M  89.5M      0.3   0.1  220M 9.16M     1 root         0 S   7h02:27     0     0 /sbin/init splash
+                                 0.3   0.0     0     0     8 root         0 ?   1:16.70     0     0 rcu_sched
+    SENSORS                      0.3   3.0  991M  233M 17427 will         0 S   7:24.96     0     0 /opt/google/chrome/chrome
+    acpitz 1            25C      0.3   0.0     0     0 28963 root         0 ?   0:00.14     0     0 kworker/3:2
+    pch_skylake 1       39C      0.3   0.0     0     0 29737 root         0 ?   0:00.11     0     0 kworker/1:5
+    Package id 0        48C      0.3   1.8  767M  139M 30579 will         0 S   0:24.82     0     0 /opt/google/chrome/chrome
+    Core 0              44C      0.0   0.0     0     0     2 root         0 S   0:00.10     0     0 kthreadd
+    Core 1              48C      0.0   0.0     0     0     4 root       -20 ?   0:00.00     0     0 kworker/0:0H
+    Battery             86%      0.0   0.0     0     0     6 root       -20 ?   0:00.00     0     0 mm_percpu_wq
+                                 0.0   0.0     0     0     7 root         0 S   0:07.62     0     0 ksoftirqd/0
+    
