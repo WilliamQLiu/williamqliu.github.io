@@ -53,11 +53,11 @@ In Python 2, we're dealing with instances of either __strings__ (bytes, not real
 
 Besides just making sure your code works, make sure that your database character sets are correct.
 
-mysql> use some_database_name;
-	 > show variables like 'character_set_database'
-	 +------------------------+---------+
-	 | Variable_name          | Value   |
-	 |------------------------+---------|
-	 | character_set_database | latin1  |
-	 +------------------------+---------+
+    mysql> use some_database_name;
+         > show variables like 'character_set_database'
+         +------------------------+---------+
+         | Variable_name          | Value   |
+         |------------------------+---------|
+         | character_set_database | latin1  |
+         +------------------------+---------+
 
