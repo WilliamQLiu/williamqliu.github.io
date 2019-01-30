@@ -168,7 +168,7 @@ is to:
 
 The tradeoffs are that for the first approach, the systems struggled to keep up
 with the load of home timeline queries due to the joins. The second approach
-reads much quick, but requires to do more work at write time. There was an edge
+reads much quicker, but requires to do more work at write time. There was an edge
 case scenario with the second approach due to high number of followers per user
 (e.g. Justin Beiber). Since he has over 30 million followers, a single tweet
 results in over 30 million writes to home timelines. This a good scenario where
@@ -330,7 +330,7 @@ collection of __tuples__ (aka __rows__ in SQL).
 __NoSQL__ isn't a particular technology, it just stands for Not Only SQL. NoSQL
 stands to do:
 
-* Scale better than relational databases, with more focus on very large
+* Scales better than relational databases, with more focus on very large
   datasets and very high write throughput
 * Specialized query operations that are not suppported by the relational model
 * More dynamic data models than those of the relational schemas

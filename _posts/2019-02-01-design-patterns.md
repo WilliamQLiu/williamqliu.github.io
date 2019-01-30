@@ -124,6 +124,71 @@ Common design patterns include:
 * __Visitor__ - represent an operation to be performed on the elements of an object structure. Visitor lets you define
                 a new operation without changing the classes of the elements on which it operates
 
+## Simplest and Most Common Patterns:
+
+Out of the above, the simplest and most common patterns are:
+
+* Abstract Factory
+* Adapter
+* Composite
+* Decorator
+* Factory Method
+* Observer
+* Strategy
+* Template Method
+
+### Additional Patterns
+
+* Active Record Pattern - e.g. Django's ORM - The interface of an object conforming to this pattern would include
+  functions such as Insert, Update, Delete, plus properties that correspond more or less directly to the columns
+  of the underlying database table. Active Record pattern is an approach to accessing data in a database
+
+# Architectual
+
+The above are design patterns from 'The Gang of Four'. There's also a few architectural patterns and styles here:
+
+## Architectural Patterns
+
+* Three-tier
+* Multilayerd architecture
+* Model-View-Controller
+* Domain Driven Design
+* Micro-kernel
+* Blackboard pattern
+* Sensor-controller-actutator
+* Presentation-abstraction-control
+
+## Architectural Styles
+
+* Structure
+  - Component-based
+  - Monolithic application
+  - Layered
+  - Pipes and filters
+* Shared Memory
+  - Database-centric
+  - Blackboard
+  - Rule-based
+* Messaging
+  - Event-driven (aka implicit invocation)
+  - Publish-subscribe
+  - Asynchronous messaging
+* Adaptive Systems
+  - Plug-ins
+  - Microkernel
+  - Reflection
+  - Domain specific languages
+* Distributed Systems
+  - Client-server (2-tier, 3-tier, n-tier exhibit this style)
+  - Shared nothing architecture
+  - Space-based architecture
+  - Object request broker
+  - Peer-to-peer
+  - Rrepresentational state transfer (REST)
+  - Service-oriented
+  - Cloud computing patterns
+
+
 # Example Design Pattern - the MVC 
 
 In web applications, we commonly see the __Model__/__View__/__Controller__ (__MVC__) classes used to build
@@ -187,4 +252,4 @@ Here's several approaches to finding the design pattern that's right for your pr
 * Consider what should be variable in your design - instead of focusing on the the cause of redesign, we consider what
                                 might force a change to a design (i.e. what can you change without a redesign)
 
-
+##
