@@ -41,6 +41,17 @@ You'll see the following configuration files in `~/.aws/`:
     ls ~/.aws/
     config  credentials
 
+## AWS Auto Completer
+
+Identify where auto_completer is:
+
+    $which aws_completer
+    /usr/bin/aws_completer
+
+Then add this to your `.bashrc`
+
+Now you can 'Tab' through your commands
+
 ## S3
 
 Using the AWS CLI, you can just type in `aws s3 ls` and you'll see what S3 buckets
