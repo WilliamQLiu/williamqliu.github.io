@@ -86,6 +86,8 @@ focus on class relationships. Most patterns are thus labeled in the Object patte
 
 Common design patterns include:
 
+* __Abstract Factory__ - provide an interface for creating families of related or dependent objects without specifying
+                         their concrete classes
 * __Adapter__ - convert the interface of class into another interface clients expect
 * __Bridge__ - decouple an abstraction from its implementation so that the two can vary independently
 * __Builder__ - Separate the construction of a complex object from its representation so that the same construction
@@ -252,4 +254,40 @@ Here's several approaches to finding the design pattern that's right for your pr
 * Consider what should be variable in your design - instead of focusing on the the cause of redesign, we consider what
                                 might force a change to a design (i.e. what can you change without a redesign)
 
-##
+# Object-Oriented Programs
+
+So let's take a step back and look at what makes up object-oriented programs: __objects__.
+
+## What makes up an object?
+An object has both data and the procedures that operate on that data.
+
+* Data
+* Procedures - (aka __methods__ or __operations__) operate on the object data; performs an operation when it 
+               receives a __request__ (or __message__) from a client
+
+## Calling Procedures with Requests 
+
+Requests are the _only way to get an object to execute an operation_. Operations are the _only way to change an
+object's internal state_. Because of these restrictions, the object's internal state is said to __encapsulated__;
+it cannot be accessed directly and its representation is invisible from outside the project.
+
+## Object-oriented design methodologies
+
+You can do object-oriented design a few different ways:
+
+* Write a problem statement, single out the nouns and verbs, and create corresponding classes and operations
+* Or focus on the collaborations and responsibilities in your system
+* Or you can model the real world and translate the objects found during analysis into design
+
+## Object Interfaces
+
+Objects are known only through their __interfaces__. So what's an interface?
+
+Every operation declared by an object specifies the operation's name, the objects it takes as parameters, and
+the operation's return value (aka the operator's __signature__). The set of all signatures defined by an object's
+operations is called the __interface__ to the object.
+
+A __type__ is a name used to denote a particular interface. An object can have many types.
+A __type__ is a __subtype__ of another if its interface contains the interface of its __supertype__. Often you'll
+  hear of a subtype _inheriting_ the interface of its supertype
+
