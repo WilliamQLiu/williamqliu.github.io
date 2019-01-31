@@ -1,26 +1,28 @@
 ---
 layout: post
-title: AWS Redshift
+title: AWS Redshift and AWS Athena
 ---
 
 
 # {{ page.title }}
 
 
-## Summary
+# Summary
 
-AWS Redshift is Amazon's data warehouse solution. Most databases store data in
-**rows**, but Redshift is a **column** datastore.
+AWS Redshift vs AWS Athena
 
 **AWS Redshift Spectrum** allows you to run SQL queries against unstructured data
 in AWS S3. You can use open data formats like CSV, TSV, Parquet, Sequence, and
-RCFile.
+RCFile. AWS Redshift is Amazon's data warehouse solution. Most databases store data in
+**rows**, but Redshift is a **column** datastore.
 
 **AWS Athena** is an interactive query service that makes it easy to analyze
 data in S3 using standard SQL. You don't need to setup a server. Simply point to an S3,
 define the schema, and start querying using standard SQL. Athena is more for
-very simple reporting.
+very simple reporting. Athena also supports CSV, JSON, Gzip files, and columnar formats
+like Apache Parquet
 
+__Presto__ - a distributed SQL query engine for big data
 
 ## Row vs Columns
 
@@ -118,7 +120,7 @@ Uses AWS Athena Meta-data to understand files in S3. This decouples storage
 from compute. Still must make read-only copies, but of meta-data only, so
 smaller and faster to scale.
 
-## Redshift - Load data
+### Redshift - Load data
 
 Redshift isn't meant to be a transactional database (i.e. no updates, deletes)
 The preferred way of working with Redshift is to COPY to load data from files
@@ -130,7 +132,7 @@ from any of the following:
 * DynamoDB Tables
 * Not preferred method: DML
 
-## Redshift vs Athena
+### Redshift vs Athena
 
 So what's different between Redshift and Athena?
 
@@ -139,4 +141,119 @@ So what's different between Redshift and Athena?
 * Athena automatically parallel; Redshift only as parallel as you configure
 * Athena data can be stored in multiple formats per table; Redshift can be
   loaded from files in multiple formats
+
+# Presto
+
+https://github.com/prestodb/presto
+
+## Build Presto from Source
+
+### Install Maven
+
+    # Check for Maven
+    sudo apt policy maven
+
+    maven:
+    Installed: 3.5.2-2
+    Candidate: 3.5.2-2
+    Version table:
+    *** 3.5.2-2 500
+            500 http://archive.ubuntu.com/ubuntu bionic/universe amd64 Packages
+            500 http://archive.ubuntu.com/ubuntu bionic/universe i386 Packages
+            100 /var/lib/dpkg/status
+
+    sudo apt install maven
+
+    # Find Maven Install
+    ls -lsa /usr/share/maven
+    total 32
+     4 drwxr-xr-x   6 root root  4096 Oct  9 07:07 .
+    12 drwxr-xr-x 382 root root 12288 Jan 27 11:23 ..
+     4 drwxr-xr-x   2 root root  4096 Oct  9 07:07 bin
+     4 drwxr-xr-x   2 root root  4096 Oct  9 07:07 boot
+     0 lrwxrwxrwx   1 root root    10 Feb 23  2018 conf -> /etc/maven
+     4 drwxr-xr-x   2 root root  4096 Oct  9 07:07 lib
+     4 drwxr-xr-x   2 root root  4096 Oct  9 07:07 man
+
+    # Find Maven properties
+    ls -lsa /etc/maven
+    total 40
+     4 drwxr-xr-x   3 root root  4096 Oct  9 07:07 .
+    12 drwxr-xr-x 160 root root 12288 Jan 27 11:23 ..
+     4 drwxr-xr-x   2 root root  4096 Oct  9 07:07 logging
+     4 -rw-r--r--   1 root root   220 Oct 18  2017 m2.conf
+    12 -rw-r--r--   1 root root 10211 Oct 18  2017 settings.xml
+     4 -rw-r--r--   1 root root  3645 Oct 18  2017 toolchains.xml
+
+### Install JDK
+
+    sudo apt-get update
+    sudo apt-get install default-jre  # install Java Runtime Environment (JRE)
+    sudo apt-get install default-jdk  # has JRE in it as well, slightly larger than JRE only
+
+My jre that I wanted to use was in: `/usr/lib/jvm/java-1.11.0-openjdk-amd64`
+My `.bashrc` has
+
+    export JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
+    export PATH=$PATH:$JAVA_HOME
+
+    
+## Installing and Deploying Presto Server
+
+Follow the instructions here: https://prestodb.github.io/docs/current/installation/deployment.html
+
+    #Copy the latest release
+    cd /tmp && wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.216/presto-server-0.216.tar.gz
+    tar -xvf presto-server-0.216.tar.gz
+
+## Installing and using Presto CLI
+
+Install the CLI for Presto here: https://prestodb.github.io/docs/current/installation/cli.html
+
+The downloaded file can be renamed to `presto` and `chmod +x`, then moved to `/usr/local/bin`
+
+Can run with: `presto` or say `presto --server localhost:8080 --catalog hive --schema default`
+
+## Presto JDBC Driver
+
+https://prestodb.github.io/docs/current/installation/jdbc.html
+
+# Athena
+
+Setup a database, table, schema and run your queries
+
+## DDL
+
+__Data Definition Language (DDL)__ is a standard for commands that define the different structures in a database.
+DDL statements create, modify, and remove database objects such as tables, indexes, and users.
+Common DDL statements are CREATE, ALTER, and DROP.
+
+    /* Create a table */
+    CREATE EXTERNAL TABLE IF NOT EXISTS default.elb_logs (
+      `request_timestamp` string,
+      `elb_name` string,
+      `request_ip` string,
+      `request_port` int,
+      `backend_ip` string,
+      `backend_port` int,
+      `request_processing_time` double,
+      `backend_processing_time` double,
+      `client_response_time` double,
+      `elb_response_code` string,
+      `backend_response_code` string,
+      `received_bytes` bigint,
+      `sent_bytes` bigint,
+      `request_verb` string,
+      `url` string,
+      `protocol` string,
+      `user_agent` string,
+      `ssl_cipher` string,
+      `ssl_protocol` string 
+    )
+    ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
+    WITH SERDEPROPERTIES (
+      'serialization.format' = '1',
+      'input.regex' = '([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*):([0-9]*) ([.0-9]*) ([.0-9]*) ([.0-9]*) (-|[0-9]*) (-|[0-9]*) ([-0-9]*) ([-0-9]*) \"([^ ]*) ([^ ]*) (- |[^ ]*)\" (\"[^\"]*\") ([A-Z0-9-]+) ([A-Za-z0-9.-]*)$'
+    ) LOCATION 's3://athena-examples-us-east-1/elb/plaintext/'
+    TBLPROPERTIES ('has_encrypted_data'='false');
 
