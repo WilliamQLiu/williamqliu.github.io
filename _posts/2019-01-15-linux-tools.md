@@ -26,6 +26,12 @@ iftop shows network usage like what top does for CPU usage. iftop listens to net
 and displays a table of current bandwidth usage by pairs of hosts. Basically, whose using up all the bandwidth and
 what are they doing?!
 
+Install with:
+
+    pip install glances
+
+    Run with `glances`
+
 Use `sudo ifconfig` OR `sudo ip addr show` to find all attached network interfaces on your Linux system.
 Then use the `-i` flag to specify the interface you want to monitor, e.g. `sudo iftop -i wlp58s0`
 

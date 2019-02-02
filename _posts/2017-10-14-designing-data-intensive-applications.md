@@ -727,4 +727,41 @@ B-Trees need to maintain a write ahead log.
 
 Usually LSM-Trees are typically faster for writes and B-Trees are faster for reads.
 
+# Data Warehousing
 
+So in a database, you have __transactions__ that mean a group of reads and writes. For transactions, you can have
+__transaction processing__, which means allowing clients to make low-latency reads and writes. On the opposite side
+are __batch processing jobs__, which only run periodically (e.g. once a day).
+
+
+## OLTP - Transactions based
+
+The basic access pattern for most businesses was to look up a small number of records by a key, using an index.
+The records are inserted or updated based on the user's input; because these applications are interactive,
+the access pattern became known as __online transaction processing__ (__OLTP__).
+
+## OLAP - Analytics based
+
+You can also use databases for data analytics, which has a much different access pattern than transactions.
+Usually an analytic query scans over a large number of records, reads a few columns per record, and calculates
+aggregate statistics (e.g. count, sum, average) instead of returning raw data back.
+
+## OLTP vs OLAP
+
+    PROPERTY                    OLTP                                            OLAP
+    Main read pattern           Small number of records per query, uses key     Aggregate over large number of records
+    Main write pattern          Low-latency writes from user input              Bulk import (ETL) or event stream
+    Primarily used by           End user/customer, via web app                  Internal Business Analyst
+    What data represents        Latest state of data (current point in time)    History of events that happened over time
+    Dataset size                GB to TB                                        TB to PB 
+
+When you run analytics on a separate database, this is called your __data warehouse__. It's separate from your
+OLTP operations. The process of getting data into the warehouse is known as __Extract-Transform-Load (ETL)__.
+So why use a separate data warehouse for OLTP vs OLAP? The indexing algorithms that work well for OLTP aren't very
+good at analytical queries.
+
+## Data Models
+
+There's a wide range of data models used in transaction processing and fewer models used in data models for analytics.
+
+Data models for analytics usually uses __star schema__ (aka __dimensional modeling__).
