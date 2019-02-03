@@ -68,7 +68,7 @@ focus on class relationships. Most patterns are thus labeled in the Object patte
                      -------------------------------------------------------------------
                      |   Creational      |   Structural      |   Behaviroal            |
     ------------------------------------------------------------------------------------
-    |Scope |  Class  |   Factory Method  |   Adapter (class) | Interpreter             |
+    |Scope |  Class  |   Factory Method  |  Adapter (class)  | Interpreter             |
     |      |         |                   |                   | Template Method         |
     |      -----------------------------------------------------------------------------
     |      |  Object |  Abstract Factory |  Adapter (object) | Chain of Responsibility |
@@ -88,7 +88,7 @@ Common design patterns include:
 
 * __Abstract Factory__ - provide an interface for creating families of related or dependent objects without specifying
                          their concrete classes
-* __Adapter__ - convert the interface of class into another interface clients expect
+* __Adapter__ - (aka __wrapper__) convert the interface of class into another interface clients expect
 * __Bridge__ - decouple an abstraction from its implementation so that the two can vary independently
 * __Builder__ - Separate the construction of a complex object from its representation so that the same construction
                 process can create different representations
@@ -131,7 +131,7 @@ Common design patterns include:
 Out of the above, the simplest and most common patterns are:
 
 * Abstract Factory
-* Adapter
+* Adapter (aka wrapper)
 * Composite
 * Decorator
 * Factory Method
@@ -189,7 +189,6 @@ The above are design patterns from 'The Gang of Four'. There's also a few archit
   - Rrepresentational state transfer (REST)
   - Service-oriented
   - Cloud computing patterns
-
 
 # Example Design Pattern - the MVC 
 
@@ -290,4 +289,11 @@ operations is called the __interface__ to the object.
 A __type__ is a name used to denote a particular interface. An object can have many types.
 A __type__ is a __subtype__ of another if its interface contains the interface of its __supertype__. Often you'll
   hear of a subtype _inheriting_ the interface of its supertype
+
+# Diving into Common Patterns
+
+## Adapter (Class, Object Structural)
+
+__Adapter__ (aka __wrapper) lets classes work together that normally couldn't because of incompatible interfaces.
+
 
