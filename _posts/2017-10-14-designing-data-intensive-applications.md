@@ -740,6 +740,13 @@ The basic access pattern for most businesses was to look up a small number of re
 The records are inserted or updated based on the user's input; because these applications are interactive,
 the access pattern became known as __online transaction processing__ (__OLTP__).
 
+For OLTP, we have two main schools of thought for storage:
+
+* __Log-structured__, which only permits appending to files and deleting obsolete files, but never updates a file that
+                      has been written (e.g. Cassandra). These enable higher write throughput due.
+* __Update-in-place__, which treats the disk as a set of fixed-size pages that can be overwritten (e.g. B-Trees, often
+                       used in relational databases)
+
 ## OLAP - Analytics based
 
 You can also use databases for data analytics, which has a much different access pattern than transactions.
@@ -754,6 +761,7 @@ aggregate statistics (e.g. count, sum, average) instead of returning raw data ba
     Primarily used by           End user/customer, via web app                  Internal Business Analyst
     What data represents        Latest state of data (current point in time)    History of events that happened over time
     Dataset size                GB to TB                                        TB to PB 
+    Bottleneck                  Usually disk seek time                          Issue is updates
 
 When you run analytics on a separate database, this is called your __data warehouse__. It's separate from your
 OLTP operations. The process of getting data into the warehouse is known as __Extract-Transform-Load (ETL)__.
@@ -765,3 +773,130 @@ good at analytical queries.
 There's a wide range of data models used in transaction processing and fewer models used in data models for analytics.
 
 Data models for analytics usually uses __star schema__ (aka __dimensional modeling__).
+
+Other variations of the star schema is the __snowflake schema__, where dimensions are further
+broken down into subdimensions.
+
+### Star Schema
+
+At the center of a schema is the __fact table__. Each row of the fact table represents
+an event that occurred at a particular time. Each row of the fact table might be
+analyzing website traffic (a page view or page click) or retail sales.
+
+The name star schema comes from the fact that when the table relationships are visualized,
+the fact table is in the middle, surrounded by its dimension tables.
+
+__Fact Tables__
+
+Usually facts are captured as individual events, allowing for maximum flexibility of analysis later.
+
+`fact_sales` table
+
+    date_key | product_sk | store_sk | promotion_sk | customer_sk | quantity | net_price | discount_price   |
+    140102   | 31         | 3        | NULL         | NULL        | 1        | 2.49      | 2.49             |
+    140102   | 69         | 5        | 19           | NULL        | 3        | 14.99     | 9.99             |
+    140102   | 74         | 3        | 23           | 191         | 1        | 4.99      | 3.89             |
+    140102   | 33         | 8        | NULL         | 235         | 4        | 0.99      | 0.99             |
+
+Most of your data is in fact tables. Some of the columns in the fact table are attributes, but other columns
+are foreign key references to other tables (dimension tables).
+
+__Dimension Tables__
+
+Dimension tables represent the who, what, where, when, how, and why of the event.
+
+`dim_store` table
+
+    store_sk | state | city
+    1        | WA    | Seattle
+    2        | CA    | San Francisco
+    3        | CA    | Palo Alto
+
+`dim_product` table
+
+    product_sk  |  sku      | description   | brand     | category     |
+    30          | OK4012    | Bananas       | Freshmax  | Fresh Fruit  |
+    31          | KA9511    | Fish food     | Aquatech  | Pet supplies |
+    32          | AB1234    | Croissant     | Dealicious| Bakery       |
+
+`dim_date` table
+
+    date_key    | year  |   month   | day   | weekend   | is_holiday
+    140101      | 2014  |   jan     | 1     | wed       | yes
+    140102      | 2014  |   jan     | 2     | thu       | no
+    140103      | 2014  |   jan     | 3     | fri       | no
+
+`dim_customer` table
+
+    customer_sk |   name    | date_of_birth
+    190         | Alice     | 1979-03-29    
+    191         | Bob       | 1961-09-02
+    192         | Cecil     | 1991-12-13
+
+`dim_promotion` table
+
+    promotion_sk    |   name        |   ad_type     | coupon_type
+    18              | New Year Sale | Poster        | NULL
+    19              | Aquarium deal | Direct mail   | Leaflet
+    20              | Coffee Bundle | In-store sign | NULL
+
+### Snowflake Schema
+
+__Snowflake schema__ is where dimensions are further broken down into subdimensions.
+The idea behind the snowflake schema is that the dimensions are normalized into
+multiple related tables (instead of star schema's dimensions being denormalized with each
+dimension represented by a single table).
+
+Snowflake schemas are more normalized than star schemas, but star schemas are often
+The principle behind snowflaking is normalization of the dimension tables by removing
+cardinality attributes and forming separate tables.
+preferred because they are simpler for analysts to work with.
+
+### Row vs Column oriented storage
+
+Once your fact tables become large (trillions of rows, hundred columns wide),
+you'll find that a typical data warehouse query only accesses about 5 columns at a time.
+
+In most OLTP databases, data is laid out in a __row-oriented__ fashion.
+Even with indexes, you'll still be loading a lot of extra information
+with a row-oriented storage engine.
+
+The idea behind __column-oriented storage__ is that you don't store all the
+values from one row together, but store all the values from each __column__ together.
+An example of a column oriented storage is _Parquet_. Column oriented storage is
+also better able to be compressed (with __bitmap encoding__ being particularly effective
+in data warehousing). If there are a lot of zeros in most of the bitmaps, then
+we say it is __sparse__. We get faster reads, but writes are more difficult. If you want
+to insert a row in the middle of a sorted table, you most likely have to rewrite all
+the column files.
+
+### Aggregation with Materialized Views
+
+Another data warehouse is __materialized aggregates__, where instead of having to
+crunch through the raw data every time, we cache some of these counts/sums by
+creating a __materialized view__. In a relational model, it is often defined like
+a standard view (a table-like object whose contents are the results of some query).
+The different is that a materialized view is an _actual copy of the query results
+written to disk_.
+
+#### Data Cube (aka OLAP cube)
+
+A common special case of a materialized view is known as a __data cube__ or __OLAP cube__.
+It is a grid of aggregates grouped by different dimensions.
+
+Imagine that each fact has foreign keys to only two dimensional tables (`date` and `product`).
+Each cell contains the aggregate (e.g. `SUM`) of an attribute (e.g. `net_price`) of all facts
+with that date-product combination. Then you can apply the same aggregate along each row
+or column and get a summary that has been reduced by one dimension (e.g. the sales by product
+regardless of date, or the sales by date regardless of product)
+
+In general, you often have more than two dimensions. If you had say five dimensions: date,
+product, store, promotion, and customer, it's harder to imagine, but the idea is still the same:
+each cell contains the sales for a particular date-product-store-promotion-customer combination.
+
+Advantage of a materialized data cube is that queries are very fast
+Disadvantage is that a data cube doesn't have the same flexibility as querying the raw data
+
+Most data warehouses keep as much raw data as possible and use aggregates like data cubes
+only as performance boost for certain queries.
+

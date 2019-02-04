@@ -186,8 +186,8 @@ The above are design patterns from 'The Gang of Four'. There's also a few archit
   - Space-based architecture
   - Object request broker
   - Peer-to-peer
-  - Rrepresentational state transfer (REST)
-  - Service-oriented
+  - Representational state transfer (REST)
+  - Service-oriented (aka Microservices)
   - Cloud computing patterns
 
 # Example Design Pattern - the MVC 
