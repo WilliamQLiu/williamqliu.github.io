@@ -276,6 +276,10 @@ An example of filtering output looks like:
 * `strace -f someprogram` to also trace the child processes as they are created from the results of `fork()`, `vfork()`, and `clone()`
 * `strace -p somepid` to trace a specific process id
 
+### strace specific process id
+
+    strace -ewrite -p $PID
+
 ## g++
 
 **g++** is a nix based C++ compiler.

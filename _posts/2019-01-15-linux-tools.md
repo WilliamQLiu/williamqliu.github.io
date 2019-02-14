@@ -135,3 +135,97 @@ For example:
     Battery             86%      0.0   0.0     0     0     6 root       -20 ?   0:00.00     0     0 mm_percpu_wq
                                  0.0   0.0     0     0     7 root         0 S   0:07.62     0     0 ksoftirqd/0
     
+## iptables
+
+Linux's __iptables__ is a user-space utility program that allows a system admin to configure the tables provided
+by the Linux kernel firewall. Be careful with this program because if you're ssh'd into a server, one wrong command
+and you might be locked out.
+
+### Install
+
+    sudo apt-get install iptables
+
+### Usage
+
+Iptables uses three different chains:
+
+* Input - control behavior of incoming connections (e.g. if a user attempts to ssh into your pc/server, iptables will
+          match the IP address and port to a rule in the input chain)
+* Forward - used for incoming connections that aren't actually being delivered locally and instead forwards the request
+            to its target. Normally you don't use this chain unless you're doing some kind of routing.
+            Run `iptables -L -v` to see how many `chain FORWARD` has been done
+* Output - used for outgoing connections (e.g. if you try to ping a website, iptables will check its output chain
+            to see what the rules are regarding ping and make a decision to allow or deny the connection attempt)
+
+To see a list of rules:
+
+    sudo iptables -S
+
+Or see the currently configured iptables rules:
+
+    sudo iptables -L
+
+To see a cleaner version of rules:
+
+    sudo iptables -L | grep policy
+    Chain INPUT (policy ACCEPT)
+    Chain FORWARD (policy DROP)
+    Chain OUTPUT (policy ACCEPT)
+
+To accept all connections by default:
+
+    iptables --policy INPUT ACCEPT
+    iptables --policy OUTPUT ACCEPT
+    iptables --policy FORWARD ACCEPT
+
+To deny all connections by default:
+
+    iptables --policy INPUT DROP
+    iptables --policy OUTPUT DROP
+    iptables --policy FORWARD DROP
+
+### Accept, Drop Reject
+
+The three most basic 'responses' are to:
+
+* Accept - allow the connection
+* Drop - drop the connection, act like it never happened (i.e. if you don't want the source to realize your system exists)
+* Reject - Don't allow the connection, but send back an error (i.e. don't want the source to connect and let them know firewall blocked them)
+
+To block a specific IP Address (say `10.10.10.10`), you can run:
+
+    iptables -A INPUT -s 10.10.10.10 -j DROP
+
+To block a range of IP Addresses (say `10.10.10.0/24`), you can run:
+
+    iptables -A INPUT -s 10.10.10.0/24 -j DROP
+
+### Save Changes
+
+Ubuntu: `sudo iptables-save`
+CentOS: `sudo iptables save`
+
+## Firewalld (for CentOS)
+
+FirewallD is a frontend controller for iptables used to implement network traffic rules.
+FirewallD uses __zones__ and __services__ instead of chain and rules.
+
+Start the serve with:
+
+    sudo systemctl start firewalld
+    sudo systemctl enable firewalld
+
+Check the state with:
+
+    sudo firewall-cmd --state
+    running
+
+### Configuration Sets
+
+Firewalld uses two __configuration sets__, the __runtime__ and the __permanent__. By default, rules are applied
+to runtime only unless you specify the `--permanent` flag.
+
+To add port 8080 permanently to a `public` zone, run:
+
+    sudo firewall-cmd --zone=public --add-port=8080/tcp --permanent
+
