@@ -119,11 +119,18 @@ able to run a command like this:
     | xcom              |
     +-------------------+
 
+## Database
+
+If you setup LocalExecutor and change out the `sql_alchemy_conn`, you can get going pretty quickly with Airflow.
+It might look like this:
+
+    sql_alchemy_conn = mysql://myusername:mypassword@mydb:3306/airflow
+
 ## Run Webserver and Scheduler
 
 airflow webserver  # shows GUI
-airflow scheduler
-airflow worker # picks up tasks
+airflow scheduler  # sends tasks (and picks up tasks if you're LocalExecutor)
+airflow worker # picks up tasks only if you're using Celery
 
 ## Distributed Mode
 
@@ -206,6 +213,9 @@ You can run a DAG on a schedule using the `schedule_interval`, which happens to 
           schedule_interval='*/5 * * * *',  # Run every 5 minutes
           dagrun_timeout=timedelta(seconds=120))
 
+My advice is to name your `dag_id` with versions (e.g. `my_dag_v1`) because when certain things change about your
+DAG (like `schedule_interval`), bump up the version (e.g. from v1 to v2).
+
 You can also pass in presents into the `schedule_interval`, including:
 
 * `None` - don't schedule, use for "externally triggered" DAGs
@@ -214,6 +224,9 @@ You can also pass in presents into the `schedule_interval`, including:
 * `@daily` - run once a day at midnight
 
 etc.
+
+Keep in mind if you're running a distrubted system that your DAG is sent to a `/tmp` folder so if you have code
+that uses say `os.path`, make sure that path is there for all your servers.
 
 #### How DAG schedule runs
 
@@ -322,6 +335,10 @@ Clear - Clear a set of task instances, as if they never ran
 Say a DAG needs to be completely rerun, then just run clear:
 
     airflow clear my_dag -s 2018-09-21 -e 2018-09-22
+
+Clear only dags that have failed
+
+    airflow clear my_dag_id -f
 
 ### Hooks
 
@@ -878,3 +895,108 @@ The task instance table shows you what dags have been executed, when, the state,
     | my_task_id_abcdefghi | dag_download_abcdef | 2018-08-02 01:05:00.000000 | 2018-08-03 15:46:23.427211 | 2018-08-03 15:46:26.416335 |  2.98912 | success |          1 | 3d3a39269fbd | root     |      4 | NULL | default |               2 | BashOperator | 2018-08-03 15:46:22.171445 | 1000 |         2 |
     | my_task_id_abcdefghi | dag_download_abcdef | 2018-08-02 02:05:00.000000 | 2018-08-03 15:46:32.067906 | 2018-08-03 15:46:35.113323 |  3.04542 | success |          1 | 3d3a39269fbd | root     |      5 | NULL | default |               2 | BashOperator | 2018-08-03 15:46:30.859648 | 1043 |         2 |
 
+
+## Logging
+
+The log format by default is a little too granular for my tastes. I like to log into one file and just grep from there.
+In airflow.cfg, just modify the `log_filename_format`. Default is:
+
+    log_filename_template = {{ ti.dag_id }}/{{ ti.task_id }}/{{ ts }}/{{ try_number }}.log
+
+I prefer something like:
+
+    log_filename_template = {{ ti.dag_id }}//{{ ti.task_id }}/loggy.log
+
+It makes it easier to grep and clean out logs
+
+## Systemctl
+
+You can run your airflow commands in something like `screen` or `nohup` for quick testing, but if you want a production
+environment, you might want to consider using `systemctl` to handle airflow restarts.
+
+Basically, check out this: https://github.com/apache/airflow/tree/master/scripts/systemd
+
+As an example, on a CentOS machine, I have the following (where `will` is my user and airflow is installed in `/home/will`)
+
+### /etc/sysconfig/airflow
+
+    # Licensed to the Apache Software Foundation (ASF) under one
+    # or more contributor license agreements.  See the NOTICE file
+    # distributed with this work for additional information
+    # regarding copyright ownership.  The ASF licenses this file
+    # to you under the Apache License, Version 2.0 (the
+    # "License"); you may not use this file except in compliance
+    # with the License.  You may obtain a copy of the License at
+    # 
+    #   http://www.apache.org/licenses/LICENSE-2.0
+    # 
+    # Unless required by applicable law or agreed to in writing,
+    # software distributed under the License is distributed on an
+    # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    # KIND, either express or implied.  See the License for the
+    # specific language governing permissions and limitations
+    # under the License.
+
+    # This file is the environment file for Airflow. Put this file in /etc/sysconfig/airflow per default
+    # configuration of the systemd unit files.
+    #
+    AIRFLOW_CONFIG=/home/will/airflow/airflow.cfg
+    AIRFLOW_HOME=/home/will/airflow/
+
+### /usr/lib/tmpfiles.d/airflow.conf
+
+    #Licensed to the Apache Software Foundation (ASF) under one
+    # or more contributor license agreements.  See the NOTICE file
+    # distributed with this work for additional information
+    # regarding copyright ownership.  The ASF licenses this file
+    # to you under the Apache License, Version 2.0 (the
+    # "License"); you may not use this file except in compliance
+    # with the License.  You may obtain a copy of the License at
+    # 
+    #   http://www.apache.org/licenses/LICENSE-2.0
+    # 
+    # Unless required by applicable law or agreed to in writing,
+    # software distributed under the License is distributed on an
+    # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    # KIND, either express or implied.  See the License for the
+    # specific language governing permissions and limitations
+    # under the License.
+
+    D /run/airflow 0755 airflow airflow
+     
+### /usr/lib/systemd/system/airflow-scheduler.service
+
+    # Licensed to the Apache Software Foundation (ASF) under one
+    # or more contributor license agreements.  See the NOTICE file
+    # distributed with this work for additional information
+    # regarding copyright ownership.  The ASF licenses this file
+    # to you under the Apache License, Version 2.0 (the
+    # "License"); you may not use this file except in compliance
+    # with the License.  You may obtain a copy of the License at
+    # 
+    #   http://www.apache.org/licenses/LICENSE-2.0
+    # 
+    # Unless required by applicable law or agreed to in writing,
+    # software distributed under the License is distributed on an
+    # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    # KIND, either express or implied.  See the License for the
+    # specific language governing permissions and limitations
+    # under the License.
+
+    [Unit]
+    Description=Airflow scheduler daemon
+    After=
+    Wants=
+
+    [Service]
+    EnvironmentFile=/etc/sysconfig/airflow
+    User=will
+    Group=will
+    Type=simple
+    ExecStart=/home/will/.virtualenvs/airflow/bin/airflow scheduler
+    Restart=always
+    RestartSec=5s
+
+    [Install]
+    WantedBy=multi-user.target
+     
