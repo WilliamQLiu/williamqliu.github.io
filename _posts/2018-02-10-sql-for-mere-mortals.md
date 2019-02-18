@@ -199,7 +199,65 @@ Indexes for `Tourney_Matches`
     TournamentsTourney_Matches
                                 TourneyID
 
+#### ztblBowlerRatings
+
+Table `ztblBowlerRatings`
+
+    Field               Data Type       Size        Required    Default     Primary Key     Foreign Key
+    ----------------------------------------------------------------------------------------------------------
+    BowlerRating        nvarchar        15          Yes
+    BowlerLowAvg        smallint        2
+    BowlerHighAvg       smallint        2
+
+Indexes for `ztblBowlerRatings`
+
+    Index Name                  Attributes/Field Names 
+    --------------------------------------------------
+    PrimaryKey                  Primary
+                                BowlerRating
+
+#### ztblSkipLabels
+
+Table `ztblSkipLabels`
+
+    Field               Data Type       Size        Required    Default     Primary Key     Foreign Key
+    ----------------------------------------------------------------------------------------------------------
+    LabelCount          int             4           Yes                     Yes
+ 
+Indexes for `ztblSkipLabels`
+
+    Index Name                  Attributes/Field Names 
+    --------------------------------------------------
+    PrimaryKey                  Primary
+                                LabelCount
   
+#### ztblWeeks
+
+Table `ztblWeeks`
+
+    Field               Data Type       Size        Required    Default     Primary Key     Foreign Key
+    ----------------------------------------------------------------------------------------------------------
+    WeekStart           date            8           Yes                     Yes
+    WeekEnd             date            8
+
+Indexes for `ztblWeeks`
+
+    Index Name                  Attributes/Field Names 
+    --------------------------------------------------
+    PrimaryKey                  Primary
+                                WeekStart
+ 
+#### Relationship Constraints
+
+    Name                            Parent          Parent Fields       Child           Child Fields
+    ------------------------------------------------------------------------------------------------
+    BowlersBowler_Scores            Bowlers         BowlerID            Bowler_Scores   BowlerID
+    BowlersTeams                    Bowlers         BowlerID            Teams           CaptainID
+    Match_GamesBowler_Scores        Match_Games     MatchID_GameNumber  Bowler_Scores   MatchID_GameNumber
+    TeamsBowlers                    Teams           TeamID              Bowlers         TeamID
+    TeamsTourney_Matches            Teams           TeamID              Tourney_Matches OddLaneTeamID
+    TeamsTourney_Matches1           Teams           TeamID              Tourney_Matches EvenLaneTeamID
+    
 ## Types of Databases
 
 There are two types of databases:
