@@ -494,9 +494,14 @@ of the data in the database. Consider books like 'Database Design for Mere Morta
 
 ## Database Structure
 
-To check that your database structure is sound, consider the following:
+In order to make sure that your database structure is sound, let's take a look at:
 
-For columns:
+* Columns
+* Tables
+
+### Database Structure (Columns)
+
+Since columns are our smallest data structure, let's look at them first:
 
 * Is the column name descriptive and meaningful for everyone in the entire organization?
   Remember that several departments might use the database
@@ -516,7 +521,7 @@ For columns:
   If you do store calculated values, when the value of any part of the calculation changes, 
   the result value stored in the column is not updated.
 
-### Multipart Columns
+#### Multipart Columns
 
 __Multipart__ columns occur where you can say yes to the question: "Can I take the current value
 of this column and break it up into smaller, more distinct parts?". Here's an example:
@@ -533,7 +538,7 @@ be broken up into CustAddress, CustCity, CustZipCode, CustState, etc.
 
 More complicated multipart examples might be:
 
-    Instruments
+    'Instruments' Table
     InstrumentID    Manufacturer    InstrumentDescription
     -----------------------------------------------------
     GUIT2201        Fender          Fender Stratocaster
@@ -542,4 +547,96 @@ More complicated multipart examples might be:
 
 In the above, you can see that `InstrumentID` has an ID as well as the type (e.g. GUIT for Guitar).
 To resolve this, split InstrumentID to an InstrumentID as well as InstrumentType column.
+
+#### Multivalued Columns
+
+To identify a multivalued column, you can see that the data is stored in our columns with some
+commas, semicolons, or some other delimiter.
+
+    'Pilots' Table
+    PilotID     PilotFirstName      PilotLastName       Certifications
+    -----------------------------------------------------------------------
+    25100       Sam                 Alborous            727, 737, 757, MD80
+    25101       Jim                 Wilson              737, 747, 757
+    25102       David               Smith               757, MD80, DC9
+
+In the above, the `Certifications` column will cause data integrity issues (e.g. difficult to
+update). The values in multivalued columns have a many-to-many relationship with every row
+in its parent table: one specific value (e.g. `737`) can be associated with any number of rows
+in the parent table and a single row in the parent table can be associated with any number of
+rows in the multivalued column. In order to solve any many-to-many relationships, you need a
+__linking table__.
+
+    'Pilots' Table
+    PilotID     PilotFirstName      PilotLastName
+    ---------------------------------------------
+    25100       Sam                 Alborous     
+    25101       Jim                 Wilson       
+    25102       David               Smith       
+
+    'Pilot_Certifications' Table (the 'linking table') 
+    PilotID     CertificationID
+    ---------------------------
+    25100       8102
+    25100       8103
+    25100       8105
+    25100       8106
+    25101       8103
+    25101       8104
+    25101       8105
+
+    'Certifications' Table
+    CertificationID     TypeofAircraft
+    ----------------------------------
+    8102                Boeing 727
+    8103                Boeing 737
+    8104                Boeing 747
+    8105                Boeing 757
+
+So that's how you resolve a multivalued column using a linking table.
+
+### Database Structure (Tables)
+
+Tables are the basis for every SQL query you create. Poorly designed tables will create data
+integrity problems. Look out for:
+
+* Table names should be plural form (instead of singular for columns)
+  A table stores a collection of instances of the subject of the table.
+* Is the Table name unique and descriptive enough for the entire organization?
+* Is the Table name clear in identifying the subject of the table? Remember that the subject of
+  the table is either an __object__ or an __event__.
+* Does the Table name contain words that convey physical characteristics? Avoid using words like
+  'File', 'Record', and 'Table' in the Table name since they add confusion. Instead consider say
+  `Employee_Record`
+* Don't use an acronym or abbreviation as a Table name
+* Does your Table name identify more than one subject? If you have AND OR in the table name,
+  it's a pretty good sign that you have more than one subject.
+* Make sure that the table represents a single subject
+* Make sure that each table has a __primary key__; we use this to unique identify each row within
+  a table as well as using it to establish table relationships
+* Make sure there are not any multipart or multivalued columns
+* Make sure there are no calculated columns in the table
+* Make sure the table is free of any unnecessary duplicate columns
+
+#### Remove unnecessary Duplicate Columns
+
+You don't want duplicate columns because this will cause data integrity errors.
+
+    Staff Table
+    StaffID     StaffFirstName      StaffLastName
+    ---------------------------------------------
+    98014       Peter               Brehm
+    98109       Mariya              Sergienko
+    
+    Classes Table
+    ClassID     Class       StaffID     StaffLastName   StaffFirstName
+    ------------------------------------------------------------------
+    1031        Art History 98014       Brehm           Peter
+    1030        Art History 98014       Brehm           Peter
+
+Here we have duplicate columns of 'StaffLastName' and 'StaffFirstName'. Remove these from
+Classes Table because we can use StaffID to establish the relationship (and since Staff Names
+belong better with the Staff Table).
+
+
 
