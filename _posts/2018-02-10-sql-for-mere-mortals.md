@@ -622,6 +622,8 @@ integrity problems. Look out for:
 
 You don't want duplicate columns because this will cause data integrity errors.
 
+Example 1:
+
     Staff Table
     StaffID     StaffFirstName      StaffLastName
     ---------------------------------------------
@@ -638,5 +640,97 @@ Here we have duplicate columns of 'StaffLastName' and 'StaffFirstName'. Remove t
 Classes Table because we can use StaffID to establish the relationship (and since Staff Names
 belong better with the Staff Table).
 
+Example 2:
 
+Another example is if you have duplicate columns as different column names. For example:
 
+    'Employees' Table    
+    EmployeeID  EmpLastName     EmpFirstName    Committee1  Committee2  Committee3
+    ------------------------------------------------------------------------------
+    7004        Gehring         Darren          Steering
+    7005        Kennedy         John            ISO 9000    Safety
+
+The issue is that what if there's a Committee4 or what if you need to search through all these columns?
+You'll realize that instead we should have a many-to-many relationship between employees and committees and that
+is solved with a linking table.
+
+    'Employees' Table
+    EmployeeID  EmpLastName     EmpFirstName
+    ----------------------------------------
+    7004        Gehring         Darren      
+    7005        Kennedy         John        
+    7006        Thompson        Sarah
+
+    'Committee_Members' Table
+    EmployeeId      CommitteeID
+    ---------------------------
+    7004            103
+    7005            104
+    7005            102
+    7006            102 
+
+    'Committees' Table
+    CommitteeID     CommitteeName       MeetingRoom     MeetingDay
+    --------------------------------------------------------------
+    100             Budget              11-C            Tuesday
+    101             Christmas           9-F             Monday
+    102             Safety              12-B            Monday
+    103             Steering            12-D            Tuesday
+    104             ISO 9000            Main-South      Wednesday
+
+Example 3:
+
+We might also run into issues of repeating phone numbers when we have multiple home phones or work phones.
+
+    'Employees' Table
+    EmployeeID  EmpLastName     EmpFirstName    EmpHomePhone    EmpWorkPhone    EmpCellPhone
+    ----------------------------------------------------------------------------------------
+    7004        Gehring         Darren          555-1234        556-1234
+    7005        Kennedy         John            555-2345
+    7006        Thompson        Sarah           555-3456
+
+We can solve that with having a one-to-many relationship:
+
+   'Employees' Table
+    EmployeeID  EmpLastName     EmpFirstName
+    ----------------------------------------
+    7004        Gehring         Darren      
+    7005        Kennedy         John        
+    7006        Thompson        Sarah       
+
+    'Phone_Numbers' Table
+    EmployeeID  PhoneID     PhoneType       PhoneNumber
+    ---------------------------------------------------
+    7004        1           Home            555-1234
+    7005        2           Home            555-2345
+    7006        3           Home            555-3456
+
+## Identification is the Key
+
+### Primary Key
+
+Every table in your database needs a __primary key__, which helps with:
+
+* uniquely identifying each row within a table
+* establish a relationship between a pair of tables
+
+A primary key is either:
+
+* a __simple primary key__ (aka __primary key__) when it is made up of a single column
+* a __composite primary key__ when it is made up of two or more columns
+
+Define a simple primary key over a composite primary key whenever you can; it's more efficient and it's easier to 
+use when establishing a table relationship
+
+To check if your primary key columns are sound:
+
+* Do the columns uniquely identify each row in the table? A good primary key ensures that we have a means of accurately
+  identifying or referencing each row in this table from other tables in the database.
+* Does this column or combination of columns have unique values? We cannot have duplicates, since that won't let us 
+  uniquely identify the object or event.
+* Will the column ever contain unknown values? We cannot have unknown values in your primary key column(s)
+* Can the value of these columns ever be optional? Your column(s) for primary key has to be required
+* Can the value of these columns ever be modified? Your primary key columns should remain static and never change.
+
+If you don't have column(s) for a primary key, you can create an artificial primary key (e.g. an EmployeeID that auto
+increments).

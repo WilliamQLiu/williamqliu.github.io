@@ -1039,3 +1039,14 @@ As an example, on a CentOS machine, I have the following (where `will` is my use
     [Install]
     WantedBy=multi-user.target
      
+### Gotchas
+
+Airflow has a few gotchas:
+
+* In a DAG, I found that `pendulum` would work on versions 1.10, but in version 1.9 I had to use `from airflow.utils.dates import days_ago`.
+* Make sure your `airflow scheduler` and if necessary, `airflow worker` is running
+* Make sure your dag is unpaused
+* If using a virtualenv with systemctl, make sure to set ExecStart to activate the virtualenv, e.g. `ExecStart=/bin/sh -c 'source /home/will/.virtualenvs/airflow/bin/activate && /home/will/.virtualenvs/airflow/bin/airflow scheduler'`
+* For `priority_weight`, set this to `0` otherwise your `airflow.task_instance` table will stack up. E.g. with a `priority_weight` of 10
+  on the first task, the next task will be `priority_weight` of 20, next is 30, etc. With a value of `0`, all `priority_weight` is 0.
+
