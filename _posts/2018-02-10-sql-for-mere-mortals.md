@@ -491,3 +491,55 @@ __Database Design__ is the structured, organized set of processes used to design
 database. A good database design methodology helps ensure the integrity, consistency, and accuracy
 of the data in the database. Consider books like 'Database Design for Mere Mortals' or
 'An Introduction to Database Systems'.
+
+## Database Structure
+
+To check that your database structure is sound, consider the following:
+
+For columns:
+
+* Is the column name descriptive and meaningful for everyone in the entire organization?
+  Remember that several departments might use the database
+* Is the column name clear and unambiguous?
+  PhoneNumber is a column name that can be misleading; is it a home phone? a work phone?
+* Do not use the same column name in several tables. If you have a City column, add a prefix
+  of the Table name (e.g. Table Customers with City column will be 'CustCity')
+* Do not use abbreviations as a column name; they're hard to read and understand
+* Do not put more than one characteristic into a column (e.g. Phone/Fax)
+* Give columns a singular name (e.g. Category instead of Categories); table names should have plural
+* Make sure the column represents a specific characteristic of the subject of the table
+* A column should only contain a single value (a __multivalued__ column can potentially store
+  several instances of the same type of value; a __multipart__ column can potentially store
+  two or more distinct values); these wreck havoc in a database
+* Make sure a column does not store the result of a calculation or concatentation.
+  A column (unlike a cell in a spreadsheet) does not store an actual calculation.
+  If you do store calculated values, when the value of any part of the calculation changes, 
+  the result value stored in the column is not updated.
+
+### Multipart Columns
+
+__Multipart__ columns occur where you can say yes to the question: "Can I take the current value
+of this column and break it up into smaller, more distinct parts?". Here's an example:
+
+    CustomerID      CustomerName        StreetAddress
+    ----------------------------------------------------------------------------
+    1001            Suzanne Viescas     15127 NE 24th, #383 Redmond, WA 98052
+    1002            William Thompson    122 Spring River Drive, Duvall, WA 98019
+    1003            Gary Hallmark       Route 2, Box 203B, Auburn, WA 98002
+
+In the above, you can see that columns `CustomerName` and `StreetAddress` can be broken up into
+more distinct columns. CustomerName can be CustFirstName and CustLastName while StreetAddress can 
+be broken up into CustAddress, CustCity, CustZipCode, CustState, etc.
+
+More complicated multipart examples might be:
+
+    Instruments
+    InstrumentID    Manufacturer    InstrumentDescription
+    -----------------------------------------------------
+    GUIT2201        Fender          Fender Stratocaster
+    MFX3349         Zoom            Player 2100 Multi-Effects
+    AMP1001         Marshall        JCM 2000 Tube Super Lead
+
+In the above, you can see that `InstrumentID` has an ID as well as the type (e.g. GUIT for Guitar).
+To resolve this, split InstrumentID to an InstrumentID as well as InstrumentType column.
+
