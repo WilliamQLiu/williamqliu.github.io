@@ -728,6 +728,16 @@ Can then run with:
 `parquet --metadata 7026c2af982a4564a92c7602b43976cf.parquet` -- see metadata about the file (e.g. schema)
 `parquet --limit 2 7026c2af982a4564a92c7602b43976cf.parquet` -- see data (limited)
 
+### Parquet with JQ
+
+Install JQ (a command-line JSON processor) at: https://github.com/stedolan/jq
+
+    sudo apt install jq
+
+Then run parquet with file format json and pipe to jq
+
+    parquet 03eef7eec86e47be939cf40fef3bd7d7.parquet --format json | jq
+
 ### Parquet with S3
 
 With a dataframe, just write your parquet to an S3 bucket like so:
