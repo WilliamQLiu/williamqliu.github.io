@@ -462,6 +462,16 @@ Parquet (and other columnar formats) can handle a lot more columns than you can 
 The data is _denormalized_ (instead of most relational formats where we try to have _third normal form_).
 You have a lot of repeated values and tables flattened into a single format.
 
+### Parquet-Format
+
+The parquet-format project contains format specifications and Thrift definitions of metadata required to properly read Parquet files.
+
+Parquet metadata is encoded using __Apache Thrift__; Apache Thrift allows you to define data types and service 
+interfaces in a simple definition file. Taking that file as input, the compiler generates code to be used to 
+easily build RPC clients and servers that communicate seamlessly across programming languages. Instead of writing 
+a load of boilerplate code to serialize and transport your objects and invoke remote methods, you can get right 
+down to business.
+
 ### Schema Evolution w/ Parquet
 
 One of the main advantages of Parquet is that it supports __schema evolution__ (similar to ProtocolBuffer, Avro, Thrift).

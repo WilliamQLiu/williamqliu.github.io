@@ -146,7 +146,7 @@ So what's different between Redshift and Athena?
 
 https://github.com/prestodb/presto
 
-## Build Presto from Source
+## Optional: Build Presto from Source
 
 ### Install Maven
 
@@ -206,15 +206,143 @@ Follow the instructions here: https://prestodb.github.io/docs/current/installati
     cd /tmp && wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.216/presto-server-0.216.tar.gz
     tar -xvf presto-server-0.216.tar.gz
 
+Setup files:
+
+    /presto-server-0.216/etc/config.properties
+    coordinator=true
+    coordinator=true
+    node-scheduler.include-coordinator=true
+    http-server.http.port=8081
+    query.max-memory=5GB
+    query.max-memory-per-node=1GB
+    query.max-total-memory-per-node=2GB
+    discovery-server.enabled=true
+    discovery.uri=http://localhost:8081
+
+    /presto-server-0.216/etc/node.properties
+    node.environment=production
+    node.id=ffffffff-ffff-ffff-ffff-ffffffffffff
+    node.data-dir=/var/presto/data
+
+    /presto-server-0.216/etc/log.properties
+    com.facebook.presto=INFO 
+
+Setup Catalogs:
+
+    /presto-server-0.216/etc/catalog/localfile.properties
+    connect.name=localfile
+
+Run the UI:
+
+    cd presto-server-0.216/bin && ./launcher
+    # default, it's 8080, but my port for this was used
+    You'll see a UI of the number of queries at: http://localhost:8081/ui/
+
+Usage:
+
+Create an `/etc/catalog` directory, where we'll put our __catalogs__, which all you to connect to different data sources
+Example catalogs include: MySQL, Hive, LocalFile. When you add a catalog using `presto-admin`, make sure to restart
+the presto server.
+
+
 ## Installing and using Presto CLI
 
 Install the CLI for Presto here: https://prestodb.github.io/docs/current/installation/cli.html
 
 The downloaded file can be renamed to `presto` and `chmod +x`, then moved to `/usr/local/bin`
 
-Can run with: `presto` or say `presto --server localhost:8080 --catalog hive --schema default`
+Can run with: `presto` or say `presto --server localhost:8081 --catalog hive --schema default`
 
-## Presto JDBC Driver
+If you get into an error, make sure to run with a `debug` flag (e.g. `./presto-cli --server localhost:8081 --debug`
+The errors that I've seen are issues like I setup a catalog incorrectly.
+
+### Presto-cli Commands
+
+#### Show catalogs
+
+    presto> show catalogs;
+
+    show catalogs;
+      Catalog  
+    -----------
+     localfile 
+     system    
+    (2 rows)
+
+    Query 20190220_235643_00000_jjy5y, FINISHED, 1 node
+    http://will.data.lan:8081/ui/query.html?20190220_235643_00000_jjy5y
+    Splits: 19 total, 19 done (100.00%)
+    CPU Time: 0.1s total,     0 rows/s,     0B/s, 8% active
+    Per Node: 0.0 parallelism,     0 rows/s,     0B/s
+    Parallelism: 0.0
+    Peak Memory: 0B
+    0:02 [0 rows, 0B] [0 rows/s, 0B/s]
+
+#### Show schemas from catalogs
+
+    #show schemas from <catalog> <like pattern>
+    presto> show schemas from localfile;
+           Schema       
+    --------------------
+     information_schema 
+     logs               
+    (2 rows)
+
+    Query 20190221_000330_00011_jjy5y, FINISHED, 1 node
+    http://will.data.lan:8081/ui/query.html?20190221_000330_00011_jjy5y
+    Splits: 19 total, 19 done (100.00%)
+    CPU Time: 0.0s total,   125 rows/s, 1.95KB/s, 5% active
+    Per Node: 0.1 parallelism,     6 rows/s,   103B/s
+    Parallelism: 0.1
+    Peak Memory: 82.4KB
+    0:00 [2 rows, 32B] [6 rows/s, 103B/s]
+
+
+## Setup Presto-Admin
+
+__Presto-Admin__ is a tool for installing and managing the Presto query engine on a cluster.
+
+https://github.com/prestodb/presto-admi://github.com/prestodb/presto-admin
+
+I downloaded and ran `python setup.py develop` to get `presto-admin` to work.
+
+    $ presto-admin
+    Usage: presto-admin [options] <command> [arg]
+
+    Options:
+      --version             show program's version number and exit
+      -h, --help            show this help message and exit
+      -d, --display         print detailed information about command
+      --extended-help       print out all options, including advanced ones
+      -I, --initial-password-prompt
+                            Force password prompt up-front
+      -p PASSWORD, --password=PASSWORD
+                            password for use with authentication and/or sudo
+
+
+    Commands:
+        catalog add
+        catalog remove
+        collect logs
+        collect query_info
+        collect system_info
+        configuration deploy
+        configuration show
+        file copy
+        file run
+        package install
+        package uninstall
+        plugin add_jar
+        server install
+        server restart
+        server start
+        server status
+        server stop
+        server uninstall
+        server upgrade
+        topology show
+
+### Presto JDBC Driver
 
 https://prestodb.github.io/docs/current/installation/jdbc.html
 
