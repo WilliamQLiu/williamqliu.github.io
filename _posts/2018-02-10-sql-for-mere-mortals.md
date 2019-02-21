@@ -734,3 +734,66 @@ To check if your primary key columns are sound:
 
 If you don't have column(s) for a primary key, you can create an artificial primary key (e.g. an EmployeeID that auto
 increments).
+
+## Establish Solid Relationships
+
+You can learn how to diagram relationships in: Database Design for Mere Mortals
+
+Diagram One-to-One Relationship
+
+    Employees                                 Employee_Confidential
+    ----------------                          ---------------------
+    |EmployeeID  PK| -|-------------------|-  |EmployeeID    PK   |
+    ----------------                          ---------------------
+
+Diagram One-to-Many Relationship
+
+    Students                                  Instruments
+    ----------------                          -------------------
+    |StudentID   PK| -|-------------------    |InstrumentID   PK|
+    ----------------                     |  / |                 |
+                                         |--- |StudentID      FK|  
+                                            \ |------------------
+
+Diagram Many-to-Many Relationship
+
+    Pilots                                                         Certifications
+    ---------------                                                ---------------------
+    |PilotID    PK| -|--|                                   |---|- |CertificationID PK |
+    ---------------     |     Pilot_Certifications          |      ---------------------
+                        |   / |----------------------|      |
+                        |---- |PilotID          CPK  |      |
+                            \ |                      | \    |
+                              |CertificationID  CPK  | ------
+                              ------------------------ /
+
+Note: Remember that these relationships need the matchings keys to have the same data type.
+
+So in order to make sure that your database has __referential integrity__, we need to make sure
+that there aren't any orphaned data. There's a few things we can do:
+
+### Establish a Deletion Rule
+
+A __deletion rule__ says that when a user makes a request to delete a row in the primary table,
+then we don't leave any __orphaned rows__ in the secondary table. There are two types of deletion rules:
+
+* __restrict deletion rule__ - does not allow you to delete the requested row unless any related rows
+    are deleted _before_ deleting your requested row. This option is usually the default rule
+* __cascade deletion rule__ - delete the row on the primary table causes automatic deletion of
+    any related rows in the secondary table; use this rule very carefully or else you might delete everything!
+
+Basically, ask yourself "If a row in my primary / one-sided table is deleted, should related rows
+in the secondary / many side table be deleted as well?
+
+In our above diagrams, a `(C)` is usually next to cascading and `(R)` for restrict
+
+### Type of Participation
+
+When you establish a relationship between a pair of tables, each table participates in a
+particular manner. The _type of participation_ assigned to a table determines whether a row
+must exist in that table before you can enter a row into another table. These two types are:
+
+* __Mandatory Participation__ - at least one row must exist in this table before you can enter
+  any rows into the other table
+* __Optional Participation__ - 
+
