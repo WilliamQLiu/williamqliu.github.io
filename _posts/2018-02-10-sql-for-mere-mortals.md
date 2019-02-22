@@ -794,6 +794,15 @@ particular manner. The _type of participation_ assigned to a table determines wh
 must exist in that table before you can enter a row into another table. These two types are:
 
 * __Mandatory Participation__ - at least one row must exist in this table before you can enter
-  any rows into the other table
-* __Optional Participation__ - 
+  any rows into the other table (indicated by a `|` in a diagram)
+* __Optional Participation__ - there is no requirement for any rows to exist in this table before
+  you enter any rows in the other table (indicated by a `O` in a diagram)
+
+### Degree of Participation
+
+After you determine how each table will participate in the relationship, you need to then figure out
+__to what degree__ each will participate. You do this by determining the min and max number of rows in one
+table that can be related to a single row in the other table. This is called the table's __degree of participation__.
+
+
 

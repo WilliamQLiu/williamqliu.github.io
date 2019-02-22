@@ -278,7 +278,7 @@ The errors that I've seen are issues like I setup a catalog incorrectly.
     Peak Memory: 0B
     0:02 [0 rows, 0B] [0 rows/s, 0B/s]
 
-#### Show schemas from catalogs
+#### Show schemas from catalog
 
     #show schemas from <catalog> <like pattern>
     presto> show schemas from localfile;
@@ -296,6 +296,23 @@ The errors that I've seen are issues like I setup a catalog incorrectly.
     Parallelism: 0.1
     Peak Memory: 82.4KB
     0:00 [2 rows, 32B] [6 rows/s, 103B/s]
+
+#### Show tables from catalog.schemas
+
+    presto>show tables from localfile.logs;
+    Table       
+    ------------------
+     http_request_log 
+    (1 row)
+
+    Query 20190221_185008_00029_jjy5y, FINISHED, 1 node
+    http://will.data.lan:8081/ui/query.html?20190221_185008_00029_jjy5y
+    Splits: 19 total, 19 done (100.00%)
+    CPU Time: 0.0s total,   111 rows/s, 3.25KB/s, 7% active
+    Per Node: 0.0 parallelism,     5 rows/s,   164B/s
+    Parallelism: 0.0
+    Peak Memory: 0B
+    0:00 [1 rows, 30B] [5 rows/s, 164B/s]
 
 
 ## Setup Presto-Admin
@@ -345,6 +362,49 @@ I downloaded and ran `python setup.py develop` to get `presto-admin` to work.
 ### Presto JDBC Driver
 
 https://prestodb.github.io/docs/current/installation/jdbc.html
+
+## Apache Drill
+
+Another program to query your data is __Apache Drill__.
+
+* Run with `bin/drill-embedded`
+* Stop with `!quit`
+
+### Apache Drill Usage
+
+    0: jdbc:drill:zk=local> show schemas;
+    +---------------------+
+    |     SCHEMA_NAME     |
+    +---------------------+
+    | cp.default          |
+    | dfs.default         |
+    | dfs.root            |
+    | dfs.tmp             |
+    | information_schema  |
+    | sys                 |
+    +---------------------+
+    6 rows selected (0.23 seconds)
+
+    0: jdbc:drill:zk=local> use cp;
+    +-------+---------------------------------+
+    |  ok   |             summary             |
+    +-------+---------------------------------+
+    | true  | Default schema changed to [cp]  |
+    +-------+---------------------------------+
+    1 row selected (0.082 seconds)
+
+To query from a local file or directory, run your query like so for a file system (say there's Parquet files there):
+
+    0: jdbc:drill:zk=local> select * from dfs.`/usr/local/airflow/data/`
+
+Keep in mind that certain queries don't work (e.g. `DESCRIBE` to show columns will error out with an invalid schema)
+
+A useful setting, especially for a lot of columns, is to:
+
+    0: jdbc:drill:zk=local> !set maxwidth 10000
+
+To quit, run `!quit`
+
 
 # Athena
 
