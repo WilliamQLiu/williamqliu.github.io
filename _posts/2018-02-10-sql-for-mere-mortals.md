@@ -804,5 +804,92 @@ After you determine how each table will participate in the relationship, you nee
 __to what degree__ each will participate. You do this by determining the min and max number of rows in one
 table that can be related to a single row in the other table. This is called the table's __degree of participation__.
 
+You can see the degree of participation indicated by values like `(x, y)` where x can be associated with a minimum
+and maximum number of associations. E.g. `(1, 1)` means can only be associated with one and only one agent.
+`(0, 6)` means there doesn't have to be an association, but cannot have more than six associations.
 
+### Automatic key rules
+
+Some database systems allow you to define a rule that cascades the key value from the 'one' table to the 'many' table
+if a value of the primary key in the 'one' table changes. Other systems allow automatic deletion of rows in the
+'many' table when you change the value of the primary key in the 'one' table.
+
+## SQL Standards
+
+__ANSI/ISO__ SQL Standard is the most widely accepted standard to date.
+
+__ODBC__ is an Open Database Connectivity (ODBC) specification, based off the __Call-Level Interface (CLI)__ specification published.
+It's basically a way to bind an SQL Database to a user-interface language.
+
+## Data vs Information
+
+There is a distinct difference between __data__ and __information__.
+
+* __Data__ is what you store in the database.
+* __Information__ is what you retrieve from the database.
+
+This will help you keep things in perspective. Remember that a database is designed to provide meaningful
+information to someone in your organization. However, the information can only be provided if the data is structured
+to support that information.
+
+The values that you store in the database are data. This data is static (remains in the same state until you modify
+it by some manual or automated process). Say we have the following data:
+
+    Katherine   Ehrlich 89931   Active  79915
+
+The above data is useless until it's been proecssed. After you process the data so that it's meaningful, we get information.
+You can present this data in a variety of ways. The main idea is that you must process your data in a way that
+returns meaningful information.
+
+    First Name: Katherine
+    Last Name: Ehrlich
+    ID: 89931
+    Status: Active
+    Zip: 79915
+
+## SQL SELECT
+
+The `SELECT` operation in SQL retrieves data and manipulates that into information.
+
+The `SELECT` operation can be broken down into three smaller operations:
+
+1. the SELECT statement
+2. the SELECT expression
+3. the SELECT query
+
+Each of the above smaller operations has its own set of keywords (aka __clauses__).
+
+### Saving a Select
+
+You can save a SELECT statement as a:
+
+* __query__
+* __view__
+* __function__
+* __stored procedure__
+
+### Results of a SELECT
+
+When you execute a SELECT statement, it usually retrieves one or more rows of information, which we call a __result set__.
+
+So what happens when you request information from the database?
+
+* You ask a question, like "What cities do our customers live in? Give me a list of employees and their info"
+* Translate your question into a form like `Select <item> from the <source data>`
+* Translate the above question into a query statement like `Select city from customers`
+
+### Building your SELECT Statement
+
+* You can specify multiple columns
+* Use `*` to specify all columns (only use this as a 'quick and dirty' way to get data; explicit better than implicit)
+* Use `DISTINCT` as an optional keyword to eliminate duplicate rows; this evaluates the values of all the columns as
+  a __single unit__ on a row-by-row basis and eliminates any redundant rows it finds (otherwise shows every occurrence)
+
+## SQL Sorting
+
+By default, the result set of a SQL statement is unordered. You can use the `ORDER BY` clause to specify the sequence
+of rows in the final result set.
+
+* You can only order by any columns that have been returned in the result set.
+* You can specify order type with either `ASC` or `DSC`
 
