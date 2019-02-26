@@ -884,12 +884,58 @@ So what happens when you request information from the database?
 * Use `*` to specify all columns (only use this as a 'quick and dirty' way to get data; explicit better than implicit)
 * Use `DISTINCT` as an optional keyword to eliminate duplicate rows; this evaluates the values of all the columns as
   a __single unit__ on a row-by-row basis and eliminates any redundant rows it finds (otherwise shows every occurrence)
+  Add `DISTINCT` before the list of columns specified in a `SELECT` clause
 
-## SQL Sorting
+## SQL Sorting / Ordering
 
 By default, the result set of a SQL statement is unordered. You can use the `ORDER BY` clause to specify the sequence
 of rows in the final result set.
 
-* You can only order by any columns that have been returned in the result set.
-* You can specify order type with either `ASC` or `DSC`
+* You can only order by any columns that have been returned in the result set
+* You can specify order type with either `ASC` or `DSC`; default is ascending
+* Check your database's __collating sequences__ to determine the order of precedence for every character
+  (e.g. if lowercase is before uppercase characters)
+* If there are multiple columns to order by, the database will evaluate the columns from ORDER BY from left to right
+
+## Expressions
+
+If you want to select more than simple columns, you'll need to create an __expression__, which is some form of
+operation involving numbers, strings, or dates and times. Expressions are used to broaden or limit the scope of
+the information you want to retrieve.
+
+### Data Types
+
+Every column in the database has an assigned __data type__, which determines the type of values the column can store.
+There are seven general categories of types of data, which include:
+
+* __character__ - `CHAR` (fixed length characters, better performance, roughly +50%) or `VARCHAR` (varying length character). 
+  Most common is `varchar`. Maximum this data type can hold is also `65,535` characters per row (and not just 255 char per column).
+  If larger than say 255 or 1024 chars, then use `TEXT` (aka __character large object__, __clob__)
+  This is the one I've seen used most commonly (`varchar` for small fields, `text` for large).
+* __national character__ - similar to char, but characters now draw from ISO-defined foreign language. I haven't
+  needed to use this.
+* __binary__ - store binary data like images, sounds, videos, or complex embedded documents. Consider a static file
+  once you're past a certain size and if you have to, try to put this in a separate table.
+* numeric (__exact numeric__ and __approximate numeric__) - with __exact numeric__ we store whole numbers and numbers
+  with decimal places (e.g. `INT`, `DECIMAL`, `SMALLINT`). With __approximate numeric__ we store numbers with decimal
+  places and exponential numbers that don't have a precision and scale per se (e.g. `FLOAT`, `REAL`, `DOUBLE PRECISION`)
+* __boolean__ - stores true and false values, usually in a single binary bit (e.g. `BIT`, `INT`, `TINYINT`)
+* __datetime__ - stores dates, times, and combinations of both. The SQL standard defines the date format as year-month-day
+  and time values as 24-hour clock.
+* __interval__ - stores the quantity of time between two datetime values, expressed as either year, month; year/month;
+  time; or day/time. Not all major databases support the `INTERVAL` data type. For MySQL, I usually use something like:
+  `DATE(NOW()) - INTERVAL 1 MONTH`
+
+### CAST function
+
+The `CAST` function converts a literal value or the value of a column into a specific data type. This helps
+ensure that the data types of the values in the expression are compatible.
+
+When you do convert a value in one column into another, make sure you:
+
+* "don't put a ten-pound sack in a five-pound box" - if you put a varchar into a char that is smaller, you'll get truncation issues
+* "don't put a square peg in a round hole" - you can't put a string into a number, say zip code with letters going into number only
+* "ten-pound sack v2" - make sure that the target data type fits (otherwise you might get rounding issues)
+* "put a square peg in a round hole w/ limitations" - sometimes you can fit a numeric into say a char data type, but you'll
+  get unexpected outcomes like padding blanks
 
