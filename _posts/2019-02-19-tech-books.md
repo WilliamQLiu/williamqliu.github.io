@@ -28,4 +28,5 @@ List of good tech books:
 * The Pragmatic Programmer: From Journeyman to Master - lessons learned on how to write good code
 * Clean Code: A Handbook of Agile Software Craftsmanship - tips on how to write clean code
 * SQL Queries for Mere Mortals - basics of SQL from queries to indexes
+* SQL Antipatterns: Avoiding the Pitfalls of Database Programming - Don't do this
 
