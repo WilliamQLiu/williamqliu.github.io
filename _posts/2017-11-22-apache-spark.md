@@ -732,6 +732,12 @@ Python version:
     pip3 install python-snappy
     pip3 install parquet
 
+If the above doesn't install correctly, try doing this:
+
+    pip3 install --user cython
+    pip3 install --user thirftpy
+    pip3 install --user parquet
+
 Can then run with:
 
 `parquet 7026c2af982a4564a92c7602b43976cf.parquet` - see file
