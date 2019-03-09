@@ -229,3 +229,11 @@ To add port 8080 permanently to a `public` zone, run:
 
     sudo firewall-cmd --zone=public --add-port=8080/tcp --permanent
 
+## Hard Drive
+
+Test out a hard drive (write to it) - good for checking throughput
+
+    $hdparm /mymount
+    $dd if=/dev/zero of=/mymount/myoutput bs=1MB
+
+
