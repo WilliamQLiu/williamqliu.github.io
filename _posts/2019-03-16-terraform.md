@@ -17,7 +17,9 @@ state of your infrastructure.
 The idea is that Terraform describes your infrastructure as code (using a high-level configuration
 syntax). This way the blueprint of your datacenter is versioned and is treated like code.
 
-## Use Cases
+## Comparing Terraform
+
+### Use Cases
 
 Some example use cases with Terraform include:
 
@@ -31,5 +33,32 @@ Some example use cases with Terraform include:
 * Create a disposable environment (e.g. demo application using real infrastructure on AWS)
 * Provision onto a scheduler (e.g. Borg, Mesos, YARN, Kubernetes) so that your infrastructure
   does not remain static, but can dynamically schedule Docker containers, Hadoop, Spark, etc.
+
+
+### Terraform vs Configuration Management Tools
+
+Configuration Management tools install and manage software on a machine that already exists.
+Examples of configuration managemnt tools include Chef and Puppet. Terraform is not a 
+configuration management tool so you might see it used in conjunction with tools like Chef.
+Terraform focuses on provisioning while a tool like Chef focuses on setting up a resource
+once it has been created.
+
+### Terraform vs CloudFormation and Heat
+
+There are tools like CloudFormation that allow the details of an infrastructure be described
+in a configuration file. However, Terraform is cloud-agnostic and allows multiple providers
+and services to be combined and composed.
+
+Terraform also separates the planning phase from the execution phase by using an execution plan.
+You run `terraform plan` to refresh the current state of an execution plan (using the configuration)
+and an action plan is generated.
+You can run `terraform graph` to visualize the plan, that way you can visualize dependent ordering.
+
+### Terraform vs Boto and Fog
+
+There are libraries like Boto and Fog that have native access to cloud providers and services
+by using their APIs. Terraform does not give low-level programmatic access to providers, but
+instead provides a high level syntax for describing how cloud resources and serviecs should
+be created, provisioned, and combined.
 
 
