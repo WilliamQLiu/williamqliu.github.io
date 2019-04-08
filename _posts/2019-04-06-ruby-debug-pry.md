@@ -24,6 +24,19 @@ List of debug commands
 * `v g` to view global variables
 * `w` to display stack frame
 
+## byebug
+
+Install
+
+    gem install byebug
+
+## pry-byebug
+
+github.com/deivid-rodriguez/pry-byebug
+
+    $gem install pry-byebug --user-install
+
+
 ## Pry
 
 Pry is a runtime developer console and IRB alternative with introspection capabilities.
@@ -39,7 +52,7 @@ Using Pry
     # Misc code
     binding.pry  # equivalent of `pdb.set_trace()`
 
-To run a program with pry, use:
+To run a program with pry (and require `pry`, add `-rpry`) and run:
 
     ruby -rpry myrubyprogram.rb
 
@@ -69,6 +82,8 @@ Example usage (basically `binding.pry` is the Python `pdb.set_trace()` equivalen
     [4] pry(main)> exit
     Program will resume here. Value of x is: 10.
     End here!
+
+### Pry Commands
 
 Pry Help to see a list of commands inside of pry:
 
@@ -147,6 +162,8 @@ Pry Help to see a list of commands inside of pry:
       change-inspector   Change the current inspector proc.
       change-prompt      Change the current prompt.
 
+#### Pry Commands
+
 Good commands to know:
 
 * `help`
@@ -161,5 +178,38 @@ Good commands to know:
 * `.ls`
 * `.cat`
 * `.pwd`
+* `self`
+
+
+## dir() equivalent
+
+Inspect an object with:
+
+    my_object.class
+    "MyStringObject".methods.sort
+    my_object.instance_of? String  #=> True
+    my_object.is_a?(String)
+
+## Methods
+
+You can remove an object's methods, e.g.
+
+    >my_object.methods
+    :public_foo, :public_bar
+
+    >my_object.methods-Object.methods
+    :something, :another
+
+### Debugger
+
+If you run a program with `debugger` instead of `binding.pry`, you'll get the debugger. You then run with
+`ruby --debug my_progrma.rb`
+
+`set autolist on` - will show where you are
+`n` to skip down a line
+`e` to evaluate an object (e[val] <expression>)
+Hitting `return` runs the last command
+`s` to step into (`s[tep]`)
+`dis` to display an expression list (e.g. going through a loop and watch it change)
 
 
