@@ -7,6 +7,18 @@ title: Ruby Rspec Tests
 # {{ page.title }}
 
 RSpec is a testing tool for Ruby to create behavior-driven development (BDD).
+RSpec is made up of multiple libraries that are designed to work together or can
+be used independently with other testing tools like __Cucumber__ or __Minitest__.
+The parts are:
+
+* __rspec-core__ - the spec runner, which provides a command line program, flexible
+  and customizable reporting, and an API to organize your code examples.
+* __rspec-expectations__ - provides a readable API to express expected outcomes of
+  a code example
+* __rspec-mocks__ - test double framework, providing multiple types of fake objects
+  to allow you to tightly control the environment in which your specs run
+* __rspec-rails__ - supports using rspec to test Ruby on Rails applications in place
+  of Rails' built-in test framework
 
 ## Test Driven Development (TDD)
 
