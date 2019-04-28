@@ -20,6 +20,19 @@ The parts are:
 * __rspec-rails__ - supports using rspec to test Ruby on Rails applications in place
   of Rails' built-in test framework
 
+## Relish
+
+RSpec is documented through executable examples on Relish: http:relishapp.com/rspec
+
+The examples are written in an "end-to-end" style demonstrating the use of various
+RSpec features in the context of executable spec files. If you want detailed
+documentation about a particular API or feature, use the API docs instead.
+
+## Cucumber
+
+__Cucumber__ provides executable documentation and provides reports indicating
+whether the software behaves according to the specification or not.
+
 ## Test Driven Development (TDD)
 
 BDD's parent is test-driven development (TDD), which means we work in a red-green
