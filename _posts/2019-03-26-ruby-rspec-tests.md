@@ -61,4 +61,8 @@ Install the `simplecov` gem, then add SimpleCov to the top of your `spec_helper.
 
 You should then get a directory called `coverage` with your results
 
+One thing to note is that you want to put SimpleCov above everything else. For example, if you have some code
+`require 'mycode'` that you want covered, make sure that `require 'simplecov'` and `SimpleCov.start` is above your
+other require.
+
 
