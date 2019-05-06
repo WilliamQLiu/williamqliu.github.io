@@ -237,3 +237,11 @@ Test out a hard drive (write to it) - good for checking throughput
     $dd if=/dev/zero of=/mymount/myoutput bs=1MB
 
 
+## TODO
+
+Tcpdump
+Telnet
+Sysdig
+df
+du
+
