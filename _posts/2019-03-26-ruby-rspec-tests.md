@@ -65,4 +65,105 @@ One thing to note is that you want to put SimpleCov above everything else. For e
 `require 'mycode'` that you want covered, make sure that `require 'simplecov'` and `SimpleCov.start` is above your
 other require.
 
+## Describing Methods
 
+So RSpec is a behavior-driven development process of writing human readable specifications.
+The basic structure is that Rspec uses the words `describe` and `it` so we can express concepts like a conversation:
+
+### `describe` and `it`
+
+* "Describe an order."
+* "It sums the prices of its line items."
+
+### `describe` and `context`
+
+`describe` and `context` group related tests together
+They are the same method.
+
+So when do you use `describe` and when do you use `context`?
+
+* Use `describe` for __things__
+* Use `context` for __states__
+
+Bad:    `context "#matriculate"
+Better: `describe "#matriculate"
+
+Bad:    `describe "when the student is sick"`
+Better: `context "when the student is sick"`
+
+### `context`
+
+* Prefer `context` since tests usually deal with permutations of state
+* `context` names should not match your method names
+* Explain __why__ a user would call the method
+
+Example:
+
+Bad:    `describe "#assign"`
+Better: `context "assigning homework to a student"`
+
+### Nested Groups with `describe` and/or `context`
+
+RSpec has two scopes:
+
+* __Example Group__ are groups defined by a `describe` or `context` block
+* __Example__ are typically defined by an `it` block, which are evaluated in the context of an _instance_ of the
+              example group class to which the example belongs.
+
+Example of a nested group:
+
+    RSpec.describe Order do
+      context "with no items" do
+        it "behaves one way" do
+          # ...
+        end
+      end
+
+      context "with one item" do
+        it "behaves another way" do
+          # ...
+        end
+      end
+    end
+
+## `before` vs `let`
+
+`before` eagerly runs code before each test
+`let` lazily runs code when it is first used
+
+Use `before` for _actions_
+Use `let` for _dependencies_ (real or test double)
+
+Examples:
+
+Bad:    let(:dummy) do
+          @classroom.initialize_roster
+        end
+Better: before do
+          @classroom.initialize_roster
+        end
+
+Bad:    before { @grade_levels = [1, 2, 3] }
+Better: let(:grade_levels) { [1, 2, 3] }
+
+## `before` with `context`
+
+* `context` is used for state
+* `before` lists the actions to get to that state
+
+## Remove weak words
+
+* Don't use "should" in your test names
+* Say what will happen
+* Running the test will tell you if it is true or not
+* Prefer active verbs as in "France __beat__ Brazil in the finals."
+* Do not use passive verbs as in "Brazil __was beaten__ by France in the finals"
+
+Bad:    it "should add the student to the class"
+Better: it "adds the student to the class"
+
+## Sources
+
+http://www.betterspecs.org/
+https://github.com/rubocop-hq/rspec-style-guide
+http://jakegoulding.com/presentations/rspec-structure/#slide-1
