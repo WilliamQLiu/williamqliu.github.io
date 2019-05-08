@@ -593,6 +593,178 @@ Raise is a specific rescue
       end
     end
 
+# Classes
+
+## Class Structure
+
+    class Person
+      # extend and include go first
+      extend SomeModule
+      include AnotherModule
+
+      # inner classes
+      CustomError = Class.new(StandardError)
+
+      # constants are next
+      SOME_CONSTANT = 20
+
+      # afterwards we have attribute macros
+      attr_reader :name
+
+      # followed by other macros (if any)
+      validates :name
+
+      # public class methods are next in line
+      def self.some_method
+      end
+
+      # initialization goes between class methods and other instance methods
+      def initialize
+      end
+
+      # followed by other public instance methods
+      def some_method
+      end
+
+      # protected and private methods are grouped near the end
+      protected
+
+      def some_protected_method
+      end
+
+      private
+
+      def some_private_method
+      end
+    end
+
+## instance methods vs class methods
+
+Class methods are methods that are called on a class.
+Instance methods are methods that are called on an instance of a class.
+
+    class Foo
+      def self.bar
+        puts 'class method'
+      end
+      
+      def baz
+        puts 'instance method'
+      end
+    end
+
+    Foo.bar # => "class method"
+    Foo.baz # => NoMethodError: undefined method ‘baz’ for Foo:Class
+
+    Foo.new.baz # => instance method
+    Foo.new.bar # => NoMethodError: undefined method ‘bar’ for #<Foo:0x1e820>
+
+## Ways of declaring class methods
+
+There's a few ways of declaring class methods. I prefer the first way. The second way is harder to see if
+something is a class method if you have a lot of class methods. The third seems uncommon.
+
+    # Way 1
+    class Foo
+      def self.bar
+        puts 'class method'
+      end
+    end
+
+    Foo.bar # "class method"
+
+    # Way 2
+    class Foo
+      class << self
+        def bar
+          puts 'class method'
+        end
+      end
+    end
+
+    Foo.bar # "class method"
+
+    # Way 3
+    class Foo; end
+    def Foo.bar
+      puts 'class method'
+    end
+
+    Foo.bar # "class method"
+
+### self inside the metaclass
+
+Lets you access the object's metaclass (aka the 'singleton class', the 'eigenclass')
+
+    class Ghost
+      class << self 
+        def method1
+        end
+
+        def method2
+        end
+      end
+    end
+
+## Ways of declaring instance methods
+
+The main difference between instance methods and class methods is that
+with an instance method, you have to declare an instance and then you
+can use the method.
+
+    Way 1
+    class Foo
+      def baz
+        puts 'instance method'
+      end
+    end
+
+    Foo.new.baz # "instance method"
+
+    # Way 2
+    class Foo
+      attr_accessor :baz
+    end
+
+    foo = Foo.new
+    foo.baz = 'instance method'
+    puts foo.baz
+
+    # Way 3
+    class Foo; end
+
+    foo = Foo.new
+    def foo.bar
+      puts 'instance method'
+    end
+
+    Foo.new.baz # "instance method"
+
+## `include` vs `extend`
+
+`include` makes the foo method available to an instance of a class and
+`extend` makes the foo method available to the class itself
+
+    module Foo
+      def foo
+        puts 'heyyyyoooo!'
+      end
+    end
+
+    class Bar
+      include Foo
+    end
+
+    Bar.new.foo # heyyyyoooo!
+    Bar.foo # NoMethodError: undefined method ‘foo’ for Bar:Class
+
+    class Baz
+      extend Foo
+    end
+
+    Baz.foo # heyyyyoooo!
+    Baz.new.foo # NoMethodError: undefined method ‘foo’ for #<Baz:0x1e708>
+
 # Setup IntelliJ with Ruby
 
 * Make sure to setup 'Project Settings' > 'Project' to point to the correct SDK
