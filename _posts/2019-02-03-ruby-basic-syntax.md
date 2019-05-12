@@ -638,6 +638,28 @@ Raise is a specific rescue
       end
     end
 
+## Class vs Instance
+
+Suppose we have the following Class:
+
+    class Calculator
+    end
+
+We create an instance of our class with:
+
+    Calculator.new
+
+We can explore this with:
+
+    irb
+    > class Calculator
+    > end
+    > calculator = Calculator.new
+    > calculator.class
+    => Calculator
+    > calculator.is_a?(Calculator)
+    => true
+
 ## instance methods vs class methods
 
 Class methods are methods that are called on a class.
