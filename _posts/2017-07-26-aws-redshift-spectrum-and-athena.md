@@ -1,6 +1,6 @@
 ---
 layout: post
-title: AWS Redshift and AWS Athena
+title: AWS Redshift Spectrum and AWS Athena
 ---
 
 
@@ -9,7 +9,7 @@ title: AWS Redshift and AWS Athena
 
 # Summary
 
-AWS Redshift vs AWS Athena
+AWS Redshift Spectrum vs AWS Athena
 
 **AWS Redshift Spectrum** allows you to run SQL queries against unstructured data
 in AWS S3. You can use open data formats like CSV, TSV, Parquet, Sequence, and

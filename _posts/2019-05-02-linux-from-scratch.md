@@ -17,6 +17,11 @@ We have the following subprojects:
 * Hints - Collection of documents that explain how to enhance your system
 * Patches - Central repository for all patches useful to an LFS user
 
+## Prereading
+
+* Building and Installing Softwar Packages for Linux - http://www.tldp.org/HOWTO/Software-Building-HOWTO.html
+* How to build software from Source Code - http://moi.vonos.net/linux/beginners-installing-from-source/
+
 # Linux From Scratch (LFS)
 
 Linux From Scratch teaches you everything that makes Linux tick.
