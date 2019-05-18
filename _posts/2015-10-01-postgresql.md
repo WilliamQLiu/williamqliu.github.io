@@ -519,3 +519,33 @@ pairings, ordered by the time.
 ## <a id="Aggregates">Aggregates</a>
 
 You can select aggregates using `COUNT`, `SUM`, and `AVG`, `MAX`, `MIN`. `DISTINCT` can be used with aggregates.
+
+
+# Notes
+
+https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types
+
+## Arrays
+
+ARRAY    Ordered list of zero or more elements of any non-ARRAY type.
+An ARRAY is an ordered list of zero or more elements of non-ARRAY values. ARRAYs of ARRAYs are not allowed. Queries that would produce an ARRAY of ARRAYs will return an error. Instead a STRUCT must be inserted between the ARRAYs using the SELECT AS STRUCT construct.
+
+Currently, BigQuery has two following limitations with respect to NULLs and ARRAYs:
+BigQuery raises an error if query result has ARRAYs which contain NULL elements, although such ARRAYs can be used inside the query.
+BigQuery translates NULL ARRAY into empty ARRAY in the query result, although inside the query NULL and empty ARRAYs are two distinct values.
+
+Declaring an ARRAY type
+ARRAY types are declared using the angle brackets (< and >). The type of the elements of an ARRAY can be arbitrarily complex with the exception that an ARRAY cannot directly contain another ARRAY.
+
+Format
+ARRAY<T>
+
+## Structs
+
+STRUCT    Container of ordered fields each with a type (required) and field name (optional).
+Declaring a STRUCT type
+STRUCT types are declared using the angle brackets (< and >). The type of the elements of a STRUCT can be arbitrarily complex.
+
+Format
+STRUCT<T>
+
