@@ -6,6 +6,7 @@ title: AWS Redshift Spectrum and AWS Athena
 
 # {{ page.title }}
 
+# Background
 
 # Summary
 

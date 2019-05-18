@@ -23,6 +23,24 @@ Start the webserver to run at http://localhost:3000 by default
 
     $ bin/rails server
 
+## We have the following directories setup
+
+* `app` - has the controllers, models, views, helpers, mailers, channels, jobs and assets
+* `bin` - contains the rails script that starts your app and has other scripts (used to setup, update, deploy, run your app)
+* `config` - your application's routes, databases, etc.
+* `db` - contains your current database schema and database migrations
+* `Gemfile`, `Gemfile.lock` - specify what your gem dependencies are; files are used by __Bundler__
+* `lib` - extended modules for your application
+* `log` - application log files
+* `package.json` - specify what npm dependencies are needed for your Rails app; file is used by __Yarn__
+* `public` - static files and compiled assets
+* `Rakefile` - file that locates and loads tasks that can be run from the command line; tasks are defined throughout
+               components of Rails. Do not modify the Rakefile, instead add tasks through the `lib/tasks` dir
+* `test` - unit tests, fixtures
+* `tmp` - temporary files (cache, pid files)
+* `vendor` - third-party code (e.g. vendored gems)
+* `.ruby-version` - the default Ruby version
+
 ## Create a new Controller and View
 
 We need to create a new controller by running the 'controller' generator and telling it
