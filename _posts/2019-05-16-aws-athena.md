@@ -10,5 +10,7 @@ title: AWS Athena
 data in S3 using standard SQL. You don't need to setup a server. Simply point to an S3,
 define the schema, and start querying using standard SQL. Athena is more for
 very simple reporting. Athena also supports CSV, JSON, Gzip files, and columnar formats
-like Apache Parquet
+like Apache Parquet.
+
+Note that Athena is based off of __Presto__, a distributed SQL query engine for big data.
 

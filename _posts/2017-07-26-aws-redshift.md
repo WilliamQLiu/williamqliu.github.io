@@ -1,17 +1,40 @@
 ---
 layout: post
-title: AWS Redshift and Redshift Spectrum
+title: Amazon Redshift and Redshift Spectrum
 ---
 
 
 # {{ page.title }}
 
-# Background
+# Summary
 
-We have the following:
+Amazon Redshift
+
+__Amazon Redshift__ is a fully managed petabyte-scaled data warehouse service.
+An Amazonn Redshift data warehouse is a collection of computing resources called
+__nodes__, that are organized into a group called a __cluster__. Each cluster
+runs an Amazon Redshift engine and contains one or more databases. Redshift
+manages all the work of provisioning capacity, monitoring, and backup of the cluster.
+
+Redshift creates one database when you provision a cluster and you're able to add
+additional databases from your initial database. Each db can create tables, load data,
+and run queries. Note that Redshift has roots that are based off of Postgres.
+
+Amazon Redshift Spectrum
+
+**Amazon Redshift Spectrum** allows you to run SQL queries against unstructured data
+in AWS S3. You can use open data formats like CSV, TSV, Parquet, Sequence, and
+RCFile. AWS Redshift is Amazon's data warehouse solution. Most databases store data in
+**rows**, but Redshift is a **column** datastore. You're able to create Redshift
+tables and query data using __Redshift Spectrum__.
+
+# Redshift Data Warehouse System Architecture 
+
+In an Amazon Redshift data warehouse, we have the following architecture:
 
 * Client Applications connect (with JDBC or ODBC) to a Leader Node
-* The Leader Node then connects to a Data Warehouse Center
+* The Leader Node then connects to a Data Warehouse Cluster (e.g. Compute Node 1 with many nodes,
+  Compute Node 2 with many nodes)
 
 Amazon Redshift is based on PostgreSQL so most existing SQL client applications
 will work with minimal changes. Communication is done through Amazon Redshift's
@@ -72,23 +95,6 @@ https://docs.aws.amazon.com/redshift/latest/dg/c_SQL_commands.html
 ## SQL Functions Reference
 
 https://docs.aws.amazon.com/redshift/latest/dg/c_SQL_functions.html
-
-# Summary
-
-AWS Redshift Spectrum vs AWS Athena
-
-**AWS Redshift Spectrum** allows you to run SQL queries against unstructured data
-in AWS S3. You can use open data formats like CSV, TSV, Parquet, Sequence, and
-RCFile. AWS Redshift is Amazon's data warehouse solution. Most databases store data in
-**rows**, but Redshift is a **column** datastore.
-
-**AWS Athena** is an interactive query service that makes it easy to analyze
-data in S3 using standard SQL. You don't need to setup a server. Simply point to an S3,
-define the schema, and start querying using standard SQL. Athena is more for
-very simple reporting. Athena also supports CSV, JSON, Gzip files, and columnar formats
-like Apache Parquet
-
-__Presto__ - a distributed SQL query engine for big data
 
 ## Row vs Columns
 
