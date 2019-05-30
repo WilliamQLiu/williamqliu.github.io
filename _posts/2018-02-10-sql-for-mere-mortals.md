@@ -13,12 +13,12 @@ including SQL Server, MySQL, and PostgreSQL
 
 The book is broken into six sections:
 
-1. How Databases are mathematical models
-2. SQL Basics (e.g. select, where, order by)
-3. Working with multiple tables (e.g. joins, subqueries)
-4. Summarizing and Grouping Data (e.g. group by, having)
-5. Modifying data (e.g. update, insert, delete)
-6. Complex problems (e.g. not, and, case)
+1. How Databases are mathematical models - Chapter 1
+2. SQL Basics (e.g. select, where, order by) - Chapter 4
+3. Working with multiple tables (e.g. joins, subqueries) - Chapter 7
+4. Summarizing and Grouping Data (e.g. group by, having) - Chapter 12
+5. Modifying sets of data (e.g. update, insert, delete) - Chapter 15
+6. Complex problems (e.g. not, and, case) - Chapter 18
 
 ## Entity Relationship Diagram (ERD)
 
@@ -35,8 +35,6 @@ Get the code samples here: http://www.informit.com/store/sql-queries-for-mere-mo
 * Recipes - save and manage recipes
 * Sales Orders - manage orders for a store that sells bicycles
 * School Scheduling - register students at a school
-
-### ERD 
 
 ## Schemas
 
@@ -262,10 +260,23 @@ Indexes for `ztblWeeks`
     
 ## Types of Databases
 
+A database is an organized collection of data used to model some type of organization or organizational process.
+
 There are two types of databases:
 
-* __Operational Databases__ - used to collect, modify, and maintain _dynamic_ data on a day-to-day basis
-* __Analytical Databases__ - stores and tracks historical and time-dependent data that is static (data is not really modified)
+* __Operational Databases__ - used to collect, modify, and maintain data on a day-to-day basis. The data stored 
+                              is _dynamic_, meaning it changes constantly and always reflect up-to-the-minute information.
+* __Analytical Databases__ - stores and tracks historical and time-dependent data that is _static_ (data is not really modified)
+                             New data might often be added and is used for tracking trends, viewing statistical data over
+                             a long period, or making tactical or strategic business projections.
+
+### Relational Database Systems
+
+A __relational database management system (RDBMS)__ is a software application program used to create, maintain,
+modify, and manipulate a relational database.
+
+A __data warehouse__ is a large store of data accumulated from a wide range of sources and would enable organizations
+to access data stored in any number of nonrelational databases.
 
 ## Anatomy of a Relational Database
 
@@ -274,7 +285,7 @@ Each relation is made up of __tuples__ (records of rows) and __attributes__ (fie
 
 ### Tables
 
-Tables are the main structures in the database. Each table represents a single, specific object.
+__Tables__ are the main structures in the database. Each table represents a single, specific object.
 Each table contains at least one column that uniquely identifies each of its rows (aka __primary key__).
 
 The subject that a given table represents is usually either an __object__ or an __event__.
@@ -821,6 +832,8 @@ __ANSI/ISO__ SQL Standard is the most widely accepted standard to date.
 __ODBC__ is an Open Database Connectivity (ODBC) specification, based off the __Call-Level Interface (CLI)__ specification published.
 It's basically a way to bind an SQL Database to a user-interface language.
 
+# Part II - Chapter 4 (Create a Simple Query)
+
 ## Data vs Information
 
 There is a distinct difference between __data__ and __information__.
@@ -897,6 +910,8 @@ of rows in the final result set.
   (e.g. if lowercase is before uppercase characters)
 * If there are multiple columns to order by, the database will evaluate the columns from ORDER BY from left to right
 
+# Chapter 5 - Getting More Than Simple Columns
+
 ## Expressions
 
 If you want to select more than simple columns, you'll need to create an __expression__, which is some form of
@@ -938,4 +953,328 @@ When you do convert a value in one column into another, make sure you:
 * "ten-pound sack v2" - make sure that the target data type fits (otherwise you might get rounding issues)
 * "put a square peg in a round hole w/ limitations" - sometimes you can fit a numeric into say a char data type, but you'll
   get unexpected outcomes like padding blanks
+
+#### Types of Literals
+
+* __Character String Literal__ is a sequence of individual characters enclosed in single quotes (e.g. 'This is an example')    
+* __Numeric Literal__ is made up of an optional sign and a number and can include a decimal place, exponent symbol, and exponential number.
+* __Datetime Literal__ is made up of __date literals__, __time literals__, and __timestamp literals__.
+
+Examples:
+
+    CAST('2019-01-21' AS DATE)
+    CAST('03:30:25' AS TIME)
+    CAST('2019-01-22 14:25:00' AS DATETIME)
+
+#### Types of Expressions
+
+There are three types of SQL Expressions:
+
+* __Concatentation__ - combine two or more columns into one (e.g. 'Mike' || 'Liu' will retur 'MikeLiu'
+* __Mathematical__ - Add, subtract, multiply, divide numeric columns or literals. You can also apply absolute value, log, etc.
+* __Date and Time Arithmetic__ - Add, subtract to dates and times
+
+### AS
+
+Most calculated columns require a name. You an use the `AS` keyword to supply an alias for a real column name.
+
+    SELECT expression AS my_column_name
+
+    SELECT FirstName || ' ' || LastName AS MyName FROM People
+
+### NULL
+
+A __NULL__ represents a missing or unknown value. Null does NOT represent a zero, a character string of one
+or more blank spaces, or a zero-length character string.
+
+A Null might occur legitimately for a number reasons, including:
+
+* a specific value you need for a column is yet undefined
+* the values are truly unknown
+* none of its values apply to a particular row
+
+#### Problem with Nulls
+
+Nulls do not work nicely with mathematical operations. Any operation involving a Null evaluates to Null.
+It kinda makes sense; if a number is unknown, then the result of that operation is unknown.
+
+Examples:
+
+    (Null * 3) + 4 = Null
+
+# Chapter 6 - Filtering your Data
+
+## WHERE
+
+Use a __WHERE__ clause in a SELECT statement to filter the data. You can use basic predicates like:
+
+* Comparison (e.g. =, <>, <, >, <=, >=)
+* BETWEEN (Range) (e.g. BETWEEN 10 AND 20)
+* IN (e.g. IN ('a', 'b', 'c'))
+* LIKE (Pattern Match)
+* IS NULL
+
+### ESCAPE
+
+The __ESCAPE__ option allows you to designate a single character string literal to be the __escape character__.
+It tells the database how to interpret a percent sign or an underscore character.
+
+    SELECT ProductName, ProductCode
+    FROM Products
+    WHERE ProductCode LIKE 'G\_00' ESCAPE '\'
+
+## NOT
+
+Exclude rows from a result set by using the __NOT__ operator.
+
+    SELECT StaffID, Title
+    FROM Faculty
+    WHERE Title
+    NOT IN ('Professor', Associate Professor')
+
+You can apply NOT before a search condition, e.g.
+
+    SELECT FirstName, LastName, City
+    FROM People
+    WHERE NOT City = 'Reedley'
+
+## AND and OR
+
+You can combine two or more conditions using the __AND__ operator. __All__ conditions must be met in order for a 
+row to be included in a result set.
+
+You can combine two or more conditions using the __OR__operator. __Either__ conditions must be met in order for a
+row to be included in a result set.
+
+## SQL Order of Precedence
+
+Use parenthesis to combine and prioritize certain conditions. Otherwise, the evaluation order is:
+
+    Evaluation Order    |   Type of Operator
+    1                   |   Positive sign (+), Negative sign (-)
+    2                   |   Multiplication (*), division (/)
+    3                   |   Addition (+), subtraction (-)
+    4                   |   =, <>, <, >, <=, >=, BETWEEN, IN, LIKE
+    5                   |   NOT
+    6                   |   AND
+    7                   |   OR
+
+# Part III - Working with Multiple Tables
+
+## Set
+
+What is a __set__? Each table in your database is a set of information about one subject. A set of data can be
+as small as one column from one row in one table. There can even be empty sets.
+
+Each row in a result set is a __member__ of the set.
+The values in the columns are specific __attributes__ of each member.
+
+We use result sets of information to solve more complex problems that require linking data from two or more tables.
+
+### Set Operations
+
+The three most common set operations are:
+
+* __Intersection__ - find the common elements in two or more different sets (e.g. Show me recipes that contain both lamb and rice)
+* __Difference__ - find items that are in one set but not another (e.g. Show me recipes that contain lamb, but do not contain rice)
+* __Union__ - combine two or more similar sets (e.g. Show me all the recipes that contain either lamb or rice)
+
+Think of a __Venn diagram__ (aka __Euler__ diagram).
+
+#### Intersection
+
+One of the limitations of using a pure intersection is that the values must match in all the columns in each result set.
+If you only want to match on one or only a few column values from each set, then you will need a __JOIN__.
+
+Use the __INTERSECT__ keyword to do set intersection and find the common values
+
+#### Difference
+
+Remove from the first set all the matching members you find in the second set, and the result is the __difference__.
+
+Use the __EXCEPT__ keyword to do set difference and find the not common values
+
+#### Union
+
+A __UNION__ lets you select the _rows_ from two or more similar result sets and combine them into a single
+result set. Notice that we said _rows_ and not columns.
+
+If you run a __UNION__, you combine two sets of similar information into one set. Duplicates are lost.
+If you want to keep duplicates, use a __UNION ALL__.
+
+In order to run a UNION, you need to make sure that:
+
+* Each of the two SELECT statements that you are linking with a UNION must have the same number of output columns
+* Each corresponding column must be 'comparable'.
+
+## Chapter 8 - INNER JOINs
+
+### JOINS
+
+Use __JOIN__ to link multiple tables together.
+A Join is like an INTERSECT, except instead of matching on all the columns, you specify the columns you want to join on.
+
+You specify a JOIN as part of the FROM clause in a SQL statement. A JOIN defines a 'logical table' that is the result
+of linking two tables or results sets.
+
+Since we are joining multiple tables that might have the same column name, we need to provide a __column reference__
+that includes the table name. For example, here is a single table select that includes the table name:
+
+    SELECT Employees.FirstName, Employees.LastName, Employees.PhoneNumber 
+    FROM Employees
+
+To solve the JOIN, the database system combines every row in the first table with every row in the second
+table; this combination of all rows from one table with every row in the second talbe is called a __Cartesian product__.
+
+### Correlation Name
+
+You can create a __correlation name__ to any table you list in your FROM clause.
+Follow the table name with the optional keyword `AS` and then the correlation name you want to assign.
+
+This can be confusing because you usually write the SELECT clause before you write the FROM clause.
+If you plan to give a table an alias in the FROM clause, you have to use that alias when you qualify columnn names
+in the SELECT clause.
+
+Example:
+
+    SELECT R.RecipeTitle, R.Preparation, RC.RecipeClassDescription
+    FROM Recipe_Classes AS RC
+      INNER JOIN Recipes AS R
+    ON RC.RecipeClassID = R.RecipeClassID
+
+### INNER JOIN
+
+__INNER JOIN__ is the default join. It is the same as saying __JOIN__, but say __INNER__ to be explicit.
+Examples:
+
+  Displaying bowling teams and the name of each team captain
+  Return only students that have registered for a class and classes for which a student has registered
+
+### Derived Tables
+
+An embedded SELECT statement is a __derived table__, meaning you can substitute an entire SELECT statement 
+for any table name in your FROM clause. What we're doing is deriving a subset of data from one or more tables.
+You need to assign a correlation name so that the result of evaluating your embedded query has a name.
+
+    SELECT R.RecipeTitle, R.Preparation, RCFiltered.ClassName
+    FROM
+      (SELECT RecipeClassID, RecipeClassDescription AS ClassName
+       FROM Recipe_Classes AS RC
+       WHERE RC.ClassName = 'Main course' OR
+        RC.ClassName = 'Dessert') AS RCFiltered
+    INNER JOIN Recipes AS R
+      ON RCFiltered.RecipeClassID = R.RecipeClassID
+
+If your database does not let you embed a SELECT statement inside a FROM clause, consider using a VIEW.
+
+### Chapter 9 - OUTER JOINs
+
+Examples:
+
+  List all the classes and the students who have registered for those classes
+
+Use an OUTER JOIN with a test for Null values is an alternate way of discovering the difference between two sets.
+Examples:
+  The rows with a Null value in the columns from the Classes table represent the difference between the set of
+  all students and the set of students who have registered for a class
+
+### LEFT / RIGHT OUTER JOIN
+
+The first table you name is the one on the 'left'.
+The second table you name is the one on the 'right'.
+
+An outer join returns the unmatched rows from either the 'left' or 'right' table.
+
+    SELECT Recipe_Classes.RecipeClassDescription, Recipes.RecipeTitle
+    FROM Recipe_Classes
+    LEFT OUTER JOIN Recipes
+    ON Recipe_Classes.RecipeClassID = Recipes.RecipeClassID
+
+#### JOIN WITH Nulls
+
+List the recipe classes that do not yet have any recipes.
+
+    SELECT Recipe_Classes.RecipeClassDescription
+    FROM Recipe_Classes
+    LEFT OUTER JOIN Recipes
+     ON Recipe_Classes.RecipeClassID =
+    Recipes.RecipeClassID
+    WHERE Recipes.RecipeID IS NULL
+
+This results in doing a difference or EXCEPT operation using a JOIN. We get back 'all the `Recipe_Classes` except
+the ones that already appear in the `Recipes` table'. We created an EXCEPT!
+
+### FULL OUTER JOIN
+
+The __FULL OUTER JOIN__ includes all the rows from both of the tables. When no matching rows exist for
+rows on the 'left' side of the JOIN, you see Null values from the result set on the 'right'.
+
+# Chapter 11 - Subqueries
+
+A __subquery__ is a SELECT expression that you embed inside one of the clauses of a SELECT statement to form
+your final query statement. There are three different types of subqueries:
+
+* __Row subquery__ - embedded SELECT expression that returns more than one column and no more than one row
+* __Table subquery__ - embedded SELECT expression that returns one or more columns and zero to many rows
+* __Scalar subquery__ - embedded SELECT expression that returns only one column and no more than one row
+
+## Row Value Constructor
+
+You can use a row subquery to build a __row value constructor__. What happens is that when you create a WHERE
+clause, you build a search condition that is typically some sort of comparison of one column from one of your
+tables with another column or a literal. However, you can build a search condition that compares multiple values
+as a logical row with another set of values as a logical row (two row value constructors).
+
+Example
+
+    SELECT SKUClass, SKUNumber, ProductName
+    FROM Products
+    WHERE
+    (SKUClass, SKUNumber)
+    >= ('DSK', 9775)
+
+This is equivalent to:
+
+    SELECT SKUClass, SKUNumber, ProductName
+    FROM Products
+    WHERE
+    (SKUClass > 'DSK')
+    OR ((SKUClass = 'DSK')
+     AND (SKUNumber >= 9775))
+
+## Scalar Subqueries
+
+A __scalar subquery__ lets you fetch a single column or calculated expression from another table that does not have
+to be in the FROM clause of the main query. You can use this single value fetched by a scalar subquery in the
+list of columns you request in a SELECT clause or you can use it as a comparison value in a WHERE clause.
+
+So what is happening? You are substituting the subquery where you would normally enter a single column name
+or expression that results in a single column. That is the reason why a scalar subquery needs to return exactly
+one column and no more than one row.
+
+This lets you pluck a single value from some other table or query to include in the output of your query.
+
+Example:
+
+    SELECT Orders.OrderNumber, Orders.OrderDate, Orders.ShipDate,
+     (SELECT Customers.CustLastName FROM Customers
+      WHERE Customers.CustomerID = Orders.CustomerID)
+    FROM Orders
+    WHERE Orders.ShipDate = '2017-10-03'
+
+## Aggregate Functions
+
+Standard SQL defines many functions that calculate values in a query. A subclass of functions are
+__aggregate functions__, which lets you calculate a single value for a group of rows in a result set.
+You can use an aggregate function to count the rows, find the largest or smallest value within a set of rows,
+or calculcate the average or total of some value or expression across a result set.
+
+### COUNT
+
+Use __COUNT__ to determine the number of rows or the number of non-Null values in a result set.
+Use `COUNT(*)` to find out how many rows are in the entire set.
+Use `COUNT(my_column_name)` to count the number of rows with non-Null values in that column.
+Use `COUNT DISTINCT` to count only the unique values.
+
+## Subqueries as Filters
 
