@@ -8,6 +8,59 @@ title: Intermediate Ruby
 
 Intermediate Ruby Notes
 
+## Modules and Classes
+
+A Class can be instantiated but a module cannot.
+A module cannot be more than a library of methods.
+A class can hold its state (by keeping track of instance variables) and can be duplicated as many times
+as you want. If you ever need to instantiate something or have it exist over time, use a class instead of a module.
+Think of a module as a library of methods that you can include in your classes.
+
+### Modules
+
+You can include a module of methods in your project by using `include` in your class. Now you have access
+to all its methods as instance methods. This is the most common usage of modules, which add methods as instance
+methods.
+
+    class MyClass
+      include MyModule
+    end
+
+You can also `extend` your module instead of including your module, although this is less common. When you
+extend your module, it makes all the methods class methods.
+
+    class MyClass
+      extend MyModule
+    end
+
+Examples
+
+    module ModuleExample
+      def foo
+        'foo'
+      end
+    end
+
+
+    # Including modules binds the methods to the object instance
+    class Person
+      include ModuleExample
+    end
+
+    # IRB
+    Person.foo # NoMethodError: undefined method 'foo' for Person:Class
+    Person.new.foo # 'foo'
+
+
+    # Extending modules binds the methods to the class itself
+    class Book
+      extend ModuleExample
+    end
+
+    # IRB
+    Book.foo # 'foo'
+    Book.new.foo # NoMethodError: undefined method 'foo'    
+
 ## Namespacing (module) for your Gem
 
 You're using other people's Gems and marking the versions in a `Gemfile`.
