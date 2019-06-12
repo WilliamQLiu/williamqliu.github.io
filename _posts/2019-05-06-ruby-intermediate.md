@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Intermediate Ruby 
+title: Intermediate Ruby
 ---
 
 
@@ -59,7 +59,7 @@ Examples
 
     # IRB
     Book.foo # 'foo'
-    Book.new.foo # NoMethodError: undefined method 'foo'    
+    Book.new.foo # NoMethodError: undefined method 'foo'
 
 ## `<<`
 
@@ -73,8 +73,8 @@ With `class << self`, we open up the `self`'s singleton class so the methods can
 `self` object (which inside a class or module body is the class or module itself). Usually this is used to
 define class/module ('static') methods.
 
-    class String 
-      class < self
+    class String
+      class << self
         def value_of obj
           obj.to_s
         end
