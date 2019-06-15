@@ -96,6 +96,12 @@ define class/module ('static') methods.
 If you dont't want to type `self.` in front of each definition, you can do `class << self`. Otherwise, it
 might be clearer that the method is static if you explicitly say `def self.some_method`.
 
+## Class Variables with `@@`
+
+`@@` before a variable name means it is a class variable, meaning one per class (i.e. this variable is shared
+across all classes). If you modify the variable in an instance of one, you modify the variable for all other
+instances and even child instances. You can access these variables in both instance and class methods of the class.
+
 ## Instance Variables with `@`
 
 In Ruby, we save an instance variable using the `@` syntax. All instance variables are private. In order

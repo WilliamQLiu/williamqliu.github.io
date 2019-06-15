@@ -28,7 +28,7 @@ RCFile. AWS Redshift is Amazon's data warehouse solution. Most databases store d
 **rows**, but Redshift is a **column** datastore. You're able to create Redshift
 tables and query data using __Redshift Spectrum__.
 
-# Redshift Data Warehouse System Architecture 
+# Redshift Data Warehouse System Architecture
 
 In an Amazon Redshift data warehouse, we have the following architecture:
 
@@ -56,11 +56,34 @@ The `PG_` part is leftover from PostgreSQL.
 You normally don't want to return everything.
 
     SELECT
-      DISTINCT tablename 
+      DISTINCT tablename
     FROM
       PG_TABLE_DEF
     WHERE
       schemaname = 'public';
+
+To list schemas in Redshift:
+
+    select s.nspname as table_schema,
+           s.oid as schema_id,
+           u.usename as owner
+    from pg_catalog.pg_namespace s
+    join pg_catalog.pg_user u on u.usesysid = s.nspowner
+    order by table_schema;
+
+    -- Example
+    table_schema    schema_id   owner
+    my_schema               1    will
+
+    -- Returns us
+    databases
+      my_database1
+        schemas
+          my_schema1
+          my_schema2
+      my_database2
+        schemas
+          my_schema3
 
 ## Metadata from `PG_NAMESPACE`
 
@@ -68,7 +91,7 @@ You normally don't want to return everything.
       *
     FROM
       PG_NAMESPACE;
-    
+
     # returns nspname, nspowner, nspacl
 
 ## Searchpath
@@ -158,7 +181,7 @@ example:
     Joe:1,Mary:2,Cathy:3,Bob:4
     25000:1,40000:2,55000:3,30000:4
 
-One big difference between the systems is that with the row-based system, the primary 
+One big difference between the systems is that with the row-based system, the primary
 key is the rowid field. In the column-based system, the primary key is the
 data. So what does that mean? If we look in detail on the column-based system,
 we see that for duplicate data (e.g. 'Jones'), we're able to store the same
