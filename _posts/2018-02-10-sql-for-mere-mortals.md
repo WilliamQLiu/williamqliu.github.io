@@ -1,12 +1,12 @@
 ---
 layout: post
-title: SQL Queries for Mere Mortals 
+title: SQL Queries for Mere Mortals
 ---
 
 
 # {{ page.title }}
 
-'SQL Queries for Mere Mortals' shows you how to write queries using a variety of databases, 
+'SQL Queries for Mere Mortals' shows you how to write queries using a variety of databases,
 including SQL Server, MySQL, and PostgreSQL
 
 ## Overview
@@ -22,7 +22,7 @@ The book is broken into six sections:
 
 ## Entity Relationship Diagram (ERD)
 
-An __Entity Relationship Diagram__ (aka __ERD__, __ER Diagram__, __ER Model__) is a structural diagram for use 
+An __Entity Relationship Diagram__ (aka __ERD__, __ER Diagram__, __ER Model__) is a structural diagram for use
 in database design. An ERD contains two different symbols and connectors that visualize two important
 information: the major entities within the system scope and the inter-relationships among these entities.
 
@@ -44,7 +44,7 @@ the constraints that are to be applied on the data.
 
 Here are some example Schemas we'll be using from the book:
 
-### Bowling League 
+### Bowling League
 
 This database tracks bowling teams, team members, the matches they played, and the results.
 
@@ -63,15 +63,15 @@ Table `Bowler_Scores`
 
 Indexes for `Bowler_Scores`
 
-    Index Name                  Attributes/Field Names 
+    Index Name                  Attributes/Field Names
     --------------------------------------------------
     BowlersBowler_Scores
                                 BowlerID
-    
+
     Match_GamesBowler_Scores
                                 MatchID
                                 GameNumber
-    
+
     PrimaryKey                  Primary
                                 MatchID
                                 GameNumber
@@ -83,7 +83,7 @@ Table `Bowlers`
 
     Field               Data Type       Size        Required    Default     Primary Key     Foreign Key
     ----------------------------------------------------------------------------------------------------------
-    BowlerID            int             4           Yes         0           Yes             
+    BowlerID            int             4           Yes         0           Yes
     BowlerLastName      nvarchar        50
     BowlerFirstName     nvarchar        50
     BowlerMiddleInit    nvarchar        1
@@ -96,14 +96,14 @@ Table `Bowlers`
 
 Indexes for `Bowlers`
 
-    Index Name                  Attributes/Field Names 
+    Index Name                  Attributes/Field Names
     --------------------------------------------------
     BowlerLastName
                                 BowlerLastName
-    
+
     PrimaryKey                  Primary
                                 BowlerID
-    
+
     TeamBowlers
                                 TeamID
 
@@ -116,15 +116,15 @@ Table `Match_Games`
     MatchID             int             4           Yes         0           Yes             Tourney_Matches.MatchID
     GameNumber          smallint        2           Yes         0           Yes
     WinningTeamID       int             4                       0
- 
+
 Indexes for `Match_Games`
 
-    Index Name                  Attributes/Field Names 
+    Index Name                  Attributes/Field Names
     --------------------------------------------------
     PrimaryKey                  Primary
                                 MatchID
                                 GameNumber
-    
+
     Tourney_MatchesMatch_Games
                                 MatchID
 
@@ -134,27 +134,27 @@ Table `Teams`
 
     Field               Data Type       Size        Required    Default     Primary Key     Foreign Key
     ----------------------------------------------------------------------------------------------------------
-    TeamID              int             4           Yes                     Yes 
+    TeamID              int             4           Yes                     Yes
     TeamName            nvarchar        50          Yes
     CaptainID           int             4                                                   Bowlers.BowlerID
 
 Indexes for `Teams`
 
-    Index Name                  Attributes/Field Names 
+    Index Name                  Attributes/Field Names
     --------------------------------------------------
     BowlersTeams                Unique
                                 CaptainID
-    
+
     CaptainID                   Unique
                                 CaptainID
-    
+
     PrimaryKey                  Primary
-                                TeamID 
-     
+                                TeamID
+
     TeamID                      Unique
                                 TeamID
 
-#### Tournaments 
+#### Tournaments
 
 Table `Tournaments`
 
@@ -166,10 +166,10 @@ Table `Tournaments`
 
 Indexes for `Tournaments`
 
-    Index Name                  Attributes/Field Names 
+    Index Name                  Attributes/Field Names
     --------------------------------------------------
     PrimaryKey                  Primary
-                                TourneyID 
+                                TourneyID
 
 #### Tourney Matches
 
@@ -182,20 +182,20 @@ Table `Tourney_Matches`
     Lanes               nvarchar        5
     OddLaneTeamID       int             4                       0                           Teams.TeamID
     EvenLaneTeamID      int             4                       0                           Teams.TeamID
- 
+
 Indexes for `Tourney_Matches`
 
-    Index Name                  Attributes/Field Names 
+    Index Name                  Attributes/Field Names
     --------------------------------------------------
     PrimaryKey                  Primary
                                 MatchID
-    
+
     TeamsTourney_Matches
                                 OddLaneTeamID
-    
+
     TeamsTourney_Matches1
                                 EvenLaneTeamID
-    
+
     TournamentsTourney_Matches
                                 TourneyID
 
@@ -211,7 +211,7 @@ Table `ztblBowlerRatings`
 
 Indexes for `ztblBowlerRatings`
 
-    Index Name                  Attributes/Field Names 
+    Index Name                  Attributes/Field Names
     --------------------------------------------------
     PrimaryKey                  Primary
                                 BowlerRating
@@ -223,14 +223,14 @@ Table `ztblSkipLabels`
     Field               Data Type       Size        Required    Default     Primary Key     Foreign Key
     ----------------------------------------------------------------------------------------------------------
     LabelCount          int             4           Yes                     Yes
- 
+
 Indexes for `ztblSkipLabels`
 
-    Index Name                  Attributes/Field Names 
+    Index Name                  Attributes/Field Names
     --------------------------------------------------
     PrimaryKey                  Primary
                                 LabelCount
-  
+
 #### ztblWeeks
 
 Table `ztblWeeks`
@@ -242,11 +242,11 @@ Table `ztblWeeks`
 
 Indexes for `ztblWeeks`
 
-    Index Name                  Attributes/Field Names 
+    Index Name                  Attributes/Field Names
     --------------------------------------------------
     PrimaryKey                  Primary
                                 WeekStart
- 
+
 #### Relationship Constraints
 
     Name                            Parent          Parent Fields       Child           Child Fields
@@ -257,14 +257,14 @@ Indexes for `ztblWeeks`
     TeamsBowlers                    Teams           TeamID              Bowlers         TeamID
     TeamsTourney_Matches            Teams           TeamID              Tourney_Matches OddLaneTeamID
     TeamsTourney_Matches1           Teams           TeamID              Tourney_Matches EvenLaneTeamID
-    
+
 ## Types of Databases
 
 A database is an organized collection of data used to model some type of organization or organizational process.
 
 There are two types of databases:
 
-* __Operational Databases__ - used to collect, modify, and maintain data on a day-to-day basis. The data stored 
+* __Operational Databases__ - used to collect, modify, and maintain data on a day-to-day basis. The data stored
                               is _dynamic_, meaning it changes constantly and always reflect up-to-the-minute information.
 * __Analytical Databases__ - stores and tracks historical and time-dependent data that is _static_ (data is not really modified)
                              New data might often be added and is used for tracking trends, viewing statistical data over
@@ -280,7 +280,7 @@ to access data stored in any number of nonrelational databases.
 
 ## Anatomy of a Relational Database
 
-Data in a relational database is stored in __relations__, which appear as __tables__. 
+Data in a relational database is stored in __relations__, which appear as __tables__.
 Each relation is made up of __tuples__ (records of rows) and __attributes__ (fields or columns).
 
 ### Tables
@@ -318,7 +318,7 @@ subject of the table. Every column in a properly designed database contains one 
 The name of the column identifies the type of value it holds, that way entering data is intuitive.
 Example column names might be FirstName, LastName, City, State, ZipCode
 
-A __row__ represents a unique instance of the subject of a table. It is composed of the entire set 
+A __row__ represents a unique instance of the subject of a table. It is composed of the entire set
 of columns in a table, regardless of whether or not the columns contain any values.
 Because of how a table is defined, each row is identified throughout the database by a unique value
 in the __primary key__ column(s) of that row.
@@ -424,7 +424,7 @@ confidentiality purposes.
 ### One-to-Many
 
 When a pair of tables has a __one-to-many__ relationship, a single row in the first table can
-be related to _many rows_ in the second table, but a single row in the second table can only be 
+be related to _many rows_ in the second table, but a single row in the second table can only be
 related to _only one_ row in the first table.
 
 So how does this work? You take the primary key of the primary table and insert it into the
@@ -437,7 +437,7 @@ secondary table as a foreign key.
     1002            3           Topazz              555-2591
     1003            3           JV & the Deep Six   555-2511
 
-    'Engagements' Table 
+    'Engagements' Table
     EngagementID    EntertainerID   CustomerID  StartDate   EndDate
     ------------------------------------------------------------------
     5               1003            10006       2007-09-11  2007-09-14
@@ -529,7 +529,7 @@ Since columns are our smallest data structure, let's look at them first:
   two or more distinct values); these wreck havoc in a database
 * Make sure a column does not store the result of a calculation or concatentation.
   A column (unlike a cell in a spreadsheet) does not store an actual calculation.
-  If you do store calculated values, when the value of any part of the calculation changes, 
+  If you do store calculated values, when the value of any part of the calculation changes,
   the result value stored in the column is not updated.
 
 #### Multipart Columns
@@ -544,7 +544,7 @@ of this column and break it up into smaller, more distinct parts?". Here's an ex
     1003            Gary Hallmark       Route 2, Box 203B, Auburn, WA 98002
 
 In the above, you can see that columns `CustomerName` and `StreetAddress` can be broken up into
-more distinct columns. CustomerName can be CustFirstName and CustLastName while StreetAddress can 
+more distinct columns. CustomerName can be CustFirstName and CustLastName while StreetAddress can
 be broken up into CustAddress, CustCity, CustZipCode, CustState, etc.
 
 More complicated multipart examples might be:
@@ -581,11 +581,11 @@ __linking table__.
     'Pilots' Table
     PilotID     PilotFirstName      PilotLastName
     ---------------------------------------------
-    25100       Sam                 Alborous     
-    25101       Jim                 Wilson       
-    25102       David               Smith       
+    25100       Sam                 Alborous
+    25101       Jim                 Wilson
+    25102       David               Smith
 
-    'Pilot_Certifications' Table (the 'linking table') 
+    'Pilot_Certifications' Table (the 'linking table')
     PilotID     CertificationID
     ---------------------------
     25100       8102
@@ -640,7 +640,7 @@ Example 1:
     ---------------------------------------------
     98014       Peter               Brehm
     98109       Mariya              Sergienko
-    
+
     Classes Table
     ClassID     Class       StaffID     StaffLastName   StaffFirstName
     ------------------------------------------------------------------
@@ -655,7 +655,7 @@ Example 2:
 
 Another example is if you have duplicate columns as different column names. For example:
 
-    'Employees' Table    
+    'Employees' Table
     EmployeeID  EmpLastName     EmpFirstName    Committee1  Committee2  Committee3
     ------------------------------------------------------------------------------
     7004        Gehring         Darren          Steering
@@ -668,8 +668,8 @@ is solved with a linking table.
     'Employees' Table
     EmployeeID  EmpLastName     EmpFirstName
     ----------------------------------------
-    7004        Gehring         Darren      
-    7005        Kennedy         John        
+    7004        Gehring         Darren
+    7005        Kennedy         John
     7006        Thompson        Sarah
 
     'Committee_Members' Table
@@ -678,7 +678,7 @@ is solved with a linking table.
     7004            103
     7005            104
     7005            102
-    7006            102 
+    7006            102
 
     'Committees' Table
     CommitteeID     CommitteeName       MeetingRoom     MeetingDay
@@ -705,9 +705,9 @@ We can solve that with having a one-to-many relationship:
    'Employees' Table
     EmployeeID  EmpLastName     EmpFirstName
     ----------------------------------------
-    7004        Gehring         Darren      
-    7005        Kennedy         John        
-    7006        Thompson        Sarah       
+    7004        Gehring         Darren
+    7005        Kennedy         John
+    7006        Thompson        Sarah
 
     'Phone_Numbers' Table
     EmployeeID  PhoneID     PhoneType       PhoneNumber
@@ -730,14 +730,14 @@ A primary key is either:
 * a __simple primary key__ (aka __primary key__) when it is made up of a single column
 * a __composite primary key__ when it is made up of two or more columns
 
-Define a simple primary key over a composite primary key whenever you can; it's more efficient and it's easier to 
+Define a simple primary key over a composite primary key whenever you can; it's more efficient and it's easier to
 use when establishing a table relationship
 
 To check if your primary key columns are sound:
 
 * Do the columns uniquely identify each row in the table? A good primary key ensures that we have a means of accurately
   identifying or referencing each row in this table from other tables in the database.
-* Does this column or combination of columns have unique values? We cannot have duplicates, since that won't let us 
+* Does this column or combination of columns have unique values? We cannot have duplicates, since that won't let us
   uniquely identify the object or event.
 * Will the column ever contain unknown values? We cannot have unknown values in your primary key column(s)
 * Can the value of these columns ever be optional? Your column(s) for primary key has to be required
@@ -763,7 +763,7 @@ Diagram One-to-Many Relationship
     ----------------                          -------------------
     |StudentID   PK| -|-------------------    |InstrumentID   PK|
     ----------------                     |  / |                 |
-                                         |--- |StudentID      FK|  
+                                         |--- |StudentID      FK|
                                             \ |------------------
 
 Diagram Many-to-Many Relationship
@@ -923,7 +923,7 @@ the information you want to retrieve.
 Every column in the database has an assigned __data type__, which determines the type of values the column can store.
 There are seven general categories of types of data, which include:
 
-* __character__ - `CHAR` (fixed length characters, better performance, roughly +50%) or `VARCHAR` (varying length character). 
+* __character__ - `CHAR` (fixed length characters, better performance, roughly +50%) or `VARCHAR` (varying length character).
   Most common is `varchar`. Maximum this data type can hold is also `65,535` characters per row (and not just 255 char per column).
   If larger than say 255 or 1024 chars, then use `TEXT` (aka __character large object__, __clob__)
   This is the one I've seen used most commonly (`varchar` for small fields, `text` for large).
@@ -956,7 +956,7 @@ When you do convert a value in one column into another, make sure you:
 
 #### Types of Literals
 
-* __Character String Literal__ is a sequence of individual characters enclosed in single quotes (e.g. 'This is an example')    
+* __Character String Literal__ is a sequence of individual characters enclosed in single quotes (e.g. 'This is an example')
 * __Numeric Literal__ is made up of an optional sign and a number and can include a decimal place, exponent symbol, and exponential number.
 * __Datetime Literal__ is made up of __date literals__, __time literals__, and __timestamp literals__.
 
@@ -1040,7 +1040,7 @@ You can apply NOT before a search condition, e.g.
 
 ## AND and OR
 
-You can combine two or more conditions using the __AND__ operator. __All__ conditions must be met in order for a 
+You can combine two or more conditions using the __AND__ operator. __All__ conditions must be met in order for a
 row to be included in a result set.
 
 You can combine two or more conditions using the __OR__operator. __Either__ conditions must be met in order for a
@@ -1120,7 +1120,7 @@ of linking two tables or results sets.
 Since we are joining multiple tables that might have the same column name, we need to provide a __column reference__
 that includes the table name. For example, here is a single table select that includes the table name:
 
-    SELECT Employees.FirstName, Employees.LastName, Employees.PhoneNumber 
+    SELECT Employees.FirstName, Employees.LastName, Employees.PhoneNumber
     FROM Employees
 
 To solve the JOIN, the database system combines every row in the first table with every row in the second
@@ -1152,7 +1152,7 @@ Examples:
 
 ### Derived Tables
 
-An embedded SELECT statement is a __derived table__, meaning you can substitute an entire SELECT statement 
+An embedded SELECT statement is a __derived table__, meaning you can substitute an entire SELECT statement
 for any table name in your FROM clause. What we're doing is deriving a subset of data from one or more tables.
 You need to assign a correlation name so that the result of evaluating your embedded query has a name.
 
@@ -1277,4 +1277,5 @@ Use `COUNT(my_column_name)` to count the number of rows with non-Null values in 
 Use `COUNT DISTINCT` to count only the unique values.
 
 ## Subqueries as Filters
+
 
