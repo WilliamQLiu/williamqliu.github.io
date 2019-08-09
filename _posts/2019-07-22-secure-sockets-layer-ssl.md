@@ -121,3 +121,8 @@ In RSA, each user has a widely available public key as well as a secret private 
 When sending a message, the sender uses the receiver's public key to encrypt that message.
 The only key that can be used to decrypt that message is the receiver's private key.
 
+## PKI
+
+__PKI__ stands for __public key infrastructure__. PKI is asymmetric encryption that is used for
+transactional exchanges. It is not a specific technology but rather a framework based on
+asymmetric technologies.
