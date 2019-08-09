@@ -89,7 +89,7 @@ We use cryptography so that we can have:
 
 __Symmetric__ encryption uses the __same key__ for both encryption and decryption. The issue with symmetric
 encryption is that keys have to be shared between parties, usually across a public medium. If this key is
-intercepted during transit, then security is compromised.
+intercepted during transit (e.g. __man in the middle__), then security is compromised.
 
 Symmetric Algorithms include:
 
@@ -100,7 +100,9 @@ Symmetric Algorithms include:
 
 ### Asymmetric Encryption
 
-__Asymmetric__ encryption uses __two keys__ for encryption and decryption.
+__Asymmetric__ encryption uses __two keys__ for encryption and decryption. The issue with asymmetric encryption
+is because it is __extremely slow__, taking a lot of processing power and so it is impractical when encrypting
+large amounts of data.
 
 Asymmetric Algorithms include:
 
@@ -124,5 +126,57 @@ The only key that can be used to decrypt that message is the receiver's private 
 ## PKI
 
 __PKI__ stands for __public key infrastructure__. PKI is asymmetric encryption that is used for
-transactional exchanges. It is not a specific technology but rather a framework based on
-asymmetric technologies.
+transactional exchanges. It is not a specific technology but rather a __framework__ based on
+asymmetric technologies. Users need to have certificates that are issued by a trusted __certificate authority (CA)__.
+
+* An Administrator makes a request to the Certificate Authority (CA)
+* The CA issues keys, distributes keys, manages keys, and revokes keys
+* Certificates are usually good for a certain amount of time
+* Users can lose access based off a __CRO__ (a list of Certificates that have been revoked and not yet expired)
+
+So how does this work?
+
+* A User (Bob) wants to send an encrypted email to another User (Sally)
+* Bob and Sally exchange public keys (made available through everyone in the organization)
+* Bob encrypts his message with Sally's public key
+* Sally decrypts with her private key
+* If the encrypted message is intercepted, it cannot be opened without the receiver's private key
+
+### Web Server SSL Certificates
+
+A Web server SSL Certificate is based off PKI.
+
+* Our web server makes a request to the __Registration Authority (RA)__ that verifies the person making the request
+  from a server is actually that server
+* The Registration Authority then forwards the request over to __Certificate Authority (CA)__ and creates a
+  signed certificate that usually comes from: DigiCert, Verisign, Comodo, GoDaddy
+* The trusted CA then sends the request back to the RA and then back to the Web Server
+* The client will then see the green shield on their browser
+
+## Hybrid Encryption
+
+Due to the negatives of symmetric encryption and asymmetric encryption, there's now a __hybrid encryption__.
+So how does it work?
+
+* In a hybrid environment, one of the users shares their public key.
+* The original sender makes a symmetric session key by encrypting it with the the receiver's public key (this
+  process is known as the __asymmetric key exchange__). So Bob wants to send a message to Sally and encrypts
+  his message (which happens to be Bob's key) using Sally's key.
+* Now if there is a man in the middle attack, it doesn't know to use Sally's public key to decrypt the message.
+* Once Sally gets the message, she can unencrypt Bob's message using her key, to then get Bob's key.
+
+So basically, we do a TLS Handshake to negotiate keys before creating a secure network connection.
+We mitigate the issues with using only symmetric encryption or only using asymmetric encryption.
+
+## Public Key Exchange (TLS Handshake)
+
+We do a __TLS Handshake__ to ensure that the data we send from our browser to a web server is confidential.
+How do we know that there isn't a man in the middle?
+
+* First, the client (browser) sends a hello request
+* The server replies back with its __public key__
+* The client (browser) verifies independently with the __Certificate Authority__ to make sure that the Server is who it says it is
+* We then run the asymmetric key exchange (listed above in the hybrid encryption)
+* Remember that only the private key can be used to decrypt the messages going forward
+* We create a __session key__ for all remaining communications
+
