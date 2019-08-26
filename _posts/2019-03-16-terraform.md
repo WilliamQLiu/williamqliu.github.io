@@ -34,12 +34,12 @@ __Infrastructure as Code (IaC)__:
 * High-level syntax
 * Easily reusable with modules
 
-Execution Plans
+__Execution Plans__
 
 * Show the intent of the deploy
 * Can help ensure everything in development is intentional
 
-Resource Graph
+__Resource Graph__
 
 * Illustrates all changes and dependencies
 
@@ -181,19 +181,147 @@ For example:
       }
     }
 
-We can declare resources in `.tf.json` and `.tf` formats (e.g. say `main.tf`)
+We can declare resources in `.tf.json` and `.tf` formats (e.g. say `main.tf`).
+When you run terraform, verify that there are no other `*.tf` files in your directory because
+Terraform loads all of them. Also, never hard code in credentials to these files.
 
 ### Terraform Steps
 
 The steps for terraform are:
 
-* `terraform validate`
-* `terraform plan`
-* `terraform apply`
+* `terraform init` - run for a new configuration, which initializes local settings and data that gets used by subsequent commands
+  This downloads and installs any provider binary for the providers in use (e.g. an aws provider)
+* `terraform validate` -
+* `terraform plan` - see the execution plan before applying it
+* `terraform apply` - run in the same directory as your `my_example.tf`, which will show the __execution plan__
+
+### Terraform Step Output
+
+The output is similar to git diff, where:
+
+* A `+` next to the resource means it will be created
+* A `-` next to a resource means it will be destroyed
+* A `-/+` means Terraform will destroy and recreate the resource rather than updating it in-place.
+* A `~` means update in place
+* A `(known after apply)` means it will know the value after the resource is created.
+
+### Terraform State Data
+
+Terraform writes data into a `terraform.tfstate` file. This state file is really important.
+It keeps track of the IDs of created resources so that Terraform knows what it is managing.
+This file has to be saved and distributed to anyone who might run Terraform.
+
+See the current state with `terraform show`
+
+### Terraform Destroy
+
+Resources can be destroyed using the `terraform destroy` command, which is like `terraform apply`, but behaves
+as if all of the resources have been removed from the configuration.
+
+### Implicit and Explicit Dependencies
+
+Terraform can automatically infer when one resource depends on another.
+For example, the reference to an `aws_instance.example.id` creates an __implicit dependency__ on the `aws_instance`
+You should use an implicit dependency whenever possible.
+The `depends_on` is used when there are dependencies between resources that are NOT visible to Terraform.
+Resources that do not depend on other resources can be created in parallel with other resources.
+
+### Provisioners
+
+__Provisioners__ are only run when a resource is __created__ or __destroyed__.
+Provisioners are not a replacement for configuration management and changing the software of an already-running server.
+Think of them as a way to bootstrap your server on first creation or to do some cleanup task.
+They might move some certs around or run an actual configuration management tool (e.g. `knife <command>`) on creation
+or getting some data before a destroy operation.
+
+#### Failed Provisioners and Tainted Resources
+
+If a resource successfully creatse but fails during provisioning, Terraform will error and mark the resource as __tainted__.
+A tainted resource means it has been created, but might not be safe to use. Terraform will not attempt to restart
+provisioning on the same resource because it isn't guaranteed to be safe. Instead, Terraform will remove any
+tainted resources and create new resources, attempting to provision them again after creation.
+
+### Variables
+
+Your configurations can use items prefixed with `var` to create a variable.
+
+    provider "aws" {
+      region = var.region
+    }
+
+You can also assign variables as command-line flags
+
+    terraform apply -var 'region=us-east-2'
+
+If you want a custom variable file, you can call it `terraform.tfvars` or `*.auto.tfvars` in the current directory.
+Terraform will automatically load these files to populate variables. If the file is called something else, you can
+use the `-var-file` flag on the command line to specify a file (or multiple files).
+
+Terraform can read __Environment Variables__ in the form of `TF_VAR_name` to find the value for a variable.
+For example, `TF_VAR_region` can be set to the `region` variable.
+
+### Lists
+
+You can define lists like:
+
+    # implicitly by using brackets [...]
+    variable "cidrs" { default = [] }
+
+    # explicitly
+    variable "cidrs" { type = list }
+
+Or you can specify lists in your `terraform.tfvars` file like:
+
+    cidrs = [ "10.0.0.0/16", "10.1.0.0/16" ]
+
+### Maps
+
+You can use maps to create lookup tables.
+
+    variable "amis" {
+      type = "map"
+      default = {
+        "us-east-1" = "ami-b374d5a5"
+        "us-west-2" = "ami-4b32be2b"
+      }
+    }
+
+You can then use maps like:
+
+    resource "aws_instance" "examle" {
+      ami = var.amis[var.region]
+      instance_type = "t2.micro"
+    }
+
+This means that `[var.region]` references `var.amis`. You can also use `var.amis["us-east-1"]` to get back `ami-b374d5a5`
 
 ### Expressions
 
 Terraforms uses __expressions__ to refer to or compute values within a configuration.
 We can have simple expressions like `"hello"` or `5`.
 We can also have complex expressiones such as data exported by resources, conditional evaluation, and built-in functions.
+
+### Outputs
+
+You can define an output to show us specific information. Here, we create an output variable `ip` and the `value`
+field specifies what the value will be (usually dynamically generated). For the below example, we're taking the
+`public_ip` attribute of the elastic IP address and saving that to the output variable `ip`, where it can be
+used as say input for something else.
+
+    output "ip" {
+      value = aws_eip.ip.public_ip
+    }
+
+You can view outputs with `terraform output` (and more specifically `terraform output ip` for specific variables)
+
+## Modules
+
+Without modules, you need to edit Terraform configurations directly. This works, but has issues with lack of
+organization, lack of reusability, and difficulties in management for teams. __Modules__ in Terraform are
+self-contained packages of Terraform configurations that are managed as a group.
+
+### Terraform Registry
+
+The __Terraform Registry__ has a directory of ready-to-use modules.
+
 
