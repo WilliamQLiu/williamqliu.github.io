@@ -241,6 +241,24 @@ A tainted resource means it has been created, but might not be safe to use. Terr
 provisioning on the same resource because it isn't guaranteed to be safe. Instead, Terraform will remove any
 tainted resources and create new resources, attempting to provision them again after creation.
 
+## Hashicorp Configuration Language
+
+Syntax:
+
+* Single line comment starts with `#`
+* Multi-line comments are wrapped with `/*` and `*/`
+* Values are assigned with the syntax `key = value`
+* Strings are in double-quotes
+* Strings can interpolate other values using syntax wrapped in `${}`, e.g. `${var.foo}`
+* Numbers are assumed to be base 10
+* Boolean values are: `true`, `false`
+* Lists of primitive types can be made with square brackets `[]`, e.g. `["foo", "bar"]`
+* Maps can be made with braces `{}` and colons `:`, e.g. `{"foo": "bar", "bar": "baz}`
+
+Indent two spaces for each nestling level
+With multiple arguments, align their equals signs
+
+
 ### Variables
 
 Your configurations can use items prefixed with `var` to create a variable.
