@@ -319,6 +319,20 @@ Terraforms uses __expressions__ to refer to or compute values within a configura
 We can have simple expressions like `"hello"` or `5`.
 We can also have complex expressiones such as data exported by resources, conditional evaluation, and built-in functions.
 
+### Terraform Console
+
+You can run `terraform console` to help evaluate expressions
+
+    $terraform console
+    > docker_container.container_id.name
+    ghost_blog
+    > docker_container.container_id.ip_address
+    172.17.0.2
+    > 1 + 5
+    6
+
+Ctrl + C will exit out of your console
+
 ### Outputs
 
 You can define an output to show us specific information. Here, we create an output variable `ip` and the `value`
@@ -342,4 +356,21 @@ self-contained packages of Terraform configurations that are managed as a group.
 
 The __Terraform Registry__ has a directory of ready-to-use modules.
 
+## Terraform Commands
+
+### Tainting Resources
+
+`taint` manually marks a resource for recreation.
+
+    terraform taint [RESOURCE_NAME]
+    e.g. terraform taint docker_container.container_id
+    terraform plan  # see what will be changed
+
+### Untainting Resources
+
+`untaint` manually unmarks a resource as tainted.
+
+    terraform untaint [RESOURCE_NAME]
+    e.g. terraform untaint docker_container.container_id
+    terraform plan  # see what will be changed
 
