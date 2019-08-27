@@ -284,6 +284,24 @@ A tainted resource means it has been created, but might not be safe to use. Terr
 provisioning on the same resource because it isn't guaranteed to be safe. Instead, Terraform will remove any
 tainted resources and create new resources, attempting to provision them again after creation.
 
+## Hashicorp Configuration Language
+
+Syntax:
+
+* Single line comment starts with `#`
+* Multi-line comments are wrapped with `/*` and `*/`
+* Values are assigned with the syntax `key = value`
+* Strings are in double-quotes
+* Strings can interpolate other values using syntax wrapped in `${}`, e.g. `${var.foo}`
+* Numbers are assumed to be base 10
+* Boolean values are: `true`, `false`
+* Lists of primitive types can be made with square brackets `[]`, e.g. `["foo", "bar"]`
+* Maps can be made with braces `{}` and colons `:`, e.g. `{"foo": "bar", "bar": "baz}`
+
+Indent two spaces for each nestling level
+With multiple arguments, align their equals signs
+
+
 ### Variables
 
 Your configurations can use items prefixed with `var` to create a variable.
@@ -388,6 +406,20 @@ You can then run with `terraform plan -out=tfdev_plan -var env=dev`
 Terraforms uses __expressions__ to refer to or compute values within a configuration.
 We can have simple expressions like `"hello"` or `5`.
 We can also have complex expressiones such as data exported by resources, conditional evaluation, and built-in functions.
+
+### Terraform Console
+
+You can run `terraform console` to help evaluate expressions
+
+    $terraform console
+    > docker_container.container_id.name
+    ghost_blog
+    > docker_container.container_id.ip_address
+    172.17.0.2
+    > 1 + 5
+    6
+
+Ctrl + C will exit out of your console
 
 ### Outputs
 
@@ -507,4 +539,21 @@ self-contained packages of Terraform configurations that are managed as a group.
 
 The __Terraform Registry__ has a directory of ready-to-use modules.
 
+## Terraform Commands
+
+### Tainting Resources
+
+`taint` manually marks a resource for recreation.
+
+    terraform taint [RESOURCE_NAME]
+    e.g. terraform taint docker_container.container_id
+    terraform plan  # see what will be changed
+
+### Untainting Resources
+
+`untaint` manually unmarks a resource as tainted.
+
+    terraform untaint [RESOURCE_NAME]
+    e.g. terraform untaint docker_container.container_id
+    terraform plan  # see what will be changed
 
