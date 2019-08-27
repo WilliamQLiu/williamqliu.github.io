@@ -314,6 +314,62 @@ used as say input for something else.
 
 You can view outputs with `terraform output` (and more specifically `terraform output ip` for specific variables)
 
+### Inputs
+
+Input variables serve as parameters for a Terraform file. A variable block configures a single input variable
+for a Terraform module. Each block declares a single variable.
+
+    variable [NAME] {
+      [OPTION] = "[VALUE]"
+    }
+
+Within the body block (between the `{}` is the configuration for the variable, which can accept the following arguments:
+
+* `type` (Optional): if set, this defines the type of the variable. Valid values are `string`, `list`, and `map`
+* `default` (Optional): if set, the default value for a variable. If no default is provided and used, will raise an error
+* `description` (Optional): a human-friendly description for the variable
+
+You can also apply variables (to override the default) during an `apply`, like `terraform apply -var 'foo-bar'`.
+
+Example:
+
+    #Define variables
+    variable "container_name" {
+      description = "My container name"
+      default = "my blog"
+    }
+
+    variable "image_name" {
+      description = "Image for container"
+      default = "ghost:latest"
+    }
+
+    # Download the latest Ghost Image
+    resource "docker_image" "image_id" {
+      name = "${var.image_name}"
+    }
+
+    # Start the Container
+    resource "docker_container" "container_id" {
+      name = "${var.container_name}"
+      image = "${docker_image.image_id.latest}"
+      ports {
+        internal = "${var.int_port}"
+        external = "${var.ext_port}"
+      }
+    }
+
+    # Output the IP Address of the Container
+    output "IP Address" {
+      value = "${docker_container.container_id.ip_address}"
+      description = "The IP for the container"
+    }
+
+    output "container_name" {
+      value = "${docker_container.container_id.name}"
+      description = "The name of the container"
+    }
+
 ## Modules
 
 Without modules, you need to edit Terraform configurations directly. This works, but has issues with lack of
