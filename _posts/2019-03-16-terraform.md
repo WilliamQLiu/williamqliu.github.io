@@ -211,7 +211,50 @@ Terraform writes data into a `terraform.tfstate` file. This state file is really
 It keeps track of the IDs of created resources so that Terraform knows what it is managing.
 This file has to be saved and distributed to anyone who might run Terraform.
 
-See the current state with `terraform show`
+See the current state with `terraform show` or by looking at your `terraform.tfstate` file.
+An empty state file might look like:
+
+    {
+      "version": 3,
+      "terraform_version": "0.11.13",
+      "serial": 26,
+      "lineage": "99c40ce9d-5f1f-0885-cc8aa8e7da96",
+      "modules": [
+        {
+          "path": [
+            "root"
+          ],
+          "outputs": {},
+          "resources": {},
+          "depends_on": []
+        }
+    }
+
+Once you end up running a `terraform plan` and `terraform apply`, the resources are done deploying.
+Your `terraform.tfstate` file should now be updated to have all of your resources. It might look like:
+
+    ...
+     "resources": {
+        "docker_image.image_id": {
+          "type": "docker_image",
+          "depends_on": [],
+          "primary": {
+              "id": "sha256:.....ghost:latest",
+              "attributes": {
+                "id": "sha256:...ghost:latest",
+                "name": "ghost:latest"
+              },
+            "meta": {},
+            "tainted": false
+          },
+          "deposed": [],
+          "provider": "provider.docker"
+        }
+    }
+    ...
+
+If the state file is deleted, then Terraform won't have anything to compare against.
+
 
 ### Terraform Destroy
 
@@ -257,8 +300,16 @@ If you want a custom variable file, you can call it `terraform.tfvars` or `*.aut
 Terraform will automatically load these files to populate variables. If the file is called something else, you can
 use the `-var-file` flag on the command line to specify a file (or multiple files).
 
+#### Environment Variables In Terraform
+
 Terraform can read __Environment Variables__ in the form of `TF_VAR_name` to find the value for a variable.
-For example, `TF_VAR_region` can be set to the `region` variable.
+For example, `TF_VAR_region` can be set to the `region` variable. Or we can run `export TF_VAR_env=dev`
+to set the `env` variable as `dev`. To unset it, run `unset TF_VAR_env`
+
+Commands:
+
+    Use environment variable with `export TF_VAR_myvariable=myvalue`
+    Remove environment variable with `unset TF_VAR_myvariable`
 
 ### Lists
 
@@ -276,7 +327,7 @@ Or you can specify lists in your `terraform.tfvars` file like:
 
 ### Maps
 
-You can use maps to create lookup tables.
+You can use maps to create lookup tables. These are just key/value pairs.
 
     variable "amis" {
       type = "map"
@@ -294,6 +345,43 @@ You can then use maps like:
     }
 
 This means that `[var.region]` references `var.amis`. You can also use `var.amis["us-east-1"]` to get back `ami-b374d5a5`
+
+Example:
+
+Say we want to add a variable 'env' that can be dev or prod
+
+    # variables
+    variable "env" {
+      description = "env: dev or prod"
+      default     = "dev"
+    }
+
+    variable "image_name" {
+      type        = "map"
+      description = "Image for container"
+      default = {
+        dev  = "ghost:latest"
+        prod = "ghost:alpine"
+      }
+    }
+
+    variable "container_name" {
+      type        = "map"
+      description = "Name of the container"
+      default     = {
+        dev  = "blog_dev"
+        prod = "blog_prod"
+      }
+    }
+
+    # resources
+    resource "docker_image" "image_id" {
+      name = "${lookup(var.image_name, var.env)}"
+    }
+
+So you basically use `${lookup(var.my_variable)}` to use the variables
+You can then run with `terraform plan -out=tfdev_plan -var env=dev`
+
 
 ### Expressions
 
@@ -336,12 +424,12 @@ Example:
     #Define variables
     variable "container_name" {
       description = "My container name"
-      default = "my blog"
+      default     = "my blog"
     }
 
     variable "image_name" {
       description = "Image for container"
-      default = "ghost:latest"
+      default     = "ghost:latest"
     }
 
     # Download the latest Ghost Image
@@ -351,7 +439,7 @@ Example:
 
     # Start the Container
     resource "docker_container" "container_id" {
-      name = "${var.container_name}"
+      name  = "${var.container_name}"
       image = "${docker_image.image_id.latest}"
       ports {
         internal = "${var.int_port}"
@@ -361,14 +449,53 @@ Example:
 
     # Output the IP Address of the Container
     output "IP Address" {
-      value = "${docker_container.container_id.ip_address}"
+      value       = "${docker_container.container_id.ip_address}"
       description = "The IP for the container"
     }
 
     output "container_name" {
-      value = "${docker_container.container_id.name}"
+      value       = "${docker_container.container_id.name}"
       description = "The name of the container"
     }
+
+### Breaking out Variables and Outputs
+
+You can split out your files so that we have separate outputs and variables
+
+main.tf
+outputs.tf
+variables.tf
+
+### Terraform Workspaces
+
+Terraform workspaces can help you deploy multiple environments. By using workspaces, we can deploy multiple
+environments simultaneously without the state files colliding. Commands are:
+
+* `workspace` along with subcommands of `new`, `list`, `select`, and `delete`, `show`
+* `terraform workspace show` will show the name of the current workspace
+* `terraform workspace list` will list all workspaces (e.g. dev, prod)
+* `terraform workspace select dev` will select a specific workspace (e.g. dev)
+* `terraform workspace new dev` to create a `dev` workspace or `terraform workspace new prod` to create a `prod` workspace
+
+This is how we can have a dev environment and a production environment at the same time. This changes our state files
+so that we have:
+
+    $ ls
+    terraform.tfstate
+    terraform.tfstate.d
+    terraform.tfstate.backup
+
+    $ terraform workspace new dev
+    $ terraform workspace new prod
+
+    $ ls terraform.tfstate.d
+    dev  prod
+
+    ls terraform.tfstate.d/prod/
+    terraform.tfstate
+
+    ls terraform.tfstate.d/dev/
+    terraform.tfstate
 
 ## Modules
 
