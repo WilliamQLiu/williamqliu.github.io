@@ -644,6 +644,30 @@ Variables are found through interpolation syntax.
 * We need to specify the `source` (path to where the files are).
 * Notice how we use the `module.image.image_out`, which is the output from that module (from `outputs.tf`)
 
+### Module Sources
+
+You can specify the source of a module a few different ways.
+https://www.terraform.io/docs/modules/sources.html
+
+Local Path
+
+    module "my-module" {
+      source = "../../modules/parent-module"
+    }
+
+GitHub
+
+    module = "my-module" {
+      source = "github.com/hashicorp/example"
+    }
+
+S3 Buckets
+
+    module = "my-module" {
+      source = "s3::https://s3...../myfile.zip"
+    }
+
+
 ### Terraform Registry
 
 The __Terraform Registry__ has a directory of ready-to-use modules.
