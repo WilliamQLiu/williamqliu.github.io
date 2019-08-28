@@ -156,7 +156,7 @@ Let us look at a specific provider, the Docker Provider. You can see the list of
 
 This can be found in the documentation under providers.
 
-#### Resources
+### Resources
 
 For a resource, you might see examples like the below, where we specify a __resource type__ and a __resource name__
 (and the combination of these two parameters has to be unique).
@@ -184,6 +184,11 @@ For example:
 We can declare resources in `.tf.json` and `.tf` formats (e.g. say `main.tf`).
 When you run terraform, verify that there are no other `*.tf` files in your directory because
 Terraform loads all of them. Also, never hard code in credentials to these files.
+
+#### Null Resources
+
+You can setup a __Null Resource__ in order to perform local commands on our machine without having to deploy extra
+resources. A null resource is often used with a `local-exec` provisioner.
 
 ### Terraform Steps
 
@@ -283,6 +288,21 @@ If a resource successfully creatse but fails during provisioning, Terraform will
 A tainted resource means it has been created, but might not be safe to use. Terraform will not attempt to restart
 provisioning on the same resource because it isn't guaranteed to be safe. Instead, Terraform will remove any
 tainted resources and create new resources, attempting to provision them again after creation.
+
+#### local-exec Provisioner
+
+The `local-exec` provisioner invokes a local executable after a resource is created. This invokes a process on
+the machine running Terraform, not on the resource. You would use this with a null resource.
+
+    resource "null_resource" "null_id" {
+      provisioenr "local-exec" {
+        command = "echo ${docker_container.container_id.name}:${docker_container.container_id.ip_address} >> container.txt"
+      }
+    }
+
+#### remote-exec Provisioner
+
+If you want to run a command on the resource, use the `remote-exec` provisioner.
 
 ## Hashicorp Configuration Language
 
@@ -407,6 +427,23 @@ Terraforms uses __expressions__ to refer to or compute values within a configura
 We can have simple expressions like `"hello"` or `5`.
 We can also have complex expressiones such as data exported by resources, conditional evaluation, and built-in functions.
 
+Expressions can reference to named values:
+
+* `<RESOURCE_TYPE>.<NAME>` is an object representing a managed resource of the given type and name.
+  The attributes of the resource can be accessed using dot or square bracket notation.
+* `var.<NAME>` for value of an input variable
+* `local.<NAME>` is the value of the local value
+* `module.<MODULE_NAME>.<OUTPUT_NAME>` is the output value from a child module called by the current module
+* `data.<DATA_TYPE>.<NAME>` is an object representing a data resource of the given data source type and name
+* `path.module` is the filesystem path of the module where the expression is placed
+* `path.root` is the filesystem path of the root module of the configuration
+* `path.cwd` is the filesystem path of the current working directory. In normal use, this is same as `path.root`
+* `terraform.workspace` is the name of the currently selected workspace
+
+If the resource has the `count` argument set, the value is a list of objects representing its instances.
+
+More here: https://www.terraform.io/docs/configuration/expressions.html#references-to-named-values
+
 ### Terraform Console
 
 You can run `terraform console` to help evaluate expressions
@@ -529,11 +566,83 @@ so that we have:
     ls terraform.tfstate.d/dev/
     terraform.tfstate
 
+    $ terraform workspace select dev
+
 ## Modules
 
+ __Modules__ in Terraform are self-contained packages of Terraform configurations that are managed as a group.
 Without modules, you need to edit Terraform configurations directly. This works, but has issues with lack of
-organization, lack of reusability, and difficulties in management for teams. __Modules__ in Terraform are
-self-contained packages of Terraform configurations that are managed as a group.
+organization, lack of reusability, and difficulties in management for teams.### Terraform Registry
+
+We already setup a 'root module' where we have the following:
+
+    $ ls ~/terraform/myterraform/
+
+    # root module
+    main.tf
+    variables.tf
+    outputs.tf
+
+    $ mkdir -p modules/image && touch main.tf variables.tf outputs.tf
+    $ mkdir -p modules/container && touch main.tf variables.tf outputs.tf
+
+    # image module
+    main.tf
+    variables.tf
+    outputs.tf
+
+    # container module
+    main.tf
+    variables.tf
+    outputs.tf
+
+### Building out a Module
+
+We can create our image module. An example might be:
+
+    # main.tf
+    # Download the Image
+    resource "docker_image" "image_id" {
+      name = "${var.image_name}"
+    }
+
+    # variables.tf
+    variable "image_name" {
+      description = "Name of the image"
+    }
+
+    # outputs.tf
+    output "image_out" {
+      value = "${docker_image.image_id.latest}"
+    }
+
+We are able to get the output value through interpolation syntax
+
+Run a `terraform init`, `terraform plan`, and `terraform apply`
+
+### Using a module
+
+In our 'root' module's `main.tf`, we can use other modules like so:
+
+    # main.tf
+    module "image" {
+      source     = "./image"
+      image_name = "${var.image_name}"
+    }
+
+    # assuming we have a container module
+    module "container" {
+      source   = "./container"
+      image    = "${module.image.image_out}"
+      container_name = "${var.container_name}"
+      int_port = "${var.int_port}"
+      ext_port = "${var.ext_port}"
+    }
+
+Variables are found through interpolation syntax.
+
+* We need to specify the `source` (path to where the files are).
+* Notice how we use the `module.image.image_out`, which is the output from that module (from `outputs.tf`)
 
 ### Terraform Registry
 
@@ -556,4 +665,45 @@ The __Terraform Registry__ has a directory of ready-to-use modules.
     terraform untaint [RESOURCE_NAME]
     e.g. terraform untaint docker_container.container_id
     terraform plan  # see what will be changed
+
+### Data Resource
+
+A data source is accessed via a special resource known as a __data resource__ using a `data` block.
+
+    data "aws_ami" "example" {
+      most_recent = true
+
+      owners = ["self"]
+      tags = {
+        Name   = "app-server"
+        Tested = "true"
+      }
+    }
+
+www.terraform.io/docs/configuration/data-sources.html `
+
+Depending on the resource, you can have different arguments
+
+## Terraform Remote State
+
+In order to manage your infrastructure, Terraform needs to store state. When run locally, we store state in a file
+called `terraform.tfstate` and this state is used to map your real world infrastructure to your configuration.
+This local state file is referenced when creating a plan, then once your plan is applied and the real world
+infrastructure is actually updated, terraform also updates your state file. Prior to any operations, Terraform
+does a refresh to update the state with the real infrastructure (through `terraform refresh` command)
+
+The issue with a local state file is that in a team environment, you might have multiple people editing the file.
+The solution is that we can store this state file remotely in a place like S3 in a bucket.
+
+    # export your aws access key, aws secret access key, aws default region
+
+    # terraform.tf
+    terraform {
+      backend "s3" {
+        key = "terraform/terraform.tfstate"
+      }
+    }
+
+    terraform init --backend-config "bucket=[BUCKET_NAME]"  # initializes the S3 backend
+    terraform validate
 
