@@ -324,7 +324,37 @@ With multiple arguments, align their equals signs
 
 ### Variables
 
-Your configurations can use items prefixed with `var` to create a variable.
+A variable can be setup with:
+
+    variable "image_id" {
+      type = string
+    }
+
+Or if you want to specify the type and a default value
+
+    variable "availability_zone_names" {
+      type    = list(string)
+      default = ["us-west-1a"]
+    }
+
+__Default__
+
+The keyword `default` can be used, meaning if no value is set when calling the module, the default argument.
+The default argument requires a literal value and cannot reference other objects in the configuration.
+
+__Type__
+
+You can have a __type constraint__, meaning the value has to be of type:
+
+* `list(<TYPE>)`
+* `set(<TYPE>)`
+* `map(<TYPE>)`
+* `object({<ATTR_NAME> = <TYPE>, ... })`
+* `tuple([<TYPE>, ...])`
+
+#### Accessing Variables
+
+Your configurations can use items prefixed with `var` to access a variable.
 
     provider "aws" {
       region = var.region
@@ -690,7 +720,7 @@ The __Terraform Registry__ has a directory of ready-to-use modules.
     e.g. terraform untaint docker_container.container_id
     terraform plan  # see what will be changed
 
-### Data Resource
+### Data Source
 
 A data source is accessed via a special resource known as a __data resource__ using a `data` block.
 
@@ -707,6 +737,19 @@ A data source is accessed via a special resource known as a __data resource__ us
 www.terraform.io/docs/configuration/data-sources.html `
 
 Depending on the resource, you can have different arguments
+
+#### Data Source (and Providers) vs Resource
+
+A __data source__ allows data to be fetched or computed for use elsewhere in a Terraform configuration.
+Use of data sources allow a Terraform configuration to build on information defined outside of Terraform,
+or defined by another separate Terraform configuration. Data sources are read-only views into pre-existing data
+or they compute new values on the fly within Terraform itself.
+
+A __provider__ is responsible for defining and implementing data sources.
+
+A __resource__ causes Terraform to create and manage a new infrastructure component. Resources can be things like a
+a low level component (e.g. physical server, a virtual machine, or a container) or a higher level component (e.g.
+email provider, DNS record, database provider)
 
 ## Terraform Remote State
 
@@ -730,4 +773,25 @@ The solution is that we can store this state file remotely in a place like S3 in
 
     terraform init --backend-config "bucket=[BUCKET_NAME]"  # initializes the S3 backend
     terraform validate
+
+## AWS Terraform Example
+
+If we wanted to setup an example AWS infrastructure with Terraform, we would have the following pieces:
+
+AWS
+
+* terraform_s3_bucket with our remote state files
+* tf_internet_gateway
+* tf_internet_gateway interfaces with a VPC
+* In the VPC, we have our public route table `tf_public_rt` (e.g. 172.16.0.0, 172.16.1.0, 172.16.2.0)
+* In the VPC, we have our private route table `tf_private_rt` (e.g. 172.16.0.0, 172.16.1.0, 172.16.2.0)
+* In the VPC, we have Availability Zones 1 and 2 (AZ1, AZ2)
+* Each AZ has a VPC subnet
+* There is a security group that encompasses all of the servers (across AZs)
+* Then we have our servers (e.g. `tf_server1`, `tf_server2`)
+
+Notes:
+* route tables have a set of rules (aka __routes__) that determine where network traffic is routed
+* each __subnet__ in your VPC must be associated with a route table; the table controls the routing for the subnet
+* a subnet can only be associated with one route table at a time, but you can associate multiple subnets with the same route table
 
