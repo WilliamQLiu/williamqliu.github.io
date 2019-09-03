@@ -71,6 +71,56 @@ is written after an __oblique__(__`/`__). For example, a `/16` means 64,000 IPv4
     a.0.0.0/1          +127.255.255.255           128.0.0.0          2,147,483,648    231
     0.0.0.0/0          +255.255.255.255           0.0.0.0            4,294,967,296    232
 
-###
+## VPCs
+
+You will often see IP Addresses used in a __Virtual Private Cloud__ aka __VPC__ (e.g. Amazon VPC), which allows you to
+launch AWS resources into a virtual network that you have defined; think of it as a virtual network that is isolated
+from other virtual networks. With VPCs, we will get into:
+
+* Subnets
+* Security Groups
+* Route Tables
+
+### Subnets
+
+A __subnet__ is a range of IP Addresses in your VPC. For example, you can launch AWS resources into a specified subnet.
+A __public subnet__ is used for resources that must be connected to the Internet.
+A __private subnet__ is used for resources that won't be connected to the Internet.
+
+For AWS, each subnet has to reside entirely within one Availability Zone and cannot span zones.
+
+### CIDR Blocks
+
+When you create a VPC, you have to specify a range of IPv4 addresses for the VPC in the form of
+__Classless Inter-Domain Routing__ (__CIDR__) blocks. This might look like `10.0.0.0/16`. You can also assign
+an IPv6 CIRD block to your VPC if you are using IPv6 addresses.
+
+### Route Tables
+
+Your VPC works with __Route Tables__, which are tables that enable routing within the VPC. We specify
+the destination as the CIDR block and what the target is.
+
+    VPC with 1 CIDR block
+    Region = us-west-2
+    VPC 10.0.0.0/16
+      Subnet 1 = 10.0.0.0/17
+      Subnet 2 = 10.0.128.0/17
+    Main Route Table:
+      Destination   Target
+      10.0.0.0/16   local
+
+    VPC with 2 CIDR blocks
+    Region = us-west-2
+    VPC 10.0.0.0/16 (primary CIDR)
+    VPC 10.2.0.0/16 (secondary CIDR)
+      Subnet 1 = 10.0.0.0/17
+      Subnet 2 = 10.0.128.0/17
+      Subnet 3 = 10.2.0.0/17
+    Main Route Table:
+      Destination   Target
+      10.0.0.0/16   local
+      10.2.0.0/16   local
+
+There are a few rules for adding a CIDR block to your VPC, see here: https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#add-cidr-block-restrictions
 
 
