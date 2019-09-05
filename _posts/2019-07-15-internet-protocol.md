@@ -123,4 +123,34 @@ the destination as the CIDR block and what the target is.
 
 There are a few rules for adding a CIDR block to your VPC, see here: https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#add-cidr-block-restrictions
 
+### Security Groups
 
+__Security Groups__ are the firewall for AWS EC2 instances since they control both the inbound and outbound traffic
+at an instance level.
+
+There is a network specific security group called __Network Access Control Lists__ (__ACL__) that act as a firewall
+for a subnet, meaning it will control inbound and outbound traffic at a subnet level.
+
+### Flow Logs
+
+In AWS, there are __Flow Logs__ that capture the information about the IP traffic coming and going from the network
+interfaces in your VPC. These logs are published to CloudWatch Logs or S3.
+
+### Internet Gateways
+
+An __internet gateway__ is a VPC component that allows communication between instances in your VPC and the internet.
+An internet gateway has two purposes:
+
+* Provide a target in your VPC route tables for internet-routable traffic
+* Provide network address translation (NAT) for instances that have been assigned public IPv4 addresses
+
+### NAT
+
+You can use a __NAT__ device to enable instances in a private subnet to connect to the internet while also
+preventing the internet from initiating connections with the instances. There are two different types of NAT devices,
+a __NAT gateway__ or a __NAT instance__.
+
+## DNS
+
+__Domain Name System__ (__DNS__) is how names are resolved to their corresponding IP Address.
+It's made up of a __host name__ and a __domain name__.
