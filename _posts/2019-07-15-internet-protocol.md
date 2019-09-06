@@ -89,6 +89,7 @@ A __private subnet__ is used for resources that won't be connected to the Intern
 
 For AWS, each subnet has to reside entirely within one Availability Zone and cannot span zones.
 
+
 ### CIDR Blocks
 
 When you create a VPC, you have to specify a range of IPv4 addresses for the VPC in the form of
@@ -144,13 +145,35 @@ An internet gateway has two purposes:
 * Provide a target in your VPC route tables for internet-routable traffic
 * Provide network address translation (NAT) for instances that have been assigned public IPv4 addresses
 
-### NAT
+### NAT (Gateway and Instance)
 
 You can use a __NAT__ device to enable instances in a private subnet to connect to the internet while also
 preventing the internet from initiating connections with the instances. There are two different types of NAT devices,
 a __NAT gateway__ or a __NAT instance__.
 
+#### NAT Gateway
+
+A __NAT Gateway__ (aka __network address translation (NAT)__) enables instances in a private subnet to connect
+to the internet or other AWS Services, but prevents the internet from initiating a connection with those other
+instances.
+
+To create a NAT gateway, we have to specify the public subnet where the NAT gateway resides as well as an
+elastic IP address to associate with the NAT gateway. After you create your NAT gateway, you have to update the
+route table associated with one or more of your private subnets to point Internet-bound traffic to the NAT gateway
+(which will enable instances in your private subnets to communicate with the Internet).
+
 ## DNS
 
 __Domain Name System__ (__DNS__) is how names are resolved to their corresponding IP Address.
 It's made up of a __host name__ and a __domain name__.
+
+## Network Interfaces
+
+In AWS, there are __Elastic Network Interfaces__ (aka network interface), that is a logical netowkring component
+in a VPC that represents a virtual network card. You create and configure network interfaces and attach them to
+instances in your VPC.
+
+### Requester-Managed Network Interfaces
+
+A __requester-managed network interface__ is a network interface that an AWS service creates in your VPC.
+This network interface can represent an instance for another service (e.g. an AWS RDS instance).
