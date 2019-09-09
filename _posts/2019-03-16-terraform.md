@@ -626,6 +626,15 @@ We already setup a 'root module' where we have the following:
     variables.tf
     outputs.tf
 
+### Module Structure
+
+Reusable modules are defined using all of the same configuration language concepts we use in root modules.
+We have:
+
+* Input variables to accept values from the calling module
+* Output values to return results to the calling module, which it can then use to populate arguments elsewhere
+* Resources to define one or more infrastructure objects that the module will manage
+
 ### Building out a Module
 
 We can create our image module. An example might be:
@@ -697,6 +706,16 @@ S3 Buckets
       source = "s3::https://s3...../myfile.zip"
     }
 
+### When to use a module
+
+Over-using modules can make your overall Terraform configuration harder to understand and maintain.
+A good module should raise the level of abstraction by describing a new concept in your architecture that is
+constructed from resource types offered by providers
+
+It is not recommended to write a module that is just a thin wrapper around a single other resource type.
+If you have trouble finding a name for your module that isn't the same as the maint resource type inside it,
+that may be a sign that your module is not creating any abstraction and so the module is adding unnecessary
+complexity. If that is the case, then use the resource type directly in the calling module instead.
 
 ### Terraform Registry
 
