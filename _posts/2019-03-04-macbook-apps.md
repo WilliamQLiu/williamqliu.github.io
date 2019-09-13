@@ -8,7 +8,7 @@ title: Macbook OSX Chunkwm
 
 One of the things I really miss about being on Ubuntu is a tiling window manager like i3.
 
-# Keyboard Preferences 
+# Keyboard Preferences
 
 Instead of running `xset`, on a Mac you can just modify 'System Preferences' -> 'Keyboard' and
 change the 'key repeat' to 'fast' and 'delay until repeat' to 'short'.
@@ -63,4 +63,20 @@ https://github.com/ianyh/Amethyst
 # BetterTouchTool
 
 I like BetterTouchTool for remapping new keys and shortcuts to applications.
+
+# Spectacle
+
+Simple Tiling
+
+# Iterm2
+
+I change some of the keymappings for iterm2 so that:
+
+* cmd + shift + h = Previous Tab
+* cmd + shift + l = Next Tab
+* cmd + j = Select Split Pane Below
+* cmd + k = Select Split Pane Above
+* cmd + h = Select Split Pane Left
+* cmd + l = Select Split Pane Right
+* cmd + Return = Split Horizontally with Profile
 
