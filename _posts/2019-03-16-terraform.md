@@ -814,3 +814,10 @@ Notes:
 * each __subnet__ in your VPC must be associated with a route table; the table controls the routing for the subnet
 * a subnet can only be associated with one route table at a time, but you can associate multiple subnets with the same route table
 
+## Debugging
+
+Turn on debug when you need to do troubleshooting:
+
+    TF_LOG=DEBUG terraform <command>
+
+
