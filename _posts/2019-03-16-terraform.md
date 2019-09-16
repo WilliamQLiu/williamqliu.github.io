@@ -820,4 +820,13 @@ Turn on debug when you need to do troubleshooting:
 
     TF_LOG=DEBUG terraform <command>
 
+## Terraform Best Practices
+
+github.com/ozbillwang/terraform-best-practices
+
+* Avoid hard coding resources (e.g. `account_number=123456`)
+* Minimum AWS permissions necessary for a Terraform run
+* Define `type` for each variable, otherwise you will get weird error messages (e.g. `variable "region" { default = "us-east-2"  type = "string" }`)
+* Isolate environments (create resources with different names for each environment and each resource)
+* Retrieve state meta data from a remote backend (via `terraform_remote_state`)
 
