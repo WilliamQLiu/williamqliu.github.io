@@ -41,7 +41,6 @@ Examples
       end
     end
 
-
     # Including modules binds the methods to the object instance
     class Person
       include ModuleExample
@@ -61,10 +60,29 @@ Examples
     Book.foo # 'foo'
     Book.new.foo # NoMethodError: undefined method 'foo'
 
+#### module_function
+
+The `module_function` method creates module functions for named methods. These functions can be called with the
+module as a receiver, and also become available as instance methods to classes that mix in the module.
+Module functions are copies of the original and may be changed independently. The instance-method versions
+are made private.
+
+    module ModuleExample
+
+      def do_something
+        "Doing something"
+      end
+
+      module_function :do_something
+    end
+
+    # Call with:
+    ModuleExample.do_something
+
 ## `<<`
 
 Remember that everything in Ruby is an object. You are able to add methods to a specific instance.
-When you use the following `<<` syntax, you open up your object's singleton class (eigenclass).
+When you use the following `<<` syntax, you open up your object's singleton class (__eigenclass__).
 This allows you to specialise the behavior of methods called on that specific object.
 
     a = 'foo'
@@ -187,3 +205,4 @@ Library code is in a `lib` directory. Looking at some example gems, we have:
       class ElementNotFound < CapybaraError; end
       # ...
     end
+
