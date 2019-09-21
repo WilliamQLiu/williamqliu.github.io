@@ -39,6 +39,8 @@ title: PostgreSQL
     -  [Select in list](#selectfilterin)
     -  [Select into categories](#selectcategories)
     -  [Select by dates](#selectdates)
+    -  [Select CONVERT_TIMEZONE](#selectconverttimezone)
+    -  [Select COALESCE function](#selectcoalesce)
     -  [Select with Order, Limit, Distinct](#selectproperties)
     -  [Select combine queries with Union](#selectunion)
     -  [Select with Max and Min](#selectmaxmin)
@@ -46,7 +48,7 @@ title: PostgreSQL
 *  [SQL Joins and Subqueries](#joinsubquery)
     -  [From](#from)
     -  [Inner Join](#innerjoin)
-
+*  [SQL Window Functions](#windowfunctions)
 
 ## <a id="summary">Summary</a>
 
@@ -319,6 +321,43 @@ To select specific dates:
     36	    Crumpet	            Erica	    2012-09-22 08:36:38
     37	    Smith	            Darren	    2012-09-26 18:08:45
 
+#### <a id="selectconverttimezone">Select CONVERT_TIMEZONE</a>
+
+`CONVERT_TIMEZONE` converts a timestamp from one time zone to another.
+
+Format:
+
+    CONVERT_TIMEZONE ( ['source_timezone',] 'target_timezone', 'timestamp')
+
+Example 1:
+
+    select listtime, convert_timezone('US/Pacific', listtime) from listing where listid = 16;
+
+     listtime           |   convert_timezone
+    --------------------+---------------------
+    2008-08-24 09:36:12 | 2008-08-24 02:36:12
+
+Example 2:
+
+    select convert_timezone('EST', 'PST', '20080305 12:25:29');
+
+     convert_timezone
+    -------------------
+    2008-03-05 09:25:29
+
+#### <a id="selectcoalesce">Select COALESCE function</a>
+
+`COALESCE` returns the first non-null argument with `COALESCE(arg1, arg2, ...)` with an unlimited number of args
+and returns the first non-null (evaluating left to right). If all arguments are null, then it will return null.
+
+    SELECT COALESCE(1, 2);  # 1
+    SELECT COALESCE(NULL, 2, 1)  # 2
+
+Often this is used as a default value. For example, say you have a blog post excerpt. If there is no excerpt provided,
+then use the first 150 characters from the content post.
+
+    SELECT COALESCE(excerpt, LEFT(CONTENT, 150)) FROM blog_posts;
+
 #### <a id="selectproperties">Select Order, Limit, and Distinct</a>
 
 Produce an ordered list of the first 10 surnames with no duplicates.
@@ -540,7 +579,7 @@ You can select aggregates using `COUNT`, `SUM`, and `AVG`, `MAX`, `MIN`. `DISTIN
 
 https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types
 
-## Arrays
+#### <a id="arrays">Arrays</a>
 
 ARRAY    Ordered list of zero or more elements of any non-ARRAY type.
 An ARRAY is an ordered list of zero or more elements of non-ARRAY values. ARRAYs of ARRAYs are not allowed. Queries that would produce an ARRAY of ARRAYs will return an error. Instead a STRUCT must be inserted between the ARRAYs using the SELECT AS STRUCT construct.
@@ -555,7 +594,7 @@ ARRAY types are declared using the angle brackets (< and >). The type of the ele
 Format
 ARRAY<T>
 
-## Structs
+#### <a id="structs">Structs</a>
 
 STRUCT    Container of ordered fields each with a type (required) and field name (optional).
 Declaring a STRUCT type
@@ -563,4 +602,70 @@ STRUCT types are declared using the angle brackets (< and >). The type of the el
 
 Format
 STRUCT<T>
+
+#### <a id="windowfunctions">Window Functions</a>
+
+The standard window function syntax looks like:
+
+    function (expression) OVER (
+    [ PARTITION BY expr_list ]
+    [ ORDER BY order_list [ frame_clause ] ] )
+
+Let's break this apart:
+
+A `function` is any function like `AVG`, `COUNT`, `MIN`, `MEDIAN`, `MAX`, `NTH_VALUE`, `FIRST_VALUE`, `LAST_VALUE`,
+`ROW_NUMBER`, ``SUM`, etc. For Redshift, see list here: https://docs.aws.amazon.com/redshift/latest/dg/c_Window_functions.html
+
+`OVER` defines the window specification. This is required and tells us that we're looking at a window function
+instead of a normal function.
+
+`PARITION BY <expr_list>` is optional and means that we want to subdivide the result set into partitions, kinda
+like a `GROUP BY` clause. If a partition clause is present, the function is calculated for the rows in each
+partition. If no partition clause is specified, a single partition contains the entire table and the function
+is computed for the entire table.
+
+An `expr_list` is further broken down into
+
+    expression | column_name [, expr_list ]
+
+`ORDER BY <order_list>` is optional and means that the window function is applied to the rows within each partition
+sorted according to the order specification in `ORDER BY`.
+
+An `order_list` is further broken down into
+
+    expression | column_name [ ASC | DESC ]
+    [ NULLS FIRST | NULLS LAST ]
+    [, order_list ]
+
+A `frame_clause` is used in aggregate functions to further refine the set of rows in a function's window when using
+`ORDER_BY`. It provides the ability to include or exclude sets of rows within the ordered result. The frame clause
+does not apply to ranking functions and is not required when no `ORDER BY` clause is used in the `OVER` clause
+for an aggregate function. If an `ORDER BY` clause is used for an aggregate function, an explicit frame clause is required.
+
+
+`ROWS` - the rows clause defines the window frame by specifying a physical offset from the current row.
+This clause specifies the rows in the current window or partition that the value in the current row is to be combined
+with. It uses arguments to specify the row position, which can be before or after the current row. The reference
+point for all window frames is the current row. Each row becomes the current row in turn as the window frame
+slides forward in the partition. We have two variations:
+
+1. The frame is a simple set of rows up to and including the current row
+
+    { UNBOUNDED PRECEDING | unsigned_value PRECEDING | CURRENT ROW } |
+
+2. The frame can be a set of rows between two boundaries
+
+    {BETWEEN
+    { UNBOUNDED PRECEDING | unsigned_value { PRECEDING | FOLLOWING } |
+    CURRENT ROW}
+    AND
+    { UNBOUNDED FOLLOWING | unsigned_value { PRECEDING | FOLLOWING } |
+    CURRENT ROW }}
+
+`UNBOUNDED PRECEDING` indicates that the window starts at the first row of the partition.
+`offset PRECEDING` indicates that the window starts a number of rows equivalent to the value of offset before
+the current row
+`UNBOUNDED PRECEDING` is the default.
+
+`CURRENT ROW`
 
