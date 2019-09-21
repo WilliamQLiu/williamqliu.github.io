@@ -22,6 +22,9 @@ title: PostgreSQL
     -  [View Database Tables](#dt)
     -  [View Tables, Views, and Sequences](#viewall)
     -  [Switch Databases](#switchdb)
+    -  [Expanded Display](#expandeddisplay)
+    -  [Display Triggers](#displaytriggers)
+    -  [Display Functions](#displayfunctions)
     -  [Queries](#queries)
     -  [Exit](#exit)
     -  [SQL Help](#sqlhelp)
@@ -47,7 +50,7 @@ title: PostgreSQL
 
 ## <a id="summary">Summary</a>
 
-__PostgreSQL__ is an open source relational database.  
+__PostgreSQL__ is an open source relational database.
 
 ## <a id="basiccommands">Basic Commands</a>
 
@@ -86,12 +89,12 @@ Now that you're in psql, you can also list all databases
     # \list
     or
     # \l
-    
+
                                  List of databases
-       Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+       Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges
     -----------+----------+----------+------------+------------+-----------------------
-     airflow   | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
-     postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+     airflow   | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
+     postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
      template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
                |          |          |            |            | postgres=CTc/postgres
      template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
@@ -133,7 +136,19 @@ To connect to another database (e.g. db 'jobwaffle_prod')
 
     \connect jobwaffle_prod
     or
-    \c jobwaffle_prod 
+    \c jobwaffle_prod
+
+#### <a id="expandedoutput">Expanded Output</a>
+
+To use expanded output, do `\x`
+
+#### <a id="displaytriggers">Display Triggers</a>
+
+To display triggers, do `\dy+`
+
+#### <a id="displayfunctions">Display Functions</a>
+
+To display functions, do `\df+`
 
 #### <a id="queries">Queries</a>
 
@@ -182,14 +197,14 @@ Given the following tables:
         memid               | integer
         starttime           | timestamp
         slots               | integer
-    
+
     cd.facilities
         facid               | integer
         name                | character varying(100)
         membercost          | numeric
         guestcost           | numeric
         initialoutlay       | numeric
-        monthlymaintenance  | numeric 
+        monthlymaintenance  | numeric
 
 ### <a id="basicselects">Basic Selects</a>
 
@@ -227,7 +242,7 @@ To select specific **columns** from a table, we use **SELECT**.
     Massage Room 2	    35
     Squash Court	    3.5
     Snooker Table	    0
-    Pool Table	        0 
+    Pool Table	        0
 
 #### <a id="selectrows">Select Specific Rows</a>
 
@@ -388,7 +403,7 @@ Select the smallest value of an expression.
     SELECT MIN(joindate) AS earliest
     FROM cd.members;
 
-    earliest 
+    earliest
     2012-07-01 00:00:00
 
 #### <a id="selectsubquery">Select with Subquery</a>
@@ -399,9 +414,9 @@ Get the first and last name of the last member(s) who signed up.
     FROM cd.members
     WHERE joindate = (
         SELECT MAX(joindate) FROM cd.members
-    ); 
+    );
 
-Since our subquery returns a table with a single column and single row, 
+Since our subquery returns a table with a single column and single row,
 we can substitute this value in our WHERE clause.
 
 Another method that isn't quite as efficient and doesn't handle the case where
