@@ -133,7 +133,7 @@ Command Line:
 
 __Providers__ are APIs that Terraform uses to interact with.
 
-ihttps://www.terraform.io/docs/providers/
+https://www.terraform.io/docs/providers/
 
 Example Providers include:
 
@@ -158,8 +158,17 @@ This can be found in the documentation under providers.
 
 ### Resources
 
+A __resource__ is the most important element in Terraform. Each resource block describes one or more infrastructure
+object (e.g. virtual network, compute instance, DNS record).
+
+A resource block declares a resource of a given type (e.g. `aws_instance`) with a given local name.
+We use this name to refer to this resource from somewhere else in the same Terraform module, but has no significance
+outside of the scope of a module.
+
 For a resource, you might see examples like the below, where we specify a __resource type__ and a __resource name__
-(and the combination of these two parameters has to be unique).
+(and the combination of these two parameters has to be unique). Each resource has to be associated with a
+single resource type. Each resource type belongs to a __provider__ (which is a plugin for Terraform that offers a
+collection of resource types).
 
     resource "docker_image" "image_id" { ... }
     resource "docker_container" "container_id" { ... }
@@ -184,6 +193,8 @@ For example:
 We can declare resources in `.tf.json` and `.tf` formats (e.g. say `main.tf`).
 When you run terraform, verify that there are no other `*.tf` files in your directory because
 Terraform loads all of them. Also, never hard code in credentials to these files.
+
+So what does this all mean? We have a __provider__ like `AWS` that then has __resources__ like (`aws_vpc`)
 
 #### Null Resources
 
@@ -450,7 +461,6 @@ Say we want to add a variable 'env' that can be dev or prod
 So you basically use `${lookup(var.my_variable)}` to use the variables
 You can then run with `terraform plan -out=tfdev_plan -var env=dev`
 
-
 ### Expressions
 
 Terraforms uses __expressions__ to refer to or compute values within a configuration.
@@ -602,7 +612,7 @@ so that we have:
 
  __Modules__ in Terraform are self-contained packages of Terraform configurations that are managed as a group.
 Without modules, you need to edit Terraform configurations directly. This works, but has issues with lack of
-organization, lack of reusability, and difficulties in management for teams.### Terraform Registry
+organization, lack of reusability, and difficulties in management for teams.
 
 We already setup a 'root module' where we have the following:
 
@@ -713,7 +723,7 @@ A good module should raise the level of abstraction by describing a new concept 
 constructed from resource types offered by providers
 
 It is not recommended to write a module that is just a thin wrapper around a single other resource type.
-If you have trouble finding a name for your module that isn't the same as the maint resource type inside it,
+If you have trouble finding a name for your module that isn't the same as the main resource type inside it,
 that may be a sign that your module is not creating any abstraction and so the module is adding unnecessary
 complexity. If that is the case, then use the resource type directly in the calling module instead.
 
