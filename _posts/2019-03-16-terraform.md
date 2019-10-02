@@ -463,8 +463,10 @@ You can then run with `terraform plan -out=tfdev_plan -var env=dev`
 
 ### Expressions
 
-Terraforms uses __expressions__ to refer to or compute values within a configuration.
-We can have simple expressions like `"hello"` or `5`.
+Terraforms uses __expressions__ to refer to or compute values within a configuration. This is super important because
+we need a way to reference other values that we have in a variable file, a data source or a module.
+
+We can have simple expressions like `"hello"` or `5` or `var.my_variable`.
 We can also have complex expressiones such as data exported by resources, conditional evaluation, and built-in functions.
 
 Expressions can reference to named values:
@@ -483,6 +485,12 @@ Expressions can reference to named values:
 If the resource has the `count` argument set, the value is a list of objects representing its instances.
 
 More here: https://www.terraform.io/docs/configuration/expressions.html#references-to-named-values
+
+### Interpolation Syntax
+
+You can reference variables a variety of ways. For example, on variables:
+
+    `${var.foo}` will interpolate the `foo` variable value
 
 ### Terraform Console
 
@@ -641,8 +649,10 @@ We already setup a 'root module' where we have the following:
 Reusable modules are defined using all of the same configuration language concepts we use in root modules.
 We have:
 
-* Input variables to accept values from the calling module
+* Input variables to accept values from the calling module (think of them like function arguments)
 * Output values to return results to the calling module, which it can then use to populate arguments elsewhere
+  (think of them as function return values)
+* Local values (think of them as local temporary symbols)
 * Resources to define one or more infrastructure objects that the module will manage
 
 ### Building out a Module
@@ -688,12 +698,15 @@ In our 'root' module's `main.tf`, we can use other modules like so:
       ext_port = "${var.ext_port}"
     }
 
-Variables are found through interpolation syntax.
+Variables are found through interpolation syntax (e.g. `"${var.int_port}"` looks for the variable `int_port`
 
 * We need to specify the `source` (path to where the files are).
 * Notice how we use the `module.image.image_out`, which is the output from that module (from `outputs.tf`)
 
-### Module Sources
+### Calling a Child Module
+
+To call a module means to include the contents of that module into the configuration with specific values
+for its __input variables__.
 
 You can specify the source of a module a few different ways.
 https://www.terraform.io/docs/modules/sources.html
@@ -753,7 +766,7 @@ The __Terraform Registry__ has a directory of ready-to-use modules.
 
 A data source is accessed via a special resource known as a __data resource__ using a `data` block.
 
-    data "aws_ami" "example" {
+    data "aws_ami" "web" {
       most_recent = true
 
       owners = ["self"]
@@ -761,6 +774,21 @@ A data source is accessed via a special resource known as a __data resource__ us
         Name   = "app-server"
         Tested = "true"
       }
+
+      filter {
+        name   = "tag:Component"
+        values = ["web"]
+    }
+
+So how do you reference this?
+
+Follow the format of `data.<resource_name>.<alias>`, (e.g. `data.aws_ami.web.id`)
+
+E.g.
+
+    resource "aws_instance" "web" {
+      ami           = data.aws_ami.web.id
+      instance_type = "t1.micro"
     }
 
 www.terraform.io/docs/configuration/data-sources.html `
