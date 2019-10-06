@@ -506,6 +506,38 @@ You can run `terraform console` to help evaluate expressions
 
 Ctrl + C will exit out of your console
 
+### Local Values
+
+A __local value__ assigns a name to an expression, allowing it to be used multiple times within a module
+without repeating it. Think of local values as comparable to a traditional programming language as a function's
+local temporary symbols. Really, you'll only be using local values if you're referencing the same thing over
+and over.
+
+  locals {
+    service_name = "forum"
+    owner        = "Community Team"
+  }
+
+  locals {
+    instance_ids = concat(aws_instance.blue.*id, aws_instance.green.*.id)
+  }
+
+  locals {
+    # Common tags to be assigned to all resources
+    common_tags = {
+      Service = local.service_name
+      Owner   = local.owner
+    }
+  }
+
+You can reference local values from elsewhere in the module with an expression like `local.common_tags`
+
+    resource "aws_instance" "example" {
+      # ...
+      tags = local.common_tags
+    }
+
+
 ### Outputs
 
 You can define an output to show us specific information. Here, we create an output variable `ip` and the `value`
@@ -867,4 +899,3 @@ github.com/ozbillwang/terraform-best-practices
 * Define `type` for each variable, otherwise you will get weird error messages (e.g. `variable "region" { default = "us-east-2"  type = "string" }`)
 * Isolate environments (create resources with different names for each environment and each resource)
 * Retrieve state meta data from a remote backend (via `terraform_remote_state`)
-
