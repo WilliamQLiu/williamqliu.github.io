@@ -8,6 +8,42 @@ title: Macbook OSX Chunkwm
 
 One of the things I really miss about being on Ubuntu is a tiling window manager like i3.
 
+# Homebrew
+
+Install homebrew so you can run `brew services` and install packages/programs correctly.
+
+It's also useful if you want to install say different versions of a program (e.g. Go).
+
+    $brew info go
+    go: stable 1.13.1 (bottled), HEAD
+    Open source programming language to build simple/reliable/efficient software
+    https://golang.org
+    /usr/local/Cellar/go/1.13.1 (9,268 files, 414.0MB) *
+      Poured from bottle on 2019-10-04 at 14:47:19
+    From: https://github.com/Homebrew/homebrew-core/blob/master/Formula/go.rb
+    ==> Requirements
+    Required: macOS >= 10.10 ✔
+    ==> Options
+    --HEAD
+        Install HEAD version
+    ==> Analytics
+    install: 122,188 (30 days), 326,442 (90 days), 1,220,770 (365 days)
+    install_on_request: 97,701 (30 days), 256,432 (90 days), 920,590 (365 days)
+    build_error: 0 (30 days)
+
+    $go version
+    go version go1.13.1 darwin/amd64
+
+    $brew install go@1.12
+
+    $cd /usr/local/Cellar/
+    # you'll see go and go@1.12
+
+    $brew unlink go
+    $brew link go@1.12 --force
+    $go version
+    go version go1.12.10 darwin/amd64
+
 # Keyboard Preferences
 
 Instead of running `xset`, on a Mac you can just modify 'System Preferences' -> 'Keyboard' and
