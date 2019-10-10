@@ -537,6 +537,8 @@ You can reference local values from elsewhere in the module with an expression l
       tags = local.common_tags
     }
 
+So why use locals? One neat feature from locals is that if you need to use a `data` resource, you can
+use this in locals, but cannot use that in a variable.
 
 ### Outputs
 
