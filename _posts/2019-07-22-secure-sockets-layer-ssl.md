@@ -129,7 +129,7 @@ __PKI__ stands for __public key infrastructure__. PKI is asymmetric encryption t
 transactional exchanges. It is not a specific technology but rather a __framework__ based on
 asymmetric technologies. Users need to have certificates that are issued by a trusted __certificate authority (CA)__.
 
-* An Administrator makes a request to the Certificate Authority (CA)
+* An Administrator makes a request to the __Certificate Authority (CA)__
 * The CA issues keys, distributes keys, manages keys, and revokes keys
 * Certificates are usually good for a certain amount of time
 * Users can lose access based off a __CRO__ (a list of Certificates that have been revoked and not yet expired)
