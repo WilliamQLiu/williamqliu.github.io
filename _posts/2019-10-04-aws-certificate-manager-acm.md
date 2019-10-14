@@ -55,6 +55,12 @@ enterpries in the United Kingdom).
 
 ### FQDN
 
+The __FQDN__ (fully qualified domain name) is the complete domain name for a specific computer or host on the
+internet. This is broken into two parts, the __hostname__ and the __domain name__. For example, we might have
+a mail server called `mymail.somecollege.edu`, with the hostname being 'mymail' and the host is located within
+the domain 'somecollege.edu'. Another example is 'www.indiana.edu' with 'www' being the hostname and 'indiana.edu'
+being the domain.
+
 ### PQDN
 
 ## Example ACM Certificate
@@ -126,5 +132,39 @@ ACM generates `X.509 version 3` certificates. Each is valid for 13 months. An ex
              a3:04:a1:d1:1c:46:57:41:08:40:b1:38:f9:57:62:97:10:42:
              8e:f3:a7:a8:77:26:71:74:c2:0a:5b:9e:cc:d5:2c:c5:27:c3:
              12:b9:35:d5
+
+## So how does this work?
+
+Say we have a scenario where we have a domain name and have a load balancer in front of our web apps.
+We want to route traffic from our domain name to our load balancer. Then we want to create a certificate for our
+load balancer using ACM.
+
+1. Create an ALIAS record in Route 53 for our domain name that points to a load balancer
+
+In AWS, say we're in Route 53 and have a hosted zone (Hosted Zone ID: Z21IJAM3TBE2IV) for the Domain Name "williamqliu.com"
+This hosted zone has Name Servers like `ns-1871-blah.awsdns-41.co.uk`, `ns-697-blah-awsdns-23.net`, etc.
+What we want to do is create a __Record Set__ (e.g. `test.williamqliu.com`, type 'A') that is an __Alias__ to an Alias Target,
+which we'll say is a Load Balancer.
+
+2. Create a public certificate in ACM
+
+In ACM, we add our domain name `test.cmcloudlab291.info.` and use `DNS validation` (which means that before AWS
+issues a certificate, AWS needs to validate that you own or control the domains that you are requesting the
+certificate)
+
+ACM will ask you to create a __CNAME record__ in the DNS configuration for each of the domains you entered.
+ACM makes it easy to add the CNAME record to Route 53 (just click and add). It takes a while to validate (~30 min).
+Once your certificate is validated, we want to bind the certificate to our resource (the load balancer).
+
+3. Create HTTPS listener for Load Balancer and Bind Certificate
+
+Navigate to the Load Balancer under the EC2 resource. You will see a Listener for HTTP:80 that does not have an
+SSL Certificate. This Listener ID forwards all requests to a __Target Group__, which has registered instances
+of specific EC2 instances at say Port 80 with a Protocol of HTTP and 'Target type' of 'instance'.
+
+We want to add a HTTPS Listener (default port 443) and 'Forward to' our above Target Group, add our Security Group
+that we want, and finally add the Default SSL Certificate as the one we just created.
+
+
 
 
