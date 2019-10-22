@@ -165,6 +165,41 @@ of specific EC2 instances at say Port 80 with a Protocol of HTTP and 'Target typ
 We want to add a HTTPS Listener (default port 443) and 'Forward to' our above Target Group, add our Security Group
 that we want, and finally add the Default SSL Certificate as the one we just created.
 
+## Root CA hierarchies for ACM Private CA
 
+CA administrators can create a complete CA hierarchy, including root and subordinate CAs, with no need for
+external CAs.
 
+                          Root CA (Root CA Certificate)
+                                         |
+                                         V
+                    Intermediate CA (Intermediate CA Certificate)
+    Certificate Signing Request          |                             |
+             ^                           |                             V
+             |                           V                       Signed CA certificate
+                                     Issuing CA
+                                         |
+                                         V
+                               End-entity certificates
+
+### Why create a CA hierarchy
+
+* Restrict access to the root CA
+* Grant more permissive access to subordinate CAs
+* Delegate subordinate CAs for different applications/groups
+* Audit and generate alarms for every certificate issued by root
+* Audit random samples of bulk certificates issued by subordinates
+
+### What can end-entity certificates identify?
+
+* TLS endpoints and resources (e.g. applications, databases)
+* IPSec VPN endpoints
+* Dynamic cloud resources
+* IoT devices
+
+### Use Cases
+
+* Replace software/server-based CAs
+* Replace offline root CA
+* Complement an existing root CA
 
