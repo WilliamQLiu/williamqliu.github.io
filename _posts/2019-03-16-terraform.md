@@ -892,6 +892,22 @@ Turn on debug when you need to do troubleshooting:
 
     TF_LOG=DEBUG terraform <command>
 
+## import
+
+If you have existing infrastructure, use the `import` command (e.g. run with `terraform import` to add infra
+to Terraform's state file).
+
+## if-else statement
+
+You can't really do an if-statement directly; instead you have to work around it.
+
+Booleans can be used in a Terraform tenerary operation to create an if-else statement like:
+
+    CONDITION ? TRUEVAL : FALSEVAL
+
+If you have multiple if-else statements, consider using the above to assign variables if a statement is true,
+then do a `coaelsce` to get the first value that is not empty.
+
 ## Terraform Best Practices
 
 github.com/ozbillwang/terraform-best-practices
