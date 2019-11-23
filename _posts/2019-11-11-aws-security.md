@@ -493,6 +493,9 @@ https://github.com/segmentio/aws-okta
 
 ### Magical IP Address
 
+The IP Address `169.254.169.254` is a magical IP in the cloud world (for AWS, Azure, DigitalOcean, Google) that
+allows cloud resources to find out metadata about themselves.
+
 * EC2's get IAM roles using this magical IP Address: `169.254.169.254`
 * RFC 3927 describes Link Local communications
 * This traffic cannot be blocked with Security Groups or NACLs
@@ -659,3 +662,156 @@ Be careful with scanning accounts regularly - can cause CloudTrail logs 10x in s
 
 * No tool is perfect, they all have different issues they look for
 * Use historical access to determine need
+
+## Pentests
+
+Most activities no longer require informing AWS about pentesting. Just do not Dos or brute-force things.
+
+https://aws.amazon.com/security/penetration-testing/
+
+## Assessments
+
+1. Ask your finance team: Who is paying?
+2. Ask your TAM: What accounts use your domain for their email?
+3. Ask around: Find accounts tied to personal emails using the free tier
+4. Search company emails: Subject "Welcome to Amazon Web Services"
+5. Search network logs: DNS to `console.aws.amazon.com`
+6. Identify account relationships: Use CloudMapper 'weboftrust'
+7. Perform recon (find subdomains, etc)
+
+## Important APIs
+
+    aws iam generate-credential-report
+    aws iam get-credential-report
+
+## Instances of hacks
+
+Code Spaces
+Instagram Million Dollar Bug
+
+## Limiting Access
+
+### Security Groups
+
+* Restrict based on IP or Security Group
+* Best Practice: Give all resources Security Groups (e.g. 'database', 'web app'), then restrict accesses by referencing
+  the security groups, not CIDRs.
+
+### NACLS
+
+* Allows you to block IPs
+* Should avoid using
+
+### KMS
+
+Key Management Service
+Ensures your encryption key is never accessible
+Pricing is usage based
+Every key rotation increases the monthly cost
+
+### CloudHSM
+
+Dedicated hardware
+Pricing is per hour with unlimited usage
+
+### Inspector: Network Reachability
+
+No agent needed, uses automated reasoning, only works on EC2
+
+### Global Accelerator
+
+Allows you to create direct connectivity to resources, including in a private subnet
+
+### AWS Systems Manager
+
+Attempt at replacing Chef, Ansible, etc. (also has a service called OpsWorks)
+Have to install an agent onto EC2s
+
+### AWS Secrets Manager
+
+Store secrets (API keys, passwords, etc)
+
+### AWS WAF (Web Application Firewall)
+
+Integrates with CloudFront (caching) or ALB (modern HTTP focused version of ELB)
+Pattern matching to block IP Addresses, HTTP headers, HTTP body, or UI strings and also rate-limiting
+
+### AWS Firewall Manager
+
+Manages WAF and Security Groups on multiple accounts
+
+### AWS Shield
+
+Managed DDoS protection
+Every AWS account has this on
+You can pay for Shield Advanced ($3k/mo + usage)
+
+### Service Quotas
+
+Tells you when you're getting close to limits for AWS (e.g. default EC2 limit is 20/region)
+Allows you to request limit increases via API as opposed to support tickets
+
+## Roadmap to Securing your Infra
+
+1. Inventory
+    What is in the accounts?
+    Who is the point of contact? Who pays for it?
+    Identify a Security Account
+    Move the account into an Organization
+2. Backups
+    Ensure you have backups, test your backups, and that Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO)
+    meet your requirements
+    Have backups in a separate account
+    S3 Object Lock and Glacier Vaults can ensure data cannot be deleted
+3. Visibility and initial remediation
+    Turn on CloudTrail logs for all accounts, send to a central location
+    AWS Organization Trail makes this easy
+    Make sure you allow each account to see their own logs somehow
+    Create an IAM role in every account to give Security view access
+    Create an account initialization process
+4. Detection
+    Turn on GuardDuty in all active regions
+    Detect issues from logs in near real-time
+    Perform regular scanning of your accounts for security issues
+    Document your security guidelines
+5. Secure IAM access
+    Use SSO for access
+    Remove all IAM users
+    Reduce the privileges of roles to necessary services (use Access Advisor)
+    Consider using github.com/Yelp/detect-secrets to scan for env variables
+6. Network attack surface reduction
+    Have no publicly facing EC2s or S3 buckets
+    Put EC2 behind load-balancers
+    S3 buckets can be behind CloudFront
+    Move all non-public network resource sinto private subnets and proxy
+7. Reproducibility and supply chain management
+    Control AMI and package sourcing
+    Option 1: Use Salt/Puppet/Ansible/Chef to maintain configurations on your EC2s
+    Option 2: Build your own AMIs, make the filesystem read-only
+    Do not ssh into instances to make changes
+    Host your own repo of libraries and software (do not npm/pip/yum/apt-get repos from every EC2)
+    Use infrastructure as code
+8. Enforce protections
+    Apply SCP restrictions
+      Block unwanted regions
+      Protect defenses (e.g. cannot uninstall GuardDuty, the IAM role for Security)
+    Automated remediation (remove unused IAM users)
+    Refine IAM policies (refine the actions, resources, and conditions on IAM policies)
+9. Advanced defense
+    Restrict metadata access
+    Setup honeytokens
+10. Incident preparation
+    Limit the blast radius of incidents
+      Segment accounts further? Segment applications further?
+    Practice responding to incidents (e.g. if an EC2 is compromised)
+11. Tagging Strategy
+      Important for billing, identifying owners, if something is 'Public'9. Advanced defense
+    Restrict metadata access
+    Setup honeytokens
+12. Further restrict who can do what
+      E.g. Deny ability to create IAM users and access keys
+      Deny the ability for other users to setup any networking
+      Have additional sign off (so if a laptop is compromised, can't merge code in)
+13. Have different policies for different environments
+
+
