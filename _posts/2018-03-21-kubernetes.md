@@ -64,7 +64,7 @@ Local Kubernetes via Minikube are some basic deployments
 
 # Kubernetes
 
-Kubernetes (aka __k8s__) stands for 'helmsman' or 'ship pilot'; 
+Kubernetes (aka __k8s__) stands for 'helmsman' or 'ship pilot';
 it is an open-source system for automating deployment, scaling, and management of containerized applications.
 
 There are new releases every 3 months.
@@ -110,9 +110,10 @@ Batch execution (and long running jobs)
 
 Kubernetes has the following main components:
 
-
 * One or more Master Nodes (can have multiple masters for high availablity w/ one as a leader)
-  On the Master Node, we have an API Server as well as a Scheduler and Controller
+  On the __Master Node__, we have an __API Server__, a __Scheduler__ and __Controller__, (e.g.
+  https://kubernetes.io/docs/concepts/overview/components/ with kube-controller-manager, cloud-controller-manager,
+  kube-apiserver, etcd, and kube-scheduler)
 * One or more Worker Nodes
   On the Worker Node, we have a __kube-proxy__, a __Kublet__, and __pods__
 * Distributed key-value store (__etcd__ is default), usually connected through Master Node
@@ -124,11 +125,11 @@ User interacts with the Master Node(s) through a CLI/API/Dashboard
 The __master node__ is response for managing the Kubernetes cluster.
 It is the entry point for all administrative tasks.
 
-* User sommunicate to master node via API Server, CLI, or the GUI (Dashboard)
+* Users communicate to master node via API Server, CLI, or the GUI (Dashboard)
 * __Scheduler__ interacts with workers
 * __Controller Manager__ manages state of cluster
 
-If there is multiple master nodes, they would be in __high availability (HA) mode__. One would be 
+If there is multiple master nodes, they would be in __high availability (HA) mode__. One would be
 the leader and performs all operations, the others would be followers.
 
 To manage the cluster state, Kubernetes uses __etcd__, a distributed key-value store. This
@@ -173,7 +174,7 @@ Technically __docker__ is a platform to run containers; it runs __containerd__ a
 ### Kubelet
 
 The __kubelet__ is an agent that runs on each worker node and manages pods within runtime (i.e. communicates
-with the master node). It runs the containers associated with the Pod. The kubelet connects to the container 
+with the master node). It runs the containers associated with the Pod. The kubelet connects to the container
 runtime using __Container Runtime Interface (CRI)__.
 
 #### Kubelet - CRI
@@ -627,9 +628,9 @@ Access the API Server using curl:
 		  /var/run/secrets/kubernetes.io/serviceaccount from default-token-94g57 (ro)
 	Conditions:
 	  Type		Status
-	  Initialized 	True 
-	  Ready 	True 
-	  PodScheduled 	True 
+	  Initialized 	True
+	  Ready 	True
+	  PodScheduled 	True
 	Volumes:
 	  default-token-94g57:
 		Type:	Secret (a volume populated by a Secret)
@@ -641,7 +642,7 @@ Access the API Server using curl:
 	Events:
 	  FirstSeen	LastSeen	Count	From			SubObjectPath			Type		Reason			Message
 	  ---------	--------	-----	----			-------------			--------	------			-------
-	  13m		13m		1	kubelet, minikube					Normal		SuccessfulMountVolume	MountVolume.SetUp succeeded for volume "default-token-94g57" 
+	  13m		13m		1	kubelet, minikube					Normal		SuccessfulMountVolume	MountVolume.SetUp succeeded for volume "default-token-94g57"
 	  13m		13m		1	kubelet, minikube					Normal		SandboxChanged		Pod sandbox changed, it will be killed and re-created.
 	  13m		13m		1	kubelet, minikube	spec.containers{hello-minikube}	Normal		Pulled			Container image "gcr.io/google_containers/echoserver:1.4" already present on machine
 	  13m		13m		1	kubelet, minikube	spec.containers{hello-minikube}	Normal		Created			Created container
@@ -787,7 +788,7 @@ For example, we might have a Deployment that creates a ReplicaSet A. ReplicaSet 
 
 #### Deployment Rollout
 
-__Deployment Rollout__ is when we change our containers to use an image from `nginx:1.7.9` to 
+__Deployment Rollout__ is when we change our containers to use an image from `nginx:1.7.9` to
 `nginx:1.9.1`, we update the Pods Template and a new ReplicaSet B gets created. Once ReplicaSet B
 is ready, the Deployment starts pointing to it.
 
@@ -818,7 +819,7 @@ You can divide cluster resources within Namespaces using __Resource Quotas__.
 
 ## Authenitcation, Authorization, and Admission Control
 
-To access and manage any resources/objects in the Kubernetes cluser, we need to access specific 
+To access and manage any resources/objects in the Kubernetes cluser, we need to access specific
 API endpoints on the API server. Each access request goes through the following three stages:
 
 * Authentication - Logs in a user
@@ -849,7 +850,7 @@ Kubernetes has two kinds of users:
 
 For authenication, Kubernetes has different authenticator modules, including:
 
-* __Client Certificates__ - to enable client certificate authentication, we need to 
+* __Client Certificates__ - to enable client certificate authentication, we need to
 reference a file containing one or more certificate authorities by passing `--client-ca-file=FILE`
 The certificate authorities mentioned in the file would validate the client certificates presented
 to the API server
@@ -966,7 +967,7 @@ If you need things like __TLS__, just set TLS to True and then drop in your keys
 ## Istio
 
 An open platform to connect, manage, and secure microservices; a __service mesh__.
-Each application you deploy has an envoy sidecar; handles server traffic logging, routing, service discovery, loading 
+Each application you deploy has an envoy sidecar; handles server traffic logging, routing, service discovery, loading
 balancing, etc.
 
 Lots of magic. Still very new. Mediates all inbound and outbound traffic for all services in the service mesh.
