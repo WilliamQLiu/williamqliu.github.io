@@ -178,4 +178,33 @@ Query the service (store-products) from another machine (busybox)
 
     kubectl exec busybox -- curl -s store-products
 
+## Deploy a microservice application to Kubernetes
+
+Kubernetes lets you deploy a microservice architecture to a cluster and independently scale specific components.
+
+### Stan's Robot Shop
+
+We will use Instana's open source `Stan's Robot Shop` as a sample microservice application
+https://www.instana.com/blog/stans-robot-shop-sample-microservice-application/
+
+For local development, you can just run a `docker-compose up` and see containers that look like:
+
+    docker ps
+    CONTAINER ID        IMAGE                                    COMMAND                  CREATED              STATUS              PORTS                                                 NAMES
+    280dd3f23bb5        linuxacademycontent/rs-web:0.3.2         "/root/entrypoint.sh"    About a minute ago   Up About a minute   80/tcp, 0.0.0.0:8080->8080/tcp                        robot-shop_web_1
+    1cda4525023f        linuxacademycontent/rs-shipping:0.3.2    "java -Xmn256m -Xmx7…"   About a minute ago   Up About a minute   8080/tcp                                              robot-shop_shipping_1
+    f6edbe16b538        linuxacademycontent/rs-payment:0.3.2     "python payment.py"      About a minute ago   Up About a minute   8080/tcp                                              robot-shop_payment_1
+    1c52bd4ee4b1        linuxacademycontent/rs-ratings:0.3.2     "docker-php-entrypoi…"   About a minute ago   Up About a minute   80/tcp                                                robot-shop_ratings_1
+    a1d777a51a0c        linuxacademycontent/rs-dispatch:0.3.2    "/bin/sh -c bin/gorcv"   About a minute ago   Up About a minute                                                         robot-shop_dispatch_1
+    a9c61ad074d5        linuxacademycontent/rs-user:0.3.2        "docker-entrypoint.s…"   About a minute ago   Up About a minute   8080/tcp                                              robot-shop_user_1
+    74d96e05674c        linuxacademycontent/rs-cart:0.3.2        "docker-entrypoint.s…"   About a minute ago   Up About a minute   8080/tcp                                              robot-shop_cart_1
+    3c84ff6cce75        linuxacademycontent/rs-catalogue:0.3.2   "docker-entrypoint.s…"   About a minute ago   Up About a minute   8080/tcp                                              robot-shop_catalogue_1
+    be8d2e6b5a6a        redis:4.0.6                              "docker-entrypoint.s…"   About a minute ago   Up About a minute   6379/tcp                                              robot-shop_redis_1
+    fd94d6a937c6        rabbitmq:3.7-management-alpine           "docker-entrypoint.s…"   About a minute ago   Up About a minute   4369/tcp, 5671-5672/tcp, 15671-15672/tcp, 25672/tcp   robot-shop_rabbitmq_1
+    647f62e5fb74        linuxacademycontent/rs-mysql-db:0.3.2    "docker-entrypoint.s…"   About a minute ago   Up About a minute   3306/tcp                                              robot-shop_mysql_1
+    60df63c9ef0b        linuxacademycontent/rs-mongodb:0.3.2     "docker-entrypoint.s…"   About a minute ago   Up About a minute   27017/tcp                                             robot-shop_mongodb_1
+
+To run this on kubernetes, you can create your own k8s namespace like so:
+
+    kubectl create namespace robot-shop
 
