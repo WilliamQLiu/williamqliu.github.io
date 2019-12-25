@@ -10,8 +10,8 @@ title: Design Patterns
 
 The below notes are based on the book __Designs Patterns - Elements of Reusable Object-Oriented Software__.
 The idea is that all well structured object-oriented architectures are full of patterns. When you design a system, you
-need to focus on the common collaborations among its objects (i.e. its design pattern). The book shows you the 
-importance that patterns can play in architecting complex systems, then it provides a reference of well-engineered 
+need to focus on the common collaborations among its objects (i.e. its design pattern). The book shows you the
+importance that patterns can play in architecting complex systems, then it provides a reference of well-engineered
 patterns that a developer can apply to their own applications.
 
 # Why Design Patterns
@@ -82,53 +82,6 @@ focus on class relationships. Most patterns are thus labeled in the Object patte
     |      |         |                   |                   | Visitor                 |
     ----------------------------------------------------------------------------------
 
-## Creational Patterns
-
-## Structural Patterns
-
-__Structural Patterns__ are concerned with how classes and objects are composed to form larger
-structures. Structural class patterns use inheritance to compose interfaces or implementations.
-
-Think how multiple inheritance mixes two or more classes into one. The result is a class that
-combines the properties of its parent class. This might be useful for making independently
-developed class libraries to work together. An example code snippet in Python might look like:
-
-    class Subclass(BaseClass1, BaseClass2, BaseClass3, ...):
-        pass
-
-Another example is the __Adapter__ class. The adapter makes one interface (the adaptee's) conform
-to another, providing a uniform abstraction of different interfaces. Say you have "x" and
-you need "y", then Adapter solves this problem. There are a number of ways to accomplish it,
-but here is the general idea with an example code snippet:
-
-    class WhatIHave:
-        def g(self):    pass
-        def h(self):    pass
-
-    class WhatIWant:
-        def f(self):    pass
-
-    class MyAdapter(WhatIwant):
-        def __init__(self, whatIHave):
-            self.whatIHave = whatIHave
-
-        def f(self):
-            # implement behavior using methods in WhatIHave
-            self.whatIHave.g()
-            self.whatIHave.h()
-
-    class WhatIUse:
-        def op(self, whatIWant):
-            whatIWant.f()
-
-Another example of a structural pattern is __Facade__, where we apply the rule 
-"If something is ugly, hide it inside an object". Usually this is implemented as a singleton
-abstract factory. You might use this if you have a confusing collection of classes and interactions that
-the client programmer doesn't really need to see, you can create an interface that is useful
-for the client programmer and that only presents what's necessary.
-
-## Behavioral Patterns
-
 # Catalog of Design Patterns
 
 Common design patterns include:
@@ -192,30 +145,70 @@ Out of the above, the simplest and most common patterns are:
   functions such as Insert, Update, Delete, plus properties that correspond more or less directly to the columns
   of the underlying database table. Active Record pattern is an approach to accessing data in a database
 
-# Design Principles
 
-Here's a list of design principles, which all you to ask questions about your proposed design.
+## Creational Patterns
 
-* __Principle of least astonishment__ - don't be astonishing
-* __Make common things easy and rare things possible__
-* __Consistency__ - Do not pile on random rules
-* __Law of Demeter__ - aka "don't talk to strangers"; an object should only reference itself, its
-                       attributes, and the arguments of its methods. We want to "minimize coupling"
-* __Independence__ or __Orthogonality__ - express independent ideas independently. This complements
-    Separation, Encapsulation and Variation, and is part of the Low-Coupling-High-Cohesion message
-* __Managed Coupling__ - Simply stating we have "low coupling" in a design is too vague - coupling
-    happens and the important issue is to acknowledge it and control it
-* __Subtraction__ - a design is finished when you cannot take anything else away
-* __Simplicity before generality__ - "the simplest solution is the best"
-* __Reflexivity__ (aka __Isomorphism__) - One abstraction per class, one class per abstraction
-* __Once and once only__ - Avoid duplication of logic and structure where the duplication is not
-    accidental (i.e. where both pieces of code express the same intent for the same reason)
+### Abstract Factory
 
-# Architectual
+### Builder
 
-The above are design patterns from 'The Gang of Four'. There's also a few architectural patterns and styles here:
+### Factory Method
 
-## Architectural Patterns
+### Prototype
+
+### Singleton
+
+## Structural Patterns
+
+__Structural Patterns__ are concerned with how classes and objects are composed to form larger
+structures. Structural class patterns use inheritance to compose interfaces or implementations.
+
+Think how multiple inheritance mixes two or more classes into one. The result is a class that
+combines the properties of its parent class. This might be useful for making independently
+developed class libraries to work together. An example code snippet in Python might look like:
+
+    class Subclass(BaseClass1, BaseClass2, BaseClass3, ...):
+        pass
+
+Another example is the __Adapter__ class. The adapter makes one interface (the adaptee's) conform
+to another, providing a uniform abstraction of different interfaces. Say you have "x" and
+you need "y", then Adapter solves this problem. There are a number of ways to accomplish it,
+but here is the general idea with an example code snippet:
+
+    class WhatIHave:
+        def g(self):    pass
+        def h(self):    pass
+
+    class WhatIWant:
+        def f(self):    pass
+
+    class MyAdapter(WhatIwant):
+        def __init__(self, whatIHave):
+            self.whatIHave = whatIHave
+
+        def f(self):
+            # implement behavior using methods in WhatIHave
+            self.whatIHave.g()
+            self.whatIHave.h()
+
+    class WhatIUse:
+        def op(self, whatIWant):
+            whatIWant.f()
+
+Another example of a structural pattern is __Facade__, where we apply the rule
+"If something is ugly, hide it inside an object". Usually this is implemented as a singleton
+abstract factory. You might use this if you have a confusing collection of classes and interactions that
+the client programmer doesn't really need to see, you can create an interface that is useful
+for the client programmer and that only presents what's necessary.
+
+## Behavioral Patterns
+
+## Architectual Patterns and Styles
+
+The above 'Creational', 'Structural', 'Behaviorla' are design patterns from 'The Gang of Four'.
+There's also a few architectural patterns and styles:
+
+### Architectural Patterns
 
 * Three-tier
 * Multilayerd architecture
@@ -256,7 +249,7 @@ The above are design patterns from 'The Gang of Four'. There's also a few archit
   - Service-oriented (aka Microservices)
   - Cloud computing patterns
 
-# Example Design Pattern - the MVC 
+# Example Design Pattern - the MVC
 
 In web applications, we commonly see the __Model__/__View__/__Controller__ (__MVC__) classes used to build
 user interfaces. We have:
@@ -327,10 +320,10 @@ So let's take a step back and look at what makes up object-oriented programs: __
 An object has both data and the procedures that operate on that data.
 
 * Data
-* Procedures - (aka __methods__ or __operations__) operate on the object data; performs an operation when it 
+* Procedures - (aka __methods__ or __operations__) operate on the object data; performs an operation when it
                receives a __request__ (or __message__) from a client
 
-## Calling Procedures with Requests 
+## Calling Procedures with Requests
 
 Requests are the _only way to get an object to execute an operation_. Operations are the _only way to change an
 object's internal state_. Because of these restrictions, the object's internal state is said to __encapsulated__;
@@ -361,5 +354,26 @@ A __type__ is a __subtype__ of another if its interface contains the interface o
 ## Adapter (Class, Object Structural)
 
 __Adapter__ (aka __wrapper) lets classes work together that normally couldn't because of incompatible interfaces.
+
+
+# Design Principles
+
+Here's a list of design principles, which all you to ask questions about your proposed design.
+
+* __Principle of least astonishment__ - don't be astonishing
+* __Make common things easy and rare things possible__
+* __Consistency__ - Do not pile on random rules
+* __Law of Demeter__ - aka "don't talk to strangers"; an object should only reference itself, its
+                       attributes, and the arguments of its methods. We want to "minimize coupling"
+* __Independence__ or __Orthogonality__ - express independent ideas independently. This complements
+    Separation, Encapsulation and Variation, and is part of the Low-Coupling-High-Cohesion message
+* __Managed Coupling__ - Simply stating we have "low coupling" in a design is too vague - coupling
+    happens and the important issue is to acknowledge it and control it
+* __Subtraction__ - a design is finished when you cannot take anything else away
+* __Simplicity before generality__ - "the simplest solution is the best"
+* __Reflexivity__ (aka __Isomorphism__) - One abstraction per class, one class per abstraction
+* __Once and once only__ - Avoid duplication of logic and structure where the duplication is not
+    accidental (i.e. where both pieces of code express the same intent for the same reason)
+
 
 
