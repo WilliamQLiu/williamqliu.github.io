@@ -148,7 +148,50 @@ Out of the above, the simplest and most common patterns are:
 
 ## Creational Patterns
 
-### Abstract Factory
+Creational design patterns abstract the instantiation process.
+Why is this important? As systems evolve, they depend more on object composition than class inheritance.
+That means when you crate objects with specific behaviors, it requires more than just instantiating a class.
+
+### Maze Example
+
+The below five creational patterns are closely related; let's see what this means for building a maze for
+a computer game. Let's assume a maze is a set of rooms and the maze knows its neighbors, which are represented
+by classes for `Room`, `Door`, and `Wall` (which has a common abstract class of `MapSite`).
+
+So let's say we define a `MazeGame` class that creates the maze. We can setup this maze a few ways:
+
+* We can hard code the maze layout (e.g. create a new maze, set rooms, doors, then add walls). However, this
+  solution is inflexible and the design is not flexible.
+
+But what if we need to create an `EnchantedMaze` class that has new components like `DoorNeedingSpell`
+or when we call the funciton to add a room, we now need an `EnchantedRoom` instead of a regular `Room`?
+The creational patterns provide different ways to remove explicit references to concrete classes from
+code that needs to instantiate them.
+
+* __Abstract Factory__ - if `CreateMaze` __passed an object as a parameter__ to use to create rooms, then
+  you can change the classes of rooms by passing a different parameter
+* __Builder__ - if `CreateMaze` is passed an object that can create a new maze in its entirety using
+  operations for adding rooms to the maze it builds, then you can use __inheritance__ to change parts of the
+  maze
+* __Factory Method__ - if `CreateMaze` calls __virtual functions__ instead of constructor calls to create
+  the rooms, then you can change the classes that get instantiated by making a subclass of `MazeGame`
+  and redefining those virtual functions
+* __Prototype__ - if `CreateMaze` is parameterized by various prototypical room objects, which it then copies
+  and adds to the maze, then you can change the maze by replacing these prototypical objects with a different one
+* __Singleton__ - there can only be one maze per game and all game objects have ready access to it (without
+  resorting to global variables or functions).
+
+### Abstract Factory (aka Kit)
+
+Intent: Provide an interface for creating families of related or dependent objects without specifying
+        their concrete classes
+
+Motivation: An example of an Abstract Factory would be a user interface toolkit that supports multiple
+            look =-and-feel standards. You can define different look-and-feel appearances and behaviors
+            for various user interface 'widgets' like scroll bars, windows, and buttons.
+
+Solution: We define an abstract `WidgetFactory` class that declares an interface for creating each basic
+          kind of widget.
 
 ### Builder
 
