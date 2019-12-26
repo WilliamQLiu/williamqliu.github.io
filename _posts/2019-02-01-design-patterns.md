@@ -191,8 +191,40 @@ Motivation: An example of an Abstract Factory would be a user interface toolkit 
             for various user interface 'widgets' like scroll bars, windows, and buttons.
 
 Solution: We define an abstract `WidgetFactory` class that declares an interface for creating each basic
-          kind of widget.
+          kind of widget. We have an abstract class for each kind of widget and concrete subclasses
+          implement widgets for specific look-and-feel standards. The WidgetFactory interface has an operation
+          that returns a new widget object for each abstract widget class. Clients call these operations
+          to obtain widget instances (but clients aren't aware o the concrete classes they're using, meaning
+          that clients stay independent of the look and feel).
 
+          So what does this do? Clients create widgets through the WidgetFactory interface. There is no knowledge
+          of the classes that implement widgets for a particular look and feel. The clients only have to commit
+          to an interface defined by an abstract class (not a particular concrete class).
+
+Application: Use the AbstractFactory pattern when:
+
+  * a system should be independent of how its products are created, composed, and represented
+  * a system should be configured with one of multiple families of products
+  * a family of related product objects is designed to be used together, and you need to enforce this constraint
+  * you want to provide a class library of products, and you want to reveal just their interfaces, not their implementation
+
+Partipants:
+
+  * AbstractFactory (e.g. WidgetFactory) - declares an interface for operations that create abstract product objects
+  * ConcreteFactory (e.g. MotifWidgetFactory, PMWidgetFactory) - implements the operations to create concrete product objects
+  * AbstractProduct (e.g. Window, ScrollBar) - declares an interface for a type of product object
+  * ConcreteProduct (e.g. MotifWindow, MotifScrollBar) - defines a product object to be created by the corresponding
+                                                         concrete factory. Implements the AbstractProduct interface
+  * Client - uses only interfaces declared by AbstractFactory and AbstractProduct classes
+
+Consequences: The Abstract Factory pattern has the following benefits and liabilities:
+
+1. It isolates concrete classes. The Abstract Factory pattern helps you control the classes of objects that an
+   application creates. A factory encapsulates the responsibility and the process of creating product objects so
+   it isolates clients from implementation classes. Clients manipulate instances through their abstract interfaces.
+2. It makes exchanging product families easy. The class of a concrete factory appears only once (at instantiation).
+   It makes it easy to change the concrete factory an application usses. You can change different product configurations
+   simply by changing the concrete factory.
 ### Builder
 
 ### Factory Method
