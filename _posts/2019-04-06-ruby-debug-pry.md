@@ -42,7 +42,8 @@ Pry is a runtime developer console and IRB alternative with introspection capabi
 
 Install Pry
 
-    sudo apt-get install pry 
+    sudo apt-get install pry
+
     gem install pry --user-install
 
 Using Pry
@@ -247,3 +248,8 @@ Hitting `return` runs the last command
     rescue rspec -- break on exception in rspec
     rescue rails server -- break on exception in rails server
     try-again -- run last failing spec, reloads the file not the enviornment
+
+## irb
+
+IRB stands for __interactive ruby__ and allows you to interactively execute Ruby expressions.
+

@@ -15,7 +15,7 @@ SQLite3
 
 ## Create a new Ruby on Rails app
 
-    $ rails new blog 
+    $ rails new blog
 
 ## Start the Web Server
 
@@ -41,9 +41,21 @@ Start the webserver to run at http://localhost:3000 by default
 * `vendor` - third-party code (e.g. vendored gems)
 * `.ruby-version` - the default Ruby version
 
-## Create a new Controller and View
+## Generate vs Scaffold
 
-We need to create a new controller by running the 'controller' generator and telling it
+To generate models or resources, you can either generate individual models, resources or do this with scaffolding to setup a lot for you
+
+  rails generate model MyModelName myfieldname:text  # Will generate a model in your 'models' dir and a migration file in 'db/migrate/ dir
+  rails generate controller MyControllerName MyActionName
+  rails generate resource MyResourceRoute name:my_table # Will generate the above model, migration file, as well as controller in `controllers` dir and 'resource' route in 'routes.rb' file
+  rails generate scaffold Micropost context: text user_id: integer  # generates the above, but in controller file, also adds a lot more methods (e.g. GET, POST, PATCH, DELETE)
+
+Shortcut: `rails g` is the shortcut for `rails generate`
+Note: `rails destroy` (aka `rails d`) does the opposite of `generate` and will undo.
+
+### Create a new Controller and View
+
+To manually create items, we need to create a new controller by running the 'controller' generator and telling it
 we want a controller named 'Welcome' with an action called 'index'
 
     $ bin/rails generate controller Welcome index
@@ -72,7 +84,7 @@ We generated:
 ### Setup routing
 
 Open the `config/routes.rb` file and add `root 'welcome#index'`
-This tells Rails to map requests to the root of the application to the welcome controller's index action and 
+This tells Rails to map requests to the root of the application to the welcome controller's `index` action and
 get `welcome/index` so that requests go to `http://localhost:3000/welcome/index`
 
 i.e. GET `/welcome/index/` returns to `welcome#index`, which is our template in `/app/view/welcome/welcome.index.erb`
@@ -96,7 +108,6 @@ Under `bin/rails routes` or `bin/rake routes` (depending on version), you should
                   PUT    /articles/:id(.:format)      articles#update
                   DELETE /articles/:id(.:format)      articles#destroy
              root GET    / ### Generate Controller for Articles
-
 
 ### Generate Controller for Articles
 
@@ -130,7 +141,7 @@ In `app/controllers/articles_controller.rb`, we need to define a method for `new
       end
     end
 
-## Debugging
+## Debugging with Rails Console
 
 When you're in your app directory, you can get into a console to debug issues:
 
@@ -139,3 +150,109 @@ When you're in your app directory, you can get into a console to debug issues:
     Post.first
     Post.first.comments
     Post.first.comments.create! body: 'Say something funny!'
+
+### Rails Console Sandbox
+
+If you want to run without changing any data, use sandbox: `rails console --sandbox`
+
+### Rails Console DB
+
+If you want to run the cli for your database, run: `rails dbconsole`
+
+## Rake
+
+__Rake__ is `Ruby Make`, a standalone Ruby utility that replaces UNIX `make`. We have a `Rakefile` and a `.rake` files
+to build up a list of tasks. In Rails, Rake is used for common administration tasks, especialy sophisticated ones that
+build off of each other.
+
+### Rake Tasks
+
+To see a list of Rake tasks available to you, run `rake --tasks`. Each task has a description.
+
+    rake --tasks
+
+## Models
+
+### Validation
+
+You want to make sure that only valid data is saved to your database. Check if valid with `.valid?`
+
+    Person.create(name: "John Doe").valid? # => true
+    Person.create(name: nil).valid? # => false
+
+These methods trigger validations:
+
+* create
+* create!
+* save
+* save!
+* update
+* update!
+
+The __bang__ versions (e.g. `save!`) raise an exception if the record is invalid. The non-bang versions don't
+so be careful using those.
+
+Some methods do not trigger validations, including:
+
+* decrement!
+* decrement_counter
+* increment!
+* increment_counter
+* toggle!
+* touch
+* update_all
+* update_attribute
+* update_column
+* update_columns
+* update_counters
+
+### Model Associations
+
+You can create associations between data models. Say we have a `User` Model, each potentially connected to
+many `Micropost` models. The key attributes here are `has_many` and `belongs_to`.
+
+    #app/models/user.rb
+    class User < ApplicationRecord
+      has_many :microposts
+    end
+
+    #app/models/micropost.rb
+    class Micropost < ApplicationRecord
+      belongs_to :user
+      validates :content, length: { maximum: 140 }
+    end
+
+### Model Inheritance
+
+Models inhert from other models using `<`. Here's an example:
+
+    #app/models/micropost.rb
+    class Micropost < ApplicationRecord
+    end
+
+The `Micropost` Model inherits from `ApplicationRecord`, which then inherits from the base class `ActiveRecord::Base` Model
+
+## Controllers
+
+### Controller Inheritance
+
+Controllers also inherit from other controllers using `<`, similar to Models. Here's an example:
+
+    #app/controllers/microposts_controller.rb
+    class MicropostsController < ApplicationController
+    end
+
+    #app/controllers/application_controller.rb
+    class ApplicationController < ActionController::Base
+    end
+
+The `MicropostsController` Controller inherits from `ApplicationController`, which then inherits from the base class `ActionController::Base`
+Some of the functionality that is inherited from the base class `ActionController::Base` includes the ability to
+manipulate model objects, filter inbound HTTP requests, and render views as HTML.
+
+Since all Rails controllers inherit from `ApplicationController`, rules defined in the Application controller are
+automatically applied to every action in the application.
+
+## Tests
+
+To run tests, do `rails test`
