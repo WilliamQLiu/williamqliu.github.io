@@ -8,22 +8,7 @@ title: William Liu
     <div id="home"
     <body>
         <h3>About</h3>
-        <p>Hi, I'm Will.  I'm the creator of <a id="commandpageslink" href="https://www.commandpages.com">Command Pages</a> (a graphical interface for documenting unix commands)</a><p>
-        <script>mixpanel.track_links('#commandpageslink', 'Clicked Command Pages Link');</script>
-
-        <div>
-          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-            <!-- Will Dev Blog -->
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-2688512100080723"
-                 data-ad-slot="6994709697"
-                 data-ad-format="auto"></ins>
-            <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
-        </div>
-
+        <p>Hi, I'm Will</p>
         <br>
 
         <h3>Blog Posts</h3>
@@ -31,6 +16,13 @@ title: William Liu
         {% for post in site.posts %}
             <li><span>{{ post.date | date_to_string }}</span> &nbsp &nbsp <a href="{{ post.url }}">{{ post.title }}</a></li>
         {% endfor %}
+        </ul>
+
+        <h3>Projects</h3>
+        <ul class="posts">
+          <li><a id="commandpageslink" href="https://www.commandpages.com">Command Pages</a> (a graphical interface for documenting unix commands)</a>
+            <script>mixpanel.track_links('#commandpageslink', 'Clicked Command Pages Link');</script>
+          </li> 
         </ul>
     </body>
 
