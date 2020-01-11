@@ -8,6 +8,12 @@ title: Google Cloud Platform (GCP)
 
 ## Intro to Google Cloud Platform
 
+Install the Google Cloud SDK here by downloading and running `./google-cloud-sdk/install.sh`
+
+    https://cloud.google.com/sdk/docs/quickstart-macos
+
+You can then run with `gcloud` and `kubectl`
+
 ### History of data technologies from Google
 
 * **Google File System (GFS)** (2002, w/ newer version of **Colossus** in 2010) is the basis for **HDFS** and **MapReduce** (2004) is the basis for **Hadoop**; these allow a distributed file and compute system using large clusters of commodity hardware. No longer really used due to coupling of storage and compute.
@@ -1147,7 +1153,7 @@ read from multiple files, that then make up your PCollection.
 To write data out of a pipeline, you can use TextIO.Write.to/data/output with
 a suffix. Most writes are meant to be across multiple machines/files (to handle larger
 data), but you can force a single machine only (beware much slower) by
-specifying `withoutSharding`. 
+specifying `withoutSharding`.
 
 #### Running a Pipeline
 
@@ -1267,7 +1273,7 @@ For batch inputs, explicitly assign timestamp when emitting at some step in
 your pipeline.
 
 Now that there is a timestamp associated with the message (whether by batch or
-a real time pipeline), we can then do our transformations in Windows. 
+a real time pipeline), we can then do our transformations in Windows.
 
 Say we have a sliding window of 2 minutes where we want to get an average. We
 have the sliding window run every 30 seconds. That way any time we do a group
@@ -1285,16 +1291,16 @@ BigQuery where you can run your SQL.
 
 ## Building Resilient Streaming Systems
 
-The idea of data __streaming__ means data processing for an __unbounded__ data 
+The idea of data __streaming__ means data processing for an __unbounded__ data
 set (a data set that is never complete when considering time). This is the
-opposite of __bounded__ data sets, which is a finite data set that is complete 
+opposite of __bounded__ data sets, which is a finite data set that is complete
 regardless of time.
 
-When people talk about stream processing, we think about the execution engine, 
+When people talk about stream processing, we think about the execution engine,
 meaning we look at the system, the service, the runner, and what we are
 using to process the unbounded data.
 
-Examples of stream processing systems might be something like physical sensors 
+Examples of stream processing systems might be something like physical sensors
 collecting data or credit card transactions. Usually we need to take action on
 that data immediately, like checking if a transaction is fradulent (by comparing
 against data we've collected in the past).
@@ -1322,7 +1328,7 @@ sender and receiver, we'll have durability and/or availability problems.
   receiver and the receiver crashes. If one of the senders has a problem (say
   its sending a lot or bad messages), then the receiver crashes.
 * __Fan-out__ scenario would be a single sender creating messages to multiple
-  receivers. If the sender can't send a message to a bad receiver and it 
+  receivers. If the sender can't send a message to a bad receiver and it
   keeps trying, the sender and receiver would crash (e.g. too many messages
   built up)
 
@@ -1336,7 +1342,7 @@ publisher is back, it'll continue sending messages.
 
 ### Deal with unordered/late data
 
-You will get some late data. Even for something like sensors, smaller packets 
+You will get some late data. Even for something like sensors, smaller packets
 usually arrive faster than larger packets due to __latency__ (or any other
 number of reasons). This latency could happen during transmit (e.g. network
 delays, ingest delays, write latencies, ingest failures), during ingest or
@@ -1353,8 +1359,8 @@ model as an example):
   triggers, and allowed lateness
 * How do refinements of results relate? Answered via accumulation modes
 
-We get low-latency speculation (make best guess based on current data) and 
-ability to refine the results after the fact (e.g. new data comes in 3 hours 
+We get low-latency speculation (make best guess based on current data) and
+ability to refine the results after the fact (e.g. new data comes in 3 hours
 late, refine or ignore).
 
 ### Deal with real-time insights
@@ -1372,7 +1378,7 @@ much harder.
 
 Sample Scenario 1
 
-* What is the scenario? San Diego Department of Transportation wants to bring 
+* What is the scenario? San Diego Department of Transportation wants to bring
 live updates on highway lanes to commuters on the highway
 * What data is sent? San Diego highway traffic data collected over many miles
   of highway for all lanes, transmitted at 5-min intervals
@@ -1402,7 +1408,7 @@ Sample Scenario 2
 
 ### Google Pub/Sub
 
-You create __topics__ and __subscribe__ to the topics to receive messages 
+You create __topics__ and __subscribe__ to the topics to receive messages
 that are published.
 
 Example Code for Publisher
@@ -1426,8 +1432,8 @@ Example Code for Publisher
         batch.publish(PAYLOAD1)
         batch.publish(PAYLOAD2, extra=EXTRA)
 
-Pub/Sub allows for __Push__ and __Pull__ delivery flows, where subscribers 
-can ask to be notified immediately or subscribers can poll periodically 
+Pub/Sub allows for __Push__ and __Pull__ delivery flows, where subscribers
+can ask to be notified immediately or subscribers can poll periodically
 to see if there are any new messages from the topic.
 
 * __Pull__ subscription - delays between publication and delivery, good for
@@ -1451,7 +1457,7 @@ Example Code for Subscription
 
     # configure gcloud if you haven't yet
     gcloud init
-    
+
     # install gcloud beta command line component (if you haven't yet)
     gcloud components install beta
     or sudo apt-get install google-cloud-sdk
@@ -1507,7 +1513,7 @@ Simulate traffic sensor data into PubSub
             to_sleep_secs = sim_time_elapsed - time_elapsed
             return to_sleep_secs
 
-        topublish = list() 
+        topublish = list()
 
         for line in ifp:
             event_data = line   # entire line of input CSV is the message
@@ -1551,15 +1557,15 @@ Simulate traffic sensor data into PubSub
             topic.create()
         else:
             logging.info('Reusing pub/sub topic {}'.format(TOPIC))
-     
+
         # notify about each line in the input file
-        programStartTime = datetime.datetime.utcnow() 
+        programStartTime = datetime.datetime.utcnow()
         with gzip.open(INPUT, 'rb') as ifp:
             header = ifp.readline()  # skip header
             firstObsTime = peek_timestamp(ifp)
             logging.info('Sending sensor data from {}'.format(firstObsTime))
             simulate(topic, ifp, firstObsTime, programStartTime, args.speedFactor)
- 
+
 Download data
 
     #./download_data.sh
@@ -1571,7 +1577,7 @@ Ensure Shell has the correct permissions
     gcloud auth application-default login
 
 Run the sensor data
-    
+
     # pip install google-cloud
     ./send_sensor_data.py --speedFactor=60
 
@@ -1598,12 +1604,12 @@ Most systems have two pipelines to balance latency, throughput, and fault tolera
     We have another datastream for the batch layer ('batch data')
 
 The issue is that continuously arriving data can come out of order.
-Say you have some data that comes in timestamped at 8:00 am and on time (at 8:00 am), 
+Say you have some data that comes in timestamped at 8:00 am and on time (at 8:00 am),
 but then at 3pm you get another piece of data for 8:00 am.
 
 What we want is a programming model that can process both batch and stream
 data. Beam has this concept of a __window__, which helps support time-based
-shuffle. It doesn't matter when the __input__ is (the __processing time__), it'll 
+shuffle. It doesn't matter when the __input__ is (the __processing time__), it'll
 get shuffled into the actual __output__ (the __event time__).
 
 Some other challenges include:
@@ -1613,7 +1619,7 @@ Some other challenges include:
   distributed sensors and still be fault tolerant
 * Programming Model - compare traffic over past hour against that of last
   Friday at same time (batch and stream code being the same)
-* Unboundedness - What happens if data from a sensor arrives late? 
+* Unboundedness - What happens if data from a sensor arrives late?
 
 #### Size
 
@@ -1632,7 +1638,7 @@ received the data). So where in event time do we need to do our computations?
 * __Fixed Windows__ means doing the computation logic in fixed windows (e.g.
   run computation each hour)
 * __Sliding Windows__ means doing the computation logic in fixed windows, but
-  continuously do them (e.g. each five minutes redo computation for each 
+  continuously do them (e.g. each five minutes redo computation for each
   hour)
 * __Sessions Windows__ means computing by a session (e.g. website monitors each
   user's web session and checks the number of clicks per session). This window
@@ -1675,7 +1681,7 @@ and out-of-order.
   that was published in 12:00 - 12:02, 12:02 - 12:04, etc. and create a sum for
   each.
 * Incremental Processing Model - With streaming, if you close the window at
-  12:02, you might not have all that data before you do your computations. 
+  12:02, you might not have all that data before you do your computations.
   How do I go back and recompute means, avgs? Using the heuristic watermark
   (based off of what kind of event data is coming in currently), we might see
   that by 12:07 all the data for 12:02 is complete. Then the window for 12:02
@@ -1691,13 +1697,13 @@ the average speed of traffic for every sensor along the highway.
 
 ### Ad-hoc analysis of data
 
-We can use BigQuery to create real time streaming analytics and dashboards. 
+We can use BigQuery to create real time streaming analytics and dashboards.
 The main issue we'll be dealing with is latency, meaning that we get data in
-real time, do computations (e.g. aggregations), write our computations to 
+real time, do computations (e.g. aggregations), write our computations to
 disk, but once that's all done it'll be old data (e.g. 5 minutes late). Usually
 you combine BigQuery with something like Dataflow (processing engine) and
 possibly Pub/Sub (as an ingest messaging bus). BigQuery is the long term
-storage that you can run SQL queries. BigQuery is fast, about 100k rows 
+storage that you can run SQL queries. BigQuery is fast, about 100k rows
 per table per second.
 
 ### Google Cloud Spanner
