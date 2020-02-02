@@ -8,7 +8,7 @@ title: Amazon Redshift and Redshift Spectrum
 
 # Summary
 
-Amazon Redshift
+## Amazon Redshift
 
 __Amazon Redshift__ is a fully managed petabyte-scaled data warehouse service.
 An Amazonn Redshift data warehouse is a collection of computing resources called
@@ -20,7 +20,7 @@ Redshift creates one database when you provision a cluster and you're able to ad
 additional databases from your initial database. Each db can create tables, load data,
 and run queries. Note that Redshift has roots that are based off of Postgres.
 
-Amazon Redshift Spectrum
+## Amazon Redshift Spectrum
 
 **Amazon Redshift Spectrum** allows you to run SQL queries against unstructured data
 in AWS S3. You can use open data formats like CSV, TSV, Parquet, Sequence, and
@@ -118,6 +118,11 @@ https://docs.aws.amazon.com/redshift/latest/dg/c_SQL_commands.html
 ## SQL Functions Reference
 
 https://docs.aws.amazon.com/redshift/latest/dg/c_SQL_functions.html
+
+## Redshift Utils
+
+If you are running a lot of Admin functionality (e.g. want the DDL for tables, views, etc), then consider
+looking at the scripts here: https://github.com/awslabs/amazon-redshift-utils/tree/master/src/AdminViews
 
 ## Row vs Columns
 

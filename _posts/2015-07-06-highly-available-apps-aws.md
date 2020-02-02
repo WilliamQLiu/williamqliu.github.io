@@ -107,9 +107,15 @@ S3 is perfect for hosting your __static__ digital assets (e.g. css, company logo
 
 You can also use Amazon S3's website feature when only client-side processing is required.  There's no infrastructure to configure/launch.
 
+With S3, there are different file systems with the following URI schemes:
+
+    S3 Native FileSystem (URI Scheme: s3n): a native filesystem for reading and writing regular files on S3; 5GB limit on file size
+    S3A (URI Scheme: s3a), successor to the S3 Native, uses Amazon's libraries to interact with S3. Allows S3a to support larger files
+    S3 Block FileSystem (URI Scheme: s3): a block-based filesystem backed by S3. Files are stored as blocks, just like in HDFS.
+
 ####<a id="cloudfront">AWS CloudFront</a>
 
-__CloudFront__ is a world-wide __content distribution network__ (CDN).  This distributes content to end users closest to the user so its low latency, high data transfer speeds (and makes use of edge locations).  Availability SLA is 
+__CloudFront__ is a world-wide __content distribution network__ (CDN).  This distributes content to end users closest to the user so its low latency, high data transfer speeds (and makes use of edge locations).  Availability SLA is
 
 Without CloudFront, your content is being loaded from EC2 webservers directly.  With no CDN, the response time is longer and server load is higher.
 
@@ -148,7 +154,7 @@ In __EC2__, you can see that there is an Elastic IP address (__Elastic IPs__) at
 
 In our __EC2__, we can create __Images__ under __Instances__ > Actions > Image > Create Image.  This is done so we can launch a replacement instance in the same exact state as the current running instance (in case something goes wrong).  You can see these images under the __Images__ > __AMI__.
 
-We will simulate a faulty instance by deleting the web server under instances.  We now replace the web server by going to AMIs, selecing the AMI we just created, and clicking 'Launch'.  We then specify the size and security groups (select the www-server security group), and the keypair.  
+We will simulate a faulty instance by deleting the web server under instances.  We now replace the web server by going to AMIs, selecing the AMI we just created, and clicking 'Launch'.  We then specify the size and security groups (select the www-server security group), and the keypair.
 
 ##<a id="lab1b">How to automatically fix bad instances</a>
 
@@ -205,7 +211,7 @@ IP Address will change over time (so don't use IP Address).
 
 For spiky/flash traffic, pre-warm ELB by submitting a request to AWS Support.  You can also DIY by slowling simulating more users.
 
-There are two types of ELBs: __public ELB__ (only ELB is public facing, Web/app instances can use private IP Adddresses in private subnets) and __internal ELBs__ (ideal for balancing request between multiple internal tiers).  
+There are two types of ELBs: __public ELB__ (only ELB is public facing, Web/app instances can use private IP Adddresses in private subnets) and __internal ELBs__ (ideal for balancing request between multiple internal tiers).
 
 ####<a id="autoscale">AWS Auto Scaling</a>
 
@@ -239,9 +245,9 @@ We will continue our previous web application and remove the single point of fai
 
 ####<a id="lab2b">Auto Scaling Part 1</a>
 
-So what happens if an instance in an AZ fails?  The other instances have to carry the load.  We can implement __auto scaling__ to help correct for this.  We simulate an instance stopping by stopping a web server instance.  The instance will fail an ELB health check and ELB will remove this instance from rotation.  
+So what happens if an instance in an AZ fails?  The other instances have to carry the load.  We can implement __auto scaling__ to help correct for this.  We simulate an instance stopping by stopping a web server instance.  The instance will fail an ELB health check and ELB will remove this instance from rotation.
 
-After a few minutes, Auto Scaling will find the unavailable instance, terminate it, and launch a replacement instance, then register it with ELB.  You can see this in action in __EC2__ under __Auto Scaling Groups__ and look at the 'Activity History' to see that an instance was terminated, then a new EC2 instance is automatically launching.  
+After a few minutes, Auto Scaling will find the unavailable instance, terminate it, and launch a replacement instance, then register it with ELB.  You can see this in action in __EC2__ under __Auto Scaling Groups__ and look at the 'Activity History' to see that an instance was terminated, then a new EC2 instance is automatically launching.
 
 ####<a id="lab2c">Auto Scaling Part 2</a>
 
@@ -345,7 +351,7 @@ Very very high durability of objects.  Unlimited storage of objects of any type.
 
 ##<a id="dbarchitecture">Database Options</a>
 
-AWS supports a variety of database deployment options.  
+AWS supports a variety of database deployment options.
 
 *  AWS can support traditional database high availability options by mirroring and replication.
 *  AWS also offers managed databases with high availability support using __Amazon RDS Multi-AZ__ and __Amazon DynamoDB__.
@@ -414,7 +420,7 @@ AWS __DynamoDB__ is a fully managed NoSQL database service that provides extreme
 *  AWS supports a wide variety of database and high availability options
 *  Consider whether you want to manage your database infrastructure or let AWS do it
 *  RDS provides a high availability relational database
-*  DynamoDB provides a high availability and fault tolerant NoSQL database 
+*  DynamoDB provides a high availability and fault tolerant NoSQL database
 
 ##<a id="lab3">Lab 3 Exercise - Create High Availability on Database Tier</a>
 
