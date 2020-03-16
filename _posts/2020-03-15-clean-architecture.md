@@ -202,12 +202,16 @@ to make the system easy to extend without incurring a high impact of change. We 
 partitioning the system into components, and arranging these components into a dependency hierarchy that protects
 high-level components form changes in lower-level components.
 
+Summary: __You should be able to extend a classes behavior, without modifying it.__
+
 #### LSP: The Liskov Substitution Principle
 
 __The Liskov Substitution Principle__ says that subtypes are defined as the following substitution property:
 
 If for each object 01 of type S there is an object 02 of type T such that for all programs P defined in terms of T,
 the behavior of P is unchanged when 01 is substituted for 02 then S is a subtype of T.
+
+Summary: __Derived classes must be substitutable for their base classes.__
 
 ##### The Square/Rectangle Problem
 
@@ -218,7 +222,7 @@ What happens if you violate this principle? You might be tempted to put in if-st
 endpoint (e.g. if endpoint ends with `dest` from `acme.com` instead of the regular `destination`). However, the
 better scenario would be to add a configuration database keyed by the dispatch URI (e.g. acme.com -> use `dest` endpoint)
 
-Summary: Substitution works great, until a simple violation of substitutability, which can cause a system's architecture
+Substitution works great, until a simple violation of substitutability, which can cause a system's architecture
 to be polluted with a significant amount of extra mechanisms.
 
 #### ISP - The Interface Segregation Principle
@@ -227,6 +231,8 @@ __The Interface Segregation Principle__
 
 It is harmful to depend on modules that contain more than you need. Depending on something that carries baggage
 that you don't need can cause you troubles that you don't expect.
+
+Summary: __Make fine grained interfaces that are client specific.__
 
 #### DIP - The Dependency Inversion Principle
 
@@ -248,9 +254,10 @@ So why the interface? Interfaces do not change as often as the concrete implemen
   create multiple implementations.
 * Never mention the name of anything concrete and volatile.
 
+Summary: __Depend on abstractions, not on concretions.__
+
 ##### Factories
 
 Use an __Abstract Factory__ to manage the undesirable dependencies listed above.
-
 
 
