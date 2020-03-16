@@ -141,3 +141,116 @@ Notes:
 * __Event Sourcing__ is a strategy where we store the transactions, but not the state; if state is needed, apply all transactions from the start
 
 
+## 3 - Design Principles
+
+The architecture doesn't matter if the bricks are bad. We use the __SOLID__ principles to tell us how to setup our
+bricks (i.e. how to arrange our functions and data structures into classes, and how those classes should be interconnected).
+This is for __mid-level software structures__ (think modules, class design).
+
+So what is a class? A __class__ is simply a coupled grouping of functions and data.
+So what is our goal? With SOLID, we want to be able to create __mid-level software structures__ (i.e. for modules) that are:
+
+* tolerant of change
+* are easy to understand
+* are the basis of components that can be used in many software systems
+
+### SOLID Principles
+
+The SOLID principles are:
+
+* SRP - The Single Responsibility Principle - each software module has one, and only one, reason to change
+* OCP - The Open-Closed Principle - for software systems to be easy to change, they must be designed to allow the
+  behavior of those systems to be changed by adding new code, rather than changing existing code
+* LSP - The Liskov Substitution Principle - to build software systems from interchangeable parts, those parts must
+  adhere to a contract that allows those parts to be substituted one for another
+* ISP - The Interface Segregation Principle - avoid depending on things that they don't use
+* DIP - The Dependency Inversion Principle - the code that implements high-level policy should not depend on the code
+  that implements low-level details. Details should depend on Policies.
+
+#### SRP: The Single Responsibility Principle
+
+__The Single Responsibility Principle__ means that a __module__ should have one, and only one, reason to change.
+This is NOT the same as a __function__ should do one, and only one thing. Instead, a better way of thinking about
+this principle is that __a module should be responsible to one, and only one, actor__.
+
+So what is a `module`? This can be a source file or a cohesive set of functions and data structures.
+
+What happens if you violate this principle?
+
+* Accidental Duplication - (e.g. CFO, COO, CTO using different methods in an Employee class so that there is tight
+  coupling between the COO's methods from affecting say the CTO). __Separate the code that different actors depend on.__
+* Merges - (e.g. CTO wants to change the Employee table, but so does COO); again, separate code that different actors depend on
+
+##### Facade Pattern
+
+You can separate the data from the functions. You can have three classes that are not allowed to know about each other,
+but they share access to say an `EmployeeData` class, which is a simple data structure with no methods.
+
+With the __Facade Pattern__, we can have an `EmployeeFacade` that has little code, but is responsible for instantiating
+and delegating to the classes with the functions. Each of the classes that has a family of methods is a __scope__.
+Outside of that scope, no one knows that the private members of the family exist.
+
+In my experience, this can get a little out of hand (where there are way too many classes).
+
+#### OCP: The Open-Closed Principle
+
+__The Open-Closed Principle__ means that a __software artifact should be open for extensions but closed for modification__.
+You should be able to extend the software's behavior without having to modify that artifact.
+
+A good software architecture can reduce the amount of changed code to the barest minimum (ideally zero). The goal is
+to make the system easy to extend without incurring a high impact of change. We can accomplish this goal by
+partitioning the system into components, and arranging these components into a dependency hierarchy that protects
+high-level components form changes in lower-level components.
+
+#### LSP: The Liskov Substitution Principle
+
+__The Liskov Substitution Principle__ says that subtypes are defined as the following substitution property:
+
+If for each object 01 of type S there is an object 02 of type T such that for all programs P defined in terms of T,
+the behavior of P is unchanged when 01 is substituted for 02 then S is a subtype of T.
+
+##### The Square/Rectangle Problem
+
+Say you have a Rectangle and Square. Square is not a subtype of Rectangle because a Rectangle has independently mutable
+height and width. A Square by definition has the same height and width that changes together.
+
+What happens if you violate this principle? You might be tempted to put in if-statements to substitute say a REST
+endpoint (e.g. if endpoint ends with `dest` from `acme.com` instead of the regular `destination`). However, the
+better scenario would be to add a configuration database keyed by the dispatch URI (e.g. acme.com -> use `dest` endpoint)
+
+Summary: Substitution works great, until a simple violation of substitutability, which can cause a system's architecture
+to be polluted with a significant amount of extra mechanisms.
+
+#### ISP - The Interface Segregation Principle
+
+__The Interface Segregation Principle__
+
+It is harmful to depend on modules that contain more than you need. Depending on something that carries baggage
+that you don't need can cause you troubles that you don't expect.
+
+#### DIP - The Dependency Inversion Principle
+
+__The Dependency Inversion Principle (DIP)__ tells us that the most flexible systems are those in which source code
+dependencies refer only to abstractions, not to concretions. When you import a library, the source code dependencies
+should not refer to concrete modules (e.g. a module in which the functions being called are implemented).
+
+In reality, you cannot abstract away say the `String` class. Changes to that class are rare and tightly controlled.
+We can rely on the operating system and standard libraries; it is the __volatile__ concrete elements of our system
+that we want to avoid depending on.
+
+So why the interface? Interfaces do not change as often as the concrete implementation. We should follow:
+
+* Don't refer to volatile concrete classes. Refer to abstract interfaces instead. We enforce the use of Abstract Factories.
+* Don't derive from volatile concrete classes. Remember that inheritance is the strongest, most rigid of all the source
+  code relationships; it should be used with great care.
+* Don't override concrete functions. Concrete functions often require source code dependencies. When you override
+  these functions, you do not eliminate the dependencies (instead you inherit them). Make the function abstract and
+  create multiple implementations.
+* Never mention the name of anything concrete and volatile.
+
+##### Factories
+
+Use an __Abstract Factory__ to manage the undesirable dependencies listed above.
+
+
+
