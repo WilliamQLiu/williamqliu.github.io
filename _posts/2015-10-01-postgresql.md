@@ -48,7 +48,12 @@ title: PostgreSQL
 *  [SQL Joins and Subqueries](#joinsubquery)
     -  [From](#from)
     -  [Inner Join](#innerjoin)
-*  [SQL Window Functions](#windowfunctions)
+*  [Functions](#functions)
+    -  [JSON Functions](#jsonfunctions)
+    -[SQL Window Functions](#windowfunctions)
+*  [Tips](#tips)
+    -  [Optimization - Sargable Query vs Nonsargable Query](#sargable)
+
 
 ## <a id="summary">Summary</a>
 
@@ -101,6 +106,31 @@ Now that you're in psql, you can also list all databases
                |          |          |            |            | postgres=CTc/postgres
      template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
                |          |          |            |            | postgres=CTc/postgres
+
+#### <a id="showtablesizes">Show Table Size</a>
+
+You can run a query like this to see disk usage:
+
+    SELECT nspname || '.' || relname AS "relation",
+        pg_size_pretty(pg_total_relation_size(C.oid)) AS "total_size"
+      FROM pg_class C
+      LEFT JOIN pg_namespace N ON (N.oid = C.relnamespace)
+      WHERE nspname NOT IN ('pg_catalog', 'information_schema')
+        AND C.relkind <> 'i'
+        AND nspname !~ '^pg_toast'
+      ORDER BY pg_total_relation_size(C.oid) DESC
+      LIMIT 5;
+    Example output:
+
+    COPY
+           relation       | total_size
+    ----------------------+------------
+     public.snapshots     | 823 MB
+     public.invoice_items | 344 MB
+     public.messages      | 267 MB
+     public.topics        | 40 MB
+     public.invoices      | 35 MB
+    (5 rows)
 
 #### <a id="seeroles">See Roles</a>
 
@@ -553,10 +583,10 @@ pairings, ordered by the time.
     INNER JOIN cd.facilities facil
         ON books.facid = facil.facid
     WHERE
-	    DATE(books.starttime) = '2012-09-21'
-	    AND facil.name LIKE '%Tennis Court%'
+        DATE(books.starttime) = '2012-09-21'
+        AND facil.name LIKE '%Tennis Court%'
     ORDER BY
-	    books.starttime;
+        books.starttime;
 
     start	            name
     2012-09-21 08:00:00	Tennis Court 1
@@ -603,7 +633,20 @@ STRUCT types are declared using the angle brackets (< and >). The type of the el
 Format
 STRUCT<T>
 
-#### <a id="windowfunctions">Window Functions</a>
+##<a id="jsonfunctions">JSON Functions</a>
+
+https://www.postgresql.org/docs/9.3/functions-json.html
+
+###`json_extract_path_text`
+
+Format:
+    json_extract_path_text(from_json json, VARIADIC path_elems text[])
+
+Example:
+
+    json_extract_path_text('{"f2":{"f3":1},"f4":{"f5":99,"f6":"foo"}}','f4', 'f6')  # returns 'foo'
+
+##<a id="windowfunctions">Window Functions</a>
 
 The standard window function syntax looks like:
 
@@ -668,4 +711,54 @@ the current row
 `UNBOUNDED PRECEDING` is the default.
 
 `CURRENT ROW`
+
+##<a id="tips">Tips</a>
+
+###<a id="monitoring">Monitoring</a>
+
+In SQL Server (not Postgres), you can kinda see how much work is going on behind the scenes with something like:
+
+    SET STATISTICS IO ON
+    SET STATISTICS TIME ON
+    <my_query>
+    SET STATISTICS IO OFF
+    SET STATISTICS TIME OFF
+
+In Postgres, we don't have that exact command, but we do have explain:
+
+    EXPLAIN (ANALYZE ON, BUFFERS ON) SELECT ...
+
+Besides `EXPLAIN`, we have monitoring stats in `pg_statio_*` for IO stats.
+The data isn't scoped to a session, but it can help in monitoring efficient queries in clean environments.
+
+https://www.postgresql.org/docs/current/monitoring-stats.html
+
+###<a id="sargable">Optimization - Sargable Query vs Nonsargable Query</a>
+
+__Non-sargable__ stands for __Non Search Argument__. When we do this type of query, SQL is unable to use an index.
+An example of this is when a function is used in the WHERE clause or a JOIN clause.
+
+    -- Non-sargable Query
+    SELECT EmployeeName
+    FROM EmployeeTest
+    WHERE LEFT(EmployeeName, 1) = 'A';
+    -- Results in performing the `LEFT` function on every single record
+
+A __sargable query__ stands for __Searchable Argument__. When we do this type of query, SQL is able to use indexes.
+An example of the above SQL that is faster.
+
+    -- Sargable Query
+    SELECT EmployeeName
+    FROM EmployeeTest
+    WHERE EmployeeName LIKE 'A%';
+
+Other Examples of Sargable:
+
+    -- Non-Sargable
+    WHERE YEAR(DateOfBirth) = '1952'
+
+    -- Sargable Query
+    WHERE DateOfBirth >= '19520101' AND DateOfBirth < '19530101'
+
+Summary: Use a __sargable query__ by NOT including a function in your WHERE or JOIN clause so you can utilize indexes
 
