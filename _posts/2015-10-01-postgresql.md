@@ -48,10 +48,14 @@ title: PostgreSQL
 *  [SQL Joins and Subqueries](#joinsubquery)
     -  [From](#from)
     -  [Inner Join](#innerjoin)
+*  [Views](#views)
+    -  [Materialized Views](#materializedviews)
 *  [Functions](#functions)
     -  [JSON Functions](#jsonfunctions)
     -[SQL Window Functions](#windowfunctions)
 *  [Tips](#tips)
+    -  [Explain](#explain)
+    -  [Monitoring](#monitoring)
     -  [Optimization - Sargable Query vs Nonsargable Query](#sargable)
 
 
@@ -600,10 +604,28 @@ pairings, ordered by the time.
     2012-09-21 15:30:00	Tennis Court 1
     2012-09-21 16:00:00	Tennis Court 2
 
+##<a id="views">Views</a>
+
+###<a id="materializedviews">Materialized Views</a>
+
+__Materialized Views__ in Postgres are like views, but they persist the results in a table-like form.
+
+    CREATE MATERIALIZED VIEW myview AS SELECT * FROM mytable;
+
+The main difference between a materialized view and a created table is that the materialized view
+cannot be directly updated after it is created. The query used to create the materialized view is stored exactly
+the same way that a view's query is stored. The only way to get fresh data is with:
+
+    REFRESH MATERIALIZED VIEW myview;
+
+So why use a materialized view?
+
+* Accessing the data stored in a materialized view is often faster than accessing the underlying tables directly or through a view
+* However, the data is not always current (you make that tradeoff)
+
 ## <a id="Aggregates">Aggregates</a>
 
 You can select aggregates using `COUNT`, `SUM`, and `AVG`, `MAX`, `MIN`. `DISTINCT` can be used with aggregates.
-
 
 # Notes
 
@@ -714,7 +736,7 @@ the current row
 
 ##<a id="tips">Tips</a>
 
-###<a id="monitoring">Monitoring</a>
+###<a id="explain">Explain</a>
 
 In SQL Server (not Postgres), you can kinda see how much work is going on behind the scenes with something like:
 
@@ -728,7 +750,9 @@ In Postgres, we don't have that exact command, but we do have explain:
 
     EXPLAIN (ANALYZE ON, BUFFERS ON) SELECT ...
 
-Besides `EXPLAIN`, we have monitoring stats in `pg_statio_*` for IO stats.
+###<a id="monitoring">Monitoring</a>
+
+esides `EXPLAIN`, we have monitoring stats in `pg_statio_*` for IO stats.
 The data isn't scoped to a session, but it can help in monitoring efficient queries in clean environments.
 
 https://www.postgresql.org/docs/current/monitoring-stats.html
@@ -761,4 +785,102 @@ Other Examples of Sargable:
     WHERE DateOfBirth >= '19520101' AND DateOfBirth < '19530101'
 
 Summary: Use a __sargable query__ by NOT including a function in your WHERE or JOIN clause so you can utilize indexes
+
+So what do I do? Instead of using functions on your field (i.e. it shows up on the LEFT side of your field, instead we
+want this on the right hand side)
+
+###<a id="">Optimization - SELECT specific columns'</a>
+
+Do not run `SELECT *` if you do not need all columns. If you just select the columns you need, it'll be faster
+and you probably don't (and shouldn't) have an index on all columns.
+
+###<a id="">Optimization - LIMIT</a>
+
+LIMIT your results if you do not need everything
+
+###<a id="">Optimization - LEFT vs RIGHT calculation</a>
+
+If you do a calculation on the LEFT side vs the RIGHT side, this changes our speed:
+
+    # Non-Sargable Query because Calculation done on left side
+    WHERE Salary / 2 = 554677;
+
+    # Sargable Query because Calculation done on right side
+    WHERE Salary = (277338.5 * 2);
+
+###<a id="indexes">Indexes<a>
+
+In Postgres, you cannot just run a `SHOW INDEXES` command to the list the index information of a table or database.
+Instead, we have the `pg_indexes` view that you can query or you can run `\d` to command on psql to view the index
+information for a table.
+
+See all indexes of a specific schema (using the `pg_indexes` view)
+
+    SELECT
+        tablename,
+        indexname,
+        indexdef
+    FROM
+        pg_indexes
+    WHERE
+        schemaname = 'myschema'
+    ORDER BY
+        tablename,
+        indexname;
+
+See all indexes for a table
+
+    SELECT
+        indexname,
+        indexdef
+    FROM
+        pg_indexes
+    WHERE
+        tablename = 'mytable';
+
+####<a id="indexes-create">Create an Index</a>
+
+You can create an index on specific column(s) for a table or a materialized view. There's pros and cons to an index.
+It comes down to:
+
+* Con: Indexes slow down inserts (need to add additional data for indexes, figure out what indexes to add, increase storage)
+* Pro: Indexes speed up searches for getting data
+
+####<a id="indexes-include">Include Column in Index</a>
+
+A lot of times when we create an index, we just think about the keyed columns.
+There is the optional __INCLUDE__ clause that lets you specify a list of columns that will be included in the index
+as a __non-key__ column.
+
+Say you're searching based off an indexed column and return just that index column. This is optimal since it hits the
+index (DateOfBirth) and return only that data (DateOfBirth).
+
+    SELECT DateOfBirth
+    FROM EmployeeTest
+    WHERE DateOfBirth >= '19520101' AND DateOfBirth < '19530101';
+
+However, if you change the above to `SELECT DateOfBirth, EmployeeName` and `EmployeeName` is not an index, we now
+do a search for the index, then we go back and need to pull information for the `EmployeeName` column. If you are
+regularly pulling this information back, you might want to `INCLUDE` a column into the index.
+
+Just take care to not add many non-key columns to an index when you have really wide columns.
+Also keep in mind that the index tuple cannnot exceed a certain size, otherwise data insertion fails.
+A non-key column duplicates data from the index's table and increases the size of the index.
+
+https://www.postgresql.org/docs/11/sql-createindex.html
+
+####<a id="indexes-stale">Stale and Fragmented Indexes</a>
+
+Indexes store statistics (see monitoring) and uses estimations of what the data looks like in order to optimize itself.
+These statistics get old and the distribution of data may get old. You would need to redinex then.
+
+https://www.postgresql.org/docs/9.3/sql-reindex.html
+
+    REINDEX
+
+Update statistics with: https://www.postgresql.org/docs/9.3/sql-analyze.html
+
+    ANALYZE [VERBOSE} [table_name]
+
+Updating statistics store information into the `pg_statistic` system catalog
 

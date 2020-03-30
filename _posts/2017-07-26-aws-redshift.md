@@ -111,6 +111,48 @@ With Amazon Redshift Spectrum, you can query external data.
     SELECT * FROM SVV_EXTERNAL_TABLES;
     # schemaname, tablename, location, input_format, output_format, serialization_lib, serde_parameters, compressed, parameters
 
+You have to create an external table in an external schema. An external schema references a database in the
+external data catalog and provides the IAM role ARN that authorizes your cluster to access S3.
+
+### Create External Schema
+
+To create an external schema, you can use Amazon Athena, AWS Glue Data Catalog or an Apache Hive metastore like
+Amazon EMR. It might look like:
+
+    CREATE EXTERNAL SCHEMA [IF NOT EXISTS] schema_name
+    FROM { [DATA CATALOG] | HIVE METASTORE }
+    DATABASE 'database_name'
+    [ REGION 'aws-region' ]
+    [ URI 'hive_metastore_uri' [ PORT port_number ] ]
+    IAM_ROLE 'iam-role-arn-string'
+    [ CATALOG ROLE 'catalog-role-arn-string' ]
+    [ CREATE EXTERNAL DATABASE IF NOT EXISTS ]
+
+### Create External Table
+
+To create an external table, it might look like:
+
+Say we have S3 data in: s3://my-bucket-name/tickit/spectrum/sales
+
+    CREATE EXTERNAL TABLE spectrum.sales(
+      salesid integer,
+      listid integer,
+      sellerid integer,
+      dateid smallint,
+      pricepaid decimal(8,2),
+      saletime timestamp)
+    ROW FORMAT DELIMITED
+    FIELDS TERMINATED BY '\t'
+    STORED AS TEXTFILE
+    LOCATION 's3://my-bucket-name/tickit/sales/'
+    TABLE PROPERTIES ('numRows'='172000');
+
+### Query External Tables
+
+You can query your data in S3 using Athena with a query like:
+
+    SELECT COUNT(*) FROM spectrum.sales;
+
 ## SQL Commands Reference
 
 https://docs.aws.amazon.com/redshift/latest/dg/c_SQL_commands.html
@@ -241,5 +283,12 @@ So what's different between Redshift and Athena?
 * Athena automatically parallel; Redshift only as parallel as you configure
 * Athena data can be stored in multiple formats per table; Redshift can be
   loaded from files in multiple formats
+
+## Workload Management (WLM)
+
+__Workload Management__ (WLM) is used to define multiple query queues and to route queries to the appropriate
+queues at runtime. The idea is that you might have many people running queries at the same time and some
+queries might use more cluster resources for longer periods of time that might affect the performance of
+other queries.
 
 
