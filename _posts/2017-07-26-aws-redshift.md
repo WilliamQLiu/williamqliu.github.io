@@ -130,7 +130,7 @@ Amazon EMR. It might look like:
 
 ### Create External Table
 
-To create an external table, it might look like:
+To create an external table, it might look like this:
 
 Say we have S3 data in: s3://my-bucket-name/tickit/spectrum/sales
 
@@ -147,11 +147,39 @@ Say we have S3 data in: s3://my-bucket-name/tickit/spectrum/sales
     LOCATION 's3://my-bucket-name/tickit/sales/'
     TABLE PROPERTIES ('numRows'='172000');
 
+Additional Details here: https://docs.aws.amazon.com/redshift/latest/dg/c-spectrum-external-tables.html
+
+### View External Table Metadata
+
+You can see what external tables are available by checking the system view here:
+
+     SELECT * FROM SVV_EXTERNAL_TABLES;
+
+Some important columns are:
+
+* __schemaname__ - the name of the Redshift external schema for the external table
+* __tablename__ - the name of the external table
+* __location__ - the location (e.g. where in s3)
+* __input format__ - e.g. org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
+* __output format__ - e.g. org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
+
+You can create this source table with AWS Glue Data Catalog so that you can use the data in Athena and Redshift.
+
+You can format shift to Parquet with an AWS Glue Job (or do this outside of the CLI tools by reading from the S3
+location, then writing to another location as parquet using some code).
+
 ### Query External Tables
 
 You can query your data in S3 using Athena with a query like:
 
     SELECT COUNT(*) FROM spectrum.sales;
+
+There's pseudocolumns `$path` and `$size` that lets you see the size of the data files for each row returned by
+a query. You have to explicitly specify these columns; they won't return from a `SELECT *`.
+
+    SELECT "$path", "$size"
+    FROM myschema.mytable
+    WHERE myid = 1;
 
 ## SQL Commands Reference
 
