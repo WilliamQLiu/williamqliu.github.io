@@ -203,3 +203,9 @@ Example of gem list
     sidekiq (5.2.5)
     simplecov (0.16.1)
     simplecov-html (0.10.2)
+
+Linking to a local gem
+
+    gem 'my-gem', '~> 3.5.0', :path => '/Users/william.liu/workspace/my-gem'
+
+
