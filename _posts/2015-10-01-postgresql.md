@@ -57,6 +57,7 @@ title: PostgreSQL
     -  [Explain](#explain)
     -  [Monitoring](#monitoring)
     -  [Optimization - Sargable Query vs Nonsargable Query](#sargable)
+*  [Resources](#resources)
 
 
 ## <a id="summary">Summary</a>
@@ -292,7 +293,7 @@ To select specific **rows** from a table, we use SQL's **WHERE**:
     4	    Massage Room 1	35	        3000
     5	    Massage Room 2	35	        3000
 
-#### <a id="selectfiltertext">Filter Text</a>
+#### <a id="selectlike">LIKE </a>
 
 You can filter strings in tables (e.g. list all facilities with the word
 'Tennis' in the name).
@@ -305,6 +306,24 @@ You can filter strings in tables (e.g. list all facilities with the word
     0	    Tennis Court 1	    5	        25	        10000	        200
     1	    Tennis Court 2	    5	        25	        8000	        200
     3	    Table Tennis	    0	        5	        320             10
+
+#### <a id="selectsimilar">SIMILAR TO</a>
+
+`SIMILAR` is similar to `LIKE`, except you can run a regular expression.
+
+    'abc' SIMILAR TO 'abc'      # true
+    'abc' SIMILAR TO 'a'        # false
+    'abc' SIMILAR TO '%(b|d)%'  # true
+
+https://www.postgresql.org/docs/8.3/functions-matching.html
+
+We have:
+
+    `|` to denote alternation (either of two alternatives)
+    `*` to denote repetition of the previous item zero or more times
+    `+` to denote repetition of the previous item one or more times
+    `()` to group items into a single logical item
+    `[]` to specify a character class, like in a POSIX regular expression
 
 #### <a id="selectfilterin">Filter In List</a>
 
@@ -655,11 +674,11 @@ STRUCT types are declared using the angle brackets (< and >). The type of the el
 Format
 STRUCT<T>
 
-##<a id="jsonfunctions">JSON Functions</a>
+## <a id="jsonfunctions">JSON Functions</a>
 
 https://www.postgresql.org/docs/9.3/functions-json.html
 
-###`json_extract_path_text`
+### `json_extract_path_text`
 
 Format:
     json_extract_path_text(from_json json, VARIADIC path_elems text[])
@@ -668,7 +687,7 @@ Example:
 
     json_extract_path_text('{"f2":{"f3":1},"f4":{"f5":99,"f6":"foo"}}','f4', 'f6')  # returns 'foo'
 
-##<a id="windowfunctions">Window Functions</a>
+## <a id="windowfunctions">Window Functions</a>
 
 The standard window function syntax looks like:
 
@@ -734,9 +753,9 @@ the current row
 
 `CURRENT ROW`
 
-##<a id="tips">Tips</a>
+## <a id="tips">Tips</a>
 
-###<a id="explain">Explain</a>
+### <a id="explain">Explain</a>
 
 In SQL Server (not Postgres), you can kinda see how much work is going on behind the scenes with something like:
 
@@ -750,14 +769,14 @@ In Postgres, we don't have that exact command, but we do have explain:
 
     EXPLAIN (ANALYZE ON, BUFFERS ON) SELECT ...
 
-###<a id="monitoring">Monitoring</a>
+### <a id="monitoring">Monitoring</a>
 
 esides `EXPLAIN`, we have monitoring stats in `pg_statio_*` for IO stats.
 The data isn't scoped to a session, but it can help in monitoring efficient queries in clean environments.
 
 https://www.postgresql.org/docs/current/monitoring-stats.html
 
-###<a id="sargable">Optimization - Sargable Query vs Nonsargable Query</a>
+### <a id="sargable">Optimization - Sargable Query vs Nonsargable Query</a>
 
 __Non-sargable__ stands for __Non Search Argument__. When we do this type of query, SQL is unable to use an index.
 An example of this is when a function is used in the WHERE clause or a JOIN clause.
@@ -789,16 +808,16 @@ Summary: Use a __sargable query__ by NOT including a function in your WHERE or J
 So what do I do? Instead of using functions on your field (i.e. it shows up on the LEFT side of your field, instead we
 want this on the right hand side)
 
-###<a id="">Optimization - SELECT specific columns'</a>
+### <a id="">Optimization - SELECT specific columns'</a>
 
 Do not run `SELECT *` if you do not need all columns. If you just select the columns you need, it'll be faster
 and you probably don't (and shouldn't) have an index on all columns.
 
-###<a id="">Optimization - LIMIT</a>
+### <a id="">Optimization - LIMIT</a>
 
 LIMIT your results if you do not need everything
 
-###<a id="">Optimization - LEFT vs RIGHT calculation</a>
+### <a id="">Optimization - LEFT vs RIGHT calculation</a>
 
 If you do a calculation on the LEFT side vs the RIGHT side, this changes our speed:
 
@@ -808,7 +827,7 @@ If you do a calculation on the LEFT side vs the RIGHT side, this changes our spe
     # Sargable Query because Calculation done on right side
     WHERE Salary = (277338.5 * 2);
 
-###<a id="indexes">Indexes<a>
+### <a id="indexes">Indexes<a>
 
 In Postgres, you cannot just run a `SHOW INDEXES` command to the list the index information of a table or database.
 Instead, we have the `pg_indexes` view that you can query or you can run `\d` to command on psql to view the index
@@ -838,7 +857,7 @@ See all indexes for a table
     WHERE
         tablename = 'mytable';
 
-####<a id="indexes-create">Create an Index</a>
+#### <a id="indexes-create">Create an Index</a>
 
 You can create an index on specific column(s) for a table or a materialized view. There's pros and cons to an index.
 It comes down to:
@@ -846,7 +865,7 @@ It comes down to:
 * Con: Indexes slow down inserts (need to add additional data for indexes, figure out what indexes to add, increase storage)
 * Pro: Indexes speed up searches for getting data
 
-####<a id="indexes-include">Include Column in Index</a>
+#### <a id="indexes-include">Include Column in Index</a>
 
 A lot of times when we create an index, we just think about the keyed columns.
 There is the optional __INCLUDE__ clause that lets you specify a list of columns that will be included in the index
@@ -869,7 +888,7 @@ A non-key column duplicates data from the index's table and increases the size o
 
 https://www.postgresql.org/docs/11/sql-createindex.html
 
-####<a id="indexes-stale">Stale and Fragmented Indexes</a>
+#### <a id="indexes-stale">Stale and Fragmented Indexes</a>
 
 Indexes store statistics (see monitoring) and uses estimations of what the data looks like in order to optimize itself.
 These statistics get old and the distribution of data may get old. You would need to redinex then.
@@ -883,4 +902,8 @@ Update statistics with: https://www.postgresql.org/docs/9.3/sql-analyze.html
     ANALYZE [VERBOSE} [table_name]
 
 Updating statistics store information into the `pg_statistic` system catalog
+
+## <a id="resources">Resources</a>
+
+Good basic and common usage: https://popsql.com/learn-sql/postgresql/
 
