@@ -319,4 +319,76 @@ queues at runtime. The idea is that you might have many people running queries a
 queries might use more cluster resources for longer periods of time that might affect the performance of
 other queries.
 
+## Database Security
+
+You manage database security by controlling which users have access to which database objects. You can grant
+access to objects to either user accounts or groups.
+
+* By default, privileges are granted only to the object owner
+* Amazon Redshift database users are named user accounts that can connect to the database
+  You either have to assign the privileges directly to the account or by being a member of the group that has privileges
+* Schemas are collections of database tables and other database objects. Schemas are similar to file system directories,
+  but cannot be nested. Users can be granted access to a single schema or to multiple schemas
+
+### Users
+
+To create and modify users, you can run:
+
+    CREATE USER
+    ALTER USER
+    DROP USER
+
+To get a list of current users, run:
+
+    SELECT * FROM pg_user;
+
+    #usename, usesysid, usecreatedb, usesuper, usecatupd, passwd, valuntil, useconfig
+    #rdsdb          1
+
+You can make a user a SUPERUSER by:
+
+    CREATE USER adminuser myuser password 'mypassword';
+    ALTER USER adminuser myuser;
+
+### Groups
+
+Groups are collections of users that can be collectively assigned privileges for easier security maintenance.
+
+To create groups:
+
+    CREATE GROUP mywebusers;
+
+To list groups:
+
+    SELECT * FROM pg_group;
+
+    # groname, grosysid, grolist
+    # my_group,     100,   {109}
+
+### Schemas
+
+A database has one or more named schemas. Each schema in a database contains tables and other kinds of named objects.
+By default, a database a has single schema named `PUBLIC`. You can use schemas to group database objects under a
+common name. Schema commands include:
+
+    CREATE SCHEMA
+    ALTER SCHEMA
+    DROP SCHEMA
+
+To list all your schemas, you can query `pg_namespace`:
+
+    SELECT * FROM pg_namespace;
+    # nspname, nspowner, nspacel
+
+To list all of your tables that belong to a schema, query `pg_table_def`:
+
+    SELECT DISTINCT(tablename) FROM pg_table_def
+    WHERE schemaname = 'my_schema';
+
+### Giving Usage
+
+You can grant usage with:
+
+    GRANT USAGE ON SCHEMA myschema TO GROUP mywebgroup;
+    GRANT ALL ON SCHEMA myschema to GROUP mywebgroup;
 
