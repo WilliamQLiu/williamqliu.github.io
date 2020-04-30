@@ -253,3 +253,33 @@ Hitting `return` runs the last command
 
 IRB stands for __interactive ruby__ and allows you to interactively execute Ruby expressions.
 
+## VSCode with Ruby
+
+https://github.com/microsoft/vscode-recipes/tree/master/debugging-Ruby-on-Rails
+
+### Install
+
+Add 'ruby-debug-ide', 'debase', and 'rspec' to your Gemfile.
+
+    group :development do
+      gem 'ruby-debug-ide', '~> 0.6'
+      gem 'debase', '~> 0.2'
+      gem 'rspec', '~> 3.9'
+    end
+
+After a `bundle install`, find out where your files are:
+
+    which bundle
+    bundle info ruby-debug-ide
+    which rspec
+
+Add this to your Debugger `launch.json` configurations.
+
+## Other Debug Ideas
+
+__Time Travel Debugging__ - None that I know of at the moment
+__Conditional Breakpoint Debugging__ - set a condition when a variable is a certain value (e.g. x == 100);
+  Yes in VSCode, add a Breakpoint, then 'Edit Breakpoint', then set your example like [here](https://code.visualstudio.com/docs/editor/debugging#_conditional-breakpoints`)
+__Data Breakpoints__ - debugger breaks when the variable is a certain value
+__Logging__ - Just `puts` or log info can really help, especially for distributed systems
+
