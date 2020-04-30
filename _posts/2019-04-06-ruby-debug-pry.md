@@ -282,4 +282,4 @@ __Conditional Breakpoint Debugging__ - set a condition when a variable is a cert
   Yes in VSCode, add a Breakpoint, then 'Edit Breakpoint', then set your example like [here](https://code.visualstudio.com/docs/editor/debugging#_conditional-breakpoints`)
 __Data Breakpoints__ - debugger breaks when the variable is a certain value
 __Logging__ - Just `puts` or log info can really help, especially for distributed systems
-
+__Git Bisect__ - if you know a good and bad commit, narrow down what changes happened since then
