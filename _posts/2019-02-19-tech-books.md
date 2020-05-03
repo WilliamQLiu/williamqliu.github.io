@@ -29,4 +29,8 @@ List of good tech books:
 * Clean Code: A Handbook of Agile Software Craftsmanship - tips on how to write clean code
 * SQL Queries for Mere Mortals - basics of SQL from queries to indexes
 * SQL Antipatterns: Avoiding the Pitfalls of Database Programming - Don't do this
+* Clean Architecture: A Craftsman's Guide to Software Structure and Design
 
+TODO:
+
+* Effective Debugging - 66 specific ways to debug software and systems, by Diomidis Spinellis
