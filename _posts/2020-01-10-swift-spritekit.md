@@ -38,6 +38,41 @@ Just plug in your phone to your computer's usb and select your iPhone during the
 * In Xcode, under Preferences > Account, you should add your AppleID and assign the project to a team
 * If you get 'Untrusted Developer' when launching your app on your phone, then open the 'Settings' > 'General' > 'Device Management' > Choose your profile > 'Trust myprofile'
 
+## Important Classes
+
+* `SKView` - an object that displays SpriteKit content - this content is provided by an `SKScene` object
+  e.g. look at the Interface Builder, this is just a view that holds a scene object
+* `SKScene` - the root node for all SpriteKit objects displayed in a view
+  e.g. you place background images, all your nodes, etc.
+    * the size of the scene defines the visible area
+    * nodes can be placed outside of the visible portion of the scene, but will still be processed by the scene
+      (and will be ignored by the renderer)
+    * contents are scaled to fit the view
+    * anchor points position the coordinate system (e.g. can be bottom left 0,0 center 0.5,0.5, or top right 1,1)
+* `SKNode` - provides baseline behavior (does not actually draw)
+    * provides a coordinate system to its children (e.g. everything is drawn using SKNode subclasses)
+    * can be used to represent layers
+    * can be used as a hidden trigger
+* `SKSpriteNode` - a subclass of `SKNode`; the basic building blocks of your game
+    * Can be textured OR colored and untextured
+    * E.g. 'Sky' being the root node (z=0)
+            |_ Missiles (z=-1)
+            |_ Body (z=100)
+            |_ Rotor1 (z=+1)
+            |_ Rotor2 (z=+1)
+* `SKAction` - an animation that is executed by a node in the scene (i.e. change a node in some way like move its
+  position over time, an animation that fades out an object)
+* `SKPhysicsBody` - add physics simulation to the node
+
+### How do these all fit together?
+
+SKView
+  SKScene (the root node)
+    SKNode
+      - SKSpriteNode1
+      - SKSpriteNode2
+      - SKSpriteNode3
+
 ### Nodes
 
 Nodes include:
