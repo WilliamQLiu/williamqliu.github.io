@@ -60,18 +60,19 @@ __ADVANCED__
     -  [descriptors](#descriptors)
     -  [Container Objects](#magicmethodscontainerobjects)
     -  [Callable Objects](#magicmethodscallable)
-*  [Context Managers](contextmanagers)
+*  [Context Managers](#contextmanagers)
     -  [__enter__() and __exit__()](#enterexit)
+*  [Protocols](#protocols)
 
 __DATA STRUCTURES__
 
-* 
+*
 
 - - - -
 
 ## <a id="numbers">NUMBERS</a>
 
-Python can do simple calculations like addition, subtraction, division, multiplcation, and calculate powers.  
+Python can do simple calculations like addition, subtraction, division, multiplcation, and calculate powers.
 
      2 + 2**3  # Addition with 2 to the power of 2
      #10
@@ -82,10 +83,10 @@ Integers (e.g. `2`, `4`, `20`) have type **int** and the fractional parts (e.g. 
 
      (50 - 5 * 6) / 3  # Floor division because operands are both type int
      #6
-     
+
      (50 - 5 * 6) / 3.0  # No floor division, at least one operand type float
      #6.666666666666667
-     
+
      #(50 - 5 * 6) // 3  # Forces floor division
      #6
 
@@ -102,7 +103,7 @@ Python can also manipulate strings using single quotes (`'...'`) and double quot
 
     temp = "hello world"  # double quotes
     print temp  # hello world
-    
+
     temp = 'doesn\'t'  # use \ to escape a quote
     print temp  # doesn't
     print type(temp)  # <type 'str>'
@@ -114,7 +115,7 @@ If you don\'t want characters prefaced by `\` to be interpreted as a special cha
     print "C:\some\name"  # here \n means newline
     #C:\some
     #ame
-    
+
     print r"C:\some\name"  # here it reads the raw string
     #C:\some\name
 
@@ -125,10 +126,10 @@ If you want to join strings together use `+`.  If you want to slice strings, use
     word = "Python"
     print word[1]  # Get character in position 0
     #y
-    
+
     print word[-1]  # get character in last position
     #n
-    
+
     print word[2:4]  # Slice characters
     #th
 
@@ -154,11 +155,11 @@ Lists are a way to hold items in order.  The items can be different data types o
     squares = [1, 4, 9, 16, 25]  # make a list of numbers
     print squares
     #[1, 4, 9, 16, 25]
-    
+
     squares + [36, 49, 64, 'etc']  # Add in another list
     #[1, 4, 9, 16, 25, 36, 49, 64, 'etc']
-    
-    print squares[2:4]  
+
+    print squares[2:4]
     #[9, 16]
     print type(squares)  # <type 'list'>
 
@@ -234,7 +235,7 @@ A __Counter__ object is made to support rapid tallies. E.g.
     cnt = Counter()
     for word in ['red', 'blue', 'green', 'blue', 'red', 'red']:
         cnt[word] += 1
-    
+
     cnt
     # Counter({'red': 3, 'blue': 2, 'green': 1})
 
@@ -274,7 +275,7 @@ If there is no `maxlen` specificed or it is `None`, deques can grow to an arbitr
 
 ### List comprehensions
 
-List comprehensions are a concise way of making lists based on an operation or 
+List comprehensions are a concise way of making lists based on an operation or
 if the item satisifes a certain condition.  This is a compact for-loop that builds lists.
 Here are different ways of doing a regular loop along with the list comprehension equivalent:
 
@@ -283,7 +284,7 @@ Here are different ways of doing a regular loop along with the list comprehensio
         squares.append(x**2)
     print squares
     #[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
-    
+
     squares = map(lambda x: x**2, range(10))  # same, using map
     squares = [x**2 for x in range(10)]  # same, using list comprehension
 
@@ -296,23 +297,23 @@ The basic structure is:
 *  We have the list comprehension enclosed with brackets `[]` because we return a list
 *  In the middle section, we have `for <element> in <list>` and it looks like a regular `for-loop`.  This tells us we are iterating over the list going through each element in the sequence.
 *  The `<output value>` is what we append to the list we are building.  We can say this is the element itself, the element squared, the absolute value of the element, etc.
-*  The `<optional criteria>` can be a way to filter out items if they do not meet a condition.  
+*  The `<optional criteria>` can be a way to filter out items if they do not meet a condition.
 
 Examples:
 
     vec = [-4, -2, 0, 2, 4]
-    
+
     [x for x in vec]  # print out the list as is
     #[-4, -2, 0, 2, 4]
-    
+
     [x*2 for x in vec]  # create a new list with the output values doubled
     #[-8, -4, 0, 4, 8]
-    
+
     [abs(x) for x in vec]  # apply a function to all the elements
     #[8, 4, 0, 4, 8]
-    
+
     [x for x in vec if x >= 0]  # filter the list to exclude negative numbers
-    #[0, 2, 4]    
+    #[0, 2, 4]
 
 - - - -
 
@@ -321,16 +322,16 @@ Examples:
 **Tuples** are like read-only lists because they are immutable (instead of mutable) and are enclosed with parentheses (instead of brackets).  Tuples do care about the order of when items were inserted. Tuples can also be sliced just like lists.
 
 So what's the big deal about tuples? Tuples are a fixed size so they don't have append or extend
-methods like lists. However, since Tuples are immutable, tuples are great for 
-dictionary keys (since dict keys have to be immutable). 
+methods like lists. However, since Tuples are immutable, tuples are great for
+dictionary keys (since dict keys have to be immutable).
 
     temp = ('abcd', 786, 2.23, 'john', 70.2 )
     print temp  # ('abcd', 785, 2.23, 'john', 70.2)
     print type(temp)  #<type 'tuple'>
-    
+
     print temp[0]  # prints first element of the tuple
     # abcd
-    
+
     print temp[1:3]  # prints elements after 1st to 3rd
     # (785, 2.23)
 
@@ -348,7 +349,7 @@ Here is a code example of a tuple holding structure:
 
     # Use with hash tables
     clicked_table = {}
-    clicked_table[clicked_here] = "clicked on monkey" 
+    clicked_table[clicked_here] = "clicked on monkey"
     clicked_table[clicked_here] = "clicked on monkey"
 
 Notes about tuples:
@@ -382,13 +383,13 @@ Assuming `s` and `t` are sequences and `n`, `i`, `j` are integers.
 A useful built-in function for sequences is Enumerate.  Enumerate means you return a tuple containing a count and the value from iterating over the sequence.  By default this starts counting from start 0, unless you specify the `start=` parameter.
 
     seasons = ['Spring', 'Summer', 'Fall', 'Winter']
-    
+
     list(enumerate(seasons))
     # [(0, 'Spring'), (1, 'Summer'), (2, 'Fall'), (3, 'Winter')]
-    
+
     list(enumerate(seasons, start=1))
     # [(1, 'Spring'), (2, 'Summer'), (3, 'Fall'), (4, 'Winter')]
-    
+
     for i, value in enumerate(seasons):
         print "Position ", i, " has value ", value
     #Position  0  has value  Spring
@@ -398,22 +399,22 @@ A useful built-in function for sequences is Enumerate.  Enumerate means you retu
 
 #### <a id="sequencesort">Sorting Sequences</a>
 
-Python has a `sort` method that modifies a list in-place and a `sorted` method that builds a new sorted list 
+Python has a `sort` method that modifies a list in-place and a `sorted` method that builds a new sorted list
 from an iterable.  NumPy also has a `sort` method, but it does not modify the list in-place.
 
     my_list = ['hello', 'world', 'will', 'was', 'here']
-    
+
     #NumPy's sort; not inplace
     np.sort(my_list)
     #array(['hello', 'here', 'was', 'will', 'world'],
     #  dtype='|S5')
     my_list
     #['hello', 'world', 'will', 'was', 'here']
-    
+
     #Python's sort; inplace, only works for lists
     my_list.sort()
     #['hello', 'here', 'was', 'will', 'world']
-    
+
     #Python's sorted
     sorted([5, 2, 3, 1, 4], reverse=False)
     [1, 2, 3, 4, 5]
@@ -465,13 +466,13 @@ Get an item from an object using **itemgetter**.  This basically looks up an ind
 
     #String
     itemgetter(1)('ABCDEFG')  #'B'
-    
+
     #List
     itemgetter(2)(['Hello', 'World', 'Will'])  #'World'
-    
+
     #Dict
     itemgetter('Age')(phonebook1)
-    
+
     #Tuple
     itemgetter(2)(student_tuple)  # ('dave', 'B', 10)
 
@@ -485,10 +486,10 @@ Get attributes from an object using **attrgetter**.  This basically looks up an 
             self.id = id
             self.name = name
             self.grades = grades
-        
+
         def __str__(self):
             return '%s has grade %s' %(self.name, self.grades)
-    
+
     students = [Student(0, 'Will', 70), Student(1, 'Laura', 90), Student(2, 'Wayne', 87)]
     best_student = max(students, key=operator.attrgetter('grades'))
     print best_student
@@ -522,8 +523,8 @@ Example:
     phonebook.keys()  #get keys  #['Age', 'Name', 'Number']
     phonebook.values()  # get values  # [30, 'Will', 123456789]
     phonebook.clear()  # clears all values, keeps keys
-    
-    #Iterate through key, values    
+
+    #Iterate through key, values
     for my_key, my_value in phonebook.iteritems():
         print "Key is: ", my_key
         print "Value is: ", my_value
@@ -533,7 +534,7 @@ Example:
     #Value is:  Will
     #Key is:  Number
     #Value is:  938477566
-    
+
 
 - - - -
 
@@ -593,11 +594,11 @@ Python has the usual control flow statements.  These include:
     # range() function
     for i in range(5):
         print i,  # 0 1 2 3 4
-    
+
     # normal call with separate arguments
     temp = list(range(3, 6))
     print temp  # [3, 4, 5]
-    
+
     $ xrange() function
     for i in xrange(2, 10):
         print i,  # 2 3 4 5 6 7 8 9
@@ -613,7 +614,7 @@ These are often used in combination with `filter()`, `map()`, and `reduce()`
 
 #### <a id="filter">filter()</a>
 
-`filter(function, sequence)` is a function that filters out all the elements of a sequence where the function returns `True`.  
+`filter(function, sequence)` is a function that filters out all the elements of a sequence where the function returns `True`.
 The first argument is the function that returns a Boolean and this is applied to every element of the list.
 A sequence is returned where the values are only where the function returns `True`.
 
@@ -623,15 +624,15 @@ A sequence is returned where the values are only where the function returns `Tru
     fib = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
     result = filter(lessThanFive, fib)
     print result # [0, 1, 1, 2, 3]
-    
+
     # filter() with strings
     names = ['Jack', 'Jill', 'Steve', '']
     filter(None, names)  # empty strings, 0's and None's are False
-    
+
     # filter() with lambda
     result = filter(lambda x: x %2, fib)  # odd only
     print result # [1, 1, 3, 5, 13, 21, 55]
-    
+
     # filter's equivalent in list comprehension
     # [item for item in iterable if function(item)]  # if function not None
     # [item for item in iterable if item]  # if function is None
@@ -647,7 +648,7 @@ Map applies the function to all the elements of the sequence and returns this as
         return ((float(9)/5)*T + 32)
     temp = (36.5, 37, 37.5, 39)  # temp (C)
     F = map(fahrenheit, temp)
-    
+
     # map() with lambda
     Celsius = [36.5, 37, 37.5, 39]
     Fahrenheit = map(lambda x: (float(9)/5)*x + 32, Celsius)
@@ -656,7 +657,7 @@ Map applies the function to all the elements of the sequence and returns this as
 #### <a id="reduce">reduce</a>
 
 `reduce(function, sequence)` applies a function to a sequence and returns a single value (instead of a list like the above).
-The idea is that the first two items are reduced to a single value, 
+The idea is that the first two items are reduced to a single value,
 then that single value and the third value is reduced into a new single value.
 This repeats until no more items are in the list and we only have a single value.
 
@@ -668,7 +669,7 @@ Reduce is available through `functools.reduce`.
 
 #### <a id="zip">zip</a>
 
-`zip(sequence1, sequence2)` returns a list of tuples, where each tuple contains the ith element from each of the sequences. 
+`zip(sequence1, sequence2)` returns a list of tuples, where each tuple contains the ith element from each of the sequences.
 The returned list is truncated to the length of the shortest argument sequence.
 
     # zip()
@@ -712,11 +713,11 @@ A way to see if an object is immutable (e.g. a string) is by seeing memory locat
     >>mystr.__repr__
     <method-wrapper '__repr__' of str object at 0x7f74135cb5f0>
 	# See the memory location where our object mystr is stored
-	
+
 	>>mystr = "hey I changed!"
 	>>mystr.__repr__
     <method-wrapper '__repr__' of str object at 0x7f74135cb5f0>
-	# See that the object is now stored in a different memory location 
+	# See that the object is now stored in a different memory location
 
 	>>mystr_2 = mystr
 	>>mystr_2
@@ -731,7 +732,7 @@ A way to see if an object is immutable (e.g. a string) is by seeing memory locat
 	# Only when we change the value of our new variable does it point to a new memory location
 
 A way to see if an object is mutable (e.g. a list) is by seeing memory locations stay the same even when the object changes:
-	
+
 	>>mylist = [1, "hey", "there", None]
 	>>mylist.__repr__
 	<method-wrapper '__repr__' of list object at 0x7f7413546248>
@@ -759,14 +760,14 @@ A way to see if an object is mutable (e.g. a list) is by seeing memory locations
 	>>anotherlist.__repr__
 	<method-wrapper '__repr__' of list object at 0x7f7413546248>
 	# Notice that both lists are in the same memory location
-	
+
 	>>anotherlist[2] = "foo"
 	>>anotherlist
 	[1, "hey", "foo", None, "another item"]
 	>>mylist
 	[1, "hey", "foo", None, "another item"]
 	# Notice that both lists have now changed, even though we only modified anotherlist
-	
+
 	>>anotherlist.__repr__
 	<method-wrapper '__repr__' of list object at 0x7f7413546248>
 	>>mylist.__repr__
@@ -804,7 +805,7 @@ Mutable objects (usually containers, user-defined types):
 * user-defined classes (unless specifically made immutable)
 
 The exceptions are a __tuple__, which is an immutable container and
-a __frozenset__, which is an immutable version of set. 
+a __frozenset__, which is an immutable version of set.
 
 ### <a id="mutableimmutableerror">Common Error</a>
 
@@ -846,7 +847,7 @@ Instead, you want to do something that takes advantage of the mutability of a si
 
 	### Another way is to use a list comprehension
 	"".join([str(data) for data in container])
-	
+
 	### Or use a map function
 	"".join(map(str, container))
 
@@ -861,7 +862,7 @@ A __function__ is a block of reusable code that is used to perform specific acti
         age = age_yesterday + 1
         message = "Happy Birthday " + person + "! Congrats turning " + str(age)
         return message
-    
+
     happy_birthday(Will, 29)  # Happy Birthday Will! Congrats turning 30!
     happy_birthday('Laura', 26)  # Happy Birthday Laura! Congrats turning 27!
     happy_birthday(name='Billy')  # Happy Birthday Billy! Congrats turning 11!
@@ -874,19 +875,19 @@ A __class__ is like a blueprint or instruction manual for creating objects.  You
             """ Return a Customer object with name and balance """
             self.name = name
             self.balance = balance
-        
+
         def withdraw(self, amount):
             """ Return the balance remaining after withdrawing an amount """
             if amount > self.balance:
                 raise RuntimeError("Amount greater than available balance")
             self.balance -= amount
             return self.balance
-        
+
         def deposit(self, amount):
             """ Return balance remaining after depositing an amount """
             self.balance += amount
             return self.balance
-    
+
     will = Customer()  # Create an instance of the Class
 
 A __method__ is a function that is stored as a class attribute.  Here we declare a method called `get_size` and bind it to an instance of our object Pizza.
@@ -896,7 +897,7 @@ A __method__ is a function that is stored as a class attribute.  Here we declare
             self.size = size
         def get_size(self):
             return self.size
-    
+
     my_pizza = Pizza(size=5)
     my_pizza.get_size()  # 5
 
@@ -928,11 +929,11 @@ In Python classes we have __unbound__ and __bound__ methods.  When you access th
      class Customer(object):
         def withdraw():
             return "Withdrawing money!"
-    
+
     # Example of unbound method
     Customer.withdraw
     # <unbound method Customer.withdraw>
-    
+
     # Example of bound method
     Will = Customer()
     Will.withdraw
@@ -949,12 +950,12 @@ Besides bound and unbound methods, we have __static methods__ and __class method
         @classmethod
         def deposit(cls):
             return "Depositing money!"
-    
+
     Will = Customer()
     Will.withdraw  # <function withdraw at 0x00000000>
     Will.withdraw()  # Normally this would be a bound method, but staticmethod prevents it
     # 'Withdrawing money!'
-    
+
     Will.deposit  # <bound method type.deposit of <class '__main__.Customer'>>
     Will.deposit()  # 'Depositing money!'
 
@@ -964,25 +965,25 @@ __Class methods__ tells the method not to bind to an instance, but the `@classme
 
 #### <a id="decorators">Decorators</a>
 
-Decorators are functions that are applied right before your function or method call.  This is usually seen in something like a login function where say you can only run this specific function if you are logged in.  The decorator is a clean way to show this so you do not have to declare the login function inside your function. 
+Decorators are functions that are applied right before your function or method call.  This is usually seen in something like a login function where say you can only run this specific function if you are logged in.  The decorator is a clean way to show this so you do not have to declare the login function inside your function.
 
     def p_decorate(func):
         """ Wraps string around with <p> tags """
         def func_wrapper(name):
             return "<p>{0}</p>".format(func(name))
         return func_wrapper
-    
+
     # Example of decorating a function
     @p_decorate
     def get_text_clean(name):
         return "lorem ipsum, {0} dolor sit amet".format(name)
-    
+
     # Example of decorating a method
     class Person(object):
         def __init__(self):
             self.name = "Willy"
             self.family = "Liu"
-    
+
         @p_decorate
         def get_fullname(self):
             return self.name + " " + self.family
@@ -996,21 +997,21 @@ Classes in Python create objects, which provides all the standard features of Ob
 
 #### <a id="classattributes">Class Attribute Reference</a>
 
-When you create a Class, all variables are in the __local scope__ (i.e. referenced only inside the Class).  You can reference class objects with the pattern `Obj.name`; this can reference variables or methods.  
+When you create a Class, all variables are in the __local scope__ (i.e. referenced only inside the Class).  You can reference class objects with the pattern `Obj.name`; this can reference variables or methods.
 
 Example 1
 
     class Car(object):
         """ This is the docstring of a class """
-    
+
         wheels = 4
         def __init__(self, make, model):
             self.make = make
             self.model = model
-    
+
         def make_sound(self):
             print "Vroooom!"
-    
+
     mustang = Car('Ford', 'Mustang')
     print mustang.wheels  # 4
     print Car.wheels  # 4
@@ -1020,19 +1021,19 @@ Example 2
     class MyClass:
         """ A simple example class """
         i = 12345  # a class attribute set at the class level
-    
+
         def f(self):
             return 'hello world'
-    
+
     MyClass.i  # access an object integer
     # 12345
-    
+
     MyClass.f  # access an object method
     # <unbound method MyClass.f>
-    
+
     MyClass.__doc__  # access an object docstring
     # 'A simple example class'
-    
+
     MyClass.__dict__  # access an object dict
     # {'i': 12345, '__module__': '__main__', '__doc__': ' A simple class ', 'f': <function f at 0x0000000002BCA128>}
 
@@ -1048,7 +1049,7 @@ The instantiation operation ('calling' a class object) creates an empty object. 
         def __init__(self, realpart, imagpart):
             self.r = realpart
             self.i = imagpart
-    
+
     x = Complex(3.0, -4.5)
     x.r, x.i  #(3.0, -4.5)
 
@@ -1066,12 +1067,12 @@ The instantiation operation ('calling' a class object) creates an empty object. 
             return self.species
         def __str__(self):
             return "%s is a %s" % (self.name, self.species)
-    
+
     polly = Pet("Polly", "Parrot")
-    
+
     print "Polly is a %s" % polly.getSpecies()
     # Polly is a Parrot
-    
+
     print "Polly is a %s" % Pet.getSpecies(polly)
     # Polly is a Parrot
 
@@ -1094,9 +1095,9 @@ Classes can be derived from other classes and these can take many forms.  A __de
 
     class Vehicle(object):
         """ A vehicle for sale """
-    
+
         base_sale_price = 0
-    
+
         def __init__(self, wheels, miles, make, model, year, sold_on):
             """ Return a new Vehicle object """
             self.wheels = wheels
@@ -1105,19 +1106,19 @@ Classes can be derived from other classes and these can take many forms.  A __de
             self.model = model
             self.year = year
             self.sold_on = sold_on
-    
+
         def sale_price(self):
             """ Return the sale price for this vehicle """
             if self.sold_on is not None:
                 return 0.0  # Already sold
             return 5000.0 * self.wheels
-    
+
         def purchase_price(self):
             """ Return the price we would pay to purchase the vehicle """
             if self.sold_on is None:
                 return 0.0  # Not yet sold
             return self.base_sale_price - (.10 * self.miles)
-    
+
     class Car(Vehicle):
         def __init__(self, wheels, miles, make, model, year, sold_on):
             """ Return a new Car object """
@@ -1126,7 +1127,7 @@ Classes can be derived from other classes and these can take many forms.  A __de
             self.make = make
             self.model = model
             ...
-    
+
     class Truck(Vehicle):
         def __init__(self, wheels, miles, make, model, year, sold_on):
             """ Return a new Car object """
@@ -1141,62 +1142,62 @@ Classes can be derived from other classes and these can take many forms.  A __de
 In the above, we have a few issues in that there is still some repetition of fields and now we have a _Vehicle_ object when it is really a concept (and not a real thing).  We can abstract these methods with `from abc import ABCMeta, abstractmethod`.  For example:
 
     from abc import ABCMeta, abstractmethod
-    
+
     class Vehicle(object):
         """ Vehicle for Sale """
-    
+
         __metaclass__ = ABCMeta
-        
+
         base_sale_price = 0
         wheels = 0
-    
+
         def __init__(self, miles, make, model, year, sold_on):
             self.miles = miles
             self.make = make
             self.model = model
             self.year = year
             self.sold_on = sold_on
-    
+
         def sale_price(self):
             """Return sale price"""
             if self.sold_on is not None:
                 return 0.0  # Already sold
             return 5000.0 * self.wheels
-        
+
         def purchase_price(self):
             """ Return price we pay to purchase the vehicle """
             if self.sold_on is None:
                 return 0.0  # Not yet sold
             return self.base_sale_price - (.10 * self.miles)
-    
+
         @abstractmethod
         def vehicle_type(self):
             """ Return a string representing the type of vehicle this is """
             pass
-    
+
     class Car(Vehicle):
         """ A Car """
-    
+
         base_sale_price = 8000
         wheels = 4
-    
+
         def vehicle_type(self):
             """ Return a string representing the type of vehicle this is """
             return 'car'
-    
+
     class Motorcycle(Vehicle):
         """ A Motorcycle """
-    
+
         base_sale_price = 4000
         wheels = 2
-    
+
         def vehicle_type(self):
             """ Return a string representing the type of vehicle this is """
             return 'motorcycle'
 
 __Abstract Base Class__ creates a class that you can only inherit from.  By putting `__metaclass__ = ABC`, we created an ABC.
 
-__abstractmethod__ requires that the class has a `__metaclass__ = ABCMeta`. 
+__abstractmethod__ requires that the class has a `__metaclass__ = ABCMeta`.
 
 #### <a id="reflection">Reflection (aka Introspection)</a>
 
@@ -1241,7 +1242,7 @@ Python has a few 'magic' methods that add 'magic' to your classes.  These method
 `__del__(self)` - this is destructor; this defines behavior for when an object is garbaged collected (e.g. close a database connection, close a file object).  There is no guarantee that this will be executed on exit so be careful.
 
     from os.path import join
-    
+
     class FileObject:
         """ Wrapper for file objects """
         def __init__(self, filepath='~', filename='sample.txt'):
@@ -1292,14 +1293,14 @@ Descriptors are not meant to be used alone and instead are used when building ob
 
     class Meter(object):
         ''' Descriptor for a meter '''
-    
+
         def __init__(self, value=0.0):
             self.value = float(value)
         def __get__(self, instance, owner):
             return self.value
         def __set__(self, instance, value):
             self.value = float(value)
-    
+
     class Distance(object):
         ''' Class to represent distance using descriptor for meters '''
         meter = Meter()
@@ -1342,11 +1343,11 @@ Python functions are first-classed objects; this means they can be passed to fun
 
     class Entity(object):
         """ Class to represent an entity.  Callable to update the entity's position.  If no class inheritance, it is good practice to explicitly inherit from type 'object' """
-    
+
         def __init__(self, size, x, y):
             self.x, self.y = x, y
             self.size = size
-    
+
         def __call__(self, x, y):
             """ Change the position of the entity """
             self.x, self.y = x, y
@@ -1361,13 +1362,111 @@ PEP 343 introduces a new __with__ statement to Python so we don't have to be as 
 
     with VAR = EXPR:
         BLOCK
-    
+
     VAR = EXPR
     VAR.__enter__()
     try:
         BLOCK
     finally:
         VAR.__exit__()
+
+## <a id="mypy">mypy</a>
+
+__Mypy__ is an optional static type checker for Python that wants to combine the benefits of dynamic ('duck') typing
+and static typing. You get a type system and compile-time type checking. The idea is to go from dynamic typing to
+static typing.
+
+__Dynamic Typing__
+
+    def fib(n):
+        a, b = 0, 1
+        while a < n:
+            yield a
+            a, b = b, a+b
+
+__Statically Typed Python__
+
+    from typing import Iterator
+
+    def fib(n: int) -> Iterator[int]:
+        a, b = 0, 1
+        while a < n:
+            yield a
+            a, b = b, a+b
+
+### More mypy examples
+
+__Dynamic Typing__
+
+    class BankAccount:
+        def __init__(self, initial_balance=0):
+            self.balance = initial_balance
+        def deposit(self, amount):
+            self.balance += amount
+        def withdraw(self, amount):
+            self.balance -= amount
+        def overdrawn(self):
+            return self.balance < 0
+
+    my_account = BankAccount(15)
+    my_account.withdraw(5)
+    print(my_account.balance)
+
+__Static Typing__
+
+    class BankAccount:
+        def __init__(self, initial_balance: int = 0) -> None:
+            self.balance = initial_balance
+        def deposit(self, amount: int) -> None:
+            self.balance += amount
+        def withdraw(self, amount: int) -> None:
+            self.balance -= amount
+        def overdrawn(self) -> bool:
+            return self.balance < 0
+
+    my_account = BankAccount(15)
+    my_account.withdraw(5)
+    print(my_account.balance)
+
+### <a id="mro">Method Resolution Order</a>
+
+__Method resolution order (mro)__ is the order that Python looks for a method in a hierarchy of classes.
+For example, say Class C inherits from Class A and Class B.
+
+    class A:
+        def process(self):
+            print("Process A")
+
+    class B:
+        pass
+
+    class C(A, B):
+        pass
+
+    obj = C()
+    obj.process()  # Process A
+    print(C.mro())  # print MRO for Class C with results of: [<class '__main__.C'>, <class '__main__.A'>, <class '__main__.B'>, <class 'object'>]
+
+
+### <a id="protocols">Protocols</a>
+
+Protocols are a new class `typing.Protocol`, which is an instance of `abc.ABCMeta`).
+
+    from typing import Protocol
+
+    class SupportsClose(Protocol):
+        def close(self) -> None:
+            ...
+
+    class Resource:
+        ...
+        def close(self) -> None:
+            self.file.close()
+            self.lock.release()
+
+    # 'Resource' is now a subtype of 'SupportsClose' (aka where the 'magic' method resolution order happens)
+    # So if you iterate through all of 'SupportsClose', it'll also loop through 'Resource'
+
 
 ## <a id="testing">Testing</a>
 
@@ -1387,5 +1486,4 @@ Python has a couple ways to package and distribute your Python code:
   that can be imported in your setup.py script. There's also a
   `pkg_resources` Python package that can be imported in your code
   to locate data files installed with a distribution.
-
 

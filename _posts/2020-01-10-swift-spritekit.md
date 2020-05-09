@@ -29,6 +29,15 @@ Documentation topics include:
 * Shaders - Customize node drawing by augmenting the node's color or shape
 * Warping - Distort a node by supplying verticies and their transformations
 
+## Simulator and Building on an iPhone
+
+You can use the built-in simulator to simulate a phone or you can build directly to your phone.
+Just plug in your phone to your computer's usb and select your iPhone during the build in Xcode.
+
+
+* In Xcode, under Preferences > Account, you should add your AppleID and assign the project to a team
+* If you get 'Untrusted Developer' when launching your app on your phone, then open the 'Settings' > 'General' > 'Device Management' > Choose your profile > 'Trust myprofile'
+
 ### Nodes
 
 Nodes include:
