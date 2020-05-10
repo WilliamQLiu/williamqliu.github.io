@@ -73,7 +73,43 @@ SKView
       - SKSpriteNode2
       - SKSpriteNode3
 
-### Nodes
+### How do I create a Game
+
+You can create a 'Single Page Application' or a 'Game'. Select a 'Game' and then pick 'SpriteKit' so that it
+will prefill in some defaults.
+
+A SPA will get you a:
+
+* AppDelegate.swift (same as Game)
+* ViewController.swift (instead of GameViewController.swift, which is just using a View with the `SKView` class)
+* Main.storyboard (same as Game)
+* Assets.xcassets (same as Game)
+* LaunchScreen.storyboard (same as Game)
+* info.plist
+
+With a SPA, you will need to add in:
+
+* GameScene.sks (a game scene, which is a subclass of `SKScene`)
+* ViewController.swift / GameViewController.swift (connect the `GameScene.sks` with the `GameScene.swift`)
+
+## Assets
+
+Under `Assets.xcassets`, you can place your images, music, etc.
+
+## GameScene
+
+The `GameScene.sks` file allows you to modify your `SKScene`. You can:
+
+* Select the 'Size' of the Scene (e.g. iPhone SE)
+* Change the background color
+* Change the `Anchor Point` (e.g. reference for all your assets). E.g. anchor point 0,0 is bottom left
+* Change the 'Gravity' for the physics engine (X=0, Y=-9.8) is standard earth)
+* On the bottom right you can see all your `Assets` that you dragged in from above
+* Drag assets over and they appear as `SKSpriteNode` in your scene (and can then modify sprite sizes, textures, etc.
+* You can animate your 'SKSpriteNodes' by adding `Actions`. E.g. `Move Action` on the sprite node that looks like a cloud
+  The 'Action' can be found in your 'Object Library' (where you click on the '+' sign)
+
+## Nodes
 
 Nodes include:
 
