@@ -29,6 +29,29 @@ Documentation topics include:
 * Shaders - Customize node drawing by augmenting the node's color or shape
 * Warping - Distort a node by supplying verticies and their transformations
 
+## WWDC Videos
+
+* [Best Practices for Building SpriteKit Games](https://developer.apple.com/videos/play/wwdc2014/608/)
+  Talks about scalability, game structure, performance best practices
+* [Deeper into GameplayKit with DemoBots](https://developer.apple.com/videos/play/wwdc2015/609/)
+  Sample code for a demo game using best practices
+  [Documentation Archive for DemoBots](https://developer.apple.com/library/archive/samplecode/DemoBots/Introduction/Intro.html)
+* [Introducing GameplayKit](https://developer.apple.com/videos/play/wwdc2015/608/)
+  Provides common design patterns and architectures (works with SpriteKit, SceneKit, Metal)
+  E.g. Entities & Components, State Machines, Agents, Pathfinding, MinMax AI, Random Sources, Rule Systems
+* Can find additional videos under [Topics](https://developer.apple.com/videos/topics/) 'Games', '2D Graphics'
+
+### Introducing GameplayKit
+
+__Entities and Components__
+
+Classic Problem - given these objects, where does `[shoot:]`, `[move:]`, `[isTargetable]` go?
+
+    GameObject
+      > Projectile
+      > Tower
+      > Archer
+
 ## Simulator and Building on an iPhone
 
 You can use the built-in simulator to simulate a phone or you can build directly to your phone.
