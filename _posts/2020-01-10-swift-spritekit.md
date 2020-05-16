@@ -29,7 +29,7 @@ Documentation topics include:
 * Shaders - Customize node drawing by augmenting the node's color or shape
 * Warping - Distort a node by supplying verticies and their transformations
 
-## WWDC Videos
+# WWDC Videos
 
 * [Best Practices for Building SpriteKit Games](https://developer.apple.com/videos/play/wwdc2014/608/)
   Talks about scalability, game structure, performance best practices
@@ -41,16 +41,61 @@ Documentation topics include:
   E.g. Entities & Components, State Machines, Agents, Pathfinding, MinMax AI, Random Sources, Rule Systems
 * Can find additional videos under [Topics](https://developer.apple.com/videos/topics/) 'Games', '2D Graphics'
 
+## Best Practices for Building Spritekit Games
+
 ### Introducing GameplayKit
 
-__Entities and Components__
+The GameplayKit framework focuses on gameplay topics like AI, pathfinding, and autonomous movement (kinda like
+how Apple has SpriteKit, SceneKit, and Metal for a visual framework). Think of GameplayKit as an API of
+gameplay solutions with seven major features.
 
-Classic Problem - given these objects, where does `[shoot:]`, `[move:]`, `[isTargetable]` go?
+* Components - how to structure your game objects and game logic
+* State machines - describes the statefulness and state changes of your game objects
+* Agents - autonomously moving entities that are controlled by realistic behaviors and goals
+* Pathfinding - navigation graph generation and how we move entities between the passable areas in the game world
+* MinMax AI - give life to our computerr-controlled opponents
+* Randomization - allow random sources and distributions
+* Rule Systems - a way to model discreet and fuzzy logic
+
+#### Entities and Components
+
+Classic Problem - In games, there are many entities and components. Say we have a tower defense game
+and there are objects of say towers and archers, where does `[shoot:]`, `[move:]`, `[isTargetable]` go?
 
     GameObject
       > Projectile
       > Tower
       > Archer
+
+We can copy and paste code across archers and towers, but we now have duplicate code where you have to update.
+Another option is to use an inheritance model so that a higher class (say GameObject), but that also means
+shared functionality needs to move to a higher and higher hierarchies (to the point where a basic game object
+is now complicated with layers of inheritance). So what are other options? Entities and Components!
+
+__Components__ encapsulate singular elements of our game logic. Changing the above into components would
+make it have loose coupling from the hierarchy.
+
+    MoveComponent - deals with moving
+    ShootComponent - deals with shooting
+    TargetComponent - what it means to be targetable
+
+When you create a new entity in the game, just look up what components you have available.
+An example of this might be an archer that gets rooted (we can apply this affect by temporarily
+removing the 'MoveComponent').
+
+__Entities__ are defined through `GKEntity`, the entity base class, and it has a collection of components
+that you can add or remove dynamically.
+
+# Sample Code
+
+https://developer.apple.com/documentation/gameplaykit
+
+* Boxes: GameplayKit Entity-Component Basics
+* Dispenser: GameplayKit State Machine Basics
+* Pathfinder: GameplayKit Pathfinding Basics
+* AgentsCatalog: Using the Agents System in GameplayKit
+* FourInARow: Using the GameplayKit Minmax strategist for Opponent AI
+* DemoBots: Building a Cross Platform Game with SpriteKit and GameplayKit
 
 ## Simulator and Building on an iPhone
 
