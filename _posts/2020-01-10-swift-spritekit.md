@@ -206,6 +206,7 @@ __Pathfinding__ is an issue in many games. Let's first define a few things:
 * __Optimal path__ exists between any two connected nodes
 
 __GKGraph__
+
 `GKGraph` is the abstract graph base class. It is the container of graph nodes and dynamically allows you to
 add or remove nodes, connect new nodes, find paths between nodes. There are two specializations of the `GKGraph`,
 which are:
@@ -234,6 +235,7 @@ A `GKGraph` that works with pathing around obstacles as class `GKObstacleGraph`.
 Sample code looks like:
 
     /* Make an obstacle - a simple square */
+
     vector_float2 points[] = {{400,400}, {500,400}, {500,500}, {400,500}};
     GKPolygonObstacle *obstacle = [[GKPolygonObstacle alloc] initWithPoints:points count:4];
 
@@ -393,6 +395,60 @@ Games consist of three elements:
 * __Nouns__ (Properties) - the position, speed, health, equipment, etc.
 * __Verbs__ (Actions) - run, jump, use item, accelerate, etc.
 * __Rules__ - how your nouns and verbs interact
+
+What is a __Rule System__?
+
+Say you have a role-playing game with turn-based combat that include rules governing what happens when
+opposing characters move into the same space. You might have to calculate say an attack of opportunity for
+the monster that just landed next to your hero. These rules can quickly get complex with conditional logic statements.
+So what happens is that we have these systems with __emergent behavior__, cases where the interactions
+between simple entities follow simple rules, but lead to interesting patterns in the system as a whole.
+
+Rule systems provide an abstraction that treats certain elements of game logic as data, decompose your game into
+functional, reusable, and extensible pieces. By incorporating fuzzy logic, rule systems can treat decisions
+as continuous variables instead of discrete states, leading to complex behavior from even simple combinations of rules.
+
+Another example is binary driver AI
+
+* Input is distance
+* Output is either [slowDown] or [speedUp], but we might have some weird spots around the cutoff of say 5
+  where the AI doesn't know whether to speed up or slow down, resulting in jerky movements
+* With fuzzy logic, you don't have to be either slowDown or speedUp, can be inbetween (grades of true)
+* Fuzzy logic deals with approximations
+
+We separate what we should do from how we should do it
+
+* state facts about the world
+* take deferred actions based on the facts of the world
+
+We do this by designing a rule system, which indlues two main classes:
+
+* `GKRule` to represent a specific decision to be made based on external state
+* `GKRuleSystem` which evaluates a set of rules against state data to determine a set of facts
+
+__GKRule__ class
+
+A `GKRule` is made up of two parts, a boolean __predicate__ and an __action__.
+A rule's __predicate__ is the decision-making part; it evaluates a set of state information and returns a Boolean result.
+A rule's __action__ is code whose execution is triggered only when the predicate produces a true result.
+GameplayKit evaluates rules in the context of the rule system. Typically, a rule's predicate tests state data
+maintained by the rule system and its action either changes the system's state or asserts a fact.
+A rule does not need local state data; this allows you to design individual rules as functional units with well-defined
+behavior and reuse them in any rule system.
+
+__GKRuleSystem__ class
+
+A `GKRuleSystem` has three key parts: an __agenda of rules__, __state data__, and __facts__.
+The __agenda__ is where you combine a set of rules by adding them to the __agenda__ of a rule system object with
+(`addRule:` or `addRulesFromArray:` methods). By default, rules are evaluated based on order (or change `salience` property).
+The __state data__ is the rule system's `state` dictionary, which contains information rules can be tested against.
+The state dictionary can reference anything useful to your set of rules, including strings, numbers, or other classes.
+The __facts__ represent a conclusion drawn from the evaluation of rules in a system and can be any type of object.
+When a rule system evaluates its rules, the rule actions can _assert_ a fact or _retract_ a fact. Facts can vary
+in grade to define some __fuzzy logic__. For example, a character moving to a space might not always trigger
+an attack; you might instead trigger an attack only when the character moving is also in a vulnerable state.
+
+For details, see: https://developer.apple.com/library/archive/documentation/General/Conceptual/GameplayKit_Guide/RuleSystems.html
 
 # Sample Code
 
