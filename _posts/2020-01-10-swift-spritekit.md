@@ -81,10 +81,139 @@ make it have loose coupling from the hierarchy.
 
 When you create a new entity in the game, just look up what components you have available.
 An example of this might be an archer that gets rooted (we can apply this affect by temporarily
-removing the 'MoveComponent').
+removing the 'MoveComponent'). In SwiftKit, all components are a `GKComponent`.
 
 __Entities__ are defined through `GKEntity`, the entity base class, and it has a collection of components
 that you can add or remove dynamically.
+
+Example might look like:
+
+    /* Make our archer */
+    GKEntity *archer = [GKEntity entity];
+
+    /* Archers can move, shoot, be targeted */
+    [archer addComponent: [MoveComponent component]];
+    [archer addComponent: [ShootComponent component]];
+    [archer addComponent: [TargetComponent component]];
+
+    /* Create MoveComponentSystem */
+    GKComponentSystem *moveSystem = [GKComponentSystem systemWithComponentClass:MoveComponent.class];
+
+    /* Add archer's MoveComponent to the System */
+    [moveSystem addComponent: [archer componentForClass:MoveComponent.class]]
+
+#### State Machines
+
+__State Machines__ are the backbone of many gameplay elements like Animation, AI, UI, levels, etc.
+An example of a state machine might be PacMan, where we have:
+
+    Chase <-> Flee
+    Respawn
+    Defeated
+
+Another example might be animations with:
+
+    IdleAnimation <-> MoveAnimation
+    AttackAnimation
+
+Or a game user interface using states to show what UI elements to show and what other game elements are running:
+
+    Menu
+    Playing
+    Paused
+    GameOverr
+
+Different types of state machines include:
+
+__GKStateMachine__
+`GKStateMachine` is the general purpose finite state machine, which can only have a single current state, but
+can have all possible states too. `[enterState` causes state transition and checks if the transition is valid.
+Calls `[exit]` on previous, `[enter]` on next state and updates `currentState`
+
+__GKState__
+`GKState` is an abstract class that implements logic in Enter/Exit/Update. You would subclass GKState to define
+each state and the rules for allowed transitions between states. An instance of `GKStateMachine` would be used
+to manage a machine that combines several states. The idea behind this system is that it provides a way to organize
+code in your game by organizing state-dependent actions into methods that run when entering a state, exiting a
+state, and periodically while in a state (e.g. animation frame).
+
+#### Agents, Behaviors, and Goals
+
+So what does agents, behaviors, and goals solve? Games need believable movements (e.g. walk around a square building,
+you don't do sharp 90 degree turns when bumped into object)
+
+__Agents__ are a component that moves a game entity according to a set of goals and realistic constraints
+Class is `GKAgent` that is really just a `GKComponent`.
+
+* Driven by behaviors and goals
+* Realistic constraints
+
+__Behaviors__ are made up of a group of goals that influence the movement of an agent
+Class is `GKBehavior`, a dictionary-like container of goals wheer you can add/remove goals, adjust weights of goals, etc.
+
+* Goals combined via weights
+
+__Goals__ are an influence that motivates the movement of one or more agents. Class is `GKGoal`.
+
+* Examples can be 'Seek', 'Avoid', 'Flee', 'Follow Path', 'Wander', 'Intercept', 'Separate', etc.
+
+Sample Code for Agents, Behaviors, and Goals
+
+    /* Make some goals, we want to seek the enemy, avoid obstacles, target speed */
+    GKGoal *seek = [GKGoal goalToSeekAgent:enemyAgent];
+    GKGoal *avoid = [GKGoal goalToAvoidObstacles:obstacles];
+    GKGoal *targetSpeed = [GKGoal goalToReachTargetSpeed:50.0f];
+
+    /* Combine goals into behavior */
+    GKBehavior *behavior = [GKBehavior behaviorWithGoals:@[seek,avoid,targetSpeed] andWeights:@[@1.0,@5.0,@0.5]];
+
+    /* Make an agent - add the behavior to it */
+    GKAgent2D *agent = [[GKAgent2D* alloc] init];
+    agent.behavior = behavior;
+
+__AgentDelegate__ is a __protocol__ that synchronizes the state of an agent with its visual representation in
+your game; defined through `GKAgentDelegate`. Allows you to sync graphics, animations, physics with two callbacks:
+`[agentWillUpdate:]` called before updates and `[agentDidUpdate:]` called after updates for say
+a SpriteKit Node, a SceneKit Node, or a Render Component. Sample code looks like:
+
+    @implementation MyAgentSpriteNode
+
+    (void)agentWillUpdate:(GKAgent2D *)agent {
+
+        /* Position the agent to match our sprite */
+        agent.position = self.position;
+        agent.rotation = self.zRotation;
+    }
+
+    (void)agentDidUpdate:(GKAgent2D *)agent {
+
+        /* Update the sprite's position to match the agent */
+        self.position = agent.position;
+        self.zRotation = agent.rotation;
+    }
+
+So why use this? For say a space shooter game, you can have projectiles attack your ship with smart pathing
+based off the goals that are already predefined.
+
+#### Pathfinding
+
+__Pathfinding__ is an issue in many games. Let's first define a few things:
+
+* __Pathfinding__ operations on a navigation _graph_
+* __Graphs__ are collections of _nodes_
+* __Nodes__ are joined by _connections_
+* __Connections__ are _directional_ (whether single or bidirectional)
+* __Optimal path__ exists between any two connected nodes
+
+__GKGraph__
+`GKGraph` is the abstract graph base class. It is the container of graph nodes and dynamically allows you to
+add or remove nodes, connect new nodes, find paths between nodes. There are two specializations of the `GKGraph`,
+which are:
+
+* Grid Graphs
+* Obstacle Graphs
+
+
 
 # Sample Code
 
