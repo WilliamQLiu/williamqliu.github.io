@@ -214,7 +214,7 @@ which are:
 * Grid Graphs
 * Obstacle Graphs
 
-__Grid Graphs__
+##### __Grid Graphs__
 
 A `GKGraph` that works with 2D grids as class `GKGridGraph`.
 
@@ -223,7 +223,7 @@ A `GKGraph` that works with 2D grids as class `GKGridGraph`.
 * Optional diagonal connections
 * Easily add/removal of grid nodes
 
-__Obstacle Graphs__
+##### __Obstacle Graphs__
 
 A `GKGraph` that works with pathing around obstacles as class `GKObstacleGraph`.
 
@@ -235,7 +235,6 @@ A `GKGraph` that works with pathing around obstacles as class `GKObstacleGraph`.
 Sample code looks like:
 
     /* Make an obstacle - a simple square */
-
     vector_float2 points[] = {{400,400}, {500,400}, {500,500}, {400,500}};
     GKPolygonObstacle *obstacle = [[GKPolygonObstacle alloc] initWithPoints:points count:4];
 
@@ -253,7 +252,7 @@ Sample code looks like:
     /* Find path from start to end */
     NSArray *path = [graph findPathFromNode:startNode toNode:endNode];
 
-__GKGraphNode__
+##### __GKGraphNode__
 
 For advanced pathfinding, consider using `GKGraphNode`, the graph node base class. Use this if you need
 more advanced features (e.g. terrain type of mountains costs twice as much vs flat ground) so that you are
@@ -279,7 +278,7 @@ potential loss. An example of this is say tic-tac toe. You can use this for AI-c
 for suggesting moves for the human player. You might see this in say turn-based games (or any game with discrete moves).
 You can adjust the difficulty (e.g. how far the AI looks ahead or selecting suboptimal moves).
 
-__GKGameModel__ protocol
+##### __GKGameModel__ protocol
 
 The `GKGameModel` protocol the an abstraction fo the current game state. For a chess game, you might have:
 
@@ -288,7 +287,7 @@ The `GKGameModel` protocol the an abstraction fo the current game state. For a c
 * player scores
 * possible player moves
 
-__GKGameModelUpdate__ protocol
+##### __GKGameModelUpdate__ protocol
 
 The `GKGameModelUpdate` protocol is an abstraction of a game move; implement this to describe a move in your
 turn-based game so that a `GKStrategist` object can plan game moves.
@@ -296,18 +295,18 @@ turn-based game so that a `GKStrategist` object can plan game moves.
 * Used by MinMax to build the decision tree
 * Apply to `GKGameModel` to change state
 
-__GKGameModelPlayer__ protocol
+##### __GKGameModelPlayer__ protocol
 
 The `GKGameModelPlayer` is an abstraction of a player; implement this to describe a player in your
 turn-based game so that a `GKStrategist` object can plan game moves.
 
 * Players make moves via `GKGameModelUpdate`
 
-__GKMinmaxStrategist__ class
+##### __GKMinmaxStrategist__ class
 
 The `GKMinmaxStrategist` class is an AI that chooses moves in turn-based games using a __deterministic__ strategy.
 
-__GKMonteCarloStrategist__ class
+##### __GKMonteCarloStrategist__ class
 
 The `GKMonteCarloStrategist` class is an AI that chooses moves in turn-based games using a __probabilistic__ strategy.
 
@@ -449,6 +448,24 @@ in grade to define some __fuzzy logic__. For example, a character moving to a sp
 an attack; you might instead trigger an attack only when the character moving is also in a vulnerable state.
 
 For details, see: https://developer.apple.com/library/archive/documentation/General/Conceptual/GameplayKit_Guide/RuleSystems.html
+
+Example Code:
+
+    /* Make a rule system */
+    GKRuleSystem* sys = [[GKRuleSystem alloc] init];
+
+    /* Getting distance and asserting facts */
+    float distance = sys.state[@"distance"];
+    [sys assertFact:@"close" grade:1.0f - distance / kBrakingDistance];
+    [sys assertFact:@"far" grade:distance / kBrakingDistance];
+
+    /* Grade our facts - farness and closeness */
+    float farness = [sys gradeForFact@"far"]
+    float closeness = [sys gradeForFact@"close"];
+
+    /* Derive Fuzzy acceleration */
+    float fuzzyAcceleration = farness - closeness;
+    [car applyAcceleration:fuzzyAcceleration withDeltaTime:seconds];
 
 # Sample Code
 
