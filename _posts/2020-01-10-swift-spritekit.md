@@ -213,7 +213,186 @@ which are:
 * Grid Graphs
 * Obstacle Graphs
 
+__Grid Graphs__
 
+A `GKGraph` that works with 2D grids as class `GKGridGraph`.
+
+* Creates nodes on the grid
+* Cardinal connections
+* Optional diagonal connections
+* Easily add/removal of grid nodes
+
+__Obstacle Graphs__
+
+A `GKGraph` that works with pathing around obstacles as class `GKObstacleGraph`.
+
+* Obstacles are arbitrary polygons
+* Dynamically add or remove obstacles
+* Dynamically connect nodes
+* Obstacles can have a buffer radius ('safety zone' around obstacles)
+
+Sample code looks like:
+
+    /* Make an obstacle - a simple square */
+    vector_float2 points[] = {{400,400}, {500,400}, {500,500}, {400,500}};
+    GKPolygonObstacle *obstacle = [[GKPolygonObstacle alloc] initWithPoints:points count:4];
+
+    /* Make an obstacle graph */
+    GKObstacleGraph *graph = [GKObstacleGraph graphWithObstacles:@[obstacle] bufferRadius:10.0f];
+
+    /* Make nodes for hero position and destination */
+    GKGraphNode2D *startNode = [GKGraphNode2D nodeWithPoint:her.position];
+    GKGraphNode2D *endNode = [GKGraphNode2D nodeWithPoint:goalPosition];
+
+    /* Connect start and end node to graph */
+    [graph connectNodeUsingObstacles:startNode];
+    [graph connectNodeUsingObstacles:endNode];
+
+    /* Find path from start to end */
+    NSArray *path = [graph findPathFromNode:startNode toNode:endNode];
+
+__GKGraphNode__
+
+For advanced pathfinding, consider using `GKGraphNode`, the graph node base class. Use this if you need
+more advanced features (e.g. terrain type of mountains costs twice as much vs flat ground) so that you are
+not just using the shortest path. Or say you have portals that are a shortcut between places.
+
+__SpriteKit Integration__
+
+You can easily generate obstacles from SKNode bounds, physics bodies, or textures.
+
+    /* Makes obstacles from sprite textures */
+    (NSArray*)obstaclesFromSpriteTextures:(NSArray*)sprites accuracy:(float)accuracy;
+
+    /* Makes obstacles from node bounds */
+    (NSArray*)obstaclesFromNodeBounds:(NSArray*)nodes;
+
+    /* Makes obstacles from node physics bodies */
+    (NSArray*)obstaclesFromNodePhysicsBodies:(NSArray*)nodes;
+
+#### MinMax AI
+
+__MinMax AI__ looks at all player moves, builds a decision tree, and maximizes potential gain while minimizing
+potential loss. An example of this is say tic-tac toe. You can use this for AI-controlled opponents or
+for suggesting moves for the human player. You might see this in say turn-based games (or any game with discrete moves).
+You can adjust the difficulty (e.g. how far the AI looks ahead or selecting suboptimal moves).
+
+__GKGameModel__ protocol
+
+The `GKGameModel` protocol the an abstraction fo the current game state. For a chess game, you might have:
+
+* a list of players
+* current active player
+* player scores
+* possible player moves
+
+__GKGameModelUpdate__ protocol
+
+The `GKGameModelUpdate` protocol is an abstraction of a game move; implement this to describe a move in your
+turn-based game so that a `GKStrategist` object can plan game moves.
+
+* Used by MinMax to build the decision tree
+* Apply to `GKGameModel` to change state
+
+__GKGameModelPlayer__ protocol
+
+The `GKGameModelPlayer` is an abstraction of a player; implement this to describe a player in your
+turn-based game so that a `GKStrategist` object can plan game moves.
+
+* Players make moves via `GKGameModelUpdate`
+
+__GKMinmaxStrategist__ class
+
+The `GKMinmaxStrategist` class is an AI that chooses moves in turn-based games using a __deterministic__ strategy.
+
+__GKMonteCarloStrategist__ class
+
+The `GKMonteCarloStrategist` class is an AI that chooses moves in turn-based games using a __probabilistic__ strategy.
+
+Example Code
+
+    /* ChessGameModel implements GKGameModel */
+    ChessGameModel *chessGameModel = [ChessGameModel new];
+    GKMinmaxStrategist *minmax = [GKMinmaxStrategist new];
+
+    minmax.gameModel = chessGameModel;
+    minmax.maxLookAheadDepth = 6;
+
+    /* Find the best move for the active player */
+    ChessGameUpdate *chessGameUpdate = [minmax bestMoveForPlayer:chessGameModel.activePlayer];
+
+    /* Apply update to the game model */
+    [chessGameModel applyGameModelUpdate:chessGameUpdate];
+
+#### Random Sources
+
+We have `rand()`, but games have unique random number needs. We need:
+
+* Platform-independent determinism
+* Multiple Sources
+* Number distribution
+
+Features include:
+
+* deterministic
+* serializable
+* industry-standard algorithms
+* random distributions (true random, gaussian, anti-clustering)
+* NSArray shuffling (e.g. shuffle a deck of cards)
+
+__GKRandomSource__ class
+
+`GKRandomSource` is the base class for random sources.
+
+* Guaranteed determinism with same seed
+
+__GKRandomDistribution__ class
+
+`GKRandomDistribution` is the base class for random distribution; purely random.
+
+__GKRandomDistribution__ class
+
+`GKGaussianDistribution` is a "bell curve" distribution (leans more towards the mean)
+
+__GKShuffledDistribution__ class
+
+`GKShuffledDistribution` is an anti-clustering distribution that reduces or eliminates 'runs'.
+
+Code examples (simple usage):
+
+    /* Create a six-sided dice with its own random source */
+    let d6 = GKRandomDistribution.d6()
+
+    /* Get die value between 1 and 6 */
+    let choice = d6.nextInt()
+
+Code examples (custom die):
+
+    /* Create a custom 256-sided die with its own random source */
+    let d256 = GKRandomDistribution.die(lowest:1, highest:256)
+
+    /* Get die value between 1 and 256 */
+    let choice = d256.nextInt()
+
+Code examples (array shuffling)
+
+    /* Make a deck of cards */
+    var deck = [Ace, King, Queen, Jack, Ten]
+
+    /* Shuffle them */
+    deck = GKRandomSource.sharedRandom().shuffle(deck)
+    /* Possible result - [Jack, King, Ten, Queen, Ace] */
+
+    /* Get a random card from the deck */
+    let card = deck[0]
+
+#### Rule Systems
+
+Games consist of three elements:
+
+* __Nouns__ (Properties) - the position, speed, health, equipment, etc.
+* __Verbs__ (Actions) - run, jump, use item, accelerate, etc.
+* __Rules__ - how your nouns and verbs interact
 
 # Sample Code
 
