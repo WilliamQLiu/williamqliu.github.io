@@ -199,13 +199,13 @@ based off the goals that are already predefined.
 
 __Pathfinding__ is an issue in many games. Let's first define a few things:
 
-* __Pathfinding__ operations on a navigation _graph_
-* __Graphs__ are collections of _nodes_
-* __Nodes__ are joined by _connections_
-* __Connections__ are _directional_ (whether single or bidirectional)
+* __Pathfinding__ operations on a navigatio __graph__
+* __Graphs__ are collections of __nodes__
+* __Nodes__ are joined by __connections__
+* __Connections__ are __directional__ (whether single or bidirectional)
 * __Optimal path__ exists between any two connected nodes
 
-__GKGraph__
+##### __GKGraph__
 
 `GKGraph` is the abstract graph base class. It is the container of graph nodes and dynamically allows you to
 add or remove nodes, connect new nodes, find paths between nodes. There are two specializations of the `GKGraph`,
@@ -466,6 +466,47 @@ Example Code:
     /* Derive Fuzzy acceleration */
     float fuzzyAcceleration = farness - closeness;
     [car applyAcceleration:fuzzyAcceleration withDeltaTime:seconds];
+
+# Deeper into GameplayKit with DemoBots
+
+The tools and technology used for DemoBots include:
+
+## ActionEditor
+
+There are a lot of animation states for our bots. To keep these textures to a minimum,
+we can create some of the animations as Actions. For example, a zap action is a reference action.
+You create the action once, then can apply to multiple bots.
+
+## Assets Catalog
+
+Depending on the size of your device (e.g. ipad has more pixels, iphone has less pixels), you can
+specify different assets depending on device. As the scene height scales, the player height scales.
+
+## SKCameraNode
+
+The camera is a node in the scence (and has a position); this allows you to move the camera and
+change its position. You can add constraints (like following the hero). You can also add more constraints
+like if you are approaching the corner of the screen (when you get close to an edge, the camera stops
+following the hero).
+
+## GKStateMachine
+
+The PlayerBot state has the following states using a `GKStateMachine`:
+
+* Appear
+* Player Controlled
+* Hit
+* Recharging
+
+We also use states for the game state, e.g.
+
+* Game is Paused (e.g. menu)
+* Level is completed
+* Game is Running
+
+## GKEntity and GKComponent
+
+
 
 # Sample Code
 
