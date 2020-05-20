@@ -528,6 +528,13 @@ Just plug in your phone to your computer's usb and select your iPhone during the
 * In Xcode, under Preferences > Account, you should add your AppleID and assign the project to a team
 * If you get 'Untrusted Developer' when launching your app on your phone, then open the 'Settings' > 'General' > 'Device Management' > Choose your profile > 'Trust myprofile'
 
+### Format your code
+
+Some keyboard shortcuts:
+
+* Cmd + A = select all
+* Ctrl + I = format code
+
 ## Important Classes
 
 * `SKView` - an object that displays SpriteKit content - this content is provided by an `SKScene` object
@@ -582,9 +589,51 @@ With a SPA, you will need to add in:
 * GameScene.sks (a game scene, which is a subclass of `SKScene`)
 * ViewController.swift / GameViewController.swift (connect the `GameScene.sks` with the `GameScene.swift`)
 
+### Storyboard
+
+__Storyboards__ allow you to prototype and design multiple view controller views in one file. Storyboards also
+let you create transitions between view controllers. View controllers are called __scenes__ on the storyboard.
+By default, you have a `Main.storyboard`
+
+### AppDelegate
+
+A __delegate__ is a type that represents references to methods. Think of it as a 'pointer to a function'.
+The idea is that you need to be able to invoke a piece of code, but that piece of code you're going to invoke
+isn't known until runtime. Delegates are useful for things like event handlers, where you do different things
+based on different events. So basically someone sends a request to an object, then that object forwards the request
+to another object (the delegate).
+
+So what is an `AppDelegate.swift` file and `class: AppDelegate` do?
+The AppDelegate handles application lifecycle events. That means AppDelegate controls things like
+the app being launched, backgrounded, foregrounded, receiving data, etc.
+
+A bit more in detail, the system calls the `@UIApplicationMain` function and creates a singleton `UIApplication` object.
+
 ## Assets
 
-Under `Assets.xcassets`, you can place your images, music, etc.
+Under `Assets.xcassets`, you can place your images, music, etc. If you want a spritekit `.atlas`, you need to
+click on the `+` on the bottom of Xcode, then click `Add Files to <game>` (Note: just dragging files over in Finder
+does not do the same, you hvae to add files this way). If for a `.atlas` you see a Yellow folder, it means the
+folder was not added correctly (should be blue).
+
+An example of an asset folder with an atlas might be an animation, e.g.
+
+    BearImages.atlas
+        bear1.png
+        bear2.png
+        bear3.png
+        bear4.png
+
+## Tile Maps and Sets
+
+There are four tile sets you can create:
+
+* grid - top down game with square tiles, can also use for a side scroller
+* isometric - think like baldurs gate and civilization 4
+* hexagonal pointy - hexagon (with the point on top)
+* hexagonal flat - hexagon (with the flat side on top)
+
+For additional details, see this talk: https://developer.apple.com/videos/play/wwdc2016/610/
 
 ## GameScene
 
