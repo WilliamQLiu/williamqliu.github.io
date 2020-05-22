@@ -16,7 +16,7 @@ Note that Athena is based off of __Presto__, a distributed SQL query engine for 
 
 # Presto
 
-Athena uses Presto. 
+Athena uses Presto.
 
 https://github.com/prestodb/presto
 
@@ -100,7 +100,7 @@ Setup files:
     node.data-dir=/var/presto/data
 
     /presto-server-0.216/etc/log.properties
-    com.facebook.presto=INFO 
+    com.facebook.presto=INFO
 
 Setup Catalogs:
 
@@ -137,10 +137,10 @@ The errors that I've seen are issues like I setup a catalog incorrectly.
     presto> show catalogs;
 
     show catalogs;
-      Catalog  
+      Catalog
     -----------
-     localfile 
-     system    
+     localfile
+     system
     (2 rows)
 
     Query 20190220_235643_00000_jjy5y, FINISHED, 1 node
@@ -156,10 +156,10 @@ The errors that I've seen are issues like I setup a catalog incorrectly.
 
     #show schemas from <catalog> <like pattern>
     presto> show schemas from localfile;
-           Schema       
+           Schema
     --------------------
-     information_schema 
-     logs               
+     information_schema
+     logs
     (2 rows)
 
     Query 20190221_000330_00011_jjy5y, FINISHED, 1 node
@@ -174,9 +174,9 @@ The errors that I've seen are issues like I setup a catalog incorrectly.
 #### Show tables from catalog.schemas
 
     presto>show tables from localfile.logs;
-    Table       
+    Table
     ------------------
-     http_request_log 
+     http_request_log
     (1 row)
 
     Query 20190221_185008_00029_jjy5y, FINISHED, 1 node
@@ -308,7 +308,7 @@ Common DDL statements are CREATE, ALTER, and DROP.
       `protocol` string,
       `user_agent` string,
       `ssl_cipher` string,
-      `ssl_protocol` string 
+      `ssl_protocol` string
     )
     ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.RegexSerDe'
     WITH SERDEPROPERTIES (
@@ -316,4 +316,18 @@ Common DDL statements are CREATE, ALTER, and DROP.
       'input.regex' = '([^ ]*) ([^ ]*) ([^ ]*):([0-9]*) ([^ ]*):([0-9]*) ([.0-9]*) ([.0-9]*) ([.0-9]*) (-|[0-9]*) (-|[0-9]*) ([-0-9]*) ([-0-9]*) \"([^ ]*) ([^ ]*) (- |[^ ]*)\" (\"[^\"]*\") ([A-Z0-9-]+) ([A-Za-z0-9.-]*)$'
     ) LOCATION 's3://athena-examples-us-east-1/elb/plaintext/'
     TBLPROPERTIES ('has_encrypted_data'='false');
+
+## Athena Integration with AWS Glue
+
+__AWS Glue__ is a fully managed ETL service that can categorize your data, clean it, enrich it, and move it reliably
+between various data stores. __AWS Glue crawlers__ automatically infer database and table schema from your dataset,
+storing the associated metadata in the __AWS Glue Data Catalog__.
+
+So how does Athena work with Glue? Athena supports querying datasets and data sources that are registered with the
+AWS Glue Data Catalog.
+
+* When you run __Data Manipulation Language (DML)__ queries in Athena with the Data Catalog
+as your source, you are using the Data Catalog shcmea.
+* When you run __Data Definition Language ((DDL)__ queries, the schema you define are defined in the AWS Glue Data Catalog.
+
 
