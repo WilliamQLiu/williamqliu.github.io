@@ -41,6 +41,11 @@ You'll see the following configuration files in `~/.aws/`:
     ls ~/.aws/
     config  credentials
 
+## Boto 3 Stubs
+
+Note: Need MyPy installed first (for static typing)
+Add annotations for boto3 packages - https://pypi.org/project/boto3-stubs/
+
 ## AWS Auto Completer
 
 Identify where auto_completer is:
