@@ -234,6 +234,7 @@ A `GKGraph` that works with pathing around obstacles as class `GKObstacleGraph`.
 
 Sample code looks like:
 
+    ```swift
     /* Make an obstacle - a simple square */
     vector_float2 points[] = {{400,400}, {500,400}, {500,500}, {400,500}};
     GKPolygonObstacle *obstacle = [[GKPolygonObstacle alloc] initWithPoints:points count:4];
@@ -251,6 +252,7 @@ Sample code looks like:
 
     /* Find path from start to end */
     NSArray *path = [graph findPathFromNode:startNode toNode:endNode];
+    ```
 
 ##### __GKGraphNode__
 
