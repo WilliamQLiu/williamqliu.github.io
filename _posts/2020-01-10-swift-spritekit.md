@@ -232,28 +232,6 @@ A `GKGraph` that works with pathing around obstacles as class `GKObstacleGraph`.
 * Dynamically connect nodes
 * Obstacles can have a buffer radius ('safety zone' around obstacles)
 
-Sample code looks like:
-
-    ```swift
-    /* Make an obstacle - a simple square */
-    vector_float2 points[] = {{400,400}, {500,400}, {500,500}, {400,500}};
-    GKPolygonObstacle *obstacle = [[GKPolygonObstacle alloc] initWithPoints:points count:4];
-
-    /* Make an obstacle graph */
-    GKObstacleGraph *graph = [GKObstacleGraph graphWithObstacles:@[obstacle] bufferRadius:10.0f];
-
-    /* Make nodes for hero position and destination */
-    GKGraphNode2D *startNode = [GKGraphNode2D nodeWithPoint:her.position];
-    GKGraphNode2D *endNode = [GKGraphNode2D nodeWithPoint:goalPosition];
-
-    /* Connect start and end node to graph */
-    [graph connectNodeUsingObstacles:startNode];
-    [graph connectNodeUsingObstacles:endNode];
-
-    /* Find path from start to end */
-    NSArray *path = [graph findPathFromNode:startNode toNode:endNode];
-    ```
-
 ##### __GKGraphNode__
 
 For advanced pathfinding, consider using `GKGraphNode`, the graph node base class. Use this if you need
