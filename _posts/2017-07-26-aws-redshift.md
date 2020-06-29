@@ -35,10 +35,45 @@ In an Amazon Redshift data warehouse, we have the following architecture:
 * Client Applications connect (with JDBC or ODBC) to a Leader Node
 * The Leader Node then connects to a Data Warehouse Cluster (e.g. Compute Node 1 with many nodes,
   Compute Node 2 with many nodes)
+* Redshift uses a distributed architecture (Leader Node and various Compute Nodes)
+* The Leader Node is responsible for doing the query planning, handling the load, handling data
+  agggregation from multiple nodes, planning the queries, and passing that query to compute nodes
 
 Amazon Redshift is based on PostgreSQL so most existing SQL client applications
 will work with minimal changes. Communication is done through Amazon Redshift's
 PostgreSQL JDBC and ODBC.
+
+## Types of Clusters/Nodes
+
+A redshift __cluster__ consists of __nodes__. Different node types determine the CPU, RAM,
+and storage capacity. Types of nodes include:
+
+* __DC2__ - compute-intensive data warehouse with local SSD storage included. Recommended
+  for datasets under 1TB (compressed) for the best performance at the lowest price.
+  As your data grows, increase to RA3 nodes.
+* __RA3__ - has managed storage so you can optimize your warehouse by scaling and paying
+  for compute and manaaged storage independently. You pay for the number of nodes based on your
+  performance requirements and only pay for the managed storage you use. Size based on daily
+  amount of data processed.
+
+## Leader Node
+
+The Leader Node distributes SQL to the compute nodes when a query references user-created tables
+or system tables (e.g. tables with an `STL` or `STV` prefix and system views with an `SVL` or
+`SVV` prefix). Some queries are only run on the leader node, like referencing catalog tables (
+tables with a `PG` prefix or if it does not reference any tables).
+
+Some of the leader-node only functions include:
+
+* `CURRENT_SCHEMA`
+* `CURRENT_SCHEMAS`
+* `HAS_DATABASE_PRIVILEGE`
+* `HAS_SCHEMA_PRIVILEGE`
+* `HAS_TABLE_PRIVILEGE`
+
+So really, the leader node parses and develops execution plans to carry out database operations
+(some series of steps) and distributes the compiled code to the compute nodes and assigns a portion
+of the data to each compute node.
 
 ## Metadata with `PG_TABLE_DEF`
 
@@ -391,4 +426,18 @@ You can grant usage with:
 
     GRANT USAGE ON SCHEMA myschema TO GROUP mywebgroup;
     GRANT ALL ON SCHEMA myschema to GROUP mywebgroup;
+
+## Redshift Performance
+
+Some performance features include:
+
+* Massive Parallel Processing
+* Columnar Data Storage
+* Query Optimizer
+* Result Caching
+* Compiled Code
+
+Work Load Manager (WLM) - flexibly manage priorities with workloads so that short, fast-running queries
+won't get stuck in queues behind long-running queries
+
 
