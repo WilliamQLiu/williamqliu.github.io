@@ -81,4 +81,93 @@ Use an IAM Role when:
 * An application (e.g. EC2 instance) makes requests to other AWS resources.
 * An app that runs on a mobile phone needs to make requests to AWS
 
+### Federated Roles
 
+Your users might already have an identity outside of AWS (e.g. your corporate directory or a SAML like OKTA).
+If these users need to work with AWS resources, then they also need AWS security credentials.
+You can use an IAM role to specify permissions for those users whose identity is __federated__ from your organization
+or a third party identity provider.
+
+When do you use this? We might create an AWS IAM role for engineers with a `Principal` of `Federated` through the
+SAML provider OKTA. The action would be to `sts:AssumeRoleWithSAML`.
+
+## Terraform
+
+### IAM Resources
+
+Terraform __resources__ describe an infrastructure object, such as an EC2 or DNS record.
+
+    resource "aws_instance" "web" {
+      ami           = "ami-a1b2c3d4"
+      instance_type = "t2.micro"
+    }
+
+You can access information about resources in the same module using __expressions__.
+Use the syntax `<RESOURCE_TYPE>.<NAME>.<ATTRIBUTE>` syntax to reference a resource attribute in an expression.
+
+### IAM Data Sources
+
+Terraform __data sources__ allow data to be fetched or computed for use somewhere else in the Terraform configuration.
+You would use a data source when your Terraform needs to read information defined outside of Terraform or
+in another separate Terraform configuration.
+
+You access a data source via a special resource known as a __data resource__, which is declared using a `data` block.
+
+    # Fetch information about a specific IAM policy
+    data "aws_iam_policy" "example" {
+      arn = "arn:aws:iam::XXXXXX:policy/UsersManageOwnCredentials"
+    }
+
+    # Creates an IAM policy document in JSON format, for use with resources like an `aws_iam_policy` resource
+    data "aws_iam_policy_document" "example" {
+      statement {
+        sid = "1"
+
+        actions = [
+          "s3:ListAllMyBuckets",
+          "s3:GetBucketLocation",
+        ]
+
+        resources = [
+          "arn:aws:s3:::*",
+        ]
+      }
+
+      statement {
+        actions = [
+          "s3:ListBucket",
+        ]
+
+        resources = [
+          "arn:aws:s3:::${var.s3_bucket_name}",
+        ]
+
+        condition {
+          test     = "StringLike"
+          variable = "s3:prefix"
+
+          values = [
+            "",
+            "home/",
+            "home/&{aws:username}/",
+          ]
+        }
+      }
+
+      statement {
+        actions = [
+          "s3:*",
+        ]
+
+        resources = [
+          "arn:aws:s3:::${var.s3_bucket_name}/home/&{aws:username}",
+          "arn:aws:s3:::${var.s3_bucket_name}/home/&{aws:username}/*",
+        ]
+      }
+    }
+
+    resource "aws_iam_policy" "example" {
+      name   = "example_policy"
+      path   = "/"
+      policy = data.aws_iam_policy_document.example.json
+    }
