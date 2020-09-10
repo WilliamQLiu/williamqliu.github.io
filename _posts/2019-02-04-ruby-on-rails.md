@@ -256,3 +256,42 @@ automatically applied to every action in the application.
 ## Tests
 
 To run tests, do `rails test`
+
+## ActiveRecord
+
+__ActiveRecord__ is the __M__ (model) in __MVC__. ActiveRecord helps with the creation and use of objects
+whose data requires persistent storage to a database. ActiveRecord is an implementation of the __Active Record pattern__,
+which is a description of an __Object Relational Mapping__ system.
+
+### Active Record Pattern
+
+In the book 'Patterns of Enterprise Application Architecture', Active Record pattern says that objects carry both
+persistent data and behavior which operates on that data. Active Record takes the opinion that ensuring data access
+logic as part of the object will educate users of that object on how to read and write to a database.
+
+### Transactions
+
+* A transaction acts on a single database connection (not distributed across db connections)
+* `save` and `destroy` are wrapped in a transaction
+
+Transaction Code
+
+For this example, we take money from will and pass to laura only if neither `withdrawal` or `deposit` raises an exception.
+Exceptions will force a __rollback__ that returns the database to the state before the transaction began.
+However, objects will NOT have their instance data returned to their pre-transactional state.
+
+    ActiveRecord::Base.transaction do
+      will.withdrawal(100)
+      laura.deposit(100)
+    end
+
+Exception Handling
+
+There's a couple ways to make sure that your transaction worked OR is rolled back correctly.
+
+1. You can use validations to check for values that the transaction depends on
+2. You can raise exceptions in the callbacks to the rollback, including `after_*` callbacks
+
+Exceptions thrown within a transaction block will be propagated (after triggering the ROLLBACK), so be ready to
+catch those in your application code. An example of an exception is the `ActiveRecord::Rollback` exception, which
+will trigger a ROLLBACK when raised, but not be re-raised by the transaction block.
