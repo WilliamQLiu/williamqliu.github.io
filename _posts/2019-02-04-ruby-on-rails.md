@@ -295,3 +295,34 @@ There's a couple ways to make sure that your transaction worked OR is rolled bac
 Exceptions thrown within a transaction block will be propagated (after triggering the ROLLBACK), so be ready to
 catch those in your application code. An example of an exception is the `ActiveRecord::Rollback` exception, which
 will trigger a ROLLBACK when raised, but not be re-raised by the transaction block.
+
+Nested Transactions
+
+`transaction` calls can be nested. By deafult, all database statements in the nested transaction block should
+become part of the parent transaction. That means even if you have a `raise ActiveRecord::Rollback` exception inside
+a nested block, it might not issue a rollback if the parent transaction does not see it. In order to avoid that,
+you can pass `requires_new: true` to enable sub-transactions (so that the sub-transaction can be rolled back, but
+not roll back the parent transaction).
+
+So in short, `requires_new: true` basically creates a savepoint.
+
+Active Record emulates nested transactions using savepoints on MySQL and PostgreSQL.
+See details about rollbacks here: https://dev.mysql.com/doc/refman/5.7/en/savepoint.html
+
+Note: On MySQL, do NOT use Data Definition Language (DDL) operations in nested transaction blocks that are
+emulated with savepoints (i.e. do not execute statements like `CREATE TABLE` inside blocks). MySQL automatically
+releases all savepoints on executing a DDL operation.
+
+### Callbacks
+
+There are two types of callbacks associated with committing and rolling back transactions.
+These callbacks are used for interacting with other systems since you will be guaranteed that the callback is only
+executed when the database is in a permanent state. An example of this is `after_commit` is a good place to
+put in a hook to clear a cache since clearing it from within a transaction could trigger the cache to be
+regenerated before the database is updated. After committing will ensure your cache is up to date.
+
+* `after_commit` - this callback is called on every record saved or destroyed within a transaction immediately
+  after the transaction is committed
+* `after_rollback` - this callback is called on every record saved or destroyed within a transaction immediately
+  after the transaction OR savepoint is rolled back.
+
