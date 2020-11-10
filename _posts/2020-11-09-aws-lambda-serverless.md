@@ -114,7 +114,6 @@ Search, find, and track different event schemas using __schema registry__. You c
 * AWS Schema - e.g. S3
 * Custom Schema - custom create from a template or discover from JSON
 
-
 You can pick say an AWS event schema registry that shows the schema for say S3.
 
 # Amazon Kinesis
