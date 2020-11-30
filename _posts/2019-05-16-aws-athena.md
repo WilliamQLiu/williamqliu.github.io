@@ -330,4 +330,59 @@ AWS Glue Data Catalog.
 as your source, you are using the Data Catalog shcmea.
 * When you run __Data Definition Language ((DDL)__ queries, the schema you define are defined in the AWS Glue Data Catalog.
 
+### AWS Glue Schema Registry
+
+AWS Glue Schema Registry is a feature that lets you discover, control, and evolve data stream schemas.
+A __schema__ defines the structure and format of a data record. With Glue Schema Registry, you can manage
+and enforce schemas on your data streaming applications. Since Glue Schema Registry is in AWS, there's convenient
+integrations with MSK, Kinesis Data Streams, Kinesis Data Analytics for Apache Flink, and AWS Lambda.
+
+So what does Schema Registry solve? You can use a schema as a data contract between producers and consumers to
+ensure resilience for cases like upstream changes. The idea is that you can have many systems share a schema for
+serialization and de-serialization.
+
+#### What is a schema?
+
+A __schema__ defines the structure and format of a data record at a specific version. Formats can be in AVRO and
+has Java language support.
+
+#### What is a registry?
+
+A __registry__ is a logical container of schemas. Registries allow you to organize your schemas as well as manage
+access for which applications can access which schemas. A registry has an Amazon Resource Name (ARN) that lets you
+organize and set different access permissions to different schema operations.
+
+#### What are Open Source Serde Libraries?
+
+Serde libraries are serializer and deserializer libraries used for parsing data from different
+formats, such as CSV, JSON, Parquet, Apache AVRO, Apache Parquet, and ORC.
+
+#### Versioning and Compatibility
+
+Each schema can have multiple versions. Versioning is determined by a compatibility rule
+that is applied on a schema. When you try to register a new schema version, rules are
+checked based off the previous compatibility rule. There are 8 compatibility modes:
+
+* `NONE` - No compatibility mode applies; use for development.
+  Any new version will be accepted and there are no compatibility checks.
+* `DISABLED` - Prevents versioning for a particular schema. No new versions can be added.
+* `BACKWARD` - Recommended; allows consumers to read both the current and previous schema version.
+  Use this to check compatibility against the previous schema version when you delete fields
+  or add optional fields.
+* `BACKWARD_ALL` - Allows consumers to read both current and all previous schema versions.
+  Use this to check compatibility against all previous schema versions when you delete fields
+  or add optional fields.
+* `FORWARD` - Allows consumers to read both current and the subsequent schema versions, but not
+  the later versions. A use case is when your application has been created for a previous schema
+  and should be able to process a more recent schema.
+* `FORWARD_ALL` - Allow consumers to read data written by producers of any new registered schema.
+  Use this choice when you need to add fields or delete optional fields, and check compatibility
+  against all previous schema versions.
+* `FULL` - Allows consumers to read data written by producers using the previous or next version
+  of the schema, but not earlier or later versions. You can use this choice to check compatibility
+  against the last schema version when you add or remove optional fields.
+* `FULL_ALL` - Allows consumers to read data written by producers using all previous schema versions.
+  Use this choice to check compatibility against all previous schema versions when you add or remove
+  optional fields.
+
 
