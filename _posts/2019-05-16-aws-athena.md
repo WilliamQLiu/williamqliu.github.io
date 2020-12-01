@@ -385,4 +385,30 @@ checked based off the previous compatibility rule. There are 8 compatibility mod
   Use this choice to check compatibility against all previous schema versions when you add or remove
   optional fields.
 
+#### How does the Schema Registry work?
+
+The Schema Registry works as:
+
+1. Register a schema. The schema name should equal to the name of the destination (e.g. `test_topic`, `test_stream`)
+   or the producer can provide a custom name for the schema. Producers can also add key-value pairs to the schema
+   as metadata (e.g. `source: msk_kafka_topic_A`).
+   Once registered, the Schema Registry returns the schema version id to the serializer.
+   Note: Compatibility checks are then done on the schema to ensure the new version is compatible before being registered
+   as the new version.
+   You can register the schema in two ways: __manually__ or __auto-registration__.
+   * Manual is done through the AWS Glue Console or CLI/SDK
+   * Auto-Registration is done if you turn this setting on in the producer configurations.
+     If a `REGISTRY_NAME` is not provided, then the new schema version will be under the default
+     registry of `default-registry`.
+2. The serializer validates the data records against the schema. If the schem of the record does not
+   match a registered schema, the serializer will return an exception and the application will fail to deliver the
+   record to the destination.
+3. Serialize and deliver the records (if the record compiles with the schema with optional compression).
+4. Consumers deserialize the data; consumer reads the data using the Schema Registry deserializer library
+5. Deserializer may request the schema from the Schema Registry; the schema may also be cached locally on the consumer
+   If the Schema Registry cannot deserialize the record, the consumer can log the data from the record and move on or
+   half the application
+6. The deserialize uses the schema to deserialize the record (with optional decompressing if record was compressed)
+
+Note: There is also resource-level permissions and identity-based IAM policies you can apply
 
