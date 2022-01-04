@@ -1088,11 +1088,33 @@ If you only want to match on one or only a few column values from each set, then
 
 Use the __INTERSECT__ keyword to do set intersection and find the common values
 
+Example:
+
+E.g. Show me orders with a specific product number that has a Quantity greater than zero.
+
+```SQL
+SELECT DISTINCT OrderNumber
+FROM Order_Details
+WHERE ProductNumber IN (1, 2, 6, 11)
+INTERSECT
+SELECT DISTINCT OrderNumber
+FROM Supplier_Details
+WHERE Quantity > 0;
+```
+
 #### Difference
 
 Remove from the first set all the matching members you find in the second set, and the result is the __difference__.
 
 Use the __EXCEPT__ keyword to do set difference and find the not common values
+
+E.g. Show me the orders that contain a bike but not a helmet.
+
+```SQL
+SELECT DISTINCT OrderNumber
+FROM Order_Details
+WHERE ProductNumber IN (1, 2, 6, 11)
+  AND ProductNumber NOT IN (10, 25, 26)
 
 #### Union
 
@@ -1106,6 +1128,17 @@ In order to run a UNION, you need to make sure that:
 
 * Each of the two SELECT statements that you are linking with a UNION must have the same number of output columns
 * Each corresponding column must be 'comparable'.
+
+UNION and UNION ALL combines the result of two or more SELECT statements (with each statement having the same number of columns, data types, and order).
+
+* UNION selects distinct values only.
+* UNION ALL allows duplicates.
+
+```SQL
+SELECT column_name(s) FROM table1 UNION SELECT column_name(s) FROM table2;
+
+SELECT column_name(s) FROM table1 UNION ALL SELECT column_name(s) FROM table2;
+```
 
 ## Chapter 8 - INNER JOINs
 
@@ -1150,6 +1183,13 @@ Examples:
   Displaying bowling teams and the name of each team captain
   Return only students that have registered for a class and classes for which a student has registered
 
+Note: Remember that when you join, provide a column reference that includes the table name. E.g.
+
+```
+SELECT Employees.FirstName, Employees.LastName, Employees.PhoneNumber
+FROM Employees
+```
+
 ### Derived Tables
 
 An embedded SELECT statement is a __derived table__, meaning you can substitute an entire SELECT statement
@@ -1177,6 +1217,11 @@ Use an OUTER JOIN with a test for Null values is an alternate way of discovering
 Examples:
   The rows with a Null value in the columns from the Classes table represent the difference between the set of
   all students and the set of students who have registered for a class
+
+```SQL
+SELECT column_name(s) FROM table1 FULL OUTER JOIN table2 ON table1.column_name=table2.column_name;
+```
+
 
 ### LEFT / RIGHT OUTER JOIN
 
@@ -1212,11 +1257,27 @@ rows on the 'left' side of the JOIN, you see Null values from the result set on 
 # Chapter 11 - Subqueries
 
 A __subquery__ is a SELECT expression that you embed inside one of the clauses of a SELECT statement to form
-your final query statement. There are three different types of subqueries:
+your final query statement.
 
-* __Row subquery__ - embedded SELECT expression that returns more than one column and no more than one row
+Why would you need this? You can build complex filters that do not rely on the tables in your `FROM` clause.
+Using a subquery in a `WHERE` clause is the only way to get the correct number of rows in your answer when you
+want rows from one table based on the filtered contents from other related tables.
+
+There are three different types of subqueries:
+
+* __Row subquery__ - embedded SELECT expression that returns more than one column and only one row.
+  Use to build a __raw value constructor__ (comparison)
 * __Table subquery__ - embedded SELECT expression that returns one or more columns and zero to many rows
 * __Scalar subquery__ - embedded SELECT expression that returns only one column and no more than one row
+
+
+You can use subqueries to generate an output column or to perform a complex comparision in a `WHERE` clause.
+Subqueries can often be replaced more effectively with a join, but are often used to fetch the results of a function
+calculation (aggregate). E.g.
+
+* "List vendors and a count of the products they sell to us"
+* "Display products and the latest date the product was ordered"
+* "List all staff members and the count of classes each teaches"
 
 ## Row Value Constructor
 
@@ -1262,6 +1323,112 @@ Example:
     FROM Orders
     WHERE Orders.ShipDate = '2017-10-03'
 
+### Special Predicate Keywords for Subqueries
+
+There are special predicate keywords for use in a `WHERE` clause with a subquery, including:
+
+* Set Membership: `IN` - use the `IN` keyword in a `WHERE` clause to compare a column or expression to a list of values.
+  Each value in the `IN` list could be a scalar subquery.
+* Quantified Predicate: `ALL`
+* Quantified Predicate: `SOME`
+* Quantified Predicate: `ANY`
+* Existence: `EXISTS`
+
+#### Set Membership: `IN`
+
+Select the recipe title from the recipes where the recipe ID is in the recipe ingredients from the inner joined
+with the ingredient classes that have a recipe class of 'Seafood'.
+
+```SQL
+SELECT RecipeTitle
+FROM Recipes
+WHERE Recipes.RecipeID IN
+  (SELECT RecipeID
+   FROM Recipe_Ingredients
+   WHERE Recipie_Ingredients.IngredientID IN
+   (SELECT IngredientID
+    FROM Ingredients
+    INNER JOIN Ingredient_Classes
+      ON Ingredients.IngredientClassID = Ingredient_Classes.IngredientClassID
+    WHERE Ingredient_classes.IngredientClassDescription = 'Seafood'
+   )
+  )
+```
+
+Notice how we do not want to use a complex JOIN in the outer query since we might get duplicates (more than one row per recipe
+that has more than one seafood ingredient). You can use a `DISTINCT`, but your database will have to do more work then.
+`DISTINCT` to remove
+
+#### Quantified Predicates (`ALL`, `SOME`, `ANY`)
+
+You have to SELECT as a table subquery that returns exactly one column and zero or more rows. If the subquery
+returns more than one row, the values in the row make up a list.
+
+* `ALL` comparison must be true for all the values returned by the subquery
+* `SOME` or `ANY` then the comparison only needs to be true for only one value in the list
+
+If the subquery returns no rows, then any comparison predicate with the `ALL` keyword is true, any with the `SOME` or `ANY` keyword is false.
+
+```
+SELECT Recipes.RecipeTitle
+FROM Recipes
+WHERE Recipes.RecipeID IN
+  (SELECT Recipe_Ingredients.RecipeID
+   FROM Recipe_Ingredients
+   WHERE Recipe_Ingredients.IngredientID = ANY
+   (SELECT Ingredients.IngredientID
+    FROM Ingredients
+    WHERE Ingredients.IngredientName
+    IN ('Beef', 'Garlic')
+   )
+  )
+```
+
+#### Existence: `EXISTS`
+
+Use `EXISTS` to check if a related row exists in the result set returned by a subquery.
+
+E.g. Find all the customers who ordered a bicycle
+
+```SQL
+SELECT Customers.CustomerID, Customers.CustFirstName, Customers.CustLastName
+FROM Customers
+WHERE EXISTS
+  (SELECT *
+   FROM (Orders
+         INNER JOIN Order_Details
+           ON Orders.OrderNumber = Order_Details.OrderNumber
+        )
+   INNER JOIN Products
+     ON Products.ProductNumber = Order_Details.ProductNumber
+   WHERE Products.CategoryID = 2
+     AND Orders.CustomerID = Customers.CustomerID)
+```
+
+## Subqueries as Filters
+
+### `HAVING`
+
+Use a `HAVING` clause to filter out groups of information from a subquery.
+
+# Part IV - Summarizing and Grouping Data
+
+## Chapter 12 - Simple Totals
+
+Aggregates have a simple syntax.
+
+```
+COUNT() <DISTINCT> expression AS alias
+SUM
+AVG
+MAX
+MIN
+```
+
+Each aggregate calculates a single value from the rows in a result set.
+
+Except `COUNT(*)`, all aggregate functions automatically disregard Null values.
+
 ## Aggregate Functions
 
 Standard SQL defines many functions that calculate values in a query. A subclass of functions are
@@ -1272,10 +1439,14 @@ or calculcate the average or total of some value or expression across a result s
 ### COUNT
 
 Use __COUNT__ to determine the number of rows or the number of non-Null values in a result set.
-Use `COUNT(*)` to find out how many rows are in the entire set.
+Use `COUNT(*)` to find out how many rows are in the entire set. Note: this is the only aggregate function to count Nulls.
 Use `COUNT(my_column_name)` to count the number of rows with non-Null values in that column.
 Use `COUNT DISTINCT` to count only the unique values.
 
-## Subqueries as Filters
+e.g.
 
+```SQL
+SELECT LastName, COUNT(*) AS CountOfStudents
+FROM Students
+```
 
