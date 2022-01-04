@@ -1462,3 +1462,51 @@ SELECT COUNT(DISTINCT CustCounty) AS NumberOfUniqueCounties
 FROM Customers
 ```
 
+### Using Aggregates and subqueries
+
+E.g. "List the name of every bowler whose personal average score is greater than the overall average score"
+
+```SQL
+
+SELECT Bowlers.BowlerLastName, Bowlers.BowlerFistName
+FROM Bowlers
+WHERE (SELECT AVG(RawScore)
+FROM Bowler_Scores AS BS
+WHERE BS.BowlerID = Bowlers.BowlerID)
+> (SELECT AVG(RawScore) FROM Bowler_Scores)
+ORDER BY Bowlers.BowlerLastName, Bowlers.BowlerFirstName
+```
+
+## Chapter 13 - Grouping Data
+
+Grouping data is usually done with aggregates
+
+E.g. "Show me each entertainment group's name, count of contracts for the group, total price of contracts"
+
+```SQL
+SELECT Entertainers.EntStageName,
+  COUNT(*) AS NumContracts,
+  SUM(Engagements.ContractPrice) AS TotalPrice
+FROM Entertainers
+INNER JOIN Engagements
+ON Entertainers.EntertainerID = Engagements.EntertainerID
+GROUP BY Entertainers.EntStageName
+```
+
+### `GROUP BY`
+
+Get a subtotal across groups using aggregate functions and `GROUP BY`.
+
+## Chapter 14 - Filtering Grouped Data
+
+### `HAVING`
+
+Use `HAVING` after a `GROUP BY` to filter out additional data.
+Note that you can filter on `WHERE` or `HAVING`.
+
+* Use `WHERE` to filter rows before your database groups them. Eliminate here first so you don't do extra work
+* Be careful in `WHERE` where you exclude Nulls / zero results, that's when you want to group and use `HAVING`
+
+## Chapter 15 - Modifying Sets of Data
+
+`UPDATE`
