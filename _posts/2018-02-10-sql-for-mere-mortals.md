@@ -1443,10 +1443,22 @@ Use `COUNT(*)` to find out how many rows are in the entire set. Note: this is th
 Use `COUNT(my_column_name)` to count the number of rows with non-Null values in that column.
 Use `COUNT DISTINCT` to count only the unique values.
 
-e.g.
+e.g. Select the number of students
 
 ```SQL
-SELECT LastName, COUNT(*) AS CountOfStudents
+SELECT COUNT(*) AS CountOfStudents
 FROM Students
+```
+
+e.g. Count the number of non-Null county values
+```SQL
+SELECT COUNT(CustCounty) AS NumberOfKnownCounties
+FROM Customers
+```
+
+e.g. How many unique county names are there in the customers table
+```SQL
+SELECT COUNT(DISTINCT CustCounty) AS NumberOfUniqueCounties
+FROM Customers
 ```
 
