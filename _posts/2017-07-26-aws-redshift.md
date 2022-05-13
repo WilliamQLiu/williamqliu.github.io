@@ -163,6 +163,15 @@ Amazon EMR. It might look like:
     [ CATALOG ROLE 'catalog-role-arn-string' ]
     [ CREATE EXTERNAL DATABASE IF NOT EXISTS ]
 
+E.g.
+
+    CREATE EXTERNAL SCHEMA my_raw_schema
+    FROM DATA CATALOG DATABASE
+        'my_raw_staging_schema'
+    IAM_ROLE 'arn:aws:iam::something:role/role_name';
+
+Where `my_raw_staging_schema` is your database in Athena.
+
 ### Create External Table
 
 To create an external table, it might look like this:
@@ -183,6 +192,8 @@ Say we have S3 data in: s3://my-bucket-name/tickit/spectrum/sales
     TABLE PROPERTIES ('numRows'='172000');
 
 Additional Details here: https://docs.aws.amazon.com/redshift/latest/dg/c-spectrum-external-tables.html
+
+An external table can be say a table that's AWS Athena.
 
 ### View External Table Metadata
 
@@ -439,5 +450,16 @@ Some performance features include:
 
 Work Load Manager (WLM) - flexibly manage priorities with workloads so that short, fast-running queries
 won't get stuck in queues behind long-running queries
+
+## Errors
+
+You can query for recent query errors in:
+
+```
+SELECT *
+FROM stl_error
+ORDER BY recordtime DESC
+LIMIT 100;
+```
 
 
