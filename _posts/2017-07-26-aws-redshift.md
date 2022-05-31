@@ -469,6 +469,14 @@ You can also create an AWS Lambda UDF that use custom functions defined in Lambd
 The Lambda route can overcome some of the current limitations of Python and SQL UDFs (e.g. access network
 and storage resources).
 
+### List UDFs
+
+All UDFs are in `pg_proc`. You might want to only see your custom named ones (usually starts with `f_`)
+```
+SELECT * FROM pg_proc
+WHERE proname ILIKE 'f_%' LIMIT 100;
+```
+
 ### Scalar SQL UDF
 
 A scalar SQL UDF uses a SQL SELECT clause that runs when the function is called and returns a single value.
