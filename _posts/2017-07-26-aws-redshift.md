@@ -462,4 +462,54 @@ ORDER BY recordtime DESC
 LIMIT 100;
 ```
 
+## UDFs
 
+You can create a UDF using either a SQL SELECT or a Python program.
+You can also create an AWS Lambda UDF that use custom functions defined in Lambda as part of your SQL queries.
+The Lambda route can overcome some of the current limitations of Python and SQL UDFs (e.g. access network
+and storage resources).
+
+### Scalar SQL UDF
+
+A scalar SQL UDF uses a SQL SELECT clause that runs when the function is called and returns a single value.
+To create this [function](https://docs.aws.amazon.com/redshift/latest/dg/r_CREATE_FUNCTION.html), you have
+optional input arguments (each argument needs to have a data type, referenced by $1, $2, etc) and we have one return data type.
+
+```
+create function f_sql_greater (float, float)
+  returns float
+stable
+as $$
+  select case when $1 > $2 then $1
+    else $2
+  end
+$$ language sql;
+```
+
+### Scalar Python UDF
+
+A scalar Python UDF uses a Python program that runs when the function is called and returns a single value.
+This is similar to the scalar SQL UDF except for our input arguments, each argument must have a name and a data type.
+The input and return data types can be [Redshift data types](https://docs.aws.amazon.com/redshift/latest/dg/udf-data-types.html)
+or a Python [ANYELEMENT data type](https://docs.aws.amazon.com/redshift/latest/dg/udf-creating-a-scalar-udf.html#udf-anyelement-data-type)
+
+Creating:
+```
+create function f_py_greater (a float, b float)
+  returns float
+stable
+as $$$
+  if a > b:
+    return a
+  return b
+$$ language plpythonu;
+```
+
+How to use:
+```
+select f_py_greater (commission, pricepaid*0.20) from sales;
+```
+
+### Scalar Lambda UDF
+
+Recommend that you name all UDFs using the prefix `f_` (reserved exclusiviely for all UDFs for Redshift).
