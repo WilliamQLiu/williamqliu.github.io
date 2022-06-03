@@ -484,8 +484,8 @@ To create this [function](https://docs.aws.amazon.com/redshift/latest/dg/r_CREAT
 optional input arguments (each argument needs to have a data type, referenced by $1, $2, etc) and we have one return data type.
 
 ```
-create function f_sql_greater (float, float)
-  returns float
+create function f_sql_greater (double precision, double precision)
+  returns double precision
 stable
 as $$
   select case when $1 > $2 then $1
@@ -503,13 +503,13 @@ or a Python [ANYELEMENT data type](https://docs.aws.amazon.com/redshift/latest/d
 
 Creating:
 ```
-create function f_py_greater (a float, b float)
-  returns float
+create function f_py_greater (a double precision, b double precision)
+  returns double precision
 stable
 as $$$
   if a > b:
-    return a
-  return b
+    return float(a)
+  return float(b)
 $$ language plpythonu;
 ```
 
