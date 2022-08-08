@@ -91,6 +91,40 @@ or a third party identity provider.
 When do you use this? We might create an AWS IAM role for engineers with a `Principal` of `Federated` through the
 SAML provider OKTA. The action would be to `sts:AssumeRoleWithSAML`.
 
+### AWS Service Role
+
+A role that a service assumes to perform actions in your account on your behalf.
+Some AWS services require a role for the service to assume; this role must include all the permissions
+required for the service to access the AWS resources that it needs.
+You can create, modify, and delete a service role from within IAM.
+
+### AWS Service Linked Roles
+
+An IAM service-linked role is a unique type of IAM role that is linked directly to a service (e.g. MSK Connect).
+Service-linked roles are predefined by the service and includes all the permissions that the service requires to
+call other AWS services on your behalf.
+
+An advantage to a service-linked role is that you do not have to manually add the necessary permissions; the
+service (e.g. MSK Connect) defines the permissions and only the service can assume its roles. This includes:
+
+* the trust policy
+* the permissions policy
+
+Check [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-services-that-work-with-iam.html) for AWS Services that have Service-linked roles
+
+For an example service like MSK Connect, you do not need to manually create a service-linked role. When you create
+a connector, MSK Connect creates the service-linked role for you.
+
+### Cross-service confused deputy prevention
+
+The confused deputy problem is a security issue where an entity that doesn't have permission to perform an action
+can coerce a more-privileged entity to perform the action. Cross-service impersonation can occur when one service
+(the calling service) calls another service (the called service). The calling service can be manipulated to use its
+permissions to act on another customer's resources in a way it should not have permission to access.
+
+AWS recommends using the `aws:SourceArn` and `aws:SourceAccount` global condition context keys in resource policies
+to limit the permissions that MSK Connect gives another service to the resource.
+
 ## Terraform
 
 ### IAM Resources
