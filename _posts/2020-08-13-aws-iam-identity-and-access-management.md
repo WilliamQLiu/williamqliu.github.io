@@ -89,7 +89,7 @@ You can use an IAM role to specify permissions for those users whose identity is
 or a third party identity provider.
 
 When do you use this? We might create an AWS IAM role for engineers with a `Principal` of `Federated` through the
-SAML provider OKTA. The action would be to `sts:AssumeRoleWithSAML`.
+SAML provider OKTA. The action would be to `sts:AssumeRoleWithSAML`. See 'sts' for details below.
 
 ### AWS Service Role
 
@@ -205,3 +205,20 @@ You access a data source via a special resource known as a __data resource__, wh
       path   = "/"
       policy = data.aws_iam_policy_document.example.json
     }
+
+## AWS Security Token Service (STS)
+
+AWS Security Token Service (STS) is a web service that lets you request temporary, limited-privilege credentials
+for AWS Identity and Access Management (IAM) useres or for users you authenticate (federated users).
+
+AWS STS is availabile as a global service where all STS requests got to a single endpoint at `https://sts.amazonaws.com`.
+
+You can run a few actions including:
+
+* `AssumeRole` - returns a set of temporary security credentials that you can use to access AWS resources.
+  Temporary credentials consist of an access key ID, a secret access key, and a security token. Usually you use
+  AssumeRole within your account or for cross-account access
+* `AssumeRoleWithSAML` - returns a set of temporary security credentials for users who have been authenticated via a
+  SAML authentication response. This provides a mechanism for tying an enterprise identity store or directory to role-based
+  AWS access without user-specific credentials or configuration. The temporary credentials returned by this operation
+  consist of an access key ID, a secret access key, and a security token. By default, these temp credentials last one hour.
