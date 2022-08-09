@@ -89,7 +89,41 @@ You can use an IAM role to specify permissions for those users whose identity is
 or a third party identity provider.
 
 When do you use this? We might create an AWS IAM role for engineers with a `Principal` of `Federated` through the
-SAML provider OKTA. The action would be to `sts:AssumeRoleWithSAML`.
+SAML provider OKTA. The action would be to `sts:AssumeRoleWithSAML`. See 'sts' for details below.
+
+### AWS Service Role
+
+A role that a service assumes to perform actions in your account on your behalf.
+Some AWS services require a role for the service to assume; this role must include all the permissions
+required for the service to access the AWS resources that it needs.
+You can create, modify, and delete a service role from within IAM.
+
+### AWS Service Linked Roles
+
+An IAM service-linked role is a unique type of IAM role that is linked directly to a service (e.g. MSK Connect).
+Service-linked roles are predefined by the service and includes all the permissions that the service requires to
+call other AWS services on your behalf.
+
+An advantage to a service-linked role is that you do not have to manually add the necessary permissions; the
+service (e.g. MSK Connect) defines the permissions and only the service can assume its roles. This includes:
+
+* the trust policy
+* the permissions policy
+
+Check [here](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-services-that-work-with-iam.html) for AWS Services that have Service-linked roles
+
+For an example service like MSK Connect, you do not need to manually create a service-linked role. When you create
+a connector, MSK Connect creates the service-linked role for you.
+
+### Cross-service confused deputy prevention
+
+The confused deputy problem is a security issue where an entity that doesn't have permission to perform an action
+can coerce a more-privileged entity to perform the action. Cross-service impersonation can occur when one service
+(the calling service) calls another service (the called service). The calling service can be manipulated to use its
+permissions to act on another customer's resources in a way it should not have permission to access.
+
+AWS recommends using the `aws:SourceArn` and `aws:SourceAccount` global condition context keys in resource policies
+to limit the permissions that MSK Connect gives another service to the resource.
 
 ## Terraform
 
@@ -171,3 +205,20 @@ You access a data source via a special resource known as a __data resource__, wh
       path   = "/"
       policy = data.aws_iam_policy_document.example.json
     }
+
+## AWS Security Token Service (STS)
+
+AWS Security Token Service (STS) is a web service that lets you request temporary, limited-privilege credentials
+for AWS Identity and Access Management (IAM) useres or for users you authenticate (federated users).
+
+AWS STS is availabile as a global service where all STS requests got to a single endpoint at `https://sts.amazonaws.com`.
+
+You can run a few actions including:
+
+* `AssumeRole` - returns a set of temporary security credentials that you can use to access AWS resources.
+  Temporary credentials consist of an access key ID, a secret access key, and a security token. Usually you use
+  AssumeRole within your account or for cross-account access
+* `AssumeRoleWithSAML` - returns a set of temporary security credentials for users who have been authenticated via a
+  SAML authentication response. This provides a mechanism for tying an enterprise identity store or directory to role-based
+  AWS access without user-specific credentials or configuration. The temporary credentials returned by this operation
+  consist of an access key ID, a secret access key, and a security token. By default, these temp credentials last one hour.
