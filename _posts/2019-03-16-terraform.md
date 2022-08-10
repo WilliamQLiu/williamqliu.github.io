@@ -917,3 +917,100 @@ github.com/ozbillwang/terraform-best-practices
 * Define `type` for each variable, otherwise you will get weird error messages (e.g. `variable "region" { default = "us-east-2"  type = "string" }`)
 * Isolate environments (create resources with different names for each environment and each resource)
 * Retrieve state meta data from a remote backend (via `terraform_remote_state`)
+
+## Real Life Scenarios
+
+
+### Error Acquiring the State Lock
+
+When: There's a lock, e.g. your CI is running terraform plan and so are you manually.
+
+│ Error: Error acquiring the state lock
+│
+│ Error message: ConditionalCheckFailedException: The conditional request failed
+│ Lock Info:
+│   ID:        89e18eba-e0b1-4f2d-6452-xxxxxxxx
+│   Path:      mylocation/terraform-states/my-file-staging.json
+│   Operation: OperationTypeApply
+│   Who:       william.liu
+│   Version:   1.0.0
+│   Created:   2022-08-10 18:25:00.05326249 +0000 UTC
+│   Info:
+
+Solution: `terraform force-unclock 89e18eba-e0b1-4f2d-6452-xxxxxxxx` to remove the lock. Make very sure!
+
+### What's going on with my state
+
+When: What's going on with my state?
+Solution: `terraform state list`
+
+```
+data.terraform_remote_state.something
+data.terraform_remote_state.somethingelse
+data.terraform_remote_state.subnets
+aws_route53_record.some_route
+module.mymodule.aws_instance.instance[0]
+```
+
+Look more closely with:
+
+```
+terraform state show <item>
+terraform refresh
+
+# Get the state again in case it is out of sync
+terraform state rm $THE_MODULE_NAME_FROM_OUTPUT
+terraform import $THE_MODULE_NAME_FROM_OUTPUT $IDENTIFIER
+```
+
+### Terraform Target
+
+When: I don't want to run my whole plan
+Solution: Target resources:
+
+```
+terraform plan -target="<resource_1>" -target="<resource_2>" -out=plan
+
+terraform apply -target=<resource_1>
+e.g. terraform apply -target=aws_iam_role.my_role
+
+# Destroy a single object (with target)
+terraform destroy --target=module.docker-app.module.docker-app.module.ec2-instance.aws_instance.instance[0]
+```
+
+### Terraform Taint
+
+When: Something looks wrong with an object, let's rebuild it
+Solution: Recreate with taint; Note: watch the plan carefully (e.g. if a destroy and create or an update, etc)
+
+```
+terraform init
+terraform taint --module=docker-app.docker-worker.ec2-instance aws_instance.instance
+terraform plan -target module.docker-app.module.docker-worker.module.ec2-instance.aws_instance.instance -module-depth=1 -out=plan
+terraform apply "plan"
+
+terraform untaint <resource> # if you want to untaint it
+```
+
+### Terraform fmt
+
+When: Validation errors
+Solution: `terraform fmt myfile.tf` your files
+
+### Terraform init fails
+
+When: `terraform init fails`
+Solution: `terraform init -reconfigure`
+
+```
+Initializing the backend...
+╷
+│ Error: Backend configuration changed
+│
+│ A change in the backend configuration has been detected, which may require migrating existing state.
+│
+│ If you wish to attempt automatic migration of the state, use "terraform init -migrate-state".
+│ If you wish to store the current configuration with no changes to the state, use "terraform init -reconfigure".
+╵
+```
+
