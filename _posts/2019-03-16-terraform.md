@@ -937,7 +937,8 @@ When: There's a lock, e.g. your CI is running terraform plan and so are you manu
 │   Created:   2022-08-10 18:25:00.05326249 +0000 UTC
 │   Info:
 
-Solution: `terraform force-unclock 89e18eba-e0b1-4f2d-6452-xxxxxxxx` to remove the lock. Make very sure!
+Solution: `terraform force-unlock 89e18eba-e0b1-4f2d-6452-xxxxxxxx` to remove the lock. Double check the Who is
+what you're expecting.
 
 ### What's going on with my state
 
