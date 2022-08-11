@@ -925,6 +925,7 @@ github.com/ozbillwang/terraform-best-practices
 
 When: There's a lock, e.g. your CI is running terraform plan and so are you manually.
 
+```
 │ Error: Error acquiring the state lock
 │
 │ Error message: ConditionalCheckFailedException: The conditional request failed
@@ -936,6 +937,7 @@ When: There's a lock, e.g. your CI is running terraform plan and so are you manu
 │   Version:   1.0.0
 │   Created:   2022-08-10 18:25:00.05326249 +0000 UTC
 │   Info:
+```
 
 Solution: `terraform force-unlock 89e18eba-e0b1-4f2d-6452-xxxxxxxx` to remove the lock. Double check the Who is
 what you're expecting.
