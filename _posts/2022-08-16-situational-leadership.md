@@ -132,16 +132,25 @@ Commitment
 Flexibility - the ability to use a variety of leadership styles, comfortably
 
 S1 - Directing (for D1)
+* Help others build competence
 * High Directive and Low Supportive Behavior
 * Leader: I'll decide
+* Check in frequently
 
 S2 - Coaching (for D2)
+* Re-energize and reteach
 * High Directive and High Supportive Behavior
 * Leader: Let's talk, I'll decide
+* Explore concerns and encourage
+* Explain why
 
 S3 - Supporting (for D3)
+* Build confidence in competence
 * High Supportive and Low Directive Behavior
 * Leader: Let's talk, you decide
+* Ask D3 for input about what and how
+* Listen and encourage
+* Facilitate problem solving by asking open-ended questions
 
 S4 - Delegating (for D4)
 * Low Supportive and Low Directive Behavior
