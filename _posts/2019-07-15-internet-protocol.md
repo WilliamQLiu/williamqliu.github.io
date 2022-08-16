@@ -6,7 +6,6 @@ title: Internet Protocol
 
 # {{ page.title }}
 
-
 ## IP Addresses
 
 Every device connected to the Internet needs to have an identifier. __Internet Protocol (IP) addresses__
@@ -81,14 +80,26 @@ from other virtual networks. With VPCs, we will get into:
 * Security Groups
 * Route Tables
 
+### IAM
+
+IAM (Identity and Access Management) has identify-based policies where you can allow or deny actions.
+
 ### Subnets
 
-A __subnet__ is a range of IP Addresses in your VPC. For example, you can launch AWS resources into a specified subnet.
+A __subnet__ is a range of IP Addresses in your VPC.
+  You can launch AWS resources (e.g. an EC2 instance) into a specified subnet.
+  Each subnet needs to reside in one availability zone (cannot span zones).
 A __public subnet__ is used for resources that must be connected to the Internet.
-A __private subnet__ is used for resources that won't be connected to the Internet.
+A __private subnet__ is used for resources that won't be connected to the Internet. A private subnet does not have
+  a route table entry that points to an internet gateway.
 
 For AWS, each subnet has to reside entirely within one Availability Zone and cannot span zones.
+Each subnet also needs you to choose the CIDR blocks for the public or private subnets.
 
+#### Local Zone
+
+You can add optionally add subnets in a __Local Zone__, an AWS infrastucture deployment that places compute,
+storage, database, and other services closer to your end user.
 
 ### CIDR Blocks
 
@@ -122,15 +133,80 @@ the destination as the CIDR block and what the target is.
       10.0.0.0/16   local
       10.2.0.0/16   local
 
-There are a few rules for adding a CIDR block to your VPC, see here: https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#add-cidr-block-restrictions
+There are a few rules for adding a CIDR block to your VPC, see [here](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#add-cidr-block-restrictions)
 
 ### Security Groups
 
-__Security Groups__ are the firewall for AWS EC2 instances since they control both the inbound and outbound traffic
+__Security Groups__ are the firewall for say AWS EC2 instances since they control both the inbound and outbound traffic
 at an instance level.
 
+When you create a VPC, it has a default security group.
+You can create additional security groups for each VPC.
+You can associate a security group only with resources in that VPC.
+
+#### Terraform Security Groups
+
+There are two ways to configure AWS Security Groups in Terraform. You can:
+
+* define rules __inline__ using a `aws_security_group` resource
+* define discrete `aws_security_group_rule`
+
+Example inline `aws_security_group`:
+
+```
+resource "aws_security_group" "allow_all" {
+  name        = "allow_all"
+  description = "Allow all inbound traffic"
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+```
+
+Here's the same rule as an external rule using `aws_security_group_rule`
+```
+resource "aws_security_group" "allow_all" {
+  name        = "allow_all"
+  description = "Allow all inbound traffic"
+}
+
+resource "aws_security_group_rule" "ingress" {
+  type        = "ingress"
+  from_port   = 0
+  to_port     = 0
+  protocol    = -1
+  cidr_blocks = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.allow_all.id}"
+}
+
+resource "aws_security_group_rule" "egress" {
+  type        = "egress"
+  from_port   = 0
+  to_port     = 0
+  protocol    = -1
+  cidr_blocks = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.allow_all.id}"
+}
+```
+
+#### Network ACLs
+
 There is a network specific security group called __Network Access Control Lists__ (__ACL__) that act as a firewall
-for a subnet, meaning it will control inbound and outbound traffic at a subnet level.
+for a subnet, meaning it will control inbound and outbound traffic at a subnet level. Your VPC will have a default
+network ACL that allows all inbound and outbound traffic (IPv4 and IPv6).
 
 ### Flow Logs
 
@@ -147,7 +223,7 @@ An internet gateway has two purposes:
 
 ### NAT (Gateway and Instance)
 
-You can use a __NAT__ device to enable instances in a private subnet to connect to the internet while also
+A __NAT__ device to enables instances in a private subnet to connect to the internet while also
 preventing the internet from initiating connections with the instances. There are two different types of NAT devices,
 a __NAT gateway__ or a __NAT instance__.
 
@@ -161,6 +237,9 @@ To create a NAT gateway, we have to specify the public subnet where the NAT gate
 elastic IP address to associate with the NAT gateway. After you create your NAT gateway, you have to update the
 route table associated with one or more of your private subnets to point Internet-bound traffic to the NAT gateway
 (which will enable instances in your private subnets to communicate with the Internet).
+
+In summary, resources on the internet cannot establish a connection with your instance (e.g. your EC2), but lets
+your EC2 instances in private subnets to send outbound traffic to the internet.
 
 ## DNS
 
