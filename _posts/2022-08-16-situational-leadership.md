@@ -133,15 +133,19 @@ Flexibility - the ability to use a variety of leadership styles, comfortably
 
 S1 - Directing (for D1)
 * High Directive and Low Supportive Behavior
+* Leader: I'll decide
 
 S2 - Coaching (for D2)
 * High Directive and High Supportive Behavior
+* Leader: Let's talk, I'll decide
 
 S3 - Supporting (for D3)
 * High Supportive and Low Directive Behavior
+* Leader: Let's talk, you decide
 
 S4 - Delegating (for D4)
 * Low Supportive and Low Directive Behavior
+* Leader: You decide
 
 ### Directive Leadership Behaviors
 
