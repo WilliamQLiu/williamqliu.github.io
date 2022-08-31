@@ -298,11 +298,86 @@ class Queue:
         print()
 ```
 
+## Recursion
+
+### One-Branch Recursion
+
+n! = n * (n-1) * (n-2) * ... * 1
+Example: 5! = 5 * 4 * 3 * 2 * 1
+Notice:  5! = 5 * 4!
+Notice:  5! = 5 * (5-1)!
+Pattern: n! = n * (n-1)!
+
+We took one big problem and turned it into many subproblems.
+We work on a problem until we get to the base case (e.g. 1)
+
+Example:
+```
+# Recursive implementation of n! (n-factorial) calculation
+def factorial(n):
+    # Base case: n = 0 or 1
+    if n <= 1:
+        return 1
+
+    # Recursive case: n! = n * (n - 1)!
+    return n * factorial(n - 1)
+```
+
+## Sorting
+
+### Insertion Sort
+
+### Merge Sort
+
+### Quick Sort
+
+### Bucket Sort
+
+## Binary Search
+
+### Binary Search
+
+__Binary Search__ works on a __sorted__ list of items by repeatedly dividing in half to narrow down your search.
+
+* If it is not in sorted order, you cannot use Binary Search (otherwise will be same as visiting every item)
+* We want a boundary that makes up our search space, basically a left pointer and a right pointer
+* We want a __middle index__ that is `left pointer + right pointer / 2` (and round down) to get the middle index
+
+Example:
+Guess a number from 1 -100, you pick 50
+You know it's lower than 50, so you pick 25 next
+You know it's higher than 25, so you pick 12, etc.
+
+```
+arr = [1, 3, 3, 4, 5, 6, 7, 8]
+
+# Python impelemntation of Binary Search
+def binarySearch(arr, target):
+    L, R = 0, len(arr) - 1
+
+    while L <= R:
+        mid = (L + R) // 2
+
+        if target > arr[mid]:
+            L = mid + 1
+        elif target < arr[mid]:
+            R = mid - 1
+        else:
+            return mid
+    return -1
+```
+
+|Operation               | Big-O Time |
+|Memory                  | O(1)       |
+|Time                    | log(n)     |
+
+### Search Range
+
+
+
 ## Two Pointers
 
 ## Sliding Window
-
-## Binary Search
 
 ## Trees
 
