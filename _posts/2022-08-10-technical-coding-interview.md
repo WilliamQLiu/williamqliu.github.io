@@ -373,13 +373,68 @@ def binarySearch(arr, target):
 
 ### Search Range
 
+__Search Range__ is a slight variation of the Binary Search (e.g. not given a sorted array)
+You might not be given an array of 1-100 or given a target (e.g. 10).
+You might be given a search range where n is the secret number that you have to guess.
 
+```
+# low = 1, high = 100
+
+# Binary search on some range of values
+def binarySearch(low, high):
+
+    while low <= high:
+        mid = (low + high) // 2
+
+        if isCorrect(mid) > 0:
+            high = mid - 1
+        elif isCorrect(mid) < 0:
+            low = mid + 1
+        else:
+            return mid
+    return -1
+
+# Return 1 if n is too big, -1 if too small, 0 if correct
+def isCorrect(n):
+    if n > 10:
+        return 1
+    elif n < 10:
+        return -1
+    else:
+        return 0
+```
+
+## Trees
+
+### Binary Trees
+
+__Binary Trees__ are similar in structure to __Linked Lists__ in that there are Nodes, which
+can hold values (e.g. numbers, strings), and two (left and right due to binary) nodes that are typically pointed down.
+
+* The initial Node is the __Root Node__.
+* There are relationships called __Parent Nodes__ and __Children Nodes__.
+* Pointers that do not have any children are __Leaf Nodes__ (Guaranteed to have)
+* Binary Trees are not allowed to have __Cycles__ (unlike a Linked List), meaning two Adjacent nodes cannot connect to each other
+* Two adjacent nodes are __Sibling Nodes__.
+* All nodes have to be connected (can't be floating randomly somewhere)
+* All nodes have a __Height__ property. We measure the __Height__ based on the children nodes (including it and all of its __Descendants__)
+* __Ancestor__ Nodes are any Node going up that node. The __Root Node__ does not have any Ancestor nodes.
+* The __Depth__ is the opposite of __Height__, which is basically the Height going up instead of down.
+
+```
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+```
+
+### Binary Search Tree
 
 ## Two Pointers
 
 ## Sliding Window
 
-## Trees
 
 ## Tries
 
