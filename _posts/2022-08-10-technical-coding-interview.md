@@ -622,7 +622,7 @@ def postorder(root):
 __Breadth-First Search (BFS)__ can be applied to any tree, traversing each layer first (instead of depth).
 BFS is a little different than DFS (isn't recursive, doesn't go height/depth first).
 BFS is also known as level order traversal where after we process a level of a node, we want to
-process its children.
+process its children. BFS is `O(n)` to traverse each node.
 
 ```
 from collections import deque  # a double ended queue
@@ -646,6 +646,8 @@ def bfs(root):
         for i in range(len(queue)):
             current = queue.popleft()
             print(current.value)
+
+            # this order determines if going left to right (or swap if you want right to left)
             if current.left:
                 queue.append(current.left)
             if current.right:
@@ -653,16 +655,77 @@ def bfs(root):
         level += 1
 ```
 
+### BST Sets and Maps
+
+You can create an __Ordered Set__ as a tree.
+For Python, you can use a `collections.OrderedDict`
+
+For a __Native Tree Map__, Python doesn't have one normally (`SortedDict` is one under the hood).
+
+```
+from sortedcontainers import SortedDict
+
+tree_map = SortedDict(
+  {'c': 3,
+   'a': 1,
+   'b': 2
+   })
+```
+
+## Backtracking
+
+__Backtracking__ is an algorithm to recursively build a solution incrementally, one piece at a time,
+removing those solutions that fail to meet our constraints. There are a few types of backtracking algorithms including:
+
+* __Decision Problem__ - searching for a feasible solution
+* __Optimization Problem__ - search for the best solution
+* __Enumeration Problem__ - find all feasible solutions
+
+Example Problem:
+Question: Determine if a path exists from the root of the tree to a leaf node. It may not contain any zeroes
+
+```
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+def canReachLeaf(root):
+
+    # If the first/root node is 0, we can't reach anything downstream
+    if not root or root.value == 0:
+        return False
+
+    if not root.left and not root.right:
+        return True
+    if canReachLeaf(root.left):
+        return True
+    if canReachLeaf(root.right):
+        return True
+    return False
+
+def leafPath(root, path):
+    if not root or root.value == 0:
+        return False
+    path.append(root.value)
+
+    if not root.left and not root.right:
+        return True
+    if leafPath(root.left, path):
+        return True
+    path.pop()
+    return False
+```
+
 ## Two Pointers
 
 ## Sliding Window
-
 
 ## Tries
 
 ## Heap / Priority Queue
 
-## Backtracking
 
 ## Graphs
 
