@@ -429,7 +429,127 @@ class TreeNode:
         self.right = None
 ```
 
-### Binary Search Tree
+### Binary Search Tree (BST)
+
+__Binary Search Tree__ (BST) is a special type of Binary Tree that has a __sorted property__.
+These are not sorted like an array.
+* Every single node in the left subtree has to be less than the root/current node.
+* Every single node in the right subtree has to greater than the root/current node.
+* Binary Search Trees usually do not contain duplicates
+* The definition of a BST makes it easy to do __recursion__ (i.e. one-branch recursion, go in one direction)
+* So what does a binary search tree do? Allows `log(n)` access to a node.
+```
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+def search(root, target):
+    # Need a root
+    if not root:
+        return False
+
+    if target > root.value:
+        return search(root.right, target)
+    elif target < root.value:
+        return search(root.left, target)
+    else:
+        return True
+```
+
+Why create a Binary Search Tree when we have Sorted Arrays?
+  If you want to add or remove a value from a sorted array, it's (`O(n)`) due to shifting over values.
+  The advantage of a Binary Search Tree is that inserting and deleting values can also be `log(n)`
+
+
+Assuming that a Binary Search Tree is __roughly balanced__ (for every single subtree, the height
+of the left and right might differ by 0 or 1).
+
+|Operation               | Big-O Time  |
+|----------------------- | ----------- |
+|Read/Write i-th element | log(n), O(h)|
+
+
+If the Binary Search Tree is not balanced (e.g. one subtree has a height of 10 and another subtree has has height of 2)
+|Operation               | Big-O Time |
+|----------------------- | ---------- |
+|Read/Write i-th element | O(n)       |
+
+### Binary Search Tree Insert and Remove
+
+Assuming a tree is roughly balanced, inserting is `O(h)` or `log(n)`.
+
+```
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+# Insert a new node and return the root of the BST
+def insert(root, value):
+    if not root:
+        return TreeNode(value)
+
+```
+
+### BST Insert and Remove
+
+Assuming the tree is roughly balanced, inserting will traverse the `h` of the tree.
+
+Example:
+* Root node has a value of 4 and you insert a node with value of 6
+* Option 1: You can technically make the root node 6, left node is 4, but not the norm
+* Option 2: Easier to make the Right Subtree 6, keep Root Node 4
+
+Note: There are more advanced cases of inserting to create a balanced __AVL__ tree.
+
+```
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+# Insert a new node and return the root of the BST
+def insert(root, value):
+    if not root:
+        return TreeNode(value)
+
+    if value > root.value:
+        root.right = insert(root.right, value)
+    elif value < root.value:
+        root.left = insert(root.left, value)
+    return root
+
+# Return the minimum value node of the BST
+def minValueNode(root):
+    current = root
+    while current and current.left:
+        current = current.left
+    return current
+
+# Remove a node and return the root of the BST
+def remove(root, value):
+    if not root:
+        return None
+
+    if value > root.value:
+        root.right = remove(root.right, value)
+    elif value < root.value:
+        root.left = remove(root.left, value)
+    else:
+        if not root.left:
+            return root.right
+        elif not root.right:
+            return root.left
+        else:
+            minNode = minValueNode(root.right)
+            root.value = minNode.value
+            root.right = remove(root.right, minNode.value)
+    return root
+```
 
 ## Two Pointers
 
