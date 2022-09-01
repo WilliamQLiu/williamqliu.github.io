@@ -496,14 +496,28 @@ def insert(root, value):
 
 ### BST Insert and Remove
 
-Assuming the tree is roughly balanced, inserting will traverse the `h` of the tree.
+Assuming the tree is roughly balanced, inserting will traverse the `h` of the tree,
+which is `log(n)` for a balanced tree.
 
 Example:
+
 * Root node has a value of 4 and you insert a node with value of 6
 * Option 1: You can technically make the root node 6, left node is 4, but not the norm
 * Option 2: Easier to make the Right Subtree 6, keep Root Node 4
 
 Note: There are more advanced cases of inserting to create a balanced __AVL__ tree.
+
+For removal, we have a couple cases:
+
+* Case 1 (simpler): 0 or 1 child; after we remove this node, what does the subtree look like?
+  Say we have a left subtree of 4 -> 3 -> 2 and want to remove 3.
+    Check if right pointer; if right pointer is null, then 4's pointer now points to 2
+* Case 2 (more difficult): 2 children for the node we remove
+  If we delete the node, we lose the entire subtree. Instead, we want to __replace__ the node
+  with a leaf node (and take the smallest value of the right subtree OR the largest value of the left subtree)
+
+Worst case scenario is `O log(n)`; need to find the node you're removing/replacing (traverse height once),
+then traverse the height again to remove the node.
 
 ```
 class TreeNode:
@@ -549,6 +563,94 @@ def remove(root, value):
             root.value = minNode.value
             root.right = remove(root.right, minNode.value)
     return root
+```
+
+### Depth-First Search
+
+With a sorted array, you can iterate through that array by going left to right.
+One algorithm for traversing a tree is __Depth-First-Search (DFS)__, where you go as
+deep (height wise) in one subtree as possible before going to another subtree.
+
+Within a tree, you can do many types of traversals (recursively), including:
+* __inorder traversal__ to process left to right
+* __reverseorder traversal__ to process right to left
+* __preorder traversal__
+* __postorder traversal__
+
+```
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+# normally you want to go in order (lowest to highest)
+def inorder(root):
+    if not root:
+        return
+    inorder(root.left)
+    print(root.value)  # or do something here
+    inoder(root.right)
+
+# if you want to go in reverse order (highest to lowest)
+def reverseorder(root):
+    if not root:
+        return
+    inorder(root.right)
+    print(root.value)  # or do something here
+    inorder(root.left)
+
+# print/do something before we go to the left subtree
+def preorder(root):
+    if not root:
+        return
+    print(root.value)  # or do something here
+    preorder(root.left)
+    preorder(root.right)
+
+# print/do something after we go to the right subtree
+def postorder(root):
+    if not root:
+        return
+    postorder(root.left)
+    postorder(root.right)
+    print(root.value)  # or do something here
+```
+
+### Breadth-First Search (BFS)
+
+__Breadth-First Search (BFS)__ can be applied to any tree, traversing each layer first (instead of depth).
+BFS is a little different than DFS (isn't recursive, doesn't go height/depth first).
+BFS is also known as level order traversal where after we process a level of a node, we want to
+process its children.
+
+```
+from collections import deque  # a double ended queue
+
+
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+def bfs(root):
+    queue = deque()
+
+    if root:
+        queue.append(root)
+
+    level = 0
+    while len(queue) > 0:
+        print("level: ", level)
+        for i in range(len(queue)):
+            current = queue.popleft()
+            print(current.value)
+            if current.left:
+                queue.append(current.left)
+            if current.right:
+                queue.append(current.right)
+        level += 1
 ```
 
 ## Two Pointers
