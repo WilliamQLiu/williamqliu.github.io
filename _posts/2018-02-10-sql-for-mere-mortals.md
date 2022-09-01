@@ -1265,11 +1265,13 @@ want rows from one table based on the filtered contents from other related table
 
 There are three different types of subqueries:
 
-* __Row subquery__ - embedded SELECT expression that returns more than one column and only one row.
+* __Row subquery__ - embedded SELECT expression that returns __more than one column and only one row__.
   Use to build a __raw value constructor__ (comparison)
-* __Table subquery__ - embedded SELECT expression that returns one or more columns and zero to many rows
-* __Scalar subquery__ - embedded SELECT expression that returns only one column and no more than one row
-
+* __Table subquery__ (aka __Multiple-Row Subqueries)__ - embedded SELECT expression that returns 1+ columns and
+  zero to many rows. There can be different kinds, including:
+  * If your subquery returns 1 column with multiple rows (i.e. a list of values)
+  * If your subquery returns multiple columns with multiple rows (i.e. tables)
+* __Scalar subquery__ - embedded SELECT expression that returns __only one column and no more than one row__ (i.e. single value)
 
 You can use subqueries to generate an output column or to perform a complex comparision in a `WHERE` clause.
 Subqueries can often be replaced more effectively with a join, but are often used to fetch the results of a function
@@ -1315,13 +1317,30 @@ one column and no more than one row.
 
 This lets you pluck a single value from some other table or query to include in the output of your query.
 
-Example:
+Example 1:
 
-    SELECT Orders.OrderNumber, Orders.OrderDate, Orders.ShipDate,
-     (SELECT Customers.CustLastName FROM Customers
-      WHERE Customers.CustomerID = Orders.CustomerID)
-    FROM Orders
-    WHERE Orders.ShipDate = '2017-10-03'
+Subquery is in the SELECT
+
+```
+SELECT Orders.OrderNumber, Orders.OrderDate, Orders.ShipDate,
+ (SELECT Customers.CustLastName FROM Customers
+  WHERE Customers.CustomerID = Orders.CustomerID)
+FROM Orders
+WHERE Orders.ShipDate = '2017-10-03'
+```
+
+Example 2:
+
+Subquery is the `WHERE` clause
+
+```
+SELECT name, listed_price
+FROM paintings
+WHERE listed_price > (
+    SELECT AVG(listed_price)
+    FROM paintings
+);
+```
 
 ### Special Predicate Keywords for Subqueries
 
@@ -1333,6 +1352,111 @@ There are special predicate keywords for use in a `WHERE` clause with a subquery
 * Quantified Predicate: `SOME`
 * Quantified Predicate: `ANY`
 * Existence: `EXISTS`
+
+## Table or Multirow Subqueries
+
+* __Table subquery__ (aka __Multiple-Row Subqueries)__ - can return different types of results (list or table)
+  * If your subquery returns 1 column with multiple rows (i.e. a list of values)
+  * If your subquery returns multiple columns with multiple rows (i.e. tables)
+
+Example 1 (subquery returning a list):
+
+The inner query returns a _list_ of all manager IDs.
+The outer query filters only those sales agents who are not in the managers list and calculates an average agency fee.
+The query returns a single value.
+
+```
+SELECT AVG(agency_fee)
+FROM sales_agents
+WHERE id NOT IN (SELECT id FROM managers);
+```
+
+Example 2 (subquery returning a table):
+
+When a subquery returns a table with multiple rows and multiple columns, that subquery is usually found in the
+`FROM` or `JOIN` clause. This allows you to get a table with data that was not readily available in the database
+(e.g. grouped data) and then join this table with another one from your database.
+
+
+Say we wanted to see the total amount of sales for each artist who sold at least one painting in our gallery.
+Our inner query calculates the sale for each artist from the sales table.
+Our outer query combines this information with the artists' first names and last names to get the info we want.
+
+```
+SELECT
+    artists.first_name,
+    artists.last_name,
+    artists_sales.sales
+FROM artists
+JOIN (
+    SELECT artist_id, SUM(sales_price) AS sales
+    FROM sales
+    GROUP BY artist_id
+    ) as artist_sales
+  ON artists.id = artist_sales.artist_id;
+
+
+first_name, last_name, sales
+William, Liu, 344
+Kate, Wein, 3454
+```
+
+## Row Subquery
+
+A row subquery returns a single row.
+These are often used in comparison/correlations (aka __correlated subquery__, __synchronized subquery__).
+These are often slow because the inner subquery might be evaluated once for each row processed by the outer query.
+Correlated subqueries are commonly used in the `SELECT`, `WHERE`, and `FROM` statements.
+
+
+Example 1 (correlated subquery that returns a scalar value)
+
+We want to calculate the number of paintings found in each of our galleries.
+The inner query returns a scalar value with the total number of paintings from the corresponding gallery.
+Note that the inner query depends on the outer query. We pull in the gallery_id from the `galleries` table (located
+on the outer query). You cannot run the inner query by itself.
+
+```
+SELECT city,
+    (SELECT COUNT(*)
+     FROM paintings p
+     WHERE g.id = p.gallery_id) total_paintings
+FROM galleries g;
+
+# city, total paintings
+# London, 2
+# New York, 2
+# Munich, 1
+```
+
+The equivalent of a join (note: joins are usually faster than subqueries) would be:
+
+```
+SELECT g.city, count(p.name) AS total_paintings
+FROM galleries g
+JOIN paintings p
+ON g.id = p.gallery_id
+GROUP BY g.city;
+```
+
+Example 2 (correlated subquery in the WHERE statement)
+
+Say we want to get information about sales agents whose agency fees are higher than the average fee for their gallery.
+The inner query returns the average agency fee for the gallery of the sales agent.
+The outer query returns the information about only those sale agents who satisfy the condition included in the `WHERE` statement
+(i.e. an agency fee greater than their gallery average).
+Notice that the subquery is a correlated subquery because it can't be run independently of the outer query.
+
+```
+SELECT
+    last_name,
+    first_name,
+    agency_fee
+FROM sales_agents sa1
+WHERE sa1.agency_fee > (SELECT AVG(agency_fee)
+                        FROM sales_agents sa2
+                        WHERE sa2.gallery_id = sa1.gallery_id);
+```
 
 #### Set Membership: `IN`
 
