@@ -819,6 +819,50 @@ class Heap:
         return res
 ```
 
+Pushing and popping is `O(log n)` (from percolating).
+We can get the min or max in `O(1)` time (instead of a Binary Search tree's `O(log n)` time.
+
+### Heapify
+
+There is a special algorithm called __heapify__ where you're given any array and
+can turn them into a heap in `O(n)` time.
+
+Quick tip: To get the first node that has children, you can take the entire array // 2
+and you'll get the earliest parent that has children. What we'll do is go through
+every node that has children, then percolate down.
+
+Continue moving to the left (up the tree) and then percolate / swap.
+
+```
+def heapify(self, arr):
+    # 0-th position is moved to the end
+    arr.append(arr[0])
+
+    self.heap = arr
+    cur = (len(self.heap) -1) // 2
+    while cur > 0:
+        # Percolate down
+        i = cur
+        while 2 * i < len(self.heap):
+            if (2* i + 1 < len(self.heap) and \
+                self.heap[2 * i + 1] < self.heap[2 * i] and \
+                self.heap[i] > self.heap[2 * i + 1]):
+                # Swap right child
+                tmp = self.heap[i]
+                self.heap[i] = self.heap[2 * i + 1]
+                self.heap[2 * i + 1] = tmp
+                i = 2 * i + 1
+            elif self.heap[i] > self.heap[2 * i]:
+                # Swap left child
+                tmp = self.heap[i]
+                self.heap[i] = self.heap[2 * i]
+                self.heap[2 * i ] = tmp
+                i = 2 * i
+            else:
+                break
+        cur -= 1
+```
+
 ## Two Pointers
 
 ## Sliding Window
