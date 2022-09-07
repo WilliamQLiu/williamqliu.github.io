@@ -984,11 +984,12 @@ class HashMap:
         index = 0
         for c in key:
             index += ord(c)
-        return index % self.capacity
+        return index % self.capacity  # need to mod in case of out-of-bounds
 
     def get(self, key):
         index = self.hash(key)
 
+        # This implementation is using a naive Open Addressing (instead of Chaining)
         while self.map[index] != None:
             if self.map[index].key == key:
                 return self.map[index].value
@@ -1030,6 +1031,7 @@ class HashMap:
             index = index % self.capacity
 
     def rehash(self):
+        # Ideally we want prime numbers for capacity, but this naive way just doubles
         self.capacity = 2 * self.capacity
         newMap = []
         for i in range(self.capacity):
