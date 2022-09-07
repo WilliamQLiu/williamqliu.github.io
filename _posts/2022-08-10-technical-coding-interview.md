@@ -718,14 +718,112 @@ def leafPath(root, path):
     return False
 ```
 
+## Heap / Priority Queue
+
+### Heap Properties
+
+A __Heap__ / __Priority Queue__ is different than a regular queue in that instead of FIFO,
+we can order based off a priority value. What gets popped is based on a priority property,
+which can pop the minimum or maximum of the priority value. A Priority Queue uses a Heap under the hood.
+
+The Heap below is a Binary Heap (can be a minimum binary heap or maximum binary heap).
+
+* __Structure__ Property
+
+* A Binary Heap is basically a __Complete Binary Tree__ (no holes except for possibly the last level)
+* If there are missing nodes, we first add nodes on the left to right (next available position)
+
+* __Order__ Property
+
+* The Heap's advantage should be finding the min or max quickly
+* We want the minimum (or maximum) value out of everything at the root, done in `O(1)`
+* We want every value in the left subtree to be greater than the node value and every value on
+  the right subtree to be greater than the node value (then done recursively so all descendants are also higher value)
+* We can have duplicate values (so same values can be in multiple subtrees)
+
+Heap represented as an Array
+
+* Binary Heaps are drawn as Binary Trees that are connected as pointers, but they're really
+  implemented as Arrays (with no zeroth index; the root is index 1).
+* Then next row (left to right) is filled into the array, giving us:
+
+```
+# leftChild of i = heap[2 *i]
+# rightChild of i = heap[(2 * i) + 1]
+# parent of i = heap[i // 2]  # Note, we round down
+```
+
+### Push and Pop
+
+__Pushing__ to a heap means inserting a value into the heap.
+In order to meet the __order__ property, for a minimum heap, we want to make sure the parent is
+smaller. If the descendant is smaller, we swap with the parent. You stop when the parent is smaller than the child.
+We shift up (__percolate up__) to compare descendant with parent, then swap if needed.
+
+__Popping__ from a heap means removing a value from the heap. We can't just pop a value
+in the middle of a heap because we can lose the structure. The trick to maintaining the
+order is to:
+
+* Remove the value and replace it with the last item (e.g. say we remove the root, we take the
+last value and put that in the root). We now satisfy the Structure property, but not the Order.
+* In order to satisfy the Order property, we'll do the opposite of percolating up (and instead
+will percolate down). We take the minimum of the children and swap that with our replaced value.
+* We recursively percolate down until both children are greater
+
+```
+# Min Heap
+class Heap:
+    def __init__(self):
+        self.heap = [0]
+
+    def push(self, value):
+        self.heap.append(value)
+        i = len(self.heap) - 1
+
+        # Percolate up
+        while i > 1 and self.heap[i] < self.heap[i // 2]:
+            tmp = self.heap[i]
+            self.heap[i] = self.heap[i // 2]
+            self.heap[i // 2] = tmp
+            i = i // 2
+
+    def pop(self):
+        if len(self.heap) == 1:
+            return None
+        if len(self.heap) == 2:
+            return self.heap.pop()
+
+        res = self.heap[1]
+        # Move last value to root
+        self.heap[1] = self.heap.pop()
+        i = 1
+        # Percolate down
+        while 2 * i < len(self.heap):
+            if (2 * i + 1 < len(self.heap) and \
+                self.heap[2 * i + 1] < self.heap[2 * i] and \
+                self.heap[i] > self.heap[2 * i + 1]):
+
+                # Swap right child
+                tmp = self.heap[i]
+                self.heap[i] = self.heap[2 * i + 1]
+                self.heap[2 * i + 1] = tmp
+                i = 2 * i + 1
+            elif self.heap[i] > self.heap[2 * i]:
+                # Swap left child
+                tmp = self.heap[i]
+                self.heap[i] = self.heap[2 * i]
+                self.heap[2 * i] = tmp
+                i = 2 * i
+            else:
+                break
+        return res
+```
+
 ## Two Pointers
 
 ## Sliding Window
 
 ## Tries
-
-## Heap / Priority Queue
-
 
 ## Graphs
 
