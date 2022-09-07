@@ -863,6 +863,191 @@ def heapify(self, arr):
         cur -= 1
 ```
 
+Heaps are very important for algorithms.
+
+Heapify runs in `O(n)` time.
+You can push and pop from the heap in `O(log n)` time.
+You can get the min or max in `O(1)` time.
+
+## Hash Sets/Maps
+
+The most important data structure (in real life and leetcode).
+
+__Sets__
+
+E.g. an unduplicated set of keys
+
+__Maps__
+
+Key-value pairs.
+
+Properties:
+
+* Do not allow duplicates
+* Does not maintain any type of ordering
+
+__Hash Usage__
+
+| TreeMap   | HashMap    | Operation |
+|---------- | ---------- | --------- |
+| O(logn)   | O(1)       | Insert    |
+| O(logn)   | O(1)       | Remove    |
+| O(logn)   | O(1)       | Search    |
+| O(n)      | O(nlogn)   | Inorder   |
+
+
+Example: Count how often a name appears.
+```
+names = ["alice", "brad", "collin", "brad", "dylan", "kim"]
+
+countMap = {}
+
+for name in names:
+    # if countMap does not contain name
+    if name not in countMap:
+        countMap[name] = 1
+    else:
+        countMap[name] += 1
+```
+
+### Hash Implementation
+
+A HashMap is implemented under the hood as an array.
+
+```
+hashmap.put("Alice", "NYC")
+hashmap.put("Brad", "Chicago")
+hashmap.put("Collin", "Seattle")
+```
+
+We take the key value (e.g. "Alice") and then hash that string into an integer (usually ascii representation)
+E.g. a simple hashing algorithm could be add up all the characters, then mod with
+how much space you have.
+
+```
+a = 0
+l = 11
+... # add all of this up
+```
+
+We can then have: total int from hash % index spaces = index space to put the key, value pair
+
+HashMap Example
+
+| Index  | Key, Value       |
+| ------ | ---------------- |
+| 0      |                  |
+| 1      | "Alice", "NYC"   |
+
+__Hashmap Collissions__
+
+After we insert values, we'll check when we get to 50% usage, then double space and
+rehash all of the key, value pairs to recompute their new indexes. E.g. "Alice", "NYC" might be in Index 3
+instead of Index 1 after we resize. This process is called __rehashing__ the array.
+
+Ideally the size of the array should be a __prime number__ (instead of doubling, just roughly
+doubling until it's a prime).
+
+HashMap Example After Resizing
+
+| Index  | Key, Value        |
+| ------ | ----------------- |
+| 0      |                   |
+| 1      | "Alice", "NYC"    |
+| 2      |                   |
+| 3      | "Brad", "Chicago" |
+
+__Chaining__ vs __Open Addressing__
+
+With __Chaining__, we can create a linked list to store multiple key, value pairs in the
+same index. The disadvantage is that we'll need traverse through these values.
+
+With __Open Addressing__, we get the index and if that address is full, we move onto the next
+index to see if that address (key, value) is empty until we find an empty one.
+This is a naive way of doing open addressing (can cluster when there's a lot of hashmap collisions).
+We can do some smarter ways of open addressing (e.g. square the index), etc.
+
+
+```
+class Pair:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+class HashMap:
+    def __init__(self):
+        self.size = 0
+        self.capacity = 2
+        self.map = [None, None]
+
+    def hash(self, key):
+        index = 0
+        for c in key:
+            index += ord(c)
+        return index % self.capacity
+
+    def get(self, key):
+        index = self.hash(key)
+
+        while self.map[index] != None:
+            if self.map[index].key == key:
+                return self.map[index].value
+            index += 1
+            index = index % self.capacity
+        return None
+
+    def put(self, key, value):
+        index = self.hash(key)
+
+        while True:
+            if self.map[index] == None:
+                self.map[index] = Pair(key, value)
+                self.size += 1
+                if self.size >= self.capacity // 2:
+                    self.rehash()
+                return
+            elif self.map[index].key == key:
+                self.map[index].value = value
+                return
+
+            index += 1
+            index = index % self.capacity
+
+    def remove(self, key):
+        if not self.get(key):
+            return
+
+        index = self.hash(key)
+        while True:
+            if self.map[index].key == key:
+                # Removing an element using open-addressing causes a bug,
+                # because we may create a hole in the list, and our get() may
+                # stop searching early when it reaches this hole.
+                self.map[index] = None
+                self.size -= 1
+                return
+            index += 1
+            index = index % self.capacity
+
+    def rehash(self):
+        self.capacity = 2 * self.capacity
+        newMap = []
+        for i in range(self.capacity):
+            newMap.append(None)
+
+        oldMap = self.map
+        self.map = newMap
+        self.size = 0
+        for pair in oldMap:
+            if pair:
+                self.put(pair.key, pair.value)
+
+    def print(self):
+        for pair in self.map:
+            if pair:
+                print(pair.key, pair.value)
+```
+
 ## Two Pointers
 
 ## Sliding Window
