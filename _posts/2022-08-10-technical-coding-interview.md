@@ -1050,13 +1050,96 @@ class HashMap:
                 print(pair.key, pair.value)
 ```
 
+## Graphs
+
+There's three types of graphs:
+
+* Matrix
+* Adjacency Matrix
+* Adjacency List
+
+We've already seen different subsets of graphs:
+
+* Linked Lists are a form of graphs.
+* Trees are a form of graphs (e.g. Binary Trees).
+
+What makes up a graph?
+
+* We have __nodes__ (aka __verticies__) with __pointers__ (aka __edges__) connecting them together.
+* Graphs can have __cycles__
+* Graphs follow the formula: Edges <= Verticies ^2
+
+Types of graphs
+
+* __Directed Graphs__ means you can go in one direction (e.g. from Node A to Node B)
+* __Undirected Graphs__ mean you can go either direction (e.g. from Node A to Node B OR Node B to Node A)
+
+### Matrix
+
+A __Matrix__ is a __two dimensional array__ that can be used to represent a graph.
+
+Example:
+
+```
+grid = [[0, 0, 0, 0],
+        [1, 1, 0, 0],
+        [0, 0, 0, 1],
+        [0, 1, 0, 0]]
+
+print(grid[1][2])  # gives us row 1, column 2 (`0`). Remember starts at row 0, col 0
+```
+
+Hint for defining:
+
+* Use `r` and `c` instead of `x` and `y` (easy to get confused with the latter)
+* Use `0` for Free and `1` for Blocked
+* Most common movements are left, right, up, or down (i.e. common edges)
+* We can define movements (edges) however we want
+* `0`'s are nodes and the edges are undirected
+
+### Adjacency Matrix
+
+Less common than regular matrixes, these are usually a square matrix (e.g. same as the grid above).
+
+* The dimensions represents the nodes/vertices
+* The size is v * v where v is the number of vertices.
+* Usually the value is `0` or `1`; this represents if there is/or no edge between the two vertices
+* We still have `E = V^2` hold true
+
+```
+adjMatrix[v1][v2] = 1 # an edge exists from v1 to v2 (i.e. a directed edge)
+adjMatrix[v2][v1] = 1 # an edge exists from v2 to v1 (i.e. another directed edge)
+adjMatrix[v2][v3] = 0 # an edge does not exist from v2 to v3 (i.e. not a directed edge)
+```
+
+It's rare to use because we need an entire matrix, meaning we have to use `O(v^2)` space
+(no matter how many edges we have). We could reduce down this information to `O(v + v)` => `O(v)`
+(number of nodes + number of edges).
+
+### Adjacency List
+
+__Adjacency Lists__ are the most common ways of representing graphs (especially during coding interviews).
+Example use cases are say a social network (who follows who).
+
+* Similar to Linked Lists and Tree Nodes
+* With generic graphs, we can have any number of 'neighbors'/pointers.
+
+```
+# Used for Adjacency Lists
+
+class GraphNode:
+    def __init__(self, value):
+        self.value = value
+        self.neighbors = []
+```
+
+This is more space efficient (only declaring an array with the pointers we need)
+
 ## Two Pointers
 
 ## Sliding Window
 
 ## Tries
-
-## Graphs
 
 ## Advanced Graphs
 
