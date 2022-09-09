@@ -1192,6 +1192,46 @@ The memory complexity is `O(r * c)`.
 
 ### Matrix BFS
 
+BFS is a common algorithm that is a little simpler to understand (visually) than DFS and is
+also more time efficient in terms of complexity `O(r * c)`.
+Instead of going through layers (columns with DFS), we're now going through layers (rows with BFS).
+
+Question: Find the length of the shortest path from the top left of the grid to the bottom right.
+
+```
+# Shortest path from top left to bottom right
+def bfs(grid):
+    ROWS, COLS = len(grid), len(grid[0])
+    visit = set()
+    queue = deque()
+    queue.append((0, 0))
+    visit.add((0, 0))
+
+    length = 0
+    while queue:
+        for i in range(len(queue)):
+            r, c = queue.popleft()
+            # check if it's the destination
+            if r == ROWS -1 and c == COLS - 1:
+                return length  # when we reach the result
+
+            # go through all four directions
+            neighbors = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+            for dr, dc in neighbors:
+                # e.g. first pass is dr=0, dc=1
+
+                # check if out of bounds, if we visited already, and if it's an invalid location (1)
+                if (min(r + dr, c + dc) < 0 or
+                    r + dr == ROWS or c + dc == COLS or
+                    (r + dr, c + dc) in visit or grid[r + dr][c + dc] == 1):
+                    continue
+                queue.append((r + dr, c + dc))
+                visit.add((r + dr, c + dc))
+        length += 1
+
+print(bfs(grid))
+```
+
 ## Two Pointers
 
 ## Sliding Window
