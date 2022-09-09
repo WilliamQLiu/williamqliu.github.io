@@ -1135,6 +1135,63 @@ class GraphNode:
 
 This is more space efficient (only declaring an array with the pointers we need)
 
+### Matrix DFS
+
+__Matrix Depth First Search (DFS)__
+
+* Think about it visually (matter of choices, start top left)
+* Usually recursive
+* Usually can move up, left, right, down (be careful about moving out of bounds, set up that first base case)
+* Big overlap with DFS and Backtracking
+
+Example Question with DFS (and backtracking):
+Count the unique paths from the top left to the bottom right.
+A single path may only move along `0`'s and can't visit the same cell more than once (otherwise might get into infinity paths)
+
+```
+# Matrix (2D Grid)
+grid = [[0, 0, 0, 0],
+        [1, 1, 0, 0],
+        [0, 0, 0, 1],
+        [0, 1, 0, 0]]
+
+# Count paths (backtracking)
+def dfs(grid, r, c, visit):
+    ROWS, COLS = len(grid), len(grid[0])
+
+    # Don't go out of bounds or if we've been there already (visit)
+    if (min(r, c) < 0 or
+        r == ROWS or c == COLS or
+        (r, c) in visit or grid[r][c] == 1):  # visit is a hash set
+        return 0
+
+    # Found a single path, assuming there's at least one valid path
+    if r == ROWS - 1 and c == COLS - 1:
+        return 1
+
+    # Adding to a hash set is O(1)
+    # Other options is to mark as a `1` if you visited already
+    # Another option is to create a duplicate of the grid and modify the duplicated grid
+    visit.add((r, c))
+
+    count = 0  # how many ways can you reach the result
+    count += dfs(grid, r + 1, c, visit)  # goes down first
+    count += dfs(grid, r - 1, c, visit)  # goes up
+    count += dfs(grid, r, c + 1, visit)  # goes right
+    count += dfs(grid, r, c - 1, visit)  # goes left
+
+    visit.remove((r, c))
+    return count
+
+print(dfs(grid, 0, 0, set()))
+```
+
+Say we have a 4 * 4 matrix; the worst case is 4 choices to 4 choices, etc.
+When you follow one of these 4 paths/branches, we end up with `O(4 ^ (r * c))`
+The memory complexity is `O(r * c)`.
+
+### Matrix BFS
+
 ## Two Pointers
 
 ## Sliding Window
