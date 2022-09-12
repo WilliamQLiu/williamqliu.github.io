@@ -1321,6 +1321,71 @@ Graphs can get more complicated based on priority
 (e.g. if say our graph is cities and there's actual weights to the vertices, say miles/distance
 between each city)
 
+## 1-D Dynamic Programming
+
+Example Problem: Fibonacci Sequence
+
+### Brute Force with Recursion
+
+```
+# Brute Force
+def bruteForce(n):
+    if n <= 1:
+        return n
+    return bruteForce(n - 1) + bruteForce(n - 2)
+
+````
+
+### Memoization (aka __Top Down Dynamic Programming__)
+
+Once you calculate something, you can store that result somewhere (that way you
+don't create the subtrees that were already calculated). Basically adds caching.
+
+For the cache, you can either use a hashmap or an array.
+
+Takes `O(n)` time and `O(n)` space.
+
+```
+
+# Memoization (an optimization technique to make applications more efficient)
+def memoization(n, cache):
+    if n <= 1:
+        return n
+    if n in cache:
+        return cache[n]  # here the cache is a hashmap
+
+    # Cache so we don't have to make the same recursive calls
+    cache[n] = memoization(n - 1) + memoization(n - 2)
+    return cache[n]
+```
+
+### Dynamic Programming (aka __Bottom Up Dynamic Programming__)
+
+The true dynamic programming approach (aka __bottom up dynamic programming__)
+where we don't use recursion. Instead of top down, we can start at the base case
+immediately and calculate up.
+
+Time complexity is `O(n)` and memory is `O(1)` (since we only save the last two
+previous values).
+
+```
+# Dynamic Programming
+def dp(n):
+    if n < 2:
+        return n
+
+    dp = [0, 1]
+    i = 2
+    while i <= n:
+        tmp = dp[1]
+        dp[1] = dp[0] + dp[1]
+        dp[0] = tmp
+        i += 1
+    return dp[1]
+```
+
+## 2-D Dynamic Programming
+
 ## Two Pointers
 
 ## Sliding Window
@@ -1328,10 +1393,6 @@ between each city)
 ## Tries
 
 ## Advanced Graphs
-
-## 1-D Dynamic Programming
-
-## 2-D Dynamic Programming
 
 ## Greedy
 
