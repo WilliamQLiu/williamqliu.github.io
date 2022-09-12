@@ -1232,6 +1232,95 @@ def bfs(grid):
 print(bfs(grid))
 ```
 
+### Adjacency List
+
+An __Adjacency List__ is much easier to run an algorithm on instead of a Matrix.
+To implement an adjacency list, you can use a GraphNode (value with list of neighbors) or a HashMap.
+
+* Use a Hashamp if the values are unique
+* Otherwise, need to use a GraphNode (value with list of neighbors)
+
+```
+# GraphNode for adjacency list
+class GraphNode:
+    def __init__(self, value):
+        self.value = value
+        self.neighbors = []
+
+# Or use a HashMap
+adjList = {"A": [], "B": []}
+
+# Given directed eges, build an adjacency list
+edges = [["A", "B"], ["B", "C"], ["B", "E"], ["C", "E"], ["E", "D"]]
+
+adjList = {}  # Using a hashmap for this example
+
+for src, dst in edges:
+    if src not in adjList:
+        adjList[src] = []
+    if dst not in adjList:
+        adjList[dst] = []
+    adjList[src].append(dst)
+
+```
+
+#### __DFS__ with an __Adjacency List__
+
+DFS with Backtracking: `O(N^V)`, not very efficient (exponential)
+
+```
+# Count paths (backtracking)
+def dfs(node, target, adjList, visit):
+    if node in visit:
+        return 0
+    if node == target:
+        return 1
+
+    count = 0
+    visit.add(node)
+    for neighbor in adjList[node]:
+        count += dfs(neighbor, target, adjList, visit)
+    visit.remove(node)
+
+    return count
+
+print(dfs("A", "E", adjList, set()))
+```
+
+#### __BFS__ with an __Adjacency List__
+
+`O(V + E)` for time complexity and space complexity of `O(V)` where `V` is the number of vertices
+
+```
+# Shortest path from node to target
+def bfs(node, target, adjList):
+    length = 0
+    visit = set()
+    visit.add(node)
+    queue = deque()
+    queue.append(node)
+
+    while queue:
+        for i in range(len(queue)):
+            current = queue.popleft()
+            if current == target:
+                return length
+
+            for neighbor in adjList[current]:
+                if neighbor not in visit:
+                    visit.add(neighbor)
+                    queue.append(neighbor)
+        length += 1
+    return length
+
+print(bfs("A", "E", adjList))
+
+```
+
+Graphs can get more complicated based on priority
+(e.g. if say our graph is cities and there's actual weights to the vertices, say miles/distance
+between each city)
+
 ## Two Pointers
 
 ## Sliding Window
