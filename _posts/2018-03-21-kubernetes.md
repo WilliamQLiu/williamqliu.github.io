@@ -348,6 +348,22 @@ Mount same volumes (same external storage)
 Can be labeled
 ReplicaSet represents pod group (say I want 4 of these types of pods, is a ReplicaSet)
 
+```
+# Get a list of pods for a namespace
+kubectl -n mynamespace get pods
+NAME                                          READY   STATUS    RESTARTS   AGE
+mypod-7w7tx                                     3/3     Running   0          171m
+
+# Describe a pod in detail
+kubectl -n mynamespace describe pod mypod-7w7tx
+
+# shell into pod
+kubectl -n mynamespace exec -it mypod-7w7tx bash
+
+# Get logs from all containers
+kubectl -n mynamespace logs -f somecontainer --all-containers
+```
+
 ### Deployments
 
 Deployments bind Replica Sets and Pod templates
@@ -356,6 +372,14 @@ E.g. I make a deployment of 3 nginx containers
 I update the nginx version in the deployment
  * Creates ReplicaSetB and rolls over service
 
+```
+# Get all deployments
+kubectl -n mynamespace get deployments
+
+# Restart a deployment
+kubectl -n mynamespace rollout restart deployment mydeployment
+```
+
 ### Services
 
 What you access (done via labels)
@@ -363,6 +387,12 @@ Group pods logically for access
 This is what clients interact with
 Created via Label Selection
 app=api env=dev would create a service for all our api containers in the dev environment
+
+```
+kubectl -n mynamespace get services
+NAME                TYPE       CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
+my-service          NodePort    X.X.X.X         <none>      5000:30103/TCP   2d
+```
 
 #### Service Types
 
