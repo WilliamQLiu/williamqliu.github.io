@@ -817,6 +817,31 @@ Usually there are two default namespaces:
 
 You can divide cluster resources within Namespaces using __Resource Quotas__.
 
+### Daemonset
+
+A Daemonset ensures that all (or some) nodes run a copy of a pod. As nodes are added or removed from the cluster,
+a daemonset ensures that a pod gets added to the cluster.
+
+Example uses include:
+
+* Running a node monitoring daemon on every node
+* Running a logs collection daemon on every node
+
+An example of this is say you want a datadog-agent (to collect/send metrics) on every node.
+
+```
+kubectl -n mymonitoringnamespace get daemonsets
+NAME      DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+datadog   8         8         8       8            8           kubernetes.io/os=linux   137d
+
+# Describe in detail about a particular daemonset
+kubectl -n mymonitoringnamespace describe daemonset datadog
+
+# Do a rolling restart of a daemonset
+kubectl -n mymonitoringnamespace rollout restart daemonset/datadog
+```
+
+
 ## Authenitcation, Authorization, and Admission Control
 
 To access and manage any resources/objects in the Kubernetes cluser, we need to access specific
@@ -882,7 +907,14 @@ These attributes are compared against __policies__, ultimately saying if a reque
 * __Node Authorizer__ - Node authorization is an authorization mode that specifically authorizes API requests made by Kubelets.
 
 
-## Config Maps
+## ConfigMaps
+
+A __ConfigMap__ is an API object used to store non-confidential data in key-value pairs.
+Pods can consume ConfigMaps as environmental variables, command-line arguments, or as
+configuration files in a volume.
+
+A ConfigMap allows you to decouple environment-specific configuration from your container
+images so that applications are more portable.
 
 Kubernetes just creates a config map so you can access ENV variables on apps.
 Any app that is deployed can access these variables!
@@ -899,7 +931,21 @@ https://github.com/thedevelopnik/kubernetes-intro/blob/master/pingpong-config.ym
 $kubectl create -f pingpong-config.yml
  configmap "pingpong-config" created
 
-The actual application now has the ENV variables from our config map
+You can see configmaps with:
+
+```
+kubectl -n mynamespace get configmaps
+
+kubectl -n mynamespace describe configmap pingpong-config
+``
+
+You can create a volume and volumemount your configuration to your application.
+The actual application now has the ENV variables from our config map.
+
+An example of this being used in real life is [Datadog's integrations](https://docs.datadoghq.com/containers/kubernetes/integrations/?tab=configmap) where you:
+
+1. Create a configmap with the conf.d/<my_integration (e.g. amazon_msk.d)>/conf.yaml file
+2. Volume and Volumemap the configmap to the pod
 
 ## Secrets
 
@@ -921,6 +967,7 @@ e.g. half a mb). ConfigMaps can be accessed across apps and can hold giant json 
 ConfigMaps are more convenient. Can hold entire config files and JSON blobs (like redis configuration)
 When secrets change, pods are not automatically updated. Allows you to rotate keys and by default cut
 off access to potentially compromised pods. Pods get automatic updates when a ConfigMap changes.
+
 
 # Deploying Kubernetes to Production
 
@@ -989,8 +1036,8 @@ it'll stop at a certain amount (e.g. say after 5 crashes).
 When creating bash scripts, check logs.
 Creates AWS lambda functions, check logs from there.
 
-
-
 ## Kompose
 
 Install Kubernetes Compose to turn a Docker-Compose to a Kubernetes
+
+
