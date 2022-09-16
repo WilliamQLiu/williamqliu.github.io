@@ -713,6 +713,15 @@ We are able to get the output value through interpolation syntax
 
 Run a `terraform init`, `terraform plan`, and `terraform apply`
 
+Note: When you run a `terraform plan`, sometimes you will see a message like:
+
+```
+Note: Objects have changed outside of Terraform
+
+Terraform detected the following changes made outside of Terraform since the last "terraform apply":
+```
+These are just changes that are an FYI (does not affect your current plan).
+
 ### Using a module
 
 In our 'root' module's `main.tf`, we can use other modules like so:

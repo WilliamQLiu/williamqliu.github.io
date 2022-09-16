@@ -986,6 +986,36 @@ kubectl create secret generic port --from-literal=PORT=7000
 Secrets are base64 encoded and can be encrypted at rest in etcd (default not)
 Secrets limited to 1MB, kept in a temporary file system and only run on nodes that use the secret
 
+```
+kubectl -n mynamespace get secrets
+# list of secrets
+NAME                                    TYPE                                  DATA   AGE
+my-secret                               Opaque                                  3     2d
+
+kubectl -n mynamespace describe secret my-secrets
+# shows you the type, namespace, labels, data
+Name:         my-secrets
+Namespace:    mynamespace
+Labels:       <none>
+Annotations:  <none>
+
+Type:  Opaque
+
+Data
+====
+file_1:     1184 bytes
+file_2:     1314 bytes
+file_3:     1679 bytes
+
+
+kubectl -n mynamespace get secret my-secret
+NAME                     TYPE     DATA   AGE
+my-secret                Opaque      3     2d
+
+# Opaque type means it's the default secret type
+
+```
+
 ### Secrets vs ConfigMaps
 
 __ConfigMaps__ allow you to decouple configuration artifacts from image content to keep containerized
