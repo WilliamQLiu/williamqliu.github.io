@@ -364,6 +364,11 @@ kubectl -n mynamespace exec -it mypod-7w7tx bash
 kubectl -n mynamespace logs -f somecontainer --all-containers
 ```
 
+```
+# Get the yaml of a pod
+kubectl -n mynamespace get pod mypod --output=yaml
+```
+
 ### Deployments
 
 Deployments bind Replica Sets and Pod templates
@@ -1050,6 +1055,76 @@ Creating on Google Cloud Platform:
     as an open-source monitoring system, GitLab Runner to connect to repo and execute CI/CD jobs,
     Helm Tiller to streamline installing and managing Kubernetes applications; manages releases of your charts)
 6.) You can view the automatically created yaml file from GitLab's Auto Devops
+
+### Helm Commands
+
+```
+helm
+
+❯ helm
+The Kubernetes package manager
+
+Common actions for Helm:
+
+- helm search:    search for charts
+- helm pull:      download a chart to your local directory to view
+- helm install:   upload the chart to Kubernetes
+- helm list:      list releases of charts
+
+age:
+  helm [command]
+
+Available Commands:
+  completion  generate autocompletion scripts for the specified shell
+  create      create a new chart with the given name
+  dependency  manage a chart's dependencies
+  env         helm client environment information
+  get         download extended information of a named release
+  help        Help about any command
+  history     fetch release history
+  install     install a chart
+  lint        examine a chart for possible issues
+  list        list releases
+  package     package a chart directory into a chart archive
+  plugin      install, list, or uninstall Helm plugins
+  pull        download a chart from a repository and (optionally) unpack it in local directory
+  push        push a chart to remote
+  registry    login to or logout from a registry
+  repo        add, list, remove, update, and index chart repositories
+  rollback    roll back a release to a previous revision
+  search      search for a keyword in charts
+  show        show information of a chart
+  status      display the status of the named release
+  template    locally render templates
+  test        run tests for a release
+  uninstall   uninstall a release
+  upgrade     upgrade a release
+  verify      verify that a chart at the given path has been signed and is valid
+  version     print the client version information
+
+Flags:
+      --debug                       enable verbose output
+  -h, --help                        help for helm
+      --kube-apiserver string       the address and the port for the Kubernetes API server
+      --kube-as-group stringArray   group to impersonate for the operation, this flag can be repeated to specify multiple groups.
+      --kube-as-user string         username to impersonate for the operation
+      --kube-ca-file string         the certificate authority file for the Kubernetes API server connection
+      --kube-context string         name of the kubeconfig context to use
+      --kube-token string           bearer token used for authentication
+      --kubeconfig string           path to the kubeconfig file
+  -n, --namespace string            namespace scope for this request
+      --registry-config string      path to the registry config file (default "/Users/william.liu/Library/Preferences/helm/registry/config.json")
+      --repository-cache string     path to the file containing cached repository indexes (default "/Users/william.liu/Library/Caches/helm/repository")
+      --repository-config string    path to the file containing repository names and URLs (default "/Users/william.liu/Library/Preferences/helm/repositories.yaml")
+
+Use "helm [command] --help" for more information about a command.
+```
+
+# Use helm template to locally render templates
+
+```
+helm template application -f application/values/staging/values.yaml --output-dir manifest
+```
 
 ## GitLab's Auto DevOps
 
