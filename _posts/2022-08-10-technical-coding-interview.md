@@ -1568,17 +1568,34 @@ def countBits(n):
 print(countBits(23))
 ```
 
-## Two Pointers
+## Advanced Algorithms
 
-## Sliding Window
+Arrays
 
-## Tries
+* Kadane's Algorithm
+* Sliding Window Fixed Size
+* Sliding Window Variable Size
+* Two Pointers
+* Prefix Sums
 
-## Advanced Graphs
+Linked Lists
 
-## Greedy
+* Fast and Slow Pointers
 
-## Intervals
+Trees
 
-## Math & Geometry
+* Trie
+* Union-Find
+* Segment Tree
+* Iterative DFS
+
+Heaps
+
+* Two Heaps
+
+Graphs
+
+* Dijkstra's
+* Prim's
+* Kruskal's
 
