@@ -1667,3 +1667,153 @@ def slidingWindow(nums):
 
     return [maxL, maxR]
 ```
+
+### Sliding Window Fixed Size
+
+Question: Given an array, return true if there are two elements within a window of k that are equal
+
+Example 1:
+```
+k = 2
+array = [1, 2, 3, 2, 3, 3]
+check 1,2
+check 2,3
+check 3,2
+check 3,3 returns True
+```
+
+CheckKNearbyDuplicatesBruteForce
+```
+# Check if array contains a pair of duplicate values,
+# where the two duplicates are no farther than k poisitions from
+# each other (i.e. arr[i] == arr[j] and abs(i -j) <= k).
+# O(n * k)
+def checkKNearbyDuplicatesBruteForce(nums, k):
+    for L in range(len(nums)):
+        for R in range(L + 1, min(len(nums), L + k)):
+            return True
+    return False
+```
+
+We use a hashset to help optimize the solution by adding the window to the hashset (and removing anything outside the window).
+CheckKNearbyDuplicatesOptimized
+```
+# Same problem using a sliding window
+# O(n)
+def checkKNearbyDuplicatesOptimized(nums, k):
+    window = set()  # Cur window of size <= k
+    L = 0
+
+    for R in range(len(nums)):
+        if R - L + 1 > k:
+            window.remove(nums[L])
+            L += 1
+        if nums[R] in window:
+            return True
+        window.add(nums[R])
+
+    return False
+```
+
+### Sliding Window Variable Size
+
+
+Example 1:
+
+Question: Find the length of the longest subarray, with the same value in each position
+
+```
+Array = [4, 2, 2, 3, 3, 3]
+4 = L = R
+Increment R, check if they're the same value (4 and 2), they're not
+Increment L until L = R (both at 2)
+Increment R until it's a new value
+...
+```
+
+longestSubarray
+```
+# Find the length of longest subarray with the same
+# value in each position
+# O(n)
+def longestSubarray(nums):
+    length = 0
+    L = 0
+
+    for R in range(len(nums)):
+        if nums[L] != nums[R]:
+            L = R
+        length = max(length, R - L + 1)
+    return length
+```
+
+Example 2:
+
+Question: Find the minimum length subarray, where the sum is greater than or equal to the target.
+Assume all values are positive.
+
+```
+Target = 6
+# Find length of minimum size subarray where the sum is
+# greater than or equal to the target:
+# O(n)
+def shortestSubarray(nums, target):
+    L, total = 0, 0
+    length = float("inf")
+
+    for R in range(len(nums)):
+        total += nums[R]
+        while total >= target:
+            length = min(R - L + 1, length)
+            total -= nums[L]
+            L += 1
+    return 0 if length == float("inf") else length
+
+```
+
+### Two Pointers
+
+Example 1:
+
+Question: Check if an array is a palindrome
+
+```
+# Given a string of characters, return true if it's a palindrome,
+# return false otherwise
+# O(n)
+def isPalindrome(word):
+    L, R = 0, len(word) - 1
+    while L < R:
+        if word[L] != word[R]:
+            return False
+        L += 1
+        R -= 1
+    return True
+```
+
+Example 2:
+
+Question: Given a sorted input array, return the two indices of two elements which
+sum up to the target value. Assume there's exactly one solution.
+
+```
+Target = 7
+Array = [-1, 2, 3, 4, 8, 9]
+
+# Given a sorted array of integers, return the indices
+# of two elements (in different positions) that sum up to the
+# target value. Assume there is exactly one solution.
+# O(n)
+
+def targetSum(nums, target):
+    L, R = 0, len(nums) - 1
+    while L < R:
+        if nums[L] + nums[R] > target:
+            R -= 1
+        elif nums[L] + nums[R] < target:
+            L += 1
+        else:
+            return [L, R]
+
+```
+
