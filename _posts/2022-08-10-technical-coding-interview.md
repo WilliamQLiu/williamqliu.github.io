@@ -1817,3 +1817,46 @@ def targetSum(nums, target):
 
 ```
 
+### Prefix and Postfix Sums
+
+Prefixes are contiguous blocks that start at the beginning.
+
+```
+array = [2, -1, 3, -3, 4]
+
+Example Prefixes:
+[2]
+[2, -1]
+[2, -1, 3]
+```
+
+A postfix would look like:
+```
+[4]
+[-3, 4]
+[3, -3, 4]
+```
+
+Example 1:
+
+Question: Given an array of values, design a data structure that can query the sum
+of a subarray of the values
+
+The idea is to precompute the work and save that data so we can use it in our calculations later.
+
+```
+class PrefixSum:
+
+    def __init__(self, nums):
+        self.prefix = []
+        total = 0
+        for n in nums:
+            total += n
+            self.prefix.append(total)
+
+    def rangeSum(self, left, right):
+        preRight = self.prefix[right]
+        preLeft = self.prefix[left - 1] if left > 0 else 0  # handle out of bounds
+        return (preRight - preLeft)
+```
+
