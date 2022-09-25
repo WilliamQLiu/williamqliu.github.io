@@ -1457,6 +1457,117 @@ def dp(rows, cols):
     return prevRow[0]
 ```
 
+## Bit Manipulation
+
+__Bit Manipulation__ contains:
+
+* AND
+* OR
+* XOR
+
+Bit Operations:
+
+```
+# AND - both bits need to be 1, otherwise will be 0
+n = 1 & 1
+
+# OR - just one bit needs to be 1, otherwise will be 0 if none are
+n = 1 | 0
+
+# XOR - exclusive OR, result will be 1 ONLY IF ONE of the bits is 1 (not both, or none)
+n = 0 ^ 1
+
+# NOT (negation) - opposite
+n = ~n
+
+# Bit Shifting
+n = 1
+n = n << 1
+n = n >> 1
+
+### Truth Tables
+
+## AND
+
+| AND |
+| 0 & 0 | 0 |
+| 0 & 1 | 0 |
+| 1 & 0 | 0 |
+| 1 & 1 | 1 |
+
+## OR
+
+| OR |
+| `0 | 0` | 0 |
+| `0 | 1` | 1 |
+| `1 | 0` | 1 |
+| `1 | 1` | 1 |
+
+## XOR
+
+| XOR |
+| 0 ^ 0 | 0 |
+| 0 ^ 1 | 1 |
+| 1 ^ 0 | 1 |
+| 1 ^ 1 | 0 |
+
+### Bases (e.g. Base 2, Base 10)
+
+Exponents
+
+The exponent of a number shows how many times the number is multiplied by itself.
+The zero property of exponents is applied when the exponent of any base is 0.
+
+#### Base 10
+
+`1011` means 10^0 for 1, 10^1 for 10 (the second digit), 10^2 for 0 (the third digit), and 10^4 for 1 (fourth digit).
+
+For base 10:
+    5     4     3     2
+    10^3  10^2  10^1  10^0
+    1000s 100s  10s   1s
+
+Bit Shifting for Base 10
+
+Basically just multiplies by 10
+
+e.g. 5432 would add a 0, so it would be 54320 (i.e. multiplies by 10)
+
+#### Base 2 (aka __Binary__)
+
+`1011` means that the first digit on the right is 1. The next digit is the presence of 2 (another 1).
+The third digit is the presence of 4. The next digit is the presence of 8.
+
+It's basically 2^0 for the first right digit, 2^1 for the next digit, 2^2 for the next digit, 2^4 for next, 2^8 next.
+
+For binary (base 2):
+    1    0    1    1
+    2^3  2^2  2^1  2^0
+
+Bit Shifting for Base 2
+
+Shift left by one, e.g. `001 << 1` bit shift to the left would be `010` (i.e. 1 * 2)
+* If we shift left by 1 again, we now have `100`. We're multiplying by 2 again
+* If we shift left again `100 << 1`, the `1` drops off and we have `000`.
+
+Shift right by one, e.g. `100 >> 1` bit shift to the right would be `010` (i.e. divide by 2)
+* If we shift right by 1, we now have `010 = 50`. We're dividing by 2.
+* If we have an odd number, we round down
+
+```
+# Counting Bits
+def countBits(n):
+    count = 0
+    while n > 0:
+        if n & 1 == 1:  # AND
+            count += 1
+        n = n >> 1  # same as n // 2
+    return count
+
+# 23 = 10111
+print(countBits(23))
+```
+
 ## Two Pointers
 
 ## Sliding Window
@@ -1471,4 +1582,3 @@ def dp(rows, cols):
 
 ## Math & Geometry
 
-## Bit Manipulation
