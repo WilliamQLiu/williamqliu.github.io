@@ -1860,3 +1860,86 @@ class PrefixSum:
         return (preRight - preLeft)
 ```
 
+### Linked Lists
+
+#### __Fast and Slow Pointers__ (aka __Floyd's tortoise and hare__) algorithm
+
+Example 1:
+
+Question: Find the middle of a linked list
+
+Can just technically count the length and then get the middle in O(n).
+
+The idea is that we have two pointers, a fast and a slow that we initiate both at the front of the linked list.
+The fast pointer increments by 2 positions while the slow pointer increments by 1 position.
+If the fast pointer reaches the end of the linked list, the slow pointer should be in the middle of the linked list,
+at least if there's an odd number of items. If there's an even number, then the fast pointer hits null
+and the slow pointer will be at the midway point (assuming we use the latter on a tie; if we want to
+use the earlier value on a tie, then just initialize the faster point one ahead of the slow pointer).
+
+```
+# Find the middle of a linked list with two pointers
+# Time: O(n), Space: O(1)
+
+def middleOfList(head):
+    slow, fast, = head, head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow
+```
+
+Example 2: Linked List with a cycle
+
+Question: Determine if a linked list has a cycle
+
+We can use a HashSet to add the pointer that we visited into the HashSet, but that costs
+O(n) memory space.
+
+If the slow pointer and fast cycle intercept, then it means there is a cycle (i.e. a loop/circle).
+
+```
+# Determine if the linked list contains a cycle
+# Time: O(n), Space: O(1)
+
+def hasCycle(head):
+    slow, fast = head, head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast:
+            return True
+    return False
+```
+
+Example 3:
+
+Question: Determine if a linked list has a cycle and return the beginning of the cycle if there is (or None if no cycle)
+
+# Determine if the linked list contains a cycle and
+# return the beginning of the cycle, otherwise return null.
+# Time: O(n), Space: O(1)
+
+2 * slow = fast
+if there is a cycle, slow and fast pointers will intersect at some arbitrary location
+
+```
+def cycleStart(head):
+    slow, fast = head, head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast:
+            break
+
+    if not fast or not fast.next:
+        return None
+
+    slow2 = head
+    while slow != slow2:
+        slow = slow.next
+        slow2 = slow2.next
+    return slow
+```
+
+
