@@ -1942,4 +1942,56 @@ def cycleStart(head):
     return slow
 ```
 
+### Tree
+
+#### Trie (Prefix Tree)
+
+A __trie__ (aka __prefix tree__) is a tree of characters (e.g. `a-z`, `A-Z`). It's a data structure where you can:
+
+* Insert words at `O(1)` (can also be size of the word at `O(n)` where n is the size of the word)
+* Search words at `O(1)`
+
+We can use a HashSet, but it doesn't let you do a __search prefix__ in `O(1)`
+With a hashmap, we can search for the word "apple", but we can't find the prefix of "ap"; we would have to
+search through every word.
+
+We have a single root node that is empty, then there are children of the characters (e.g. `a-z`). Each of those
+children have another set of characters (e.g. `a-z`). So the word 'apple' would be 'a', 'p', 'p', 'l', 'e' with
+each character as a TrieNode. To keep track of what children are in a TrieNode, we use a hashmap.
+
+```
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.word = False  # boolean value to determine if it's the end of the word we're looking for
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        """ If the character is not there, then create a new TrieNode """
+        curr = self.root
+        for c in word:
+            if c not in curr.children:
+                curr.children[c] = TrieNode()
+            curr = curr.children[c]
+        curr.word = True
+
+    def search(self, word):
+        curr = self.root
+        for c in word:
+            if c not in curr.children:
+                return False
+            curr = curr.children[c]
+        return curr.word
+
+    def startsWith(self, prefix):
+        curr = self.root
+        for c in prefix:
+            if c not in curr.children:
+                return False
+        return True
+```
+
 
