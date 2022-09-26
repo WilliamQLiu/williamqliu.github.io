@@ -1570,6 +1570,8 @@ print(countBits(23))
 
 ## Advanced Algorithms
 
+### Overview
+
 Arrays
 
 * Kadane's Algorithm
@@ -1606,7 +1608,9 @@ Dynamic Programming
 * LCS
 * Palindromes
 
-### Kadane's Algorithm
+### Arrays
+
+#### Kadane's Algorithm
 
 Question: Given an array of positive or negative numbers, return a non-empty (contiguous) subarray with the largest sum.
 
@@ -1668,7 +1672,7 @@ def slidingWindow(nums):
     return [maxL, maxR]
 ```
 
-### Sliding Window Fixed Size
+#### Sliding Window Fixed Size
 
 Question: Given an array, return true if there are two elements within a window of k that are equal
 
@@ -1715,7 +1719,7 @@ def checkKNearbyDuplicatesOptimized(nums, k):
     return False
 ```
 
-### Sliding Window Variable Size
+#### Sliding Window Variable Size
 
 
 Example 1:
@@ -1771,7 +1775,7 @@ def shortestSubarray(nums, target):
 
 ```
 
-### Two Pointers
+#### Two Pointers
 
 Example 1:
 
@@ -1817,7 +1821,7 @@ def targetSum(nums, target):
 
 ```
 
-### Prefix and Postfix Sums
+#### Prefix and Postfix Sums
 
 Prefixes are contiguous blocks that start at the beginning.
 
@@ -1994,4 +1998,66 @@ class Trie:
         return True
 ```
 
+#### Union-Find (aka Disjoint sets)
+
+__Union-Find__ (aka __Disjoint sets__) is a tree data structure, but can be applied to any generic graphs.
+
+Purpose:
+
+* The strenght of the union-find is that it can work with disjointed sets (e.g. two nodes connected, another
+  two nodes connected, but the entire graph is not connected to each other)
+* Union-find is used to determine if there are any cycles in a graph or count the number of connected components
+* You can usually use a __DFS__ so that's why it's pretty rare to see Union-Find (though sometimes Union-Find is more efficient)
+
+Implementation:
+
+* Union Find is a __Forest of Trees__; we assume that all nodes are disconnected to start
+* We take one of the nodes at a time, then set it as the parent of the other node
+* We _union trees by rank (height)_ (smaller tree gets added as a child to the larger tree, connect the smaller tree to the root)
+* We can't union already connected components
+
+Example 1:
+
+```
+nodes = [1, 2, 3, 4]
+edges = [[1,2], [4,1], [2,4]]
+
+# all nodes are disconnected
+# can randomly go to any node
+
+
+class UnionFind:
+    def __init__(self, n):
+        self.par = {}  # keep track of the parent, can use as a hash or array
+        self.rank = {}  # by rank we mean the 'height', we want our tree to be as small as possible (more efficient for find)
+
+        for i in range(1, n+ 1):
+            self.par[i] = i  # initialize the parent as the root itself
+            self.rank[i] = 0  # set the rank / height to 0 as a default, can also be 1
+
+    def find(self, n):
+        """ Given some node, we want to find the parent (i.e. the root parent) """
+        p = self.par[n]
+        while p != self.par[p]:
+            self.par[p] = self.par[self.par[p]]  # path compression; shorten chain by setting the parent to it's grandparent
+                                                 # in case we run find again
+            p = self.par[p]
+        return p
+
+    def union(self, n1, n2):
+        """ Union the two nodes together """
+        p1, p2 = self.find(n1), self.find(n2)
+        if p1 == p2:  # if the root parents are the same, cannot union since they're the same component
+            return False
+
+        # union by rank, aka union by height
+        if self.rank[p1] > self.rank[p2]:  # p1 higher height than p2, p1 should be parent
+            self.par[p2] = p1
+        elif self.rank[p1] < self.rank[p2]:  # p2 is higher height than p1, p2 should be parent
+            self.par[p1] = p2
+        else:  # heights are equal
+            self.par[p1] = p2
+            self.rank[p2] += 1  # need to increase the height by one
+        return True
+```
 
