@@ -2066,6 +2066,7 @@ class UnionFind:
 
 #### Segment Tree
 
+Note: not as common in coding interviews
 Say we're given an array of values and we want to support two main operations:
 
 * update(index, value)
@@ -2168,6 +2169,230 @@ class SegmentTree:
 ```
 
 #### Iterative DFS
+
+Note: Recursive DFS are easier; use that if you can.
+We can implement DFS on a binary tree with recursion, but we can also do this as an __Iterative DFS__.
+We can do this three ways and we'll do some type of operation (print in the example):
+
+* inorder
+* preorder
+* postorder
+
+Example 1:
+```
+    1
+   / \
+  2   3
+ /      \
+4        5
+
+```
+
+
+##### Inorder
+
+We process the children node first. We go left and keep going left until we can't anymore (null node).
+On a recursive solution, we would just return (pop back up to the previous node of the call stack).
+When we do this iteratively, we do the same thing (not a call stack, but just create a stack data structure
+and save the nodes onto the stack).
+
+```
+Add to the stack
+
+Stack
+ 1
+
+Stack
+ 2
+ 1
+
+Stack
+ 4
+ 2
+ 1
+
+Reach a null node, then pop from the stack
+
+Stack
+  popped 4 (next step is to keep popping because nothing on the right)
+ 2
+ 1
+
+Stack
+  popped 4
+  popped 2 (next step is to keep popping because nothing on the right)
+ 1
+
+Stack
+  popped 4
+  popped 2
+  popped 1 (start traversing the right subtree)
+  3
+
+Stack
+  popped 4
+  popped 2
+  popped 1
+  popped 3
+  5
+
+Stack
+  popped 5, no more nodes to traverse, can stop algorithm
+```
+
+
+##### Preorder
+
+We print or process the current node BEFORE we process the children node.
+
+Code:
+```
+# Definition for a binary tree node
+class TreeNode:
+    def __init__9self, val, left, right):
+        self.val = val
+        self.left = left
+        self.right = right
+
+# Time and space: O(n), really O(height) of the tree
+def inorder(root):
+    """ We're given the root node and we create our own stack """
+    stack = []
+    curr = root
+
+    while curr or stack:  # if our curr pointer is null and stack is empty, we reached the end
+        if curr:
+            stack.append(curr)  # save node by pushing to the stack
+            curr = curr.left  # traverse left
+        else:
+            curr = stack.pop()  # pop back to the parent node
+            print(curr.val)
+            curr = curr.right  # traverse right
+
+# Time and space: O(n)
+def preorder(root):
+    """
+    We print or process the current node BEFORE we process the children node
+    We process the left subtree immediately (e.g. 1, 2, 4) then right subtree after (3, 5)
+    At the root node, add left and right node to the stack, then keep traversing left nodes and push to the stack.
+    """
+    stack = []
+    curr = root
+    while curr or stack:
+        if curr:
+            print(curr.val)
+            if curr.right:
+                stack.append(curr.right)
+            curr = curr.left
+        else:
+            curr = stackpop()
+
+# Time and space: O(n)
+def postorder(root):
+    """
+    We have a stack and a visit flag stack
+    * Start with adding the root node (1) and visit flag (False)
+    * Then add next level (2, False) and (3, False)
+    * Now add the original/root node (1, True) but with a True since it's been visited
+    * We add 3 to the stack first (False), then 2 to the stack (False)
+    * We don't maintain our pointer, we just pop from the stack
+    * We then visit 2 and add that to the stack (2, True), then add its children to the stack
+    * We add the right child (Null) to the stack (visit = False)
+    * We then add 4 to the stack (visit = False)
+    * When we pop a value with a visit = True, we print it because all of its children have been added
+    * etc
+    """
+    stack = [root]
+    visit = [False]
+    while stack:
+        curr, visited = stack.pop(), visit.pop()  # going to be the same size stacks
+        if curr:
+            if visited:
+                print(curr.val)  # if visited already, we already added its descendants
+            else:
+                stack.append(curr)  # take the current node and add it to the stack
+                visit.append(True)
+
+                # important to add right child first so left child is popped first
+                stack.append(curr.right)
+                visit.append(False)  # we set False because we haven't added its children yet
+                visit.append(curr.left)
+                visit.append(False)  # we set False because we haven't added its children yet
+```
+
+### Two Heaps
+
+Example 1 (Basic):
+
+Two heaps are useful when you want to find the median.
+```
+Odd
+[4, 7, 3, 5, 1]
+Median would be the middle value = 4
+
+Even
+[1, 3, 4, 5]
+Median would be 3 + 4 / 2 = 3.5
+```
+
+Example 1 (Stream):
+So instead of getting all of those values at once, say we get a stream of values:
+
+```
+[4]
+[4, 7]
+[4, 7, 10]
+```
+
+If we're inserting a new value: `O(n)` to insert into a sorted order
+To `getMedian` is an `O(1)` operation then.
+
+Question: Implement a Median finder, where new values are inserted into the set,
+and you have to getMedian from that set.
+
+We want to insert with `O(log n)` and getMedian with `O(1)`.
+
+Solution:
+
+* We'll have two heaps: Small (`maxHeap`) and Large (`minHeap`).
+* We insert all the small values into small heap, large values into large heap
+* When we insert a single value, can just put to the small heap
+* We want all values in the small heap <= large heap
+* We want the number of values from both heaps to roughly equal
+* We take the values from both heaps, add them together and divide by 2
+
+```
+import heapq
+
+
+class Median:
+    def __init__(self):
+        self.small, self.large = [], []
+
+    def insert(self, num):
+        # Push to the max heap and swap with min heap if needed
+        heapq.heappush(self.small, -1 * num)
+        if (self.small and self.large and (-1 * self.small[0]
+            val = -1 * heapq.heappop(self.small)
+            heapq.heappush(self.large, val)
+
+        # Handle uneven size
+        if len(self.small) > len(self.large) + 1:
+            val = -1 * heapq.heappop(self.small)
+            heapq.heappush(self.large, val)
+        if len(self.large) > len(self.small) + 1:
+            val = heapq.heappop(self.large)
+            heapq.heappush(self.small, -1 * val)
+
+    def getMedian(self):
+        if len(self.small) > len(self.large):
+            return -1 * self.small[0]
+        elif len(self.large) > len(self.small):
+            return self.large[0]
+
+        # Even # of elements, return avg of two middle nums
+        return (-1 * self.small[0] + self.large[0]) /2
+```
 
 ## Competitive Programming Algorithms and Data Structures
 
