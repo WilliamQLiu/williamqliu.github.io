@@ -1554,6 +1554,8 @@ Shift right by one, e.g. `100 >> 1` bit shift to the right would be `010` (i.e. 
 * If we shift right by 1, we now have `010 = 50`. We're dividing by 2.
 * If we have an odd number, we round down
 
+Code:
+
 ```
 # Counting Bits
 def countBits(n):
@@ -1567,6 +1569,7 @@ def countBits(n):
 # 23 = 10111
 print(countBits(23))
 ```
+
 
 ## Advanced Algorithms
 
