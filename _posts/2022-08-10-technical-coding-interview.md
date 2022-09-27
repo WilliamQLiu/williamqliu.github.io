@@ -2008,6 +2008,7 @@ Purpose:
   two nodes connected, but the entire graph is not connected to each other)
 * Union-find is used to determine if there are any cycles in a graph or count the number of connected components
 * You can usually use a __DFS__ so that's why it's pretty rare to see Union-Find (though sometimes Union-Find is more efficient)
+* In the cases where we implement path compression and union by rank, we get close to `O(nodes * 1)` for find operations and `O(1)` for union
 
 Implementation:
 
@@ -2015,6 +2016,8 @@ Implementation:
 * We take one of the nodes at a time, then set it as the parent of the other node
 * We _union trees by rank (height)_ (smaller tree gets added as a child to the larger tree, connect the smaller tree to the root)
 * We can't union already connected components
+* `find` function is normally `O(n)`, but can be `O(log n)` if we implement path compression or union by rank
+* if we implement path compression AND union by rank for `find` function, we get the __Inverse Ackermann__ time (close to `O(1)`)
 
 Example 1:
 
@@ -2060,4 +2063,120 @@ class UnionFind:
             self.rank[p2] += 1  # need to increase the height by one
         return True
 ```
+
+#### Segment Tree
+
+Say we're given an array of values and we want to support two main operations:
+
+* update(index, value)
+* queryRange(L, R) and get the sum
+
+Approach 1 (with an Array):
+
+* update(index, value) is `O(1)`
+* queryRange(L, R) is `O(n)`
+
+Approach 2 (with a Segment Tree):
+
+* update(index, value) is `O(log n)`  # <- note this gets slower than the array
+* queryRange(L, R) is `O(log n)`  # <- note this is faster than the array
+
+How does this work?
+
+* We take the array and break it up into segments
+* The root node would represent the range for the entire array; left half goes to left node, right half goes to right node
+* This is where if we update a value, we have to update multiple nodes
+
+Example 1:
+
+```
+Index   0 1 2 3 4 5
+Values  5 3 7 1 4 2
+
+               [0,5]
+                22
+              /    \
+        [0,2]       [3,5]
+         15           7
+        /    \      /   \
+    [0,1]   [2,2] [3,4]  [5,5]
+      8       7     5      2
+    /    \        /    \
+[0,0]   [1,1]   [3,3]  [4,4]
+  5       3       1      4
+```
+
+```
+class SegmentTree:
+    def __init__(self, total, L, R):  # e.g. total is the 22 at the root node
+        self.sum = total  # e.g. 22 at the root [0,5] (total of everything added up)
+        self.left = None  # pointer to the left child
+        self.right = None  # pointer to the right child
+        self.L = L  # references index of the left boundary of the node e.g. 0 of the [0,5]
+        self.R = R  # references index of the right boundary of the node e.g. 5 of the [0,5]
+
+    # O(n)
+    @staticmethod
+    def build(nums, L, R):
+        """ Build a Segment Tree """
+        if L == R:
+            return SegmentTree(nums[L], L, R)
+
+        M = (L + R) // 2
+        root = SegmentTree(0, L, R)
+        root.left = SegmentTree.build(nums, L, M)  # build left side of the segment tree
+        root.right = SegmentTree.build(nums, M + 1, R)  # build right side of the segment tree
+        root.sum = root.left.sum + root.right.sum  # calculate the sum of the root node
+        return root
+
+    # O(log n)
+    def update(self, index, value):
+        """
+
+        """
+        if self.L == self.R:
+            self.sum = value
+            return
+
+        M = (self.L + self.R) // 2  # similar to how we built the segment tree, find where this value is
+        if index > M:
+            self.right.update(index, value)
+        else:
+            self.left.update(index, value)
+        self.sum = self.left.sum + self.right.sum
+
+    # O(log n)
+    def rangeQuery(self, L, R):
+        """
+        think of ranges as a number line. the entire range can be one of the following scenarios:
+          * left only
+          * right only
+          * left and right
+        we go through each value and keep popping back up the actual sum/total
+        """
+        if L == self.L and R == self.R:
+            return self.sum
+
+        M = (self.L + self.R) // 2
+        if L > M:
+            return self.right.rangeQuery(L, R)
+        elif R <= M:
+            return self.left.rangeQuery(L, R)
+        else:
+            return (self.left.rangeQuery(L, M) +
+                    self.right.rangeQuery(M + 1, R))
+```
+
+#### Iterative DFS
+
+## Competitive Programming Algorithms and Data Structures
+
+More advanced/competitive programming algorithms can be found [here](https://cp-algorithms.com/)
+
+* __Rabin-Karp algorithm__ for String Matching uses hasing to find an exact match of a pattern in a text.
+* Prefix function - __Knuth-Morris-Pratt (KMP)__ searches for occurrences of a 'word' W within a main 'text string' S by
+  employing the observation that when a mismatch occurs, the word itself embodies sufficient information to determine
+  where the next match could begin
+* Sieve of Eratosthenes - algorithm for finding all the prime numbers in a segment
+* Fenwick Tree - a data structure that can efficiently update elemnts and calculate prefix sums in a table of numbers
 
