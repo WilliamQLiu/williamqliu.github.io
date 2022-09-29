@@ -421,6 +421,7 @@ can hold values (e.g. numbers, strings), and two (left and right due to binary) 
 * __Ancestor__ Nodes are any Node going up that node. The __Root Node__ does not have any Ancestor nodes.
 * The __Depth__ is the opposite of __Height__, which is basically the Height going up instead of down.
 
+Example Code:
 ```
 class TreeNode:
     def __init__(self, value):
@@ -437,7 +438,9 @@ These are not sorted like an array.
 * Every single node in the right subtree has to greater than the root/current node.
 * Binary Search Trees usually do not contain duplicates
 * The definition of a BST makes it easy to do __recursion__ (i.e. one-branch recursion, go in one direction)
-* So what does a binary search tree do? Allows `log(n)` access to a node.
+* So what does a binary search tree do? Allows `O(log n)` access to a node.
+
+Example Code:
 ```
 class TreeNode:
     def __init__(self, value):
@@ -1923,14 +1926,13 @@ Example 3:
 
 Question: Determine if a linked list has a cycle and return the beginning of the cycle if there is (or None if no cycle)
 
+```
 # Determine if the linked list contains a cycle and
 # return the beginning of the cycle, otherwise return null.
 # Time: O(n), Space: O(1)
+# 2 * slow = fast
+# if there is a cycle, slow and fast pointers will intersect at some arbitrary location
 
-2 * slow = fast
-if there is a cycle, slow and fast pointers will intersect at some arbitrary location
-
-```
 def cycleStart(head):
     slow, fast = head, head
     while fast and fast.next:
