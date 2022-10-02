@@ -1,5 +1,6 @@
 markdown: kramdown
 higherlighter: rouge
-
+kramdown:
+  parse_block_html: true
 author:
     name: William Liu
