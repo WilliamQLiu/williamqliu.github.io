@@ -3,6 +3,7 @@ layout: post
 title: Technical Coding Interview Cheat Sheet
 ---
 
+<blog>
 # {{ page.title }}
 
 ## Summary
@@ -2596,3 +2597,4 @@ More advanced/competitive programming algorithms can be found [here](https://cp-
 * Sieve of Eratosthenes - algorithm for finding all the prime numbers in a segment
 * Fenwick Tree - a data structure that can efficiently update elemnts and calculate prefix sums in a table of numbers
 
+</blog>
