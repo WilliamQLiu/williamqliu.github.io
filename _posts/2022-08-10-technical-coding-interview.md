@@ -63,7 +63,6 @@ __Static Arrays__ have a __fixed size__ and generally not that useful (see Dynam
 __Static Arrays__ are not available in some programming languages (e.g. Python or JavaScript),
 which instead only offer Dynamic Arrays.
 
-
 * Reading or Writing i-th element is fast `O(1)`.
 * Inserting or Removing from the last element is fast `O(1)`.
 * Inserting or Removing at the front or middle is `O(n)` worst case.
@@ -329,7 +328,24 @@ def factorial(n):
 
 ### Merge Sort
 
+__Merge sort__ is an algorithm based on a divide and conquer strategy that
+operates well on any type of dataset, large or small.
+
+Worst-case time:   `O(n log n)`
+Best-case time:    `O(n log n)`
+Average-case time: `O(n log n)`
+Space:             `O(n)`
+
 ### Quick Sort
+
+__Quicksort__ is a an in-place sorting `O(1)` memory algorithm based on a divide
+and conquer strategy that is generally more efficient for small datasets or where
+the elements are fairly evenly distributed over the range.
+
+Worst-case time:   `O(n^2)`
+Best-case time:    `O(n log n)`
+Average-case time: `O(n log n)`
+Space:             `O(1)`
 
 ### Bucket Sort
 
@@ -2290,7 +2306,7 @@ def preorder(root):
                 stack.append(curr.right)
             curr = curr.left
         else:
-            curr = stackpop()
+            curr = stack.pop()
 
 # Time and space: O(n)
 def postorder(root):
