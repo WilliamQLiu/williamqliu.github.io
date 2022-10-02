@@ -3,7 +3,6 @@ layout: post
 title: Technical Coding Interview Cheat Sheet
 ---
 
-<blog>
 # {{ page.title }}
 
 ## Summary
@@ -45,6 +44,8 @@ The types of questions you'll see are:
 * Bit Manipulation
 
 <test>Click me test</test>
+
+Something here
 
 ## Arrays
 
@@ -2596,5 +2597,3 @@ More advanced/competitive programming algorithms can be found [here](https://cp-
   where the next match could begin
 * Sieve of Eratosthenes - algorithm for finding all the prime numbers in a segment
 * Fenwick Tree - a data structure that can efficiently update elemnts and calculate prefix sums in a table of numbers
-
-</blog>
