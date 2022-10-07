@@ -41,6 +41,19 @@ You'll see the following configuration files in `~/.aws/`:
     ls ~/.aws/
     config  credentials
 
+### Configure List
+
+If you're not sure what credentials are being used, you can run a:
+
+    aws configure list
+
+      Name                    Value             Type    Location
+      ----                    -----             ----    --------
+    profile                <not set>             None    None
+    access_key     ****************YYYY shared-credentials-file
+    secret_key     ****************XXXX shared-credentials-file
+    region                us-west-2              env    AWS_DEFAULT_REGION
+
 ## Boto 3 Stubs
 
 Note: Need MyPy installed first (for static typing)
