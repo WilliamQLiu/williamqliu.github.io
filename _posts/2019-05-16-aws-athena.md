@@ -317,6 +317,61 @@ Common DDL statements are CREATE, ALTER, and DROP.
     ) LOCATION 's3://athena-examples-us-east-1/elb/plaintext/'
     TBLPROPERTIES ('has_encrypted_data'='false');
 
+## Partitions
+
+### Add partitions for a table
+
+```
+ALTER TABLE orders ADD
+  PARTITION (dt = '2016-05-14', country = 'IN') LOCATION 's3://mystorage/path/to/INDIA_14_May_2016/'
+  PARTITION (dt = '2016-05-15', country = 'IN') LOCATION 's3://mystorage/path/to/INDIA_15_May_2016/';
+```
+
+### Drop partitions for a table
+
+```
+LTER TABLE orders
+DROP PARTITION (dt = '2014-05-14', country = 'IN'), PARTITION (dt = '2014-05-15', country = 'IN');
+```
+
+### Show the partitions for a table
+
+```
+SHOW PARTITIONS my_schema.my_table;
+
+run_date=2022-10-01
+run_date=2022-10-02
+```
+
+### Select the partitions
+
+```
+SELECT * FROM "my_table$partitions" LIMIT 100;
+```
+
+### Show the Locations
+
+Assuming you are partitioning on something like `run_date`
+
+```
+SELECT DISTINCT run_date, "$path" FROM my_schema.my_table
+ORDER BY run_date DESC
+LIMIT 1000
+
+run_date, $path
+2022-10-12, s3://mybucket/something/here/run_date=2022-10-12/files
+2022-10-13, s3://mybucket/something/here/run_date=2022-10-13/files
+
+```
+
+### Change the Partition Location
+
+If you don't want to drop and add, can just change the partition location
+
+```
+ALTER TABLE customers PARTITION (zip='98040', state='WA') SET LOCATION 's3://mystorage/custdata/';
+```
+
 ## Athena Integration with AWS Glue
 
 __AWS Glue__ is a fully managed ETL service that can categorize your data, clean it, enrich it, and move it reliably
