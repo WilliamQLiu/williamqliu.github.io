@@ -188,6 +188,8 @@ The errors that I've seen are issues like I setup a catalog incorrectly.
     Peak Memory: 0B
     0:00 [1 rows, 30B] [5 rows/s, 164B/s]
 
+
+
 ## Setup Presto-Admin
 
 __Presto-Admin__ is a tool for installing and managing the Presto query engine on a cluster.
@@ -370,6 +372,17 @@ If you don't want to drop and add, can just change the partition location
 
 ```
 ALTER TABLE customers PARTITION (zip='98040', state='WA') SET LOCATION 's3://mystorage/custdata/';
+```
+
+### Debugging a failed query
+
+```
+❯ aws athena get-query-execution --query-execution-id a6475246-xxxx-xxxx-xxxx-xxxxxxxxxxx
+
+{
+    "QueryExecution": {
+        "QueryExecutionId": "a6475246-xxxx-xxxx-xxxx-xxxxxxxxxxx",
+        "Query": ...
 ```
 
 ## Athena Integration with AWS Glue
