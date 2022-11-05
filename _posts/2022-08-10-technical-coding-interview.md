@@ -504,7 +504,7 @@ def partition(mylist, first, last):
             mylist[leftmark], mylist[rightmark] = mylist[rightmark], mylist[leftmark]
 
     # Once rightmark is less than leftmark, then rightmark is now the split point.
-    # That means what we picked as the pivot value can now be exchanged with the 
+    # That means what we picked as the pivot value can now be exchanged with the
     # contents of the split point and the pivot value is now in the correct place
     # Note: remember that our pivot value was the first value in our list
     mylist[first], mylist[rightmark] = mylist[rightmark], mylist[first]
@@ -2587,6 +2587,34 @@ class Median:
         return (-1 * self.small[0] + self.large[0]) /2
 ```
 
+### Backtracking
+
+#### Subsets
+
+#### Combinations
+
+#### Permutations
+
+### Graphs
+
+#### Dijkstra's
+
+#### Prim's
+
+#### Kruskal's
+
+#### Topological Sort
+
+### Dynamic Programming
+
+#### 0/1 Knapsack
+
+#### Unbounded Knapsack
+
+#### LCS
+
+#### Palindromes
+
 ## Competitive Programming Algorithms and Data Structures
 
 More advanced/competitive programming algorithms can be found [here](https://cp-algorithms.com/)
@@ -2597,3 +2625,4 @@ More advanced/competitive programming algorithms can be found [here](https://cp-
   where the next match could begin
 * Sieve of Eratosthenes - algorithm for finding all the prime numbers in a segment
 * Fenwick Tree - a data structure that can efficiently update elemnts and calculate prefix sums in a table of numbers
+
