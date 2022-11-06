@@ -17,6 +17,14 @@ state of your infrastructure.
 The idea is that Terraform describes your infrastructure as code (using a high-level configuration
 syntax). This way the blueprint of your datacenter is versioned and is treated like code.
 
+### Install
+
+```
+brew tap hashicorp/tap
+brew install hashicorp/tap/terraform
+terraform -install-autocomplete
+```
+
 ### Open Source vs Enterprise
 
 Terraform is available as open source and as Enterprise.
