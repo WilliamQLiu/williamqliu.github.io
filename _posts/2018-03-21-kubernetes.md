@@ -24,6 +24,90 @@ balancer on your desktop or the cloud or a vm or on premise.
 __Container Image__ is when an application is bundled along with its runtime and dependencies.
 We can use the image to create an isolated executable environment, also known as container.
 
+### Resources
+
+Run `kubectl api-resources` to see what resources are available along with their shortnames, e.g.
+
+```
+NAME                              SHORTNAMES   APIVERSION                             NAMESPACED   KIND
+bindings                                       v1                                     true         Binding
+componentstatuses                 cs           v1                                     false        ComponentStatus
+configmaps                        cm           v1                                     true         ConfigMap
+endpoints                         ep           v1                                     true         Endpoints
+events                            ev           v1                                     true         Event
+limitranges                       limits       v1                                     true         LimitRange
+namespaces                        ns           v1                                     false        Namespace
+nodes                             no           v1                                     false        Node
+persistentvolumeclaims            pvc          v1                                     true         PersistentVolumeClaim
+persistentvolumes                 pv           v1                                     false        PersistentVolume
+pods                              po           v1                                     true         Pod
+podtemplates                                   v1                                     true         PodTemplate
+replicationcontrollers            rc           v1                                     true         ReplicationController
+resourcequotas                    quota        v1                                     true         ResourceQuota
+secrets                                        v1                                     true         Secret
+serviceaccounts                   sa           v1                                     true         ServiceAccount
+services                          svc          v1                                     true         Service
+mutatingwebhookconfigurations                  admissionregistration.k8s.io/v1        false        MutatingWebhookConfiguration
+validatingwebhookconfigurations                admissionregistration.k8s.io/v1        false        ValidatingWebhookConfiguration
+customresourcedefinitions         crd,crds     apiextensions.k8s.io/v1                false        CustomResourceDefinition
+apiservices                                    apiregistration.k8s.io/v1              false        APIService
+controllerrevisions                            apps/v1                                true         ControllerRevision
+daemonsets                        ds           apps/v1                                true         DaemonSet
+deployments                       deploy       apps/v1                                true         Deployment
+replicasets                       rs           apps/v1                                true         ReplicaSet
+statefulsets                      sts          apps/v1                                true         StatefulSet
+tokenreviews                                   authentication.k8s.io/v1               false        TokenReview
+localsubjectaccessreviews                      authorization.k8s.io/v1                true         LocalSubjectAccessReview
+selfsubjectaccessreviews                       authorization.k8s.io/v1                false        SelfSubjectAccessReview
+selfsubjectrulesreviews                        authorization.k8s.io/v1                false        SelfSubjectRulesReview
+subjectaccessreviews                           authorization.k8s.io/v1                false        SubjectAccessReview
+horizontalpodautoscalers          hpa          autoscaling/v2                         true         HorizontalPodAutoscaler
+cronjobs                          cj           batch/v1                               true         CronJob
+jobs                                           batch/v1                               true         Job
+certificatesigningrequests        csr          certificates.k8s.io/v1                 false        CertificateSigningRequest
+leases                                         coordination.k8s.io/v1                 true         Lease
+strimzipodsets                    sps          core.strimzi.io/v1beta2                true         StrimziPodSet
+endpointslices                                 discovery.k8s.io/v1                    true         EndpointSlice
+events                            ev           events.k8s.io/v1                       true         Event
+flowschemas                                    flowcontrol.apiserver.k8s.io/v1beta2   false        FlowSchema
+prioritylevelconfigurations                    flowcontrol.apiserver.k8s.io/v1beta2   false        PriorityLevelConfiguration
+kafkabridges                      kb           kafka.strimzi.io/v1beta2               true         KafkaBridge
+kafkaconnectors                   kctr         kafka.strimzi.io/v1beta2               true         KafkaConnector
+kafkaconnects                     kc           kafka.strimzi.io/v1beta2               true         KafkaConnect
+kafkamirrormaker2s                kmm2         kafka.strimzi.io/v1beta2               true         KafkaMirrorMaker2
+kafkamirrormakers                 kmm          kafka.strimzi.io/v1beta2               true         KafkaMirrorMaker
+kafkarebalances                   kr           kafka.strimzi.io/v1beta2               true         KafkaRebalance
+kafkas                            k            kafka.strimzi.io/v1beta2               true         Kafka
+kafkatopics                       kt           kafka.strimzi.io/v1beta2               true         KafkaTopic
+kafkausers                        ku           kafka.strimzi.io/v1beta2               true         KafkaUser
+ingressclasses                                 networking.k8s.io/v1                   false        IngressClass
+ingresses                         ing          networking.k8s.io/v1                   true         Ingress
+networkpolicies                   netpol       networking.k8s.io/v1                   true         NetworkPolicy
+runtimeclasses                                 node.k8s.io/v1                         false        RuntimeClass
+catalogsources                    catsrc       operators.coreos.com/v1alpha1          true         CatalogSource
+clusterserviceversions            csv,csvs     operators.coreos.com/v1alpha1          true         ClusterServiceVersion
+installplans                      ip           operators.coreos.com/v1alpha1          true         InstallPlan
+olmconfigs                                     operators.coreos.com/v1                false        OLMConfig
+operatorconditions                condition    operators.coreos.com/v2                true         OperatorCondition
+operatorgroups                    og           operators.coreos.com/v1                true         OperatorGroup
+operators                                      operators.coreos.com/v1                false        Operator
+subscriptions                     sub,subs     operators.coreos.com/v1alpha1          true         Subscription
+packagemanifests                               packages.operators.coreos.com/v1       true         PackageManifest
+poddisruptionbudgets              pdb          policy/v1                              true         PodDisruptionBudget
+clusterrolebindings                            rbac.authorization.k8s.io/v1           false        ClusterRoleBinding
+clusterroles                                   rbac.authorization.k8s.io/v1           false        ClusterRole
+rolebindings                                   rbac.authorization.k8s.io/v1           true         RoleBinding
+roles                                          rbac.authorization.k8s.io/v1           true         Role
+priorityclasses                   pc           scheduling.k8s.io/v1                   false        PriorityClass
+csidrivers                                     storage.k8s.io/v1                      false        CSIDriver
+csinodes                                       storage.k8s.io/v1                      false        CSINode
+csistoragecapacities                           storage.k8s.io/v1                      true         CSIStorageCapacity
+storageclasses                    sc           storage.k8s.io/v1                      false        StorageClass
+volumeattachments                              storage.k8s.io/v1                      false        VolumeAttachment
+```
+
+Short names can be used in: `kubectl get <shortname`, e.g. `kubectl get sc`
+
 ### Dev/QA vs Production
 
 We can use a single host to develop and test applications, but we can't do this on a live environment
