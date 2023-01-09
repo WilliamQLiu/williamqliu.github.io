@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Apache Spark 
+title: Apache Spark
 ---
 
 
@@ -13,25 +13,25 @@ Apache Spark is a fast and general engine for large-scale data processing.
 
 ### Compared to MySQL
 
-So Spark is focused on processing (with the ability to pipe data directly from/to external datasets like S3), 
+So Spark is focused on processing (with the ability to pipe data directly from/to external datasets like S3),
 whereas you might be familiar with a relational database like MySQL, where you have storage and processing built in.
 
 ## Installation
 
 Install Steps:
 
-1. Download the latest pre-built version from the Apache Spark site: e.g. spark-2.2.0-bin-hadoop2.7 
-2. tar -zxvf spark-2.2.0-bin-hadoop2.7 
+1. Download the latest pre-built version from the Apache Spark site: e.g. spark-2.2.0-bin-hadoop2.7
+2. tar -zxvf spark-2.2.0-bin-hadoop2.7
 3. Extract this over to a place like /opt/spark-2.2.1
 4. Setup environment variables in your .bashrc like:
 	`export SPARK_HOME=/opt/spark-2.2.1` and
-    `export PATH=$SPARK_HOME/bin:$PATH` 
+    `export PATH=$SPARK_HOME/bin:$PATH`
 5. Access the shell under `/opt/pyspark` or `/bin/spark-shell` (for scala)
    SPARK_./bin/spark-submit --master local[8] <python_file.py>
 
 OR if you're using python, run `pip install pyspark` and `pip install py4j`
 
-Note that if you install using the python route, the features are a little behind. 
+Note that if you install using the python route, the features are a little behind.
 For example, the python `sbin` doesn't have `start-master.sh` scripts. I recommend installing regularly instead
 of through pip
 
@@ -136,7 +136,7 @@ to the client machine's CPU architecture (because of the required C compilation)
 Pandas, NumPy, SciPy. Distributing an egg is a brittle solution, but since we're doing distributed computing, we
 still need a way to get our libraries.
 
-So instead of distributing an egg, we're going to distrubte a `.zip` file using the `--py-files` parameter in 
+So instead of distributing an egg, we're going to distrubte a `.zip` file using the `--py-files` parameter in
 `spark-submit`. It'll look like `spark-submit --py-files dependencies.zip my_spark_job.py`
 
 Assuming you have a requirements.txt file, run the following to create a dependencies.zip:
@@ -174,12 +174,12 @@ If you're sending an egg, you can build it with:
     python setup.py bdist_egg
 
 You'll see this in a `dist` folder with a name like `myprogram-0.0.1-py3.6egg`.
-Make sure that the computer running the egg is using the same version of python 
+Make sure that the computer running the egg is using the same version of python
 as the computer that built the egg.
 
 ### Jobs UI
 
-You should be able to see all __currently running jobs__ through the UI here: 
+You should be able to see all __currently running jobs__ through the UI here:
 
     localhost:4040/jobs
 
@@ -263,7 +263,7 @@ There are two fundamental sets of APIs:
 ### Spark Master
 
 Start Master server iwth:
-    
+
     ./sbin/start-master.sh
 
 ### Spark Slaves
@@ -279,7 +279,7 @@ Make sure to start this on a separate container (don't have master and slave on 
 With Spark, you want your objects to be serializable so that they can be transmitted across
 the cluster to worker nodes.
 
-Use a mappartition when you want an operation that requires a database connection. 
+Use a mappartition when you want an operation that requires a database connection.
 You want your regular code to be serializable, so with a mappartition, you can
 process a complete partition in one go (i.e. just called once per partition)
 
@@ -299,7 +299,7 @@ Worker Nodes have Executors that run many Tasks
 
 ### Actions (RDD)
 
-Below are some sample __Actions__ by Spark. 
+Below are some sample __Actions__ by Spark.
 
 https://spark.apache.org/docs/2.2.0/rdd-programming-guide.html
 
@@ -466,10 +466,10 @@ You have a lot of repeated values and tables flattened into a single format.
 
 The parquet-format project contains format specifications and Thrift definitions of metadata required to properly read Parquet files.
 
-Parquet metadata is encoded using __Apache Thrift__; Apache Thrift allows you to define data types and service 
-interfaces in a simple definition file. Taking that file as input, the compiler generates code to be used to 
-easily build RPC clients and servers that communicate seamlessly across programming languages. Instead of writing 
-a load of boilerplate code to serialize and transport your objects and invoke remote methods, you can get right 
+Parquet metadata is encoded using __Apache Thrift__; Apache Thrift allows you to define data types and service
+interfaces in a simple definition file. Taking that file as input, the compiler generates code to be used to
+easily build RPC clients and servers that communicate seamlessly across programming languages. Instead of writing
+a load of boilerplate code to serialize and transport your objects and invoke remote methods, you can get right
 down to business.
 
 ### Schema Evolution w/ Parquet
@@ -479,6 +479,14 @@ We can start with a simple schema, then gradually add more columns to the schema
 multiple Parquet files with different, but mutually compatible schemas.
 
 Files are stored with `.parquet` appended (e.g. `my_file.parquet`)
+
+### Parquet Tools
+
+You can inspect a parquet file with https://github.com/ktrueda/parquet-tools like:
+
+```
+parquet-tools inspect s3://mybucket/myfile.snappy.parquet
+```
 
 ### Parquet Files
 
@@ -825,10 +833,10 @@ Install with `sudo apt-get install dstat`
     $ dstat
     You did not select any stats, using -cdngy by default.
     ----total-cpu-usage---- -dsk/total- -net/total- ---paging-- ---system--
-    usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw 
-     11   4  73  11   0   0|  24k  574k|   0     0 |  53B   81B|1288  5263 
-      9   4  64  22   0   0|   0   532k|  71k   67k|   0     0 |1508  3923 
-     10   5  64  21   0   0|   0   816k| 139k  137k|   0     0 |1592  5350 
+    usr sys idl wai hiq siq| read  writ| recv  send|  in   out | int   csw
+     11   4  73  11   0   0|  24k  574k|   0     0 |  53B   81B|1288  5263
+      9   4  64  22   0   0|   0   532k|  71k   67k|   0     0 |1508  3923
+     10   5  64  21   0   0|   0   816k| 139k  137k|   0     0 |1592  5350
 
 #### iostat
 
@@ -838,7 +846,7 @@ Install with: `sudo apt-get install sysstat`
 
 #### iotop
 
-__iotop__ shows current input/output (I/O) usage by process or threads. 
+__iotop__ shows current input/output (I/O) usage by process or threads.
 
 Install with `sudo apt-get install iotop`
 
@@ -849,7 +857,7 @@ I/O wait is 70% (because the processor is idle while waiting for disk)
 `cat /proc/cpuinfo` to see the number of cpu cores
 
 If your I/O wait percentage is greater than (`1 / # of CPU cores`) then your CPUs are waiting a significant
-amount of time for the disk to catch up. In the example above, the I/O wait is very large (say server has 8 cores 
+amount of time for the disk to catch up. In the example above, the I/O wait is very large (say server has 8 cores
 so 1/8 cores = 0.125).
 
 #### IOPS
@@ -907,8 +915,8 @@ There's many Python data types including:
 So how does data types work with schemas? You might setup a `StructType` as your own schema,
 with a bunch of `StructFields`.
 
-	from pyspark.sql.types import StringType, StructField, StructType, BooleanType, ArrayType, IntegerType, DateType, TimestampType	
-	
+	from pyspark.sql.types import StringType, StructField, StructType, BooleanType, ArrayType, IntegerType, DateType, TimestampType
+
     schema = StructType([  # StructType is a data type for a collection of StructFields
 	            StructField(name='my_field', dataType=IntegerType(), nullable=False, metadata={'master': 'a_field'}),
 				StructField(name='another_field', dataType=StringType(), nullable=False, metadata={'master': 'b_field'})
@@ -999,7 +1007,7 @@ are combined to a tuple. The issue is that all values for a single key might not
 the same machine, but they have to be co-located to compute the result.
 
 This requires that Spark do an all-to-all operation, meaning it must read from all partitions to find all values
-for all keys, then bring together values across partitions to compute the final result for each key. 
+for all keys, then bring together values across partitions to compute the final result for each key.
 This is called the shuffle.
 
 Operations that can cause shuffles include:
@@ -1065,7 +1073,7 @@ of the data and creates equal sized partitions of data)
 Make sure to set an alias to your dataframe, otherwise you'll get an error after you join your dataframes (if
 two columns are named the same thing and you reference one of the named columns).
 
-    my_df = my_df.alias("my_df") 
+    my_df = my_df.alias("my_df")
 
 ### Join
 
@@ -1190,9 +1198,9 @@ For App Code, I run logic like this:
 
 ### collect() and take()
 
-To print all elements on the driver, one can use the collect() method to first bring the RDD to the driver node 
-thus: rdd.collect().foreach(println). This can cause the driver to run out of memory, though, because collect() 
-fetches the entire RDD to a single machine; if you only need to print a few elements of the RDD, 
+To print all elements on the driver, one can use the collect() method to first bring the RDD to the driver node
+thus: rdd.collect().foreach(println). This can cause the driver to run out of memory, though, because collect()
+fetches the entire RDD to a single machine; if you only need to print a few elements of the RDD,
 a safer approach is to use the take(): rdd.take(100).foreach(println).
 
 ### show()
@@ -1219,7 +1227,7 @@ A simple example might be:
     squared_udf = udf(squared, IntegerType())
     df= df.withColumn("my_number_squared", squared_udf("my_number"))  # Add a new column 'my_number_squared' and fill with udf
 
-Be careful with pyspark udfs, since if you want to pass a parameter into the user defined function, make sure to 
+Be careful with pyspark udfs, since if you want to pass a parameter into the user defined function, make sure to
 mention the type and use `lit()` so you can access any of the `pyspark.sql.Column` methods / treat standard Python
 scalar as a constant column.
 
@@ -1252,14 +1260,14 @@ having to try to do everything and push the data to all other nodes).
 ### Accumulators
 
 __Accumulators__ are variables that are "added" to through an associative and commutative "add" operation (meaning
-operations like `sum` and `max` satisfy the conditions, but not `average`). They are a container for accumulating 
+operations like `sum` and `max` satisfy the conditions, but not `average`). They are a container for accumulating
 partial values across multiple tasks (running on executors). Basically, accumulators aggregate information across executors.
 For example, we might have:
 
     Accumulable     Value
     counter         45
 
-So why do we need them? Why not just have a variable? Remember that we're doing distributed computing so when Spark 
+So why do we need them? Why not just have a variable? Remember that we're doing distributed computing so when Spark
 ships code to every executor, the variables become local to that node. Any updates to that variable is not relayed
 back to the driver. We need to make accumulators so we can get the values back from each executor.
 
@@ -1267,7 +1275,7 @@ You can see each executor running in the Web UI and what those accumulators are 
 Workers only have write-only data access. Accessing the value in the accumulator is only allowed by the driver.
 
 One thing to note is that since Spark is evaluated lazily, we need an __action__ to happen otherwise the
-transformation will not be executed (e.g. a `map()` is a lazy transformation so accumulator update is not 
+transformation will not be executed (e.g. a `map()` is a lazy transformation so accumulator update is not
 guaranteed if inside a map). Spark guarantees to update accumulators inside actions only once.
 If a task is restarted, there may be undesirable side effects like accumulators being updated more than once.
 
@@ -1365,7 +1373,7 @@ acknowledgement to a source.
 When configuring your Spark cluster, keep in mind that you need to have enough allocated cores so that you can
 process the received data (as well as to run the receiver).
 
-#### DStream Transformations 
+#### DStream Transformations
 
 
 ## Apache Toree
