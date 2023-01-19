@@ -1034,3 +1034,6 @@ Initializing the backend...
 ╵
 ```
 
+### Best Practices
+
+[Google Best Practices for Terraform](https://cloud.google.com/docs/terraform/best-practices-for-terraform)
