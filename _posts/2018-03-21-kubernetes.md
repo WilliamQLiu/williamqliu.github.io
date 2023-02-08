@@ -6,6 +6,27 @@ title: Kubernetes
 
 # {{ page.title }}
 
+## Cheat Sheet Commands
+
+kubectl -n mynamespace get all
+kubectl -n mynamespace get pods
+kubectl -n mynamespace describe pod <pod-name>
+kubectl -n mynamespace get deployments
+kubectl -n mynamespace get services
+kubectl -n mynamespace get configmaps
+kubectl -n mynamespace logs -f mypod
+kubectl -n mynamespace get nodes
+kubectl -n mynamespace get replicasets
+
+kubectl -n mynamespace exec -it mypod bash
+kubectl -n mynamespace rollout restart deployment mydeployment
+kubectl -n mynamespace scale replicasets/mypod --replicas=0
+kubectl -n mynamespace scale replicasets/mypod --replicas=2
+kubectl edit deployment/my-deployment
+
+helm template my-app application/ -f application/values/local/values.yaml --output-dir manifest
+kubectl apply -f ./manifest/my-app/templates/my-app.yaml
+
 ## Background
 
 Container images are used to confine application code, its runtime, and all of its dependences in a
