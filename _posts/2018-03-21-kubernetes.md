@@ -24,90 +24,6 @@ balancer on your desktop or the cloud or a vm or on premise.
 __Container Image__ is when an application is bundled along with its runtime and dependencies.
 We can use the image to create an isolated executable environment, also known as container.
 
-### Resources
-
-Run `kubectl api-resources` to see what resources are available along with their shortnames, e.g.
-
-```
-NAME                              SHORTNAMES   APIVERSION                             NAMESPACED   KIND
-bindings                                       v1                                     true         Binding
-componentstatuses                 cs           v1                                     false        ComponentStatus
-configmaps                        cm           v1                                     true         ConfigMap
-endpoints                         ep           v1                                     true         Endpoints
-events                            ev           v1                                     true         Event
-limitranges                       limits       v1                                     true         LimitRange
-namespaces                        ns           v1                                     false        Namespace
-nodes                             no           v1                                     false        Node
-persistentvolumeclaims            pvc          v1                                     true         PersistentVolumeClaim
-persistentvolumes                 pv           v1                                     false        PersistentVolume
-pods                              po           v1                                     true         Pod
-podtemplates                                   v1                                     true         PodTemplate
-replicationcontrollers            rc           v1                                     true         ReplicationController
-resourcequotas                    quota        v1                                     true         ResourceQuota
-secrets                                        v1                                     true         Secret
-serviceaccounts                   sa           v1                                     true         ServiceAccount
-services                          svc          v1                                     true         Service
-mutatingwebhookconfigurations                  admissionregistration.k8s.io/v1        false        MutatingWebhookConfiguration
-validatingwebhookconfigurations                admissionregistration.k8s.io/v1        false        ValidatingWebhookConfiguration
-customresourcedefinitions         crd,crds     apiextensions.k8s.io/v1                false        CustomResourceDefinition
-apiservices                                    apiregistration.k8s.io/v1              false        APIService
-controllerrevisions                            apps/v1                                true         ControllerRevision
-daemonsets                        ds           apps/v1                                true         DaemonSet
-deployments                       deploy       apps/v1                                true         Deployment
-replicasets                       rs           apps/v1                                true         ReplicaSet
-statefulsets                      sts          apps/v1                                true         StatefulSet
-tokenreviews                                   authentication.k8s.io/v1               false        TokenReview
-localsubjectaccessreviews                      authorization.k8s.io/v1                true         LocalSubjectAccessReview
-selfsubjectaccessreviews                       authorization.k8s.io/v1                false        SelfSubjectAccessReview
-selfsubjectrulesreviews                        authorization.k8s.io/v1                false        SelfSubjectRulesReview
-subjectaccessreviews                           authorization.k8s.io/v1                false        SubjectAccessReview
-horizontalpodautoscalers          hpa          autoscaling/v2                         true         HorizontalPodAutoscaler
-cronjobs                          cj           batch/v1                               true         CronJob
-jobs                                           batch/v1                               true         Job
-certificatesigningrequests        csr          certificates.k8s.io/v1                 false        CertificateSigningRequest
-leases                                         coordination.k8s.io/v1                 true         Lease
-strimzipodsets                    sps          core.strimzi.io/v1beta2                true         StrimziPodSet
-endpointslices                                 discovery.k8s.io/v1                    true         EndpointSlice
-events                            ev           events.k8s.io/v1                       true         Event
-flowschemas                                    flowcontrol.apiserver.k8s.io/v1beta2   false        FlowSchema
-prioritylevelconfigurations                    flowcontrol.apiserver.k8s.io/v1beta2   false        PriorityLevelConfiguration
-kafkabridges                      kb           kafka.strimzi.io/v1beta2               true         KafkaBridge
-kafkaconnectors                   kctr         kafka.strimzi.io/v1beta2               true         KafkaConnector
-kafkaconnects                     kc           kafka.strimzi.io/v1beta2               true         KafkaConnect
-kafkamirrormaker2s                kmm2         kafka.strimzi.io/v1beta2               true         KafkaMirrorMaker2
-kafkamirrormakers                 kmm          kafka.strimzi.io/v1beta2               true         KafkaMirrorMaker
-kafkarebalances                   kr           kafka.strimzi.io/v1beta2               true         KafkaRebalance
-kafkas                            k            kafka.strimzi.io/v1beta2               true         Kafka
-kafkatopics                       kt           kafka.strimzi.io/v1beta2               true         KafkaTopic
-kafkausers                        ku           kafka.strimzi.io/v1beta2               true         KafkaUser
-ingressclasses                                 networking.k8s.io/v1                   false        IngressClass
-ingresses                         ing          networking.k8s.io/v1                   true         Ingress
-networkpolicies                   netpol       networking.k8s.io/v1                   true         NetworkPolicy
-runtimeclasses                                 node.k8s.io/v1                         false        RuntimeClass
-catalogsources                    catsrc       operators.coreos.com/v1alpha1          true         CatalogSource
-clusterserviceversions            csv,csvs     operators.coreos.com/v1alpha1          true         ClusterServiceVersion
-installplans                      ip           operators.coreos.com/v1alpha1          true         InstallPlan
-olmconfigs                                     operators.coreos.com/v1                false        OLMConfig
-operatorconditions                condition    operators.coreos.com/v2                true         OperatorCondition
-operatorgroups                    og           operators.coreos.com/v1                true         OperatorGroup
-operators                                      operators.coreos.com/v1                false        Operator
-subscriptions                     sub,subs     operators.coreos.com/v1alpha1          true         Subscription
-packagemanifests                               packages.operators.coreos.com/v1       true         PackageManifest
-poddisruptionbudgets              pdb          policy/v1                              true         PodDisruptionBudget
-clusterrolebindings                            rbac.authorization.k8s.io/v1           false        ClusterRoleBinding
-clusterroles                                   rbac.authorization.k8s.io/v1           false        ClusterRole
-rolebindings                                   rbac.authorization.k8s.io/v1           true         RoleBinding
-roles                                          rbac.authorization.k8s.io/v1           true         Role
-priorityclasses                   pc           scheduling.k8s.io/v1                   false        PriorityClass
-csidrivers                                     storage.k8s.io/v1                      false        CSIDriver
-csinodes                                       storage.k8s.io/v1                      false        CSINode
-csistoragecapacities                           storage.k8s.io/v1                      true         CSIStorageCapacity
-storageclasses                    sc           storage.k8s.io/v1                      false        StorageClass
-volumeattachments                              storage.k8s.io/v1                      false        VolumeAttachment
-```
-
-Short names can be used in: `kubectl get <shortname`, e.g. `kubectl get sc`
-
 ### Dev/QA vs Production
 
 We can use a single host to develop and test applications, but we can't do this on a live environment
@@ -176,6 +92,7 @@ Kubernetes is the whole package instead of doing one piece and needing other pie
 do not respond to health checks)
 * Automatic binpacking (automatically schedules the containers based on resource usage and constraints while keeping availability)
 * Service discovery and load balancing - groups of containers refer to each other via Domain Name System (DNS) / Kubernetes service.
+
 
 ## Features
 
@@ -805,6 +722,7 @@ $kubectl describe pod hello-minikube-180744149-sjp84
 Create - imperative management, tells kubernetes api you want to create, replace, or delete, not how
 Apply - declarative management - changes that you may have applied to a live object are maintained even if you apply other changes to the object
 
+
 `kubectl apply -f pingpong.py`
 
 ## Kubernetes Object Model
@@ -1040,15 +958,21 @@ Any app that is deployed can access these variables!
 
 https://github.com/thedevelopnik/kubernetes-intro/blob/master/pingpong-config.yml
 
+```
 	apiVersion: v1
 	kind: ConfigMap
 	metadata:
 	  name: pingpong-config
 	data:
 	  PORT: "8000"
+```
 
+You can then run the following to create the configmap:
+
+```
 $kubectl create -f pingpong-config.yml
- configmap "pingpong-config" created
+configmap "pingpong-config" created
+```
 
 You can see configmaps with:
 
@@ -1056,7 +980,7 @@ You can see configmaps with:
 kubectl -n mynamespace get configmaps
 
 kubectl -n mynamespace describe configmap pingpong-config
-``
+```
 
 You can create a volume and volumemount your configuration to your application.
 The actual application now has the ENV variables from our config map.
@@ -1065,6 +989,11 @@ An example of this being used in real life is [Datadog's integrations](https://d
 
 1. Create a configmap with the conf.d/<my_integration (e.g. amazon_msk.d)>/conf.yaml file
 2. Volume and Volumemap the configmap to the pod
+
+
+### Updating ConfigMap
+
+If you delete a configmap, it'll come back up again quickly (few seconds).
 
 ## Secrets
 
@@ -1116,6 +1045,19 @@ e.g. half a mb). ConfigMaps can be accessed across apps and can hold giant json 
 ConfigMaps are more convenient. Can hold entire config files and JSON blobs (like redis configuration)
 When secrets change, pods are not automatically updated. Allows you to rotate keys and by default cut
 off access to potentially compromised pods. Pods get automatic updates when a ConfigMap changes.
+
+## Deploying Configmaps
+
+After you update your configmap, make sure to restart your deployment
+so that the new configmap gets picked up, e.g.
+
+```
+❯ kubectl -n my-namespace get deployments
+NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+my-deployment 					2/2     2            2           17h
+
+kubectl rollout restart -n my-namespace deployment/<deploymentName>
+```
 
 
 # Deploying Kubernetes to Production
@@ -1260,3 +1202,476 @@ Creates AWS lambda functions, check logs from there.
 Install Kubernetes Compose to turn a Docker-Compose to a Kubernetes
 
 
+Setting up a new Kubernetes cluster
+
+## Initialization
+
+We'll setup the following:
+
+* Install Docker on three nodes
+* Install Kubeadm, Kubelet, and Kubectl on all three nodes
+* Bootstrap the cluster on the Kube master node
+* Join the two Kube worker nodes to the cluster
+* Setup cluster networking with __flannel__
+
+### Install Docker
+
+Install Docker on all three nodes
+
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
+    sudo apt-get update
+    sudo apt-get install -y docker-ce=18.06.1~ce~3-0~ubuntu
+    sudo apt-mark hold docker-ce
+
+Verify Docker is up and running
+
+    sudo systemctl status docker
+
+### Install Kubeadm, Kubelet, and Kubectl
+
+Install __Kubeadm__ (a tool built to provide `kubeadm init` and `kubeadm join` as best-practice fast paths for
+creating Kubernetes clusters). kubeadm performs the actions to get a minimum viable cluster up and running with the
+focus on bootstrapping and not about provisioning machines. https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/
+
+  * `kubeadm init` bootstraps a Kubernetes control-plane node
+  * `kubeadm join` bootstraps a Kubernetes worker node and join it to the cluster
+
+Install __Kubelet__ (the primary "node agent" that runs on each node). Kubelet's job is to make sure that containers
+are running in a pod. Kubelet can register the node with the apiserver using one of the following:
+the hostname, a flag to override the hostname, or specific logic for a cloud provider
+https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/
+
+Install __Kubectl__ (a command line interface for running commands against Kubernetes clusters)
+https://kubernetes.io/docs/reference/kubectl/overview/
+
+### Bootstrap the cluster on the Kube master node
+
+On the Kube master node only, run:
+
+    sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+
+Note: you will get a `kubeadm join` command that gets printed out (this is for the two Kube workers to join the cluster later)
+
+Setup the local __kubeconfig__:
+
+    mkdir -p $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Verify the Kube master node is up with:
+
+    kubectl version
+    Client Version: version.Info{Major:"1", Minor:"12", GitVersion:"v1.12.7", GitCommit:"6f482974b76db3f1e0f5d24605a9d1d38fad9a2b", GitTreeState:"clean", BuildDate:"2019-03-25T02:52:13Z", GoVersion:"go1.10.8", Compiler:"gc", Platform:"linux/amd64"}
+    Server Version: version.Info{Major:"1", Minor:"12", GitVersion:"v1.12.10", GitCommit:"e3c134023df5dea457638b614ee17ef234dc34a6", GitTreeState:"clean", BuildDate:"2019-07-08T03:40:54Z", GoVersion:"go1.10.8", Compiler:"gc", Platform:"linux/amd64"}
+
+### Join the two Kube worker nodes to the cluster
+
+On the two worker nodes, join the master
+
+    sudo su
+    kubeadm join $some_ip:6443 --token $some_token --discovery-token-ca-cert-hash $some_hash
+
+Check that your nodes joined the cluster (will have status `NotReady`)
+
+    kubectl get nodes
+
+    NAME            STATUS     ROLES    AGE   VERSION
+    ip-10-0-1-101   NotReady   master   35m   v1.12.7
+    ip-10-0-1-102   NotReady   <none>   18s   v1.12.7
+    ip-10-0-1-103   NotReady   <none>   10s   v1.12.7
+
+### Set up cluster networking with flannel
+
+Turn on iptables bridge calls on all three nodes:
+
+    echo "net.bridge.bridge-nf-call-iptables=1" | sudo tee -a /etc/sysctl.conf
+    sudo sysctl -p
+
+On the Kubernetes master node only, install Flannel
+
+    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/bc79dd1505b0c8681ece4de4c0d86c5cd2643275/Documentation/kube-flannel.yml
+
+    clusterrole.rbac.authorization.k8s.io/flannel created
+    clusterrolebinding.rbac.authorization.k8s.io/flannel created
+    serviceaccount/flannel created
+    configmap/kube-flannel-cfg created
+    daemonset.extensions/kube-flannel-ds-amd64 created
+    daemonset.extensions/kube-flannel-ds-arm64 created
+    daemonset.extensions/kube-flannel-ds-arm created
+    daemonset.extensions/kube-flannel-ds-ppc64le created
+    daemonset.extensions/kube-flannel-ds-s390x created
+
+Get nodes (should now have status 'Ready')
+
+    kubectl get nodes
+    NAME            STATUS   ROLES    AGE     VERSION
+    ip-10-0-1-101   Ready    master   43m     v1.12.7
+    ip-10-0-1-102   Ready    <none>   8m19s   v1.12.7
+    ip-10-0-1-103   Ready    <none>   8m11s   v1.12.7
+
+## Deploy a Service to Kubernetes
+
+We want to:
+
+* create a deployment for our service
+* create a service and verify that you can access it
+
+### Create a deployment for our service
+
+Log into the Kube master node and create a deployment (which will state four replias):
+
+    cat << EOF | kubectl apply -f -
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: store-products
+      labels:
+        app: store-products
+    spec:
+      replicas: 4
+      selector:
+        matchLabels:
+          app: store-products
+      template:
+        metadata:
+          labels:
+            app: store-products
+        spec:
+          containers:
+          - name: store-products
+            image: linuxacademycontent/store-products:1.0.0
+            ports:
+            - containerPort: 80
+    EOF
+
+### Create a service
+
+Create a service for our pods
+
+    cat << EOF | kubectl apply -f -
+    kind: Service
+    apiVersion: v1
+    metadata:
+      name: store-products
+    spec:
+      selector:
+        app: store-products
+      ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 80
+    EOF
+
+Make sure the service is up in the cluster:
+
+    kubectl get svc store-products
+
+Query the service (store-products) from another machine (busybox)
+
+    kubectl exec busybox -- curl -s store-products
+
+## Deploy a microservice application to Kubernetes
+
+Kubernetes lets you deploy a microservice architecture to a cluster and independently scale specific components.
+
+### Stan's Robot Shop
+
+We will use Instana's open source `Stan's Robot Shop` as a sample microservice application
+https://www.instana.com/blog/stans-robot-shop-sample-microservice-application/
+
+For local development, you can just run a `docker-compose up` and see containers that look like:
+
+    docker ps
+    CONTAINER ID        IMAGE                                    COMMAND                  CREATED              STATUS              PORTS                                                 NAMES
+    280dd3f23bb5        linuxacademycontent/rs-web:0.3.2         "/root/entrypoint.sh"    About a minute ago   Up About a minute   80/tcp, 0.0.0.0:8080->8080/tcp                        robot-shop_web_1
+    1cda4525023f        linuxacademycontent/rs-shipping:0.3.2    "java -Xmn256m -Xmx7…"   About a minute ago   Up About a minute   8080/tcp                                              robot-shop_shipping_1
+    f6edbe16b538        linuxacademycontent/rs-payment:0.3.2     "python payment.py"      About a minute ago   Up About a minute   8080/tcp                                              robot-shop_payment_1
+    1c52bd4ee4b1        linuxacademycontent/rs-ratings:0.3.2     "docker-php-entrypoi…"   About a minute ago   Up About a minute   80/tcp                                                robot-shop_ratings_1
+    a1d777a51a0c        linuxacademycontent/rs-dispatch:0.3.2    "/bin/sh -c bin/gorcv"   About a minute ago   Up About a minute                                                         robot-shop_dispatch_1
+    a9c61ad074d5        linuxacademycontent/rs-user:0.3.2        "docker-entrypoint.s…"   About a minute ago   Up About a minute   8080/tcp                                              robot-shop_user_1
+    74d96e05674c        linuxacademycontent/rs-cart:0.3.2        "docker-entrypoint.s…"   About a minute ago   Up About a minute   8080/tcp                                              robot-shop_cart_1
+    3c84ff6cce75        linuxacademycontent/rs-catalogue:0.3.2   "docker-entrypoint.s…"   About a minute ago   Up About a minute   8080/tcp                                              robot-shop_catalogue_1
+    be8d2e6b5a6a        redis:4.0.6                              "docker-entrypoint.s…"   About a minute ago   Up About a minute   6379/tcp                                              robot-shop_redis_1
+    fd94d6a937c6        rabbitmq:3.7-management-alpine           "docker-entrypoint.s…"   About a minute ago   Up About a minute   4369/tcp, 5671-5672/tcp, 15671-15672/tcp, 25672/tcp   robot-shop_rabbitmq_1
+    647f62e5fb74        linuxacademycontent/rs-mysql-db:0.3.2    "docker-entrypoint.s…"   About a minute ago   Up About a minute   3306/tcp                                              robot-shop_mysql_1
+    60df63c9ef0b        linuxacademycontent/rs-mongodb:0.3.2     "docker-entrypoint.s…"   About a minute ago   Up About a minute   27017/tcp                                             robot-shop_mongodb_1
+
+To run this on kubernetes, you can create your own k8s namespace like so:
+
+    kubectl create namespace robot-shop
+
+## kubectl commands
+
+List of basic [kubectl commands](https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands)
+
+* Create a resource: `kubectl create -f FILENAME`, `kubectl create <resource, e.g. role, service, deployment, configmap, job>`
+* Get a resource, prints out info about that resource: `kubectl get <resource>`
+* Create and run an image in a pod: `kubectl run NAME --image=image`
+* Expose a resource as a new Kubernetes service `kubectl expose -f FILENAME`
+
+### Resources
+
+Run `kubectl api-resources` to see what resources are available along with their shortnames, e.g.
+
+```
+NAME                              SHORTNAMES   APIVERSION                             NAMESPACED   KIND
+bindings                                       v1                                     true         Binding
+componentstatuses                 cs           v1                                     false        ComponentStatus
+configmaps                        cm           v1                                     true         ConfigMap
+endpoints                         ep           v1                                     true         Endpoints
+events                            ev           v1                                     true         Event
+limitranges                       limits       v1                                     true         LimitRange
+namespaces                        ns           v1                                     false        Namespace
+nodes                             no           v1                                     false        Node
+persistentvolumeclaims            pvc          v1                                     true         PersistentVolumeClaim
+persistentvolumes                 pv           v1                                     false        PersistentVolume
+pods                              po           v1                                     true         Pod
+podtemplates                                   v1                                     true         PodTemplate
+replicationcontrollers            rc           v1                                     true         ReplicationController
+resourcequotas                    quota        v1                                     true         ResourceQuota
+secrets                                        v1                                     true         Secret
+serviceaccounts                   sa           v1                                     true         ServiceAccount
+services                          svc          v1                                     true         Service
+mutatingwebhookconfigurations                  admissionregistration.k8s.io/v1        false        MutatingWebhookConfiguration
+validatingwebhookconfigurations                admissionregistration.k8s.io/v1        false        ValidatingWebhookConfiguration
+customresourcedefinitions         crd,crds     apiextensions.k8s.io/v1                false        CustomResourceDefinition
+apiservices                                    apiregistration.k8s.io/v1              false        APIService
+controllerrevisions                            apps/v1                                true         ControllerRevision
+daemonsets                        ds           apps/v1                                true         DaemonSet
+deployments                       deploy       apps/v1                                true         Deployment
+replicasets                       rs           apps/v1                                true         ReplicaSet
+statefulsets                      sts          apps/v1                                true         StatefulSet
+tokenreviews                                   authentication.k8s.io/v1               false        TokenReview
+localsubjectaccessreviews                      authorization.k8s.io/v1                true         LocalSubjectAccessReview
+selfsubjectaccessreviews                       authorization.k8s.io/v1                false        SelfSubjectAccessReview
+selfsubjectrulesreviews                        authorization.k8s.io/v1                false        SelfSubjectRulesReview
+subjectaccessreviews                           authorization.k8s.io/v1                false        SubjectAccessReview
+horizontalpodautoscalers          hpa          autoscaling/v2                         true         HorizontalPodAutoscaler
+cronjobs                          cj           batch/v1                               true         CronJob
+jobs                                           batch/v1                               true         Job
+certificatesigningrequests        csr          certificates.k8s.io/v1                 false        CertificateSigningRequest
+leases                                         coordination.k8s.io/v1                 true         Lease
+strimzipodsets                    sps          core.strimzi.io/v1beta2                true         StrimziPodSet
+endpointslices                                 discovery.k8s.io/v1                    true         EndpointSlice
+events                            ev           events.k8s.io/v1                       true         Event
+flowschemas                                    flowcontrol.apiserver.k8s.io/v1beta2   false        FlowSchema
+prioritylevelconfigurations                    flowcontrol.apiserver.k8s.io/v1beta2   false        PriorityLevelConfiguration
+kafkabridges                      kb           kafka.strimzi.io/v1beta2               true         KafkaBridge
+kafkaconnectors                   kctr         kafka.strimzi.io/v1beta2               true         KafkaConnector
+kafkaconnects                     kc           kafka.strimzi.io/v1beta2               true         KafkaConnect
+kafkamirrormaker2s                kmm2         kafka.strimzi.io/v1beta2               true         KafkaMirrorMaker2
+kafkamirrormakers                 kmm          kafka.strimzi.io/v1beta2               true         KafkaMirrorMaker
+kafkarebalances                   kr           kafka.strimzi.io/v1beta2               true         KafkaRebalance
+kafkas                            k            kafka.strimzi.io/v1beta2               true         Kafka
+kafkatopics                       kt           kafka.strimzi.io/v1beta2               true         KafkaTopic
+kafkausers                        ku           kafka.strimzi.io/v1beta2               true         KafkaUser
+ingressclasses                                 networking.k8s.io/v1                   false        IngressClass
+ingresses                         ing          networking.k8s.io/v1                   true         Ingress
+networkpolicies                   netpol       networking.k8s.io/v1                   true         NetworkPolicy
+runtimeclasses                                 node.k8s.io/v1                         false        RuntimeClass
+catalogsources                    catsrc       operators.coreos.com/v1alpha1          true         CatalogSource
+clusterserviceversions            csv,csvs     operators.coreos.com/v1alpha1          true         ClusterServiceVersion
+installplans                      ip           operators.coreos.com/v1alpha1          true         InstallPlan
+olmconfigs                                     operators.coreos.com/v1                false        OLMConfig
+operatorconditions                condition    operators.coreos.com/v2                true         OperatorCondition
+operatorgroups                    og           operators.coreos.com/v1                true         OperatorGroup
+operators                                      operators.coreos.com/v1                false        Operator
+subscriptions                     sub,subs     operators.coreos.com/v1alpha1          true         Subscription
+packagemanifests                               packages.operators.coreos.com/v1       true         PackageManifest
+poddisruptionbudgets              pdb          policy/v1                              true         PodDisruptionBudget
+clusterrolebindings                            rbac.authorization.k8s.io/v1           false        ClusterRoleBinding
+clusterroles                                   rbac.authorization.k8s.io/v1           false        ClusterRole
+rolebindings                                   rbac.authorization.k8s.io/v1           true         RoleBinding
+roles                                          rbac.authorization.k8s.io/v1           true         Role
+priorityclasses                   pc           scheduling.k8s.io/v1                   false        PriorityClass
+csidrivers                                     storage.k8s.io/v1                      false        CSIDriver
+csinodes                                       storage.k8s.io/v1                      false        CSINode
+csistoragecapacities                           storage.k8s.io/v1                      true         CSIStorageCapacity
+storageclasses                    sc           storage.k8s.io/v1                      false        StorageClass
+volumeattachments                              storage.k8s.io/v1                      false        VolumeAttachment
+```
+
+Short names can be used in: `kubectl get <shortname`, e.g. `kubectl get sc`
+
+
+## kubectl completion
+
+Add this to the end of your .zshrc
+
+```
+source <(kubectl completion zsh)
+```
+
+## kubectl config
+
+Lets you see the current context, set the cluster.
+
+```
+kubectl config current-context
+kubectl config get-clusters
+kubectl config get-users
+```
+
+## kubectl explain
+
+```
+kubectl explain <resource>
+kubectl explain pods
+```
+
+## kubectl (commands for working with apps)
+
+### kubectl top
+
+Get resource usage
+
+```
+kubectl top pod
+
+kubectl top node
+```
+
+### kubectl debug
+
+```
+kubectl debug <resource>
+kubectl debug -n my-namespace debug my-pod --image alpine
+```
+
+### kubectl events
+
+```
+❯ kubectl -n my-namespace get events
+LAST SEEN   TYPE     REASON    OBJECT                                     MESSAGE
+98s         Normal   Pulling   pod/my-pod-6c499895dd-q56ld   Pulling image "alpine"
+96s         Normal   Pulled    pod/my-pod-6c499895dd-q56ld   Successfully pulled image "alpine" in 2.400820168s
+96s         Normal   Created   pod/my-pod-6c499895dd-q56ld   Created container debugger-s2jd4
+```
+
+### Replacing a resource
+
+```
+kubectl -n my-namespace get <resource> -o yaml > my_resource.yaml
+cat my_resource.yaml # to verify
+kubectl apply -f my_resource.yaml
+```
+
+## Issue/Background: How do you isolate applications?
+
+Software components running on the same machine will require different, often conflicting
+versions of libraries. We can solve this issue by using virtual machines and containers
+to isolate environments.
+
+
+## Virtual Machines vs Containers
+
+What is a virtual machine? __Virtual Machines__ (VMs) is when applications are isolated with their own guest operating system. This means a VM is used when there are a few applications (e.g. App A, App B) running on the same environment (i.e. on a Guest OS). If you have more applications that are small, then giving each application their own VM is a waste of hardware. The main benefit of VMs is that they have full isolation (each VM
+has its own Linux kernel).
+
+So what does this look like? Say you have three VMs (VM1, VM2, VM3) and each VM is running two Apps,
+each on a Guest OS of their own. All three of the VMs would be running underneath on a bare-metal machine that has its own (single) Host OS and Hypervisor.
+
+### Hypervisors
+
+The **Hypervisor** divides the physical hardware resources into smaller sets of virtual resources that
+can be used by the operating system inside each VM. The applications running inside the VMs can do
+system calls to the guest OS' kernel in the VM, and then the kernel then performs x86 instructions
+on the virtual CPU, which are sent through the hypervisor to the host's physical CPU.
+
+There are two types of hypervisors:
+
+* hypervisors that do not use a host OS
+* hypervisors that do use a host OS
+
+## Containers
+
+What is a container? **Containers** have all system calls run on the same sinngle kernel that are then run on the host physical CPU.
+Use containers when you have a large number of processes that you want to isolate since containers have
+very little overhead (e.g. does not need to run a virtual OS so it does not have the overhead of
+needing to run a VM set of system services, only the host OS's set of system services). Since you do
+not need to run a VM OS, you also do not have a bootup like a VM; the process in a container starts up
+immediately.
+
+### Linux Namespaces and Linux Control Groups (cgroups)
+
+So how does a container work? The processes are isolated, but how does it do that if everything is running
+on the same operating system? The answer is Linux Namespaces and Linux Control Groups (cgroups).
+
+* **Linux Namespaces** ensure each process sees its own personal view of the system (file, processes, network interfaces, hostname, etc).
+* **Linux Control Groups (groups)** limit the amount of resources the process can consume (CPU, memory, network bandwidth, etc)
+
+
+Linux Namespaces - By default, each Linux system initially has one single namespace.
+All system resources (e.g. filesystems, process IDs, user IDs, network interfaces) belong to this
+single namespace. You can create additional namespaces. Other kinds of namespaces exist like:
+
+* Mount (mnt)
+* Process ID (pid)
+* Network (net)
+* Inter-process communication (ipc)
+* UTS
+* User ID (user)
+
+Each namespace kind is used to isolate a certain group of resources. For example, the UTS namespace
+determines what hostname and domain name the process running inside that namespaces sees. A process
+might be assigned a specific namespace (e.g. thinks its seeing X hostname and domain name) while
+another process might be assigned another namespace (e.g. think its seeing Y hostname and domain name).
+
+Linux Control Groups (cgroups) - cgroups are a Linux kernel feature that limits the resource usage of
+a process (or a group of processes).
+
+### Docker container platform
+
+**Docker** is a container system that makes containers easy to move across different machines.
+You package up the application, its libraries and other dependencies and even the whole OS file system
+into a simple package that can be used on any other machine also running Docker.
+We basically get a lot of the same isolation levels that VMs do. Docker is made up of:
+
+* **Images** - You package your application and its environment into an image. This has the filesystem
+  that will be available to the application and the path to the executable when the image is run.
+  Images are usually built on layers (e.g. a layer might be an ubuntu image, a python image)
+* **Registries** - a Docker Registry is a repo for your Docker images; like GitHub, but for images
+  instead of code. You can share (push and pull) other images out there.
+* **Containers** - a Docker based container is a regular Linux container created from a docker-based
+  container image. A running container is a process that runs on the host running Docker, but is
+  completely isolated from both the host and all other processes running on it.
+
+### rkt container platform
+
+**rkt** is another Linux container engine (similar to Docker). The Open Container Initiative (OCI)
+created a container image format that rkt follows. Kubernetes can also run rkt (not just Docker).
+
+## Introducing Kubernetes
+
+**Kubernetes** is a software system that allows you to easily deploy and manage containerized applications on top of it.
+Kubernetes enables you to run your software applications on thousands of computer nodes as if all those
+nodes were a single giant computer.
+
+Use case: a developer submits a list of apps to the Kubernetes master node, then Kubernetes
+deploys them to the cluster of worker nodes (does not matter where it lands). The developer can specify
+that certain apps must run together and Kubernetes will deploy them on the same worker node.
+
+Think of Kubernetes as an operating system for the cluster. k8s provides things like service discovery,
+scaling, load-balancing, self-healing, and leader election. Application developers can focus on
+implementing actual features instead of figuring out how to integrate them with the infrastructure.
+
+### Architecture of a k8s cluster
+
+A k8s cluster is composed of two types of nodes:
+
+* the **master node**, which hosts the **Kubernetes Control Plane** that controls and manages the whole
+  k8s system. The Control Plane is what controls the cluster and makes it function; this includes the
+  **Kubernetes API Server**, the **Scheduler**, and the **Controller Manager**, and **etcd**
+* **worker nodes** that run the actual applications you deploy; this includes a container runtime like
+  Docker or rkt to run your containers, the **Kubelet**, and the **Kubernetes Service Proxy (kube-proxy)**
+
+So how do you run an application in Kubernetes?
+
+1. Package the application up into one or more container images, push those images to an image registry
+2. Post a description of your app to the **Kubernetes API Server**; the description includes information like the container image that has your application or its components, how those components are related to each other, and which ones need to be run co-located (together on the same node).
+3. When the **Kubernetes API server** processes your application's description, the **Scheduler** schedules the specified groups of containers onto the available worker nodes on computational resources required by each group.
+4. The **Kubelet** on those nodes then instructs the container runtime (e.g. Docker) to pull the required container images and run the container
