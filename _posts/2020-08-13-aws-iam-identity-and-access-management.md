@@ -69,6 +69,19 @@ We have break this up a few ways:
   associated with it. Instead of being uniquely associated with one person, a role is intended to be assumed by
   anyone who needs it.
 
+## Who are you (Security Token Service)?
+
+
+```
+❯ aws sts get-caller-identity
+
+{
+    "UserId": "A...:my.email@emailprovider.com",
+    "Account": "XXXXXXXXXX",
+    "Arn": "arn:aws:sts::XXXXXXX:assumed-role/XXXXXXX/my.email@emailprovider.com"
+}
+```
+
 ### IAM Users vs IAM Roles
 
 Use an IAM User when:
@@ -222,3 +235,20 @@ You can run a few actions including:
   SAML authentication response. This provides a mechanism for tying an enterprise identity store or directory to role-based
   AWS access without user-specific credentials or configuration. The temporary credentials returned by this operation
   consist of an access key ID, a secret access key, and a security token. By default, these temp credentials last one hour.
+
+## SSO
+
+Run:
+
+```
+aws sso login --profile <some_profile> && eval $(aws-sso-creds export)
+```
+
+Show:
+
+```
+aws configure sso
+
+# test with: aws s3 ls --profile <some_profile>
+```
+
