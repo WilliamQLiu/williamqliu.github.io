@@ -60,4 +60,51 @@ In an ideal world, event time and processing time would equal, but that's not re
 
 To work with the infinite nature of unbounded data sets, systems typically provide some notion of 'windowing' the incoming data.
 i.e. we chop up the data set into finite pieces along temporal boundaries
+We have a couple options:
+
+#### Use the processing time
+
+Do not use the processing time if you care about correctness or if you care about the context of the event time.
+Your event time data may end up in the wrong processing time window (e.g. due to the lag of distributed systems), throwing correctness out the window.
+
+#### Use the event time
+
+Since data is unbounded, we can have disorder and __variable skew__, causing a __completeness problem__ for event time windows.
+
+## Data Processing Patterns
+
+Let's look at the core types of usage patterns across:
+
+* bounded and unbounded data processing
+* two main types of engines (batch and streaming)
+
+### Bounded Data
+
+Processing bounded data is straightforward. We take a set of data and run it through a data processing engine (typically batch, e.g. MapReduce).
+We end up with a useful output.
+
+### Unbounded Data
+
+#### Unbounded Data (Batch)
+
+Batch systems have been used to process unbounded data sets. You slice up the unbounded data into a collection of
+separate bounded data sets that are appropriate for batch processing.
+Usually these events can be written into directory and file hiearchies with names that specify the window they correspond to.
+
+Usually you'll still encounter a a completeness problem. What if a batch fails? What if there's a delay in one batch?
+This may mean delaying processing until you're sure all events have been collected.
+
+Depending on that data you're processing (e.g. say Session data, where it's defined as a period of activity for a user),
+you might end up with sessions that are split across batches. You can try to reduce splits by increasing your batch size,
+but that increases latency. You can add logic to stitch up sessions from previous runs, but that means more complexity.
+
+#### Unbounded Data (Streaming)
+
+Streaming systems are built for Unbounded Data. You should also consider streaming systems for data that is:
+
+* Highly unordered with respect to event times - you need some sort of time-based shuffle in your pipeline if you want
+  to analyze the data in the context in which they occurred
+* Of varying event time skew - you can't just assume you'll always see most of the data for a given event X within
+  some constant epsilon of time Y
+
 
