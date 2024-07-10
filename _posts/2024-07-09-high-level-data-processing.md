@@ -107,4 +107,55 @@ Streaming systems are built for Unbounded Data. You should also consider streami
 * Of varying event time skew - you can't just assume you'll always see most of the data for a given event X within
   some constant epsilon of time Y
 
+There's a few approaches you can use when dealing with data that has the above characteristics (see 'Approaches')
+
+### Approaches
+
+* Time-agnostic
+* Approximation
+* Windowing by processing time
+* Windowing by event time
+
+#### Time-agnostic
+
+Time-agnostic processing is used in cases where time is irrelevant (i.e. all relevant logic is data driven).
+
+An example of a time-agnostic processing is __filtering__, where you look at web traffic logs and look for a specific domain.
+If it's a domain you're interested in, then allow that in. The processing does not rely on the data being unbounded, unordered, and the event time skew is irrelevant.
+
+Another example of a time-agnostic processing is __inner-joins__ (aka __hash-join__), where you join two unbounded data sources.
+If you only care about the results of a join when an element from both sources arrive, there's no temporal element to the logic.
+You would buffer a value if it's seen in one source, then emit the joined record once the second value from the other source arrives.
+
+If we thought about an outer join, we now get into the data completeness problem (once you've seen one side of the join,
+how do you know whether the other side is ever going to arrive or not?). The answer is that you don't; you have to introduce
+some notion of a timeout, which introduces an element of time.
+
+#### Approximation
+
+Approximation is where we take an unbounded data source and provide output (where if you squint at them, look more or less like what you were hoping for).
+
+Pros: They are low overhead and designed for unbounded data.
+Cons: Limited set of them exist, the algorithms themselves are complicated, and approximations limit their utility
+
+#### Windowing
+
+__Windowing__ means to take a data source (either unbounded or bounded) and chopping it along temporal boundaries into finite chunks for processing.
+There's a lot of windowing strategies, including:
+
+* __Fixed Windows__ - slice up time into segments with a fixed-size temporal length. The segments for fixed windows are applied
+  uniformly across the entire data set.
+  - __Aligned windows__ have a start and end time that is synchronized with a reference point (e.g. a global clock).
+    All windows across all different streams start and end at the same time.
+    E.g. 5 minute window that starts at the top of the hour, event at 12:02 fits into window from 12:00 to 12:05
+  - __Unaligned fixed windows__ do not have a global clock; they are defined relative to the time of the first event in the data stream
+    or some arbitrary reference point. Each window starts after the previous window ends, but the start and end times are not synchronized across different data streams.
+   Processing may be shifted to avoid processing peaks and distribute the load more evenly.
+
+__Sliding Windows__ - a generalization of fixed windows; fixed length and a fixed period.
+  - if the period is less than the length, then the windows overlap
+  - if the period is equal to the length, you have __fixed windows__
+  - if the period is greater than the length, you have a weird sampling window that only looks at subsets of the data over time
+
+__Dynamic Windows__ - Session data from the above is an example of dynamic windows. Lengths cannot be defined prior.
 
