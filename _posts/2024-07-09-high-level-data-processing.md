@@ -197,7 +197,22 @@ Event time windows have a few drawbacks due to the fact that windows often live 
 
 A __watermark__ is a notion of input completeness with respect to event times. A watermark with a value of time X
 makes the statement "all input data with event times less than X have been observed". Watermarks act as a metric of
-progress when observing an unbounded data source with no known end
+progress when observing an unbounded data source with no known end.
+
+Watermarks help answer the first half of the question "__When__ in processing time are results materialized?".
+Watermarks are temporal notions of input completeness in the event-time domain (i.e. the way the system measures
+progress and completeness relative to the event times of the records being processed in a stream of events).
+
+You can look for two types of watermarks (perfect or heuristic):
+
+* __Perfect watermarks__ - For the case where we have perfect knowledge of all of the input data, it's possible to
+  have a perfect watermark. In this case, there is no such thing as late data; all data are early or on time.
+* __Heuristic watermarks__ - For many distributed input sources, perfect knowledge of the input data is impractical.
+  The next best option is to provide a heuristic watermark, which uses whatever information is available about the inputs
+  (partitions, ordering within partitions, growth rate of files, etc) to provide an estimate of progress that is as
+  accurate as possible. The use of heuristic watermarks mean it may sometimes be wrong, which can lead to late data.
+
+Windows are materialized as the watermark passes the end of the window.
 
 ### Triggers
 
@@ -205,6 +220,9 @@ A __trigger__ is a mechanism for declaring when the output for a window should b
 
 * Triggers provide flexibility in choosing when outputs should be emitted.
 * Triggers make it possible to observe the output for a window multiple times as it evolves
+
+Triggers help answer the second half of the question "__When__ in processing time are results materialized?".
+Triggers declare when output for a window should happen in processing time.
 
 ### Accumulation
 
@@ -216,15 +234,15 @@ of previous results within the same window) or the results might have overlap be
 
 We want to answer these questions about the data:
 
-* __What__ results are calculated? We can answer by the types of transformations within the pipeline
+* __What__ results are calculated? We can answer by the types of __transformations__ within the pipeline
   (e.g. are we computing sums, training ML models)
-* __Where__ in event time are results calculated? We can answer by the use of event-time windowing within the pipeline
+* __Where__ in event time are results calculated? We can answer by the use of event-time __windowing__ within the pipeline
   This includes common examples of windowing (e.g. fixed, sliding, sessions), use cases that have no notion of windowing
   (e.g. time-agnostic processing, classic batch processing), and other more complex types of windowing
-* __When__ in processing time are results materialized? We can answer with the use of watermarks and triggers.
+* __When__ in processing time are results materialized? We can answer with the use of __watermarks__ and __triggers__.
   The most common pattern is to use the watermark to delineate when input for a given window is complete, with
   triggers allowing the specification of early results (for speculative, partial results emitted before the window is complete)
-* __How__ do refinements of results relate? We can answer by the type of accumulation used: discarding (where results
+* __How__ do refinements of results relate? We can answer by the type of __accumulation modes__ used: discarding (where results
   are all independent and distinct), accumulating (where later results build upon prior ones), or accumulating and
   retracting (where both the accumulating value plus a retraction for the previously triggered values are emitted)
 
