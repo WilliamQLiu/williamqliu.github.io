@@ -138,7 +138,7 @@ Approximation is where we take an unbounded data source and provide output (wher
 Pros: They are low overhead and designed for unbounded data.
 Cons: Limited set of them exist, the algorithms themselves are complicated, and approximations limit their utility
 
-#### Windowing
+#### Windowing (Overview)
 
 __Windowing__ means to take a data source (either unbounded or bounded) and chopping it along temporal boundaries into finite chunks for processing.
 There's a lot of windowing strategies, including:
@@ -158,4 +158,75 @@ __Sliding Windows__ - a generalization of fixed windows; fixed length and a fixe
   - if the period is greater than the length, you have a weird sampling window that only looks at subsets of the data over time
 
 __Dynamic Windows__ - Session data from the above is an example of dynamic windows. Lengths cannot be defined prior.
+
+#### Windowing by Processing Time
+
+The system essentially buffers up incoming data into windows until some amount of processing time has passed.
+E.g. say we have five-minute fixed windows, the system would buffer up data for five minutes of processing time,
+after which it would treat all the data it had observed in those five minutes as a window and send them downstream for processing
+
+Pros:
+
+* Simple - Straightforward. You never worry about shuffling data within time. Just buffer as data arrives and send them downstream when the window closes.
+* Judging window completeness is straightforward - No need to label data as "late" since the system has perfect knowledge of whether
+  all inputs for a window have been seen or not
+* For inferring information about the source as it is observed - processing time window is ideal for cases like tracking
+  the number of requests per second sent to a global-scale web service. Calculating a rate of these requests for detecting outages
+  is the perfect use case of processing time windows
+
+Cons:
+
+* if the data has event times associated with them, that data must arrive in event time order if the processing time windows
+  are to reflect the reality of when those events actually happened.
+* Unfortunately, event-time ordered data is uncommon in many real-world, distributed input sources
+
+An example is where a mobile app gathers usage statistics for later processing. The data recorded won't be uploaded
+until the device comes online again, which means data might arrive with a skew of minutes to weeks or more.
+
+#### Windowing by Event Time
+
+Windowing by Event Time is the gold standard of windowing. Most data processing systems lack native support for it,
+although any system with a decent consistency model like Hadoop or Spark Streaming could be used to help build a windowing system).
+Event time windows have a few drawbacks due to the fact that windows often live longer (in processing time) than the actual length of the window itself.
+
+* Buffering - due to extended window lifetimes, more buffering of data is required
+  Any well-designed data-processing system with a strongly consistent persistent state should be able to handle.
+* Completeness - There is no good way of knowing when we've seen all the data for a given window
+
+### Watermarks
+
+A __watermark__ is a notion of input completeness with respect to event times. A watermark with a value of time X
+makes the statement "all input data with event times less than X have been observed". Watermarks act as a metric of
+progress when observing an unbounded data source with no known end
+
+### Triggers
+
+A __trigger__ is a mechanism for declaring when the output for a window should be materialized relative to some external signal.
+
+* Triggers provide flexibility in choosing when outputs should be emitted.
+* Triggers make it possible to observe the output for a window multiple times as it evolves
+
+### Accumulation
+
+An __accumulation__ mode specifies the relationship between multiple results that are observed for the same window.
+These results might be completely disjointed (i.e. distinct, non-overlapping piece of information, no overlap or accumulation
+of previous results within the same window) or the results might have overlap between them.
+
+### Questions
+
+We want to answer these questions about the data:
+
+* __What__ results are calculated? We can answer by the types of transformations within the pipeline
+  (e.g. are we computing sums, training ML models)
+* __Where__ in event time are results calculated? We can answer by the use of event-time windowing within the pipeline
+  This includes common examples of windowing (e.g. fixed, sliding, sessions), use cases that have no notion of windowing
+  (e.g. time-agnostic processing, classic batch processing), and other more complex types of windowing
+* __When__ in processing time are results materialized? We can answer with the use of watermarks and triggers.
+  The most common pattern is to use the watermark to delineate when input for a given window is complete, with
+  triggers allowing the specification of early results (for speculative, partial results emitted before the window is complete)
+* __How__ do refinements of results relate? We can answer by the type of accumulation used: discarding (where results
+  are all independent and distinct), accumulating (where later results build upon prior ones), or accumulating and
+  retracting (where both the accumulating value plus a retraction for the previously triggered values are emitted)
+
+
 
