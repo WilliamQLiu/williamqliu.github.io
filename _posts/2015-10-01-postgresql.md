@@ -703,7 +703,7 @@ A `function` is any function like `AVG`, `COUNT`, `MIN`, `MEDIAN`, `MAX`, `NTH_V
 `OVER` defines the window specification. This is required and tells us that we're looking at a window function
 instead of a normal function.
 
-`PARITION BY <expr_list>` is optional and means that we want to subdivide the result set into partitions, kinda
+`PARTITION BY <expr_list>` is optional and means that we want to subdivide the result set into partitions, kinda
 like a `GROUP BY` clause. If a partition clause is present, the function is calculated for the rows in each
 partition. If no partition clause is specified, a single partition contains the entire table and the function
 is computed for the entire table.
@@ -752,6 +752,191 @@ the current row
 `UNBOUNDED PRECEDING` is the default.
 
 `CURRENT ROW`
+
+What does that mean exactly?
+
+* Window functions perform an operation across a set of rows that are somehow related to the current row
+* Similar to `GROUP BY` aggregate functions, but all rows remain in the output
+
+Use cases:
+
+* Fetch values from preceding or following rows (e.g. fetching the previous row's value)
+* Assign ordinal ranks (1st, 2nd, etc) to rows based on their values' positions in a sorted list
+* Running totals, moving averages
+
+#### `ROW_NUMBER`
+
+Example Table `Summer_Medals`
+
+```
+Year, Medals, Medals_RT
+2004, 116, 116
+2008, 125, 241
+2012, 147, 388
+```
+
+Fetch Previous Row's Calculations (e.g. previous rows values, running totals):
+
+```
+Year, Champion, Last_Champion, Reigning_Champion
+1996, GER, null, false
+2000, LTU, GER, false
+2004, LTU, LTU, true
+2008, EST, LTU, false
+2012, GER, EST, false
+```
+
+Example `ROW_NUMBER()`:
+
+```
+SELECT
+  Year, Event, Country,
+  ROW_NUMBER() OVER () AS Row_N
+FROM Summer_Medals
+WHERE
+  Medal = 'Gold';
+```
+
+Example 'Numbering Rows'
+
+```
+SELECT
+ *,
+ ROW_NUMBER() OVER () AS Row_N
+FROM Summer_Medals
+ORDER BY Row_N ASC;
+```
+
+Example Ordering by Year in descending order (i.e. adding `ORDER BY` within `OVER`)
+
+```
+SELECT
+  Year, Event, Country,
+  ROW_NUMBER() OVER (ORDER BY Year DESC) AS Row_N
+FROM Summer_Medals
+WHERE
+  Medal = 'Gold';
+```
+
+### Four Functions (`LAG`, `LEAD`, `FIRST_VALUE`, `LAST_VALUE`)
+
+There are four functions:
+
+__Relative__
+
+* `LAG(column, n)` returns a `column`'s value at the row `n` rows before the current row
+* `LEAD(column, n)` returns a `column`'s value at the row `n` rows after the current row
+
+__Absolute__
+
+* `FIRST_VALUE(column)` returns the first value in the table or partition
+* `LAST_VALUE(column)` returns the last value in the table or partition
+
+#### LAG()
+
+`LAG` is a window function that takes a column and a number n and returns the column's value n rows before the current row.
+E.g. passing in `1` as `n` returns the previous row's value
+
+Syntax: `LAG(column, n) OVER ()`
+
+Example Current and Last Champions
+
+```
+WITH Discus_Gold AS(
+  SELECT
+    Year, Country AS Champion
+  FROM Summer_Medals
+  WHERE
+    Year IN (1996, 2000, 2004, 2008, 2012)
+    AND Gender = 'Men' AND Medal = 'Gold'
+    AND Event = 'Discus Throw')
+
+SELECT
+  Year, Champion,
+  LAG(Champion, 1) OVER
+    (ORDER BY Year ASC) AS Last_Champion
+FROM Discus_Gold
+ORDER BY Year ASC;
+```
+
+Results in:
+
+```
+Year, Champion, Last_Champion
+
+```
+
+#### `FIRST_VALUE` and `LAST_VALUE`
+
+
+
+```
+SELECT
+  Year, City,
+  FIRST_VALUE(City) OVER
+    (ORDER BY Year ASC) AS First_City,
+  LAST_VALUE(City) OVER (
+    ORDER BY Year ASC
+    RANGE BETWEEN
+      UNBOUNDED PRECEDING AND
+      UNBOUNDED FOLLOWING
+    ) AS Last_City
+  FROM Hosts
+  ORDER BY Year ASC;
+```
+
+
+#### PARTITION BY
+
+`PARTITION BY` splits the table into partitions based on a column's unique values
+
+* Similar to `GROUP BY`, but the results aren't rolled into one column
+* Operated on separately by the window function
+  - `ROW_NUMBER` will reset for each partition
+  - `LAG` will only fetch a row's previous value if its previous row is in the same partition
+
+Example Adding partition by one column
+
+```
+WITH Discus_Gold AS (...)
+
+SELECT
+  Year, Event, Champion,
+  LAG(Champion) OVER
+    (PARTITION BY Event
+     ORDER BY Event ASC, Year ASC) AS Last_Champion
+FROM Discus_Gold
+ORDER BY Event ASC, YEAR ASC;
+```
+
+Example Partitioning by multiple columns
+
+```
+WITH Country_Gold AS (
+  SELECT
+    DISTINCT Year, Country, Event
+  FROM Summer_Medals
+  WHERE
+    Year IN (2008, 2012)
+    AND Country IN ('CHN', 'JPN')
+    AND Gender = 'Women' AND Medal = 'Gold')
+
+SELECT
+  Year, Country, Event
+  ROW_NUMBER() OVER (PARTITION BY Year, Country)
+FROM Country_Gold;
+```
+
+Results in the Row Number resetting per partition:
+
+```
+Year, Country, Event, Row_N
+2008, CHN, +78KG (Heavyweight), 1
+2008, CHN, -49KG, 2
+...
+2008, JPN, 48 - 55KG, 1
+2008, JPN, 48 - 55KG, 2
+```
 
 ## <a id="tips">Tips</a>
 
