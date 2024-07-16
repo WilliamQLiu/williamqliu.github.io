@@ -938,6 +938,116 @@ Year, Country, Event, Row_N
 2008, JPN, 48 - 55KG, 2
 ```
 
+#### Ranking
+
+`ROW_NUMBER` is one of three ranking functions.
+
+* `ROW_NUMBER()` always assigns unique numbers, even if two rows' values are the same
+* `RANK()` assigns the same number to rows with identical values, skipping over the next numbers in such cases
+* `DENSE_RANK()` assigns the same number to rows with identical values, but doesn't skip over the next numbers
+
+Given a Source Table of:
+
+```
+SELECT
+  Country, COUNT(DISTINCT Year) AS Games
+FROM Summer_Medals
+WHERE
+  Country IN ('GBR', 'DEN', 'FRA',
+              'ITA', 'AUT', 'BEL',
+              'NOR', 'POL', 'ESP')
+GROUP BY Country
+ORDER BY Games DESC;
+```
+
+Results in:
+
+```
+Country, Games
+GBR, 27
+DEN, 26
+FRA, 26
+ITA, 25
+...
+```
+
+##### `ROW_NUMBER`
+
+```
+WITH Country_Games AS (...)
+
+SELECT
+  Country, Games
+  ROW_NUMBER()
+    OVER (ORDER BY Games DESC) AS Row_N
+FROM Country_Games
+ORDER BY Games DESC, Country ASC;
+```
+
+Results in:
+
+```
+Country, Games, Row_N
+GBR, 27, 1
+DEN, 26, 2
+FRA, 26, 3
+ITA, 25, 4
+```
+
+##### `RANK`
+
+```
+WITH Country_Games AS (...)
+
+SELECT
+  Country, Games
+  ROW_NUMBER()
+    OVER (ORDER BY Games DESC) AS Row_N,
+  RANK()
+    OVER (ORDER BY Games DESC) AS Rank_N
+FROM Country_Games
+ORDER BY Games DESC, Country ASC;
+```
+
+Results in:
+```
+Country, Games, Row_N, Rank_N
+GBR, 27, 1, 1
+DEN, 26, 2, 2
+FRA, 26, 3, 2
+ITA, 25, 4, 4
+```
+
+
+##### `DENSE_RANK`
+
+```
+WITH Country_Games AS (...)
+
+SELECT
+  Country, Games
+  ROW_NUMBER()
+    OVER (ORDER BY Games DESC) AS Row_N,
+  RANK()
+    OVER (ORDER BY Games DESC) AS Rank_N,
+  DENSE_RANK()
+    OVER (ORDER BY Games DESC) AS Dense_Rank_N
+
+FROM Country_Games
+ORDER BY Games DESC, Country ASC;
+```
+
+Results in:
+```
+Country, Games, Row_N, Rank_N, Dense_Rank_N
+GBR, 27, 1, 1, 1
+DEN, 26, 2, 2, 2
+FRA, 26, 3, 2, 2
+ITA, 25, 4, 4, 3
+```
+
+You'll want to think about ranking with partitioning
+
 ## <a id="tips">Tips</a>
 
 ### <a id="explain">Explain</a>
