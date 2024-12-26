@@ -73,4 +73,136 @@ Notes:
   - Metrics
     * Feed into Metrics that are usually a single number for a day
 
+## Cumulative Table Design
+
+You want to track dimensions over time to hold onto history (not counting users that ask to be deleted)
+
+* Core components
+  - 2 dataframes (yesterday and today)
+  - `FULL OUTER JOIN` the two data frames together
+  - `COALESCE` values to keep everything around
+  - Hang onto all of history
+* Usages
+  - Growth analytics at Facebook (`dim_all_users`)
+  - State transition tracking
+
+### Cumulative Table vs Snapshot Dimensions
+
+Daily Snapshot (`name, is_active`)
+
+```
+2023-01-01, Will, False
+2023-01-02, Will, True
+2023-01-03, Will, True
+2023-01-04, Will, True
+2023-01-05, Will, False
+```
+
+Rolling Snapshots (`name, is_active_array`)
+
+```
+2023-01-01, Will, [False]
+2023-01-02, Will, [True, False]
+2023-01-03, Will, [True, True, False]
+2023-01-04, Will, [True, True, True, False]
+2023-01-05, Will, [False, True, True, False]
+```
+
+You normally don't want this array to go on forever, normally just limit (e.g. to 30 days, `is_monthly_active`)
+
+### Cumulative Table Design
+
+1. Yesterday + Today ->
+
+2. FULL OUTER JOIN
+   COALESCE ids and unchanging dimensions
+   Compute cumulation metrics (e.g. days since x)
+   Combine arrays and changing values
+
+3. -> Cumulated Output
+
+With the array, is able to check if `is_active` in last 90 days
+
+Strengths:
+
+* Historical analysis without shuffle (i.e. very efficient)
+* Easy "transition" analysis
+
+Drawbacks:
+
+* Can only be backfilled sequentially (can't be many days at a time, e.g. 365 days all at once. However this depends on other day so needs sequential backfill)
+* Handling PII data can be a mess since deleted/inactive users get carried forward
+
+Can do "transition analysis" since all data is rammed into one row, e.g. definitions of active status:
+
+* __Churn__ - Active yesterday and not active today
+* __Resurrected__ - Not active yesterday and active today
+* __New__ - Didn't exist yesterday and now active
+* __Deleted__ - Active yesterday and deleted today
+
+### Compactness vs Usability Tradeoff
+
+* The most usable tables usually:
+  - Have no complex data types
+  - Easily can be manipulated with `WHERE` and `GROUP BY`
+* The most compact tables (not human readable)
+  - Are compressed to be as small as possible and can't be queried directly until they're decoded
+* The middle-ground tables
+  - Use complex data types (e.g. `ARRAY`, `MAP` and `STRUCT`), making querying tricker but also compacting more
+
+When would you use each type of table?
+
+* Most compact
+  - Online systems where latency and data volumes matter a lot
+  - Consumers are usually highly technical
+* Middle-ground
+  - Upstream staging / master data where the majority of consumers are other data engineers
+* Most usable
+  - When analytics is the main consumer and the majority of consumers are less technical
+
+### Struct vs Array vs Map
+
+* Struct
+  - A table within a table (ROW data type in Trino)
+  - Keys are rigidly defined, compression is good
+  - Values can be any type
+  - Can nest Struct of Struct, etc (but not usable)
+* Array
+  - Ordinal
+  - List of values that all have to be the same type
+* Map
+  - Keys are loosely defined, compression is okay
+  - Keys have to be a primitive (int, string)
+  - Values all have to be the same type
+
+### Temporal Cardinality Explosions of Dimensions
+
+* When you add a temporal aspect to your dimensions and the cardinality increases by at least 1 order of magnitude
+* Example:
+  * Airbnb has ~6 million listings
+    - If we want to know the nightly pricing and available of each night for the next year
+      * 365 * 6 million or about ~2 billion nights
+    - Should this dataset be:
+      * Listing-level with an array of nights?
+      * Listing night level with 2 billion rows?
+    - If you do the sorting right, Parquet will keep these about the same size
+
+### Badness of Denormalized Temporal Dimensions
+
+If you explode it out and need to join other dimensions, Spark shuffle will ruin your compression!
+
+### Run-length Encoding Compression
+
+Probably the most important compression technique in big data right now
+* It's why Parquet file format has become so successful
+Shuffle can ruin this. BE CAREFUL!
+* Shuffle happens in distributed environments when you do JOIN and GROUP BY
+
+When a value is repeated, it nulls it out and says "this value is repeated 5 times". Now big values are nulled out
+because you can compress it down in Parquet
+
+After a join, Spark (or any distributed compute engine) may mix up the ordering of the rows and mix up the order.
+In the end, the listing-level with an array of nights is more efficient (since downstream data engineers or users
+can join that data). If your downstream consumers are producing datasets, the shuffling will cause the compression to change.
+
 
