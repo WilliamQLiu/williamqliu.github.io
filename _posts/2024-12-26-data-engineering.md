@@ -223,18 +223,109 @@ __Idempotent__ means your pipelines produce the same results regardless of when 
 
 When a pipeline is not idempotent, it's difficult to work with because:
 
-* Silent failure
+* Silent failure (very hard to troubleshoot bugs)
 * You only see it when you get data inconsistencies and a data analyst yells at you
+* Backfilling causes inconsistencies between the old and restated data
+* Unit test cannot replicate the production behavior
+* Silent failures
 
 ### What can make a Pipeline not Idempotent
 
 * `INSERT INTO` without `TRUNCATE`
   - E.g. INSERT INTO a table twice now doubles the data
   - Use `MERGE` or `INSERT OVERWRITE` every time
+  - `MERGE` is only idempotent if you get the merge conditions right
+  - `INSERT OVERWRITE` is idiot proof; it's idempotent by default
+  - `INSERT INTO` is only idempotent if you use `TRUNCATE` first
 * Using `start_date > ` without a corresponding `end_date <`
+  - With just a `start_date`, the backfill a year later will have different data
 * Not using a full set of partition sensors
+  - If the pipeline does not know when to fire (e.g. fires with wrong data set, incomplete data),
+    it might fire with incomplete data
   - Pipeline might run when there is no/partial data
 * Not using `depends_on_past` for cumulative pipelines
+  - E.g. tomorrow can't run until today's run is successful
+* Relying on the "latest" partition of a not properly modeled SCD table
+  - Cumulative table design amplifies this bug
+  - Daily Dimensions and latest partition is a very bad idea
+  - Make sure that day's daily dimension fully landed
+
+## Should you model as Slowly Changing Dimensions?
+
+* Opinion: Max, the creator of Airflow hates SCD data modeling
+  - Lots of gotchas with SCDs, use daily snapshots instead (more storage)
+  - Pay extra in S3 to just not model SCDs
+* Options:
+  - Latest snapshot (not recommended)
+  - Daily/Monthly/Yearly snapshot (recommended by Max, get for free)
+  - SCD
+* How slowly changing are the dimensions you're modeling?
+  - If you have a dimension that changes every day, a daily snapshot is the same as a SCD
+  - SCD should change, but not very much (shouldn't be changing every day)
+  - A daily SCD would need to break it down to hour, might not be worth the effort
+
+## Why do dimensions change?
+
+* Someone decides they hate iPhone and want Android now
+* Someone migrates from team dog to team cat
+* Someone migrates from USA to another country
+
+## How can you model Dimensions that change?
+
+* Singular snapshots
+  - Be careful since these are not idempotent
+  - When you backfill (was on Team Dog, currently on Team Cat), now appears incorrect (Team Cat)
+  - Daily partitioned snapshots (Max's approach)
+  - SCD Types: 0, 1, 2, 3 (there are others, but you won't need)
+
+## Types of Slowly Changing Dimensions
+
+See below for analytical workloads:
+
+* Type 0
+  - Are fixed, will never change (e.g. birth date)
+* Type 1
+  - NEVER use (not idempotent)
+  - You only care about the latest value
+* Type 2
+  - Gold Standard, use Type 2
+  - You care about what the value was from `start_date` to `end_date`
+  - Current values usually have either an `end_date` that is:
+    * `NULL` (gotcha is BETWEEN might not work)
+    * Far into the future like `9999-12-31` (preferred way at AirBnB, make BETWEEN queries work)
+  - Hard to use:
+    * Since there is more than 1 row per dimension, you need to be careful about filtering on time
+  - Only type of SCD that is purely IDEMPOTENT
+* Type 3
+  - You only care about "original" and "current"
+  - Benefits
+    * You only have 1 row per dimension so it's easier to use
+  - Drawbacks
+    * You lose the history in between original and current (e.g. blackberry to iphone to android only shows blackberry and android)
+    * Not entirely idempotent (since it loses the middle records)
+
+Summary:
+
+* Type 0 and Type 2 are idempotent
+  - Type 0 is because the values are unchanging
+  - Type 2 is but you need to be careful with how you use `start_date` and `end_date` syntax
+* Type 1 isn't idempotent
+  - If you backfill with this dataset, you'll get the dimension as it is now, not as it was then
+* Type 3 isn't idempotent
+  - If you backfill with this dataset, it's impossible to know when to pick "original" vs "current"
+
+For transactional data, other SCDs are useful (for low latency). Above recommendations are just for analytical.
+
+## SCD Type 2 Loading
+
+You have a couple options:
+
+* Load the entire history in one query
+  - Inefficient but nimble
+  - 1 query and you're done
+* Incrementally load the data after the previous SCD is generated
+  - Has the same "depends_on_past" constraint
+  - Efficient but cumbersome
 
 ## Code
 
