@@ -8,13 +8,17 @@ title: Data Engineering
 
 # Overview
 
-1. Dimensional Data Modeling
+1.) Dimensional Data Modeling
   * Know your consumer
   * OLTP vs OLAP data modeling
   * Cumulative Table design
   * Compactness vs Usability tradeoff
   * Temporal cardinality explosion
   * Run-length encoding compression gotchas
+
+2.) Slowly Changing Dimensions and Idempotent Queries in Iceberg
+  * Idempotent pipelines
+  * Slowly-Changing Dimensions
 
 # 1 - Dimensional Data Modeling
 
@@ -205,4 +209,229 @@ After a join, Spark (or any distributed compute engine) may mix up the ordering 
 In the end, the listing-level with an array of nights is more efficient (since downstream data engineers or users
 can join that data). If your downstream consumers are producing datasets, the shuffling will cause the compression to change.
 
+# 2. Slowly Changing Dimensions and Idempotent Queries in Iceberg
 
+Create a Slowly Changing Dimension table that is __idempotent__(same result no matter how many times you execute).
+
+## Idempotent Pipelines are critical
+
+__Idempotent__ means your pipelines produce the same results regardless of when it's ran.
+
+* Regardless of the day you run it
+* Regardless of how many times you run it
+* Regardless of the hour that you run it
+
+When a pipeline is not idempotent, it's difficult to work with because:
+
+* Silent failure
+* You only see it when you get data inconsistencies and a data analyst yells at you
+
+### What can make a Pipeline not Idempotent
+
+* `INSERT INTO` without `TRUNCATE`
+  - E.g. INSERT INTO a table twice now doubles the data
+  - Use `MERGE` or `INSERT OVERWRITE` every time
+* Using `start_date > ` without a corresponding `end_date <`
+* Not using a full set of partition sensors
+  - Pipeline might run when there is no/partial data
+* Not using `depends_on_past` for cumulative pipelines
+
+## Code
+
+```
+CREATE TABLE williamliu.nba_player_scd (
+    player_name VARCHAR,
+    is_active BOOLEAN,
+    start_season INTEGER,
+    end_season INTEGER,
+    current_season INTEGER
+)
+WITH (
+    format = 'PARQUET',
+    partitioning = ARRAY ['current_season']
+)
+```
+
+## LAG function
+
+Load data that has a slowly changing dimension (track user activity changes using the `LAG` function)
+`LAG` is used to implement Type 2 SCDs, which track historical changes by adding a new row for each change.
+`LAG` lets you access data from the previous row within the same result set, based on a defined order.
+
+```
+LAG(column_name, offset, default_value) OVER (PARTITION BY partition_column ORDER BY order_column)
+```
+
+For example, you want to track when a Customer dimension changes its Address.
+```
+----- Original Table
+CustomerID	      Name	Address	UpdateDate
+1	John Doe	  123   Elm St	2024-01-01
+1	John Doe	  456   Oak St	2024-06-01
+2	Jane Smith	  789   Pine St	2024-03-01
+-----
+
+WITH Changes AS (
+    SELECT
+        CustomerID,
+        Name,
+        Address,
+        UpdateDate,
+        LAG(Address) OVER (PARTITION BY CustomerID ORDER BY UpdateDate) AS PreviousAddress
+    FROM
+        Customer
+)
+SELECT
+    CustomerID,
+    Name,
+    Address,
+    UpdateDate,
+    CASE
+        WHEN Address != PreviousAddress OR PreviousAddress IS NULL THEN 'New'
+        ELSE 'No Change'
+    END AS ChangeFlag
+FROM
+    Changes;
+
+----- New Result
+CustomerID	Name	Address	UpdateDate	ChangeFlag
+1	John Doe	123 Elm St	2024-01-01	New
+1	John Doe	456 Oak St	2024-06-01	New
+2	Jane Smith	789 Pine St	2024-03-01	New
+-----
+
+# Note: With a Type 2 SCD, you want Start and End Dates
+
+WITH Changes AS (
+    SELECT
+        CustomerID,
+        Name,
+        Address,
+        UpdateDate,
+        LAG(UpdateDate) OVER (PARTITION BY CustomerID ORDER BY UpdateDate) AS PreviousUpdateDate,
+        LAG(Address) OVER (PARTITION BY CustomerID ORDER BY UpdateDate) AS PreviousAddress
+    FROM
+        Customer
+)
+SELECT
+    CustomerID,
+    Name,
+    Address,
+    COALESCE(PreviousUpdateDate, '1900-01-01') AS StartDate,
+    UpdateDate AS EndDate
+FROM
+    Changes
+WHERE
+    Address != PreviousAddress OR PreviousAddress IS NULL;
+
+
+----- Type 2 SCD with 1.) Start and End Date and 2.) current flag
+WITH Changes AS (
+    SELECT
+        CustomerID,
+        Name,
+        Address,
+        UpdateDate,
+        LAG(Address) OVER (PARTITION BY CustomerID ORDER BY UpdateDate) AS PreviousAddress,
+        ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY UpdateDate DESC) AS RowNumber
+    FROM
+        Customer
+)
+SELECT
+    CustomerID,
+    Name,
+    Address,
+    UpdateDate AS StartDate,
+    LEAD(UpdateDate) OVER (PARTITION BY CustomerID ORDER BY UpdateDate) AS EndDate,
+    CASE WHEN RowNumber = 1 THEN 'Y' ELSE 'N' END AS CurrentFlag
+FROM
+    Changes;
+
+----- With Current Flag
+CustomerID	Name	Address	StartDate	EndDate	CurrentFlag
+1	John Doe	123 Elm St	2024-01-01	2024-06-01	N
+1	John Doe	456 Oak St	2024-06-01	NULL	Y
+2	Jane Smith	789 Pine St	2024-03-01	NULL	Y
+
+```
+
+Example LAG function:
+
+```
+SELECT
+  player_name,
+  is_active,
+  LAG(is_active, 1) OVER (PARTITION BY player_name ORDER BY current_season) AS is_active_last_season,
+  current_season
+FROM williamliu.nba_players
+
+-- PLAYER_NAME  IS_ACTIVE   IS_ACTIVE_LAST_SEASON   CURRENT_SEASON
+-- Antoine Carr    true    null    1996
+-- Antoine Carr    true    true    1997
+-- Antonio McDyess true    null    1996
+```
+
+```
+WITH lagged AS (
+SELECT
+  player_name,
+  CASE WHEN is_active THEN 1 ELSE 0 END AS is_active,
+  CASE WHEN LAG(is_active, 1) OVER (PARTITION BY player_name ORDER BY current_season) THEN 1 ELSE 0 END AS is_active_last_season,
+  current_season
+FROM williamliu.nba_players
+)
+
+SELECT
+  *,
+  CASE WHEN is_active <> is_active_last_season THEN 1 ELSE 0 END AS did_change
+FROM lagged
+
+----
+--PLAYER_NAME IS_ACTIVE   IS_ACTIVE_LAST_SEASON   CURRENT_SEASON  DID_CHANGE
+--Ben Wallace 1   0   1996    1
+--Ben Wallace 1   1   1997    0
+--Boban Marjanovic    1   0   2020    1
+```
+
+
+Rolling Sum
+```
+WITH lagged AS (
+  SELECT
+    player_name,
+    CASE WHEN is_active THEN 1 ELSE 0 END AS is_active,
+    CASE WHEN LAG(is_active, 1) OVER (
+      PARTITION BY player_name ORDER BY current_season)
+    THEN 1 ELSE 0 END AS is_active_last_season,
+    current_season
+  FROM williamliu.nba_players
+),
+streaked AS (
+  SELECT
+    *,
+    SUM(
+      CASE WHEN is_active <> is_active_last_season THEN 1 ELSE 0 END
+    ) OVER (
+      PARTITION BY
+        player_name
+      ORDER BY
+        current_season
+    ) AS streak_identifier
+  FROM lagged
+)
+SELECT
+  player_name,
+  streak_identifier,
+  MAX(is_active) AS is_active,
+  MIN(current_season) AS start_season,
+  MAX(current_season) AS end_season
+FROM streaked
+GROUP BY player_name, streak_identifier
+```
+
+
+Notes:
+* Want to use INSERT OVERWRITE for file based systems (e.g. Spark, Hive) instead of INSERT INTO
+* Ideally you use MERGE instead of INSERT INTO for database systems (e.g. Snowflake, Redshift)
+* Want to look at columns that can change for Type 2 SCDs
+* Create Temporary Tables to load new and existing data into a staging table
