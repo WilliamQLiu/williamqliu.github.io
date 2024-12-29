@@ -20,6 +20,14 @@ title: Data Engineering
   * Idempotent pipelines
   * Slowly-Changing Dimensions
 
+3.) Conceptual Data Modeling
+* What is conceptual data modeling
+* Find bad requirements
+* Why you should work backwards from metrics (e.g. revenue)
+* Who should contribute to this process? (who adds noise and who adds value)
+* The pain that happens when you get this wrong
+* The "living your best life" work shop
+
 # 1 - Dimensional Data Modeling
 
 Dimensions are attributes of an entity (e.g. user's birthday, user's favorite food)
@@ -526,3 +534,46 @@ Notes:
 * Ideally you use MERGE instead of INSERT INTO for database systems (e.g. Snowflake, Redshift)
 * Want to look at columns that can change for Type 2 SCDs
 * Create Temporary Tables to load new and existing data into a staging table
+
+# 3.) Conceptual Data Modeling
+
+Understand stakeholders' true requirements and use that in choosing the right solution
+In order to write code that lasts, you need to get clarity from stakeholders
+
+* What is conceptual data modeling
+  - A table schema is not where data modeling beings (e.g. name of the table); that's a few steps later (tables are the middle, not the beginning)
+* Find bad requirements
+* Why you should work backwards from metrics (e.g. revenue)
+* Who should contribute to this process? (who adds noise and who adds value)
+* The pain that happens when you get this wrong
+* The "living your best life" work shop
+
+## What is Conceptual Data Modeling
+
+* Conceptual (Think Brainstorm) - if you're good at understanding the business, what do we need? What are the problems we're trying to solve? Where are we at in the business?
+  - More data engineers should think here
+  - You get extreme value out of efforts for greenfield pipelines here
+* Logical (Think Relationships) - To create these data sets we need some entities. E.g. friending (friend accepts) has a left user and right user, accept friendship (have actual diagrams)
+* Physical (Think Tables and Columns) - In a table, are there varchars, ints, arrays, what do these bytes look like and how do they join, partitioning, sorting, file format, where data is stored
+  - This is where most "technical" data engineering is, but not where you'll move your career forward
+
+### How to effectively brainstorm a pipeline
+
+* Make sure you get feedback from all relevant stakeholders
+  - First line stakeholders (easy to get feedback from)
+    * Analysts, Engineers, Scientists, Product Managers
+  - Second line stakeholders (hard to get feedback from)
+    * Customers, Executives
+  - Think about who should be in the room
+    * Some people add value, some will add noise
+* A missing stakeholder might mean a critical missing requirement
+* An irrelevant stakeholder might mean an irrelevant and costly requirement
+* Take your time during this step so you don't have to rebuilt later
+* Question costly requirements to deliver more effective results
+  - Recognize high impact, low effort (ideal)
+  - Recognize low impact, high effort (axe these)
+* Requirements aren't dictates from God; always question them
+
+## When pushing back be mindful
+
+* If you push back, you need to have a solid replacement story to tell them, otherwise it won't be well received
