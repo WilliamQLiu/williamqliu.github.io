@@ -37,13 +37,21 @@ title: PostgreSQL
     -  [Select specific Rows](#selectrows)
     -  [Select by filtering text](#selectfiltertext)
     -  [Select in list](#selectfilterin)
-    -  [Select into categories](#selectcategories)
+    -  [Select `CASE`](#selectcase)
     -  [Select by dates](#selectdates)
-    -  [Select CONVERT_TIMEZONE](#selectconverttimezone)
-    -  [Select COALESCE function](#selectcoalesce)
+    -  [Select `CONVERT_TIMEZONE`](#selectconverttimezone)
+    -  [Select `COALESCE` function](#selectcoalesce)
+    -  [Select `EXTRACT` function](#selectextract)
+    -  [Select `DATE_FORMAT` function](#selectdateformat)
+    -  [Select `IF` function](#selectif)
+    -  [Select `IS NULL` and `IS NOT NULL` function](#selectisnull)
+    -  [Select `IFNULL` function](#selectifnull)
+    -  [Select `CAST` function](#selectcast)
     -  [Select with Order, Limit, Distinct](#selectproperties)
     -  [Select combine queries with Union](#selectunion)
-    -  [Select with Max and Min](#selectmaxmin)
+    -  [Select with Aggregates (Sum, Max, Min, Avg, Count)](#selectaggregates))
+    -  [`GROUP BY` and `HAVING`](#selectaggregategroupby))
+    -  [Select with a basic CTE (Common Table Expression)](#selectcte)
     -  [Select with a basic Subquery](#selectsubquery)
 *  [SQL Joins and Subqueries](#joinsubquery)
     -  [From](#from)
@@ -307,6 +315,9 @@ You can filter strings in tables (e.g. list all facilities with the word
     1	    Tennis Court 2	    5	        25	        8000	        200
     3	    Table Tennis	    0	        5	        320             10
 
+The `%` represents zero, one, or multiple characters.
+The `_` represents one, single character (e.g. `LIKE 'A__'`)
+
 #### <a id="selectsimilar">SIMILAR TO</a>
 
 `SIMILAR` is similar to `LIKE`, except you can run a regular expression.
@@ -342,7 +353,7 @@ an **IN** operator. This is called a **subquery**. For example:
         SELECT facid FROM cd.facilities
     );
 
-#### <a id="selectcategories">Select into Categories</a>
+#### <a id="selectcase">Select with `CASE`</a>
 
 If you want to select results into categories (e.g. facilities labeled 'cheap'
 or 'expensive' depending on monthly maintenacne costs > $100). You want to then
@@ -398,7 +409,7 @@ Example 2:
     -------------------
     2008-03-05 09:25:29
 
-#### <a id="selectcoalesce">Select COALESCE function</a>
+#### <a id="selectcoalesce">Select `COALESCE` function</a>
 
 `COALESCE` returns the first non-null argument with `COALESCE(arg1, arg2, ...)` with an unlimited number of args
 and returns the first non-null (evaluating left to right). If all arguments are null, then it will return null.
@@ -410,6 +421,64 @@ Often this is used as a default value. For example, say you have a blog post exc
 then use the first 150 characters from the content post.
 
     SELECT COALESCE(excerpt, LEFT(CONTENT, 150)) FROM blog_posts;
+
+#### <a id="selectextract">Select `EXTRACT` function</a>
+
+`EXTRACT` function extracts a part from a given date and returns an integer. Consider `DATE_FORMAT()` if you want to format a date
+
+    -- SELECT EXTRACT(<part> FROM <date>)
+    SELECT EXTRACT(MONTH FROM "2022-10-12")
+
+Where the part is required and can be say `HOUR`, `DAY`, `WEEK`, `YEAR_MONTH`, etc
+
+#### <a id="selectdateformat">Select `DATE_FORMAT` function</a>
+
+`DATE_FORMAT` function formats a date into a new format
+
+    -- SELECT DATE_FORMAT(<date>, <format>)
+    SELECT DATE_FORMAT("2024-01-01", "%M %d %Y");
+
+#### <a id="selectif">Select `IF` function</a>
+
+`IF` function returns a value if the condition is true or another value if condition is false.
+
+    -- SELECT IF(<condition>, <value_if_true>, <value_if_false>
+    SELECT
+      IF(Quantity>10, "MORE", "LESS")
+    FROM OrderTails;
+
+#### <a id="selectisnull">Select `IS NULL` and `IS NOT NULL`</a>
+
+`IS NULL` and `IS NOT NULL` is used to identify null and non-null values
+
+    SELECT * FROM goodreads WHERE book_title IS NULL;
+    SELECT * FROM goodreads WHERE book_title IS NOT NULL;
+
+Note: When sorting a column containing `NULL` values, these rows ascend to the top of the result (since NULLs are the smallest values)
+
+#### <a id="selectifnull">Select `IFNULL` function</a>
+
+
+
+#### <a id="selectcase">Select `CASE` function</a>
+
+`CASE` goes through conditions and returns a value when the first condition is met
+
+    -- SELECT
+    --   CASE
+    --     WHEN condition1 THEN result1
+    --     WHEN condition2 THEN result2
+    --     ELSE result
+    -- END;
+
+    SELECT product_name,
+      CASE
+        WHEN price < 10 THEN 'Low price product'
+        WHEN price > 50 THEN 'High price product'
+      ELSE
+        'Normal Product'
+      END
+    FROM products;
 
 #### <a id="selectproperties">Select Order, Limit, and Distinct</a>
 
@@ -480,9 +549,13 @@ column (for whatever reason). Use **UNION**.
     GUEST
     Jones
 
-#### <a id="selectmaxmin">Select Max and Min</a>
+#### <a id="selectaggregates">Select Aggregates (Sum, Max, Min, Avg, Count)</a>
 
-Select the largest value of an expression.
+Aggregate functions perform operations across an entire column of data.
+
+##### MAX
+
+Select the highest/largest value of an expression.
 
     SELECT MAX(joindate) AS latest
     FROM cd.members;
@@ -490,7 +563,9 @@ Select the largest value of an expression.
     latest
     2012-09-26 18:08:45
 
-Select the smallest value of an expression.
+##### MIN
+
+Select the lowest/smallest value of an expression.
 
     SELECT MIN(joindate) AS earliest
     FROM cd.members;
@@ -498,7 +573,79 @@ Select the smallest value of an expression.
     earliest
     2012-07-01 00:00:00
 
+##### SUM
+
+Add together all the values in a column
+
+    SELECT SUM(cost) AS sum_cost
+    FROM my.table;
+
+##### AVG
+
+Calculates the average of a group of selected values
+
+    SELECT AVG(cost) AS avg_cost
+    FROM my.table;
+
+##### COUNT
+
+Counts how many rows are in a column
+
+    SELECT COUNT(id) AS id_count
+    FROM my.table;
+
+#### <a id="selectaggregategroupby">Aggregate grouping with `GROUP BY` and `HAVING`</a>
+
+If you only want to aggregate a part of a table (instead of the entire column), then you want to use the `GROUP BY` function.
+
+    SELECT
+      category,
+      SUM(spend)
+    FROM product_spend
+    GROUP BY category;
+
+    ---
+    category    sum
+    electronics 1000
+    appliance   1200
+
+##### HAVING
+
+When using `GROUP BY` (i.e. aggregate function), you can filter with `HAVING` function.
+`HAVING` is different than `WHERE` since having operates on aggregate results (instead of row by row of WHERE)
+
+    SELECT COUNT(customer_id), country
+    FROM customers
+    GROUP BY country
+    HAVING COUNT(customer_id) > 5;
+
+    SELECT
+      ticker,
+      min(open)
+    FROM stock_prices
+    GROUP BY
+      ticker
+    HAVING min(open) > 100;
+
+#### <a id="selectcte">Select with CTE (Common Table Expression)</a>
+
+A CTE (Common Table Expression) is a query within a query.
+You use the `WITH` statement to create temporary tables to store results so that
+you can make complicated queries more readable and maintainable. Once your main query
+is completed, these temporary tables disappear.
+
+    WITH genre_revenue_cte AS (
+      SELECT ...
+    )
+
+    SELECT
+      g.my_field
+    FROM genre_revenue_cte AS g ...
+
 #### <a id="selectsubquery">Select with Subquery</a>
+
+Subqueries (aka inner queries) embed one query into another.
+You nest queries within parentheses and create temporary tables.
 
 Get the first and last name of the last member(s) who signed up.
 
@@ -518,6 +665,103 @@ two people joined at the exact same time.
     FROM cd.members
     ORDER BY joindate desc
     LIMIT 1;
+
+#### <a id="selectsubqueryvscte">Subquery vs CTE</a>
+
+Advantages of a CTE
+
+* Break down complex queries - You declare a CTE at the beginning of the query using `WITH`, enhancing code readability
+* If you need to reuse the same subquery result multiple times in a larger query, CTEs prevent redundant calculations
+* When you need to perform recursive queries (e.g. traversing hierarchical data like org structures or threaded discussions)
+
+    -- Finding all employees under a certain manager
+    WITH recursive_cte AS (
+      SELECT
+        employee_id,
+        name,
+        manager_id
+      FROM employees
+      WHERE manager_id = @manager_id
+
+      UNION ALL
+
+      SELECT
+        e.employee_id,
+        e.name,
+        e.manager_id
+      FROM employees AS e
+      INNER JOIN recursive_cte AS r -- The recursive cte is utilized here within the main cte
+        ON e.ManagerID = r.employee_id
+    )
+
+    SELECT * FROM recursive_cte;
+
+Advantages of a using a subquery
+
+* Single-value comparison in WHERE clauses - where you need to compare a single value to a result from another query
+  This allows for more flexibility and precision of making on-the-fly condition adjustments based on subquery results
+
+    SELECT artist_name
+    FROM concerts
+    WHERE concert_revenue > (
+      SELECT AVG(concert_revenue) FROM concerts
+    );
+
+* Column Creation and Aggregation - use subqueries to create new columns for real-time computations and to calculate
+  intermediate values for aggregation functions within larger queries. This enables more sophisticated aggregation.
+
+    SELECT
+      artist_name,
+      genre,
+      concert_revenue,
+      (SELECT AVG(concert_revenue) FROM concerts) AS avg_concert_revenue,
+      (SELECT MAX(concert_revenue) FROM concerts) AS max_concert_revenue
+    FROM concerts;
+
+    -- Subqueries often use `IN`, `NOT IN`, and `EXISTS` operators to filter based on conditions from another query
+    SELECT artist_name
+    FROM concerts
+    WHERE artist_id IN (
+      SELECT artist_id FROM concert_revenue WHERE concert_revenue > 50000);
+
+* Correlated Subqueries - utilize correlated subqueries to retrieve values from the outer query
+  For example, say you have two lists of data side by side. With correlated subqueries, you can ask questions
+  about each item in one list and get answers from the other list that are specific to that item.
+
+    SELECT
+      artist_name,
+      genre,
+      concert_revenue
+    FROM concerts AS c1
+    WHERE concert_revenue = (
+      SELECT MAX(concert_revenue)
+      FROM concerts AS c2
+      WHERE c1.genre = c2.genre
+    );
+
+
+### <a id="subqueryexists">`EXISTS` and `NOT EXISTS` for checking if any records in a subquery</a>
+
+You can use the `EXISTS` operator to test if there is any records in a subquery;
+returns TRUE if the sub query returns one or more records.
+
+    -- EXISTS example
+    SELECT customers.customer_name
+    FROM customers
+    WHERE EXISTS (
+      SELECT order_id
+      FROM orders
+      WHERE customer_id = customers.customer_id
+    );
+
+    -- NOTE EXISTS example
+    SELET customers.customer_name
+    FROM customers
+    WHERE NOT EXISTS (
+      SELECT order_id
+      FROM orders
+      WHERE customer_id = customers.customer_id
+    );
 
 ### <a id="joinsubquery">Joins and Subqueries</a>
 
@@ -1200,5 +1444,6 @@ Updating statistics store information into the `pg_statistic` system catalog
 
 ## <a id="resources">Resources</a>
 
-Good basic and common usage: https://popsql.com/learn-sql/postgresql/
+* Good basic and common usage: https://popsql.com/learn-sql/postgresql/
+* DataLemur: https://datalemur.com
 
