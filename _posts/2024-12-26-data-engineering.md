@@ -577,3 +577,51 @@ In order to write code that lasts, you need to get clarity from stakeholders
 ## When pushing back be mindful
 
 * If you push back, you need to have a solid replacement story to tell them, otherwise it won't be well received
+
+## We design systems for needs not requirements
+
+* What Netflix asked for:
+  - A arbitrarily scalable graph to measure every entity under the sun for InfoSec
+  - This was a __"false requirement"__ or overly-ambitious requirement
+
+* What they needed:
+  - A data model that handles querying a large set of relationships for entities of cardinality ten million or less (the constraint was added by the data engineer)
+
+__Systems with constraints are much more likely to be successfully delivered__.
+You need to be able to determine what you are and are not doing.
+
+__You Aren't Going to Need It__. The less scalable solution (with constraints) was preferred because it had much less maintenance.
+
+Be intentional about what the system can or cannot answer. Your data system can't answer everything. Everything is a tradeoff (e.g. IP address is out of scope, would need to build a different system). __You can't answer everyone's questions with the same system__.
+
+## Brainstorm isn't always right
+
+* Things might be overly ambitious
+* Things might be too vague and hard to find data for
+* Communicate with stakeholders so they know what to expect
+* If a stakeholder isn't giving enough clarity, it's your job as a data engineer to get people together and understand consensus definitions
+* Have a consistent way (e.g. channel) to communicate with stakeholders; things change
+
+## Work backwards from Metrics
+
+* Start brainstorming off with "ideally what would you want to measure"
+* Give space for "if we had unlimited capacity" conversations because then you'll be able to pinpoint __true north stars__
+* You'll want to think about how to turn these true north stars into 6 month, year long, etc projects (normally do this exercise 1-4 times a year)
+* This gives the data engineers a sense of purpose
+* Metrics will lead you to data sets (usually data sources, e.g. production data, third party data)
+* Data sets will lead you to __Master data__
+* Master data will lead you to __OLAP cubes__
+* OLAP cubes will lead you back to __Metrics__
+
+## Who should brainstorm with you?
+
+* The importance of each person's input into the brainstorming should be __value and usage weighted__
+* Don't rearchitect the entire pipeline for Bob the Analyst that queries once a year for a minor decision
+* The most important voices should be your power users
+
+## The pain when this goes wrong
+
+* Requirement is truly necessary
+* Requirement is seen as necessary
+* Requirement is seen as unnecessary
+* Requirement is not truly necessary
