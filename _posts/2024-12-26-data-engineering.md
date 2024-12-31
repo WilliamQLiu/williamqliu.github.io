@@ -604,7 +604,7 @@ Be intentional about what the system can or cannot answer. Your data system can'
 
 ## Work backwards from Metrics
 
-* Start brainstorming off with "ideally what would you want to measure"
+* Start brainstorming off with "__ideally__ what would you want to measure"
 * Give space for "if we had unlimited capacity" conversations because then you'll be able to pinpoint __true north stars__
 * You'll want to think about how to turn these true north stars into 6 month, year long, etc projects (normally do this exercise 1-4 times a year)
 * This gives the data engineers a sense of purpose
@@ -625,3 +625,69 @@ Be intentional about what the system can or cannot answer. Your data system can'
 * Requirement is seen as necessary
 * Requirement is seen as unnecessary
 * Requirement is not truly necessary
+
+## Conceptual Data Modeling through Lucidchart
+
+For example, living your best life has buckets:
+
+* Financial
+  - Money
+  - Career
+* Social
+  - Family Time
+  - Friends Time
+* Health
+  - Sleep
+  - Exercise
+* Recreational
+  - Places Traveled
+  - Time spent doing enjoyable things
+
+Questions:
+
+* Where would we get this data? Look at data sources
+* What is the perceived level of difficulty to get this data __automatically__? - With the above sources, are they easier to access (e.g. Green) since they have an API or harder to access (e.g. Orange) or very difficult to access (e.g. Red)
+
+* Financial
+  - Banks (Green)
+  - Brokerage Accounts (Green)
+  - Rental Properties (Orange)
+
+* Social
+  - Instagram (Orange, easy but not sure how suitable data is)
+  - Phone Location (Red)
+  - Bulk Restaurant Orders (Green)
+  - Screen Time (Orange, inversely correlated)
+
+* Health
+  - Gym Attendance (Green)
+  - BMI (Green)
+  - Sleep Tracker (Green)
+  - Diet (Red, painfully manual)
+  - Meditation (Green)
+
+* Recreational
+  - Uber bill (Orange)
+  - Airbnb bookings (Orange)
+  - PTO Used (Orange)
+  - Flights booked (Green)
+
+Creating Dimensions from your Data Sources:
+
+* Time
+* Weight Class/Bucket
+* Gender
+* Net worth Bucket
+* Location
+* Age
+* Relationship Status
+* Job Category
+* Employer
+
+How to analyze:
+
+* Low hanging fruit is the green; go for these
+* Red is not relevant or difficult to obtain (call out it's difficult, probably cross out)
+* Orange are discussion items
+
+Think about what you're NOT doing. It's not a "No", just taken out for now.
